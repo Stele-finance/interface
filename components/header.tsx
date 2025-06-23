@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { Home, Trophy, BarChart3, Vote } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Bell, Search, User, Wallet, DollarSign } from "lucide-react"
+import { Bell, Search, User, Wallet, DollarSign, Menu, Github, FileText, Twitter } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,16 +173,16 @@ export function Header() {
               <div className="absolute top-full left-0 -mt-1 w-52 z-50 pt-2">
                 {/* Invisible bridge area */}
                 <div className="h-1 w-full"></div>
-                <div className="space-y-2 p-2 bg-background border border-gray-600 rounded-2xl shadow-xl">
+                <div className="space-y-1 p-1 bg-background border border-gray-600 rounded-2xl shadow-xl">
                   <Link 
                     href="/portfolio"
-                    className="block px-4 py-3 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
+                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
                   >
                     My Portfolios
                   </Link>
                   <Link 
                     href="/challenges"
-                    className="block px-4 py-3 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
+                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
                   >
                     Total Challenges
                   </Link>
@@ -288,23 +288,33 @@ export function Header() {
         </Button>
         )}
 
-        <Button variant="ghost" size="icon" className="text-muted-foreground hidden sm:flex">
-          <Bell className="h-7 w-7" />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-7 w-7" />
+            <Button variant="ghost" size="icon" className="text-muted-foreground">
+              <Menu className="h-7 w-7" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="text-base">
-            <DropdownMenuLabel className="text-lg font-semibold">My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="text-base w-48">
+            <DropdownMenuLabel className="text-lg font-semibold">Links</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-base py-2">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-base py-2">Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-base py-2">Logout</DropdownMenuItem>
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="https://github.com/Stele-finance/interface" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <Github className="h-4 w-4" />
+                Github
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="#" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Doc
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="https://x.com/stelefinance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <Twitter className="h-4 w-4" />
+                X
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
