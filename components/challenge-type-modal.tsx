@@ -17,35 +17,7 @@ import {
 } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Loader2, Plus, Trophy } from "lucide-react"
-
-// Challenge type definitions
-const CHALLENGE_TYPES = [
-  {
-    id: 0,
-    name: "1 Week Challenge",
-    duration: "1 Week"
-  },
-  {
-    id: 1,
-    name: "1 Month Challenge",
-    duration: "1 Month"
-  },
-  {
-    id: 2,
-    name: "3 Months Challenge",
-    duration: "3 Months"
-  },
-  {
-    id: 3,
-    name: "6 Months Challenge",
-    duration: "6 Months"
-  },
-  {
-    id: 4,
-    name: "1 Year Challenge",
-    duration: "1 Year"
-  }
-];
+import { useLanguage } from "@/lib/language-context"
 
 interface ChallengeTypeModalProps {
   onCreateChallenge: (challengeType: number) => Promise<void>;
@@ -57,8 +29,38 @@ interface ChallengeTypeModalProps {
 }
 
 export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChallenges = [] }: ChallengeTypeModalProps) {
+  const { t } = useLanguage()
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
+
+  // Challenge type definitions with translations
+  const CHALLENGE_TYPES = [
+    {
+      id: 0,
+      name: `${t('oneWeek')} ${t('challenge')}`,
+      duration: t('oneWeek')
+    },
+    {
+      id: 1,
+      name: `${t('oneMonth')} ${t('challenge')}`,
+      duration: t('oneMonth')
+    },
+    {
+      id: 2,
+      name: `${t('threeMonths')} ${t('challenge')}`,
+      duration: t('threeMonths')
+    },
+    {
+      id: 3,
+      name: `${t('sixMonths')} ${t('challenge')}`,
+      duration: t('sixMonths')
+    },
+    {
+      id: 4,
+      name: `${t('oneYear')} ${t('challenge')}`,
+      duration: t('oneYear')
+    }
+  ];
 
   // Check if a challenge type is already active
   const isTypeActive = (challengeType: number) => {
@@ -92,16 +94,16 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
         >
           <Plus className="mr-3 h-5 w-5" />
-          Create Challenge
+          {t('createChallenge')}
           <Trophy className="ml-3 h-5 w-5" />
         </Button>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Create New Challenge</DialogTitle>
+          <DialogTitle className="text-xl">{t('createNewChallenge')}</DialogTitle>
           <DialogDescription className="text-base">
-            Select the type of challenge you want to create
+            {t('selectChallengeType')}
           </DialogDescription>
         </DialogHeader>
         
@@ -143,7 +145,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
                         </span>
                         {typeIsActive && (
                           <span className="text-sm text-orange-500 font-medium mt-1">
-                            Already Active
+                            {t('alreadyActive')}
                           </span>
                         )}
                       </div>
@@ -160,7 +162,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
         
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} className="text-base">
-            Cancel
+            {t('cancel')}
           </Button>
           <Button 
             onClick={handleCreate} 
@@ -170,12 +172,12 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
             {isCreating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                {t('creating')}...
               </>
             ) : selectedTypeIsActive ? (
-              "Challenge Already Active"
+              t('challengeAlreadyActive')
             ) : (
-              "Create Challenge"
+              t('createChallenge')
             )}
           </Button>
         </DialogFooter>

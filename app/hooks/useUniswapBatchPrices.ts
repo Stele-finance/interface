@@ -86,7 +86,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
   const [priceData, setPriceData] = useState<BatchPriceData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [lastFetchTime, setLastFetchTime] = useState<number>(0)
+  const lastFetchTimeRef = useRef<number>(0)
   const priceDataRef = useRef<BatchPriceData | null>(null)
 
   // Update ref whenever priceData changes
@@ -143,7 +143,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
 
     // Prevent too frequent requests (minimum 1 minute between calls)
     const now = Date.now()
-    const timeSinceLastFetch = now - lastFetchTime
+    const timeSinceLastFetch = now - lastFetchTimeRef.current
     const MIN_FETCH_INTERVAL = 60000 // 1 minute
     
     if (!forceRefresh && timeSinceLastFetch < MIN_FETCH_INTERVAL && priceDataRef.current) {
@@ -156,7 +156,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
         setIsLoading(true)
       }
       setError(null)
-      setLastFetchTime(now)
+      lastFetchTimeRef.current = now
       
       const provider = await getProvider()
       const multicallContract = new ethers.Contract(
@@ -280,7 +280,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
     } finally {
       setIsLoading(false)
     }
-  }, [tokens, getProvider, createQuoteCallData, lastFetchTime])
+  }, [tokens, getProvider, createQuoteCallData])
 
   // Create stable token key to prevent unnecessary re-renders
   const tokenKey = useMemo(() => {

@@ -21,6 +21,7 @@ import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
 import { ExternalLink, Users, Clock, Trophy, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/lib/language-context"
 
 interface ChallengeCardProps {
   id?: string
@@ -110,11 +111,19 @@ interface ActiveChallengesProps {
 }
 
 export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesProps) {
+  const { t } = useLanguage()
   const [isCreating, setIsCreating] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const { data } = useActiveChallenges()
+
+  // Translate time left text
+  const translateTimeLeft = (timeLeft: string): string => {
+    if (timeLeft === "Not started yet") return t('notStarted')
+    if (timeLeft === "Ended") return t('ended')
+    return timeLeft
+  }
 
   // Ensure client-side rendering for time calculations
   useEffect(() => {
@@ -243,10 +252,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const defaultChallenges: ChallengeCardProps[] = [
     {
       id: "1 week challenge",
-      title: "1 week",
-      type: "1 week challenge",
+      title: t('oneWeek'),
+      type: `${t('oneWeek')} challenge`,
       participants: 0,
-      timeLeft: "Not started",
+      timeLeft: t('notStarted'),
       prize: "$0.00",
       progress: 0,
       status: "pending",
@@ -257,10 +266,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "1 month challenge",
-      title: "1 month",
-      type: "1 month challenge",
+      title: t('oneMonth'),
+      type: `${t('oneMonth')} challenge`,
       participants: 0,
-      timeLeft: "Not started",
+      timeLeft: t('notStarted'),
       prize: "$0.00",
       progress: 0,
       status: "pending",
@@ -271,10 +280,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "3 months challenge",
-      title: "3 months",
-      type: "3 months challenge",
+      title: t('threeMonths'),
+      type: `${t('threeMonths')} challenge`,
       participants: 0,
-      timeLeft: "Not started",
+      timeLeft: t('notStarted'),
       prize: "$0.00",
       progress: 0,
       status: "pending",
@@ -285,10 +294,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "6 months challenge",
-      title: "6 months",
-      type: "6 months challenge",
+      title: t('sixMonths'),
+      type: `${t('sixMonths')} challenge`,
       participants: 0,
-      timeLeft: "Not started",
+      timeLeft: t('notStarted'),
       prize: "$0.00",
       progress: 0,
       status: "pending",
@@ -299,10 +308,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "1 year challenge",
-      title: "1 year",
-      type: "1 year challenge",
+      title: t('oneYear'),
+      type: `${t('oneYear')} challenge`,
       participants: 0,
-      timeLeft: "Not started",
+      timeLeft: t('notStarted'),
       prize: "$0.00",
       progress: 0,
       status: "pending",
@@ -317,10 +326,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const challenges: ChallengeCardProps[] = data?.activeChallenges ? [
     {
       id: "one-week-challenge",
-      title: "1 week",
-      type: "1 week challenge",
+      title: t('oneWeek'),
+      type: `${t('oneWeek')} challenge`,
       participants: Number(data.activeChallenges.one_week_investorCounter) || 0,
-      timeLeft: isClient ? calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime) : "Loading...",
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_week_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, data.activeChallenges.one_week_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_week_isCompleted ? "completed" : 
@@ -333,10 +342,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "one-month-challenge",
-      title: "1 month",
-      type: "1 month challenge",
+      title: t('oneMonth'),
+      type: `${t('oneMonth')} challenge`,
       participants: Number(data.activeChallenges.one_month_investorCounter) || 0,
-      timeLeft: isClient ? calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime) : "Loading...",
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, data.activeChallenges.one_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_month_isCompleted ? "completed" : 
@@ -349,10 +358,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "three-month-challenge",
-      title: "3 months",
-      type: "3 months challenge",
+      title: t('threeMonths'),
+      type: `${t('threeMonths')} challenge`,
       participants: Number(data.activeChallenges.three_month_investorCounter) || 0,
-      timeLeft: isClient ? calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime) : "Loading...",
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime)) : t('loading'),
       prize: `$${Number(data.activeChallenges.three_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, data.activeChallenges.three_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.three_month_isCompleted ? "completed" : 
@@ -365,10 +374,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "six-month-challenge",
-      title: "6 months",
-      type: "6 months challenge",
+      title: t('sixMonths'),
+      type: `${t('sixMonths')} challenge`,
       participants: Number(data.activeChallenges.six_month_investorCounter) || 0,
-      timeLeft: isClient ? calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime) : "Loading...",
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime)) : t('loading'),
       prize: `$${Number(data.activeChallenges.six_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, data.activeChallenges.six_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.six_month_isCompleted ? "completed" : 
@@ -381,10 +390,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     },
     {
       id: "one-year-challenge",
-      title: "1 year",
-      type: "1 year challenge",
+      title: t('oneYear'),
+      type: `${t('oneYear')} challenge`,
       participants: Number(data.activeChallenges.one_year_investorCounter) || 0,
-      timeLeft: isClient ? calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime) : "Loading...",
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_year_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, data.activeChallenges.one_year_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_year_isCompleted ? "completed" : 
@@ -403,32 +412,32 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         return (
           <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
             <Clock className="h-4 w-4" />
-            Active
+            {t('active')}
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300 px-3 py-1.5 text-sm">Pending</Badge>
+        return <Badge variant="outline" className="border-gray-600 text-gray-300 px-3 py-1.5 text-sm">{t('pending')}</Badge>
       case "completed":
-        return <Badge className="bg-blue-500 text-white px-3 py-1.5 text-sm">Completed</Badge>
+        return <Badge className="bg-blue-500 text-white px-3 py-1.5 text-sm">{t('completed')}</Badge>
       case "finished":
-        return <Badge className="bg-orange-500 text-white px-3 py-1.5 text-sm">Finished</Badge>
+        return <Badge className="bg-orange-500 text-white px-3 py-1.5 text-sm">{t('finished')}</Badge>
       default:
-        return <Badge variant="secondary" className="px-3 py-1.5 text-sm">Unknown</Badge>
+        return <Badge variant="secondary" className="px-3 py-1.5 text-sm">{t('unknown')}</Badge>
     }
   }
 
   // Get challenge type number from challenge title
   const getChallengeTypeFromTitle = (title: string): number => {
     switch (title) {
-      case "1 week":
+      case t('oneWeek'):
         return 0;
-      case "1 month":
+      case t('oneMonth'):
         return 1;
-      case "3 months":
+      case t('threeMonths'):
         return 2;
-      case "6 months":
+      case t('sixMonths'):
         return 3;
-      case "1 year":
+      case t('oneYear'):
         return 4;
       default:
         return 0;
@@ -444,11 +453,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl text-gray-100">Active Challenges</h2>
+        <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
         <ChallengeTypeModal 
           onCreateChallenge={handleCreateChallenge}
           isCreating={isCreating}
           activeChallenges={activeChallengesData}
+          buttonText={t('createChallenge')}
         />
       </div>
 
@@ -458,12 +468,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-14 w-32">Type</TableHead>
-                  <TableHead className="text-gray-300 w-20">ID</TableHead>
-                  <TableHead className="text-gray-300 w-24">Users</TableHead>
-                  <TableHead className="text-gray-300 w-24">Prize</TableHead>
-                  <TableHead className="text-gray-300 w-32">Progress</TableHead>
-                  <TableHead className="text-gray-300 w-28 pr-6">Status</TableHead>
+                  <TableHead className="text-gray-300 pl-14 w-32">{t('type')}</TableHead>
+                  <TableHead className="text-gray-300 w-20">{t('id')}</TableHead>
+                  <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
+                  <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
+                  <TableHead className="text-gray-300 w-32">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 w-28 pr-6">{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -5,8 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Loader2 } from "lucide-react"
 import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
+import { useLanguage } from "@/lib/language-context"
 
 export function InvestableTokens() {
+  const { t } = useLanguage()
   const { data: tokensData, isLoading, error } = useInvestableTokens()
 
   // Format token address for display
@@ -32,12 +34,12 @@ export function InvestableTokens() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">Investable Tokens</h2>
+        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent className="p-0">
             <div className="flex items-center justify-center py-8 px-6">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-              <span className="ml-2 text-gray-400">Loading tokens...</span>
+              <span className="ml-2 text-gray-400">{t('loadingTokens')}</span>
             </div>
           </CardContent>
         </Card>
@@ -48,11 +50,11 @@ export function InvestableTokens() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">Investable Tokens</h2>
+        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent className="p-0">
             <div className="text-center py-8 px-6">
-              <p className="text-red-400">Error loading tokens</p>
+              <p className="text-red-400">{t('errorLoadingTokens')}</p>
               <p className="text-sm text-gray-500 mt-1">
                 {error instanceof Error ? error.message : 'Failed to load data'}
               </p>
@@ -68,25 +70,25 @@ export function InvestableTokens() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <h2 className="text-3xl text-gray-100">Investable Tokens</h2>
+        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
         <Badge variant="secondary" className="bg-gray-700 text-gray-300 text-base px-3 py-1.5">
-          {tokens.length} tokens
+          {tokens.length} {t('tokens')}
         </Badge>
       </div>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-0">
         {tokens.length === 0 ? (
           <div className="text-center py-8 px-6">
-            <p className="text-gray-400">No investable tokens found</p>
+            <p className="text-gray-400">{t('noInvestableTokensFound')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-6 text-base">Symbol</TableHead>
-                  <TableHead className="text-gray-300 text-base">Token Address</TableHead>
-                  <TableHead className="text-gray-300 pr-6 text-base">Last Updated</TableHead>
+                  <TableHead className="text-gray-300 pl-6 text-base">{t('symbol')}</TableHead>
+                  <TableHead className="text-gray-300 text-base">{t('tokenAddress')}</TableHead>
+                  <TableHead className="text-gray-300 pr-6 text-base">{t('lastUpdated')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

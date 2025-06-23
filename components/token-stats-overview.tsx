@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge"
 import { Trophy, TrendingUp, TrendingDown, Loader2 } from "lucide-react"
 import { useTotalRanking } from "@/app/hooks/useTotalRanking"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/lib/language-context"
 
 interface TokenStatsOverviewProps {
   className?: string
 }
 
 export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
+  const { t } = useLanguage()
   const { data: rankingData, isLoading, error } = useTotalRanking()
 
   // Format wallet address for display
@@ -46,12 +48,12 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
   if (isLoading) {
     return (
       <div className={cn("space-y-6", className)}>
-        <h2 className="text-3xl text-gray-100">Total Ranking</h2>
+        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent>
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-              <span className="ml-2 text-gray-400">Loading rankings...</span>
+              <span className="ml-2 text-gray-400">{t('loadingRankings')}</span>
             </div>
           </CardContent>
         </Card>
@@ -62,11 +64,11 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
   if (error) {
     return (
       <div className={cn("space-y-6", className)}>
-        <h2 className="text-3xl text-gray-100">Total Ranking</h2>
+        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent>
             <div className="text-center py-8">
-              <p className="text-red-400">Error loading rankings</p>
+              <p className="text-red-400">{t('errorLoadingRankings')}</p>
               <p className="text-sm text-gray-500 mt-1">
                 {error instanceof Error ? error.message : 'Failed to load data'}
               </p>
@@ -83,16 +85,16 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
     <div className={cn("space-y-6", className)}>
       <div className="flex items-center gap-2">
         <Trophy className="h-6 w-6 text-gray-100" />
-        <h2 className="text-3xl text-gray-100">Total Ranking</h2>
+        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
         <Badge variant="secondary" className="ml-2 bg-gray-700 text-gray-300 text-base px-3 py-1.5">
-          {rankings.length} users
+          {rankings.length} {t('users')}
         </Badge>
       </div>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent>
         {rankings.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-400">No ranking data found</p>
+            <p className="text-gray-400">{t('noRankingDataFound')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -101,11 +103,11 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="border-b border-gray-700 hover:bg-gray-800/50">
-                    <TableHead className="text-gray-300 text-base">Rank</TableHead>
-                    <TableHead className="text-gray-300 pl-12 text-base">User</TableHead>
-                    <TableHead className="text-gray-300 text-base">Challenge</TableHead>
-                    <TableHead className="text-gray-300 pl-6 text-base">Score</TableHead>
-                    <TableHead className="text-gray-300 pl-6 text-base">Profit Ratio</TableHead>
+                    <TableHead className="text-gray-300 text-base">{t('rank')}</TableHead>
+                    <TableHead className="text-gray-300 pl-12 text-base">{t('user')}</TableHead>
+                    <TableHead className="text-gray-300 text-base">{t('challenge')}</TableHead>
+                    <TableHead className="text-gray-300 pl-6 text-base">{t('score')}</TableHead>
+                    <TableHead className="text-gray-300 pl-6 text-base">{t('profitRatio')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

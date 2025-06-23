@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { Home, Trophy, BarChart3, Vote } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Bell, Search, User, Wallet, DollarSign } from "lucide-react"
+import { Bell, Search, User, Wallet, DollarSign, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,9 +24,11 @@ import {
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useLanguage } from "@/lib/language-context"
 
 export function Header() {
   const pathname = usePathname()
+  const { t, language, setLanguage } = useLanguage()
   
   // Use global wallet hook
   const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork } = useWallet()
@@ -151,7 +153,7 @@ export function Header() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <span>Dashboard</span>
+              <span>{t('dashboard')}</span>
             </div>
           </Link>
           <div 
@@ -167,24 +169,24 @@ export function Header() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <span>Challenges</span>
+              <span>{t('challenges')}</span>
             </div>
             {challengesDropdownOpen && (
               <div className="absolute top-full left-0 -mt-1 w-52 z-50 pt-2">
                 {/* Invisible bridge area */}
                 <div className="h-1 w-full"></div>
-                <div className="space-y-2 p-2 bg-background border border-gray-600 rounded-2xl shadow-xl">
+                <div className="space-y-1 p-1 bg-background border border-gray-600 rounded-2xl shadow-xl">
                   <Link 
                     href="/portfolio"
-                    className="block px-4 py-3 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
+                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
                   >
-                    My Portfolios
+                    {t('myPortfolios')}
                   </Link>
                   <Link 
                     href="/challenges"
-                    className="block px-4 py-3 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
+                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
                   >
-                    Total Challenges
+                    {t('totalChallenges')}
                   </Link>
                 </div>
               </div>
@@ -199,7 +201,7 @@ export function Header() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <span>Vote</span>
+              <span>{t('vote')}</span>
             </div>
           </Link>
         </div>
@@ -213,7 +215,7 @@ export function Header() {
               <span className="text-sm font-medium text-gray-300">{name}</span>
               <span className="text-base font-semibold text-white">
                 {isLoadingBalance ? (
-                  <span className="text-gray-400">Loading...</span>
+                  <span className="text-gray-400">{t('loading')}</span>
                 ) : (
                   `${balance} ${symbol}`
                 )}
@@ -236,7 +238,7 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <span className="text-base font-semibold">{name}</span>
                     <span className="text-sm font-medium text-muted-foreground">
-                      {isLoadingBalance ? 'Loading...' : `${balance} ${symbol}`}
+                      {isLoadingBalance ? t('loading') : `${balance} ${symbol}`}
                     </span>
                   </div>
                 </DropdownMenuLabel>
@@ -244,31 +246,31 @@ export function Header() {
                 <DropdownMenuItem onClick={() => {
                   navigator.clipboard.writeText(walletAddress)
                 }}>
-                  Copy Address
+                  {t('copyAddress')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={fetchBalance}>
-                  Refresh Balance
+                  {t('refreshBalance')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Switch Network</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('switchNetwork')}</DropdownMenuLabel>
                 {walletNetwork !== 'ethereum' && (
                   <DropdownMenuItem onClick={() => switchWalletNetwork('ethereum')}>
-                    Ethereum Mainnet
+                    {t('ethereumMainnet')}
                   </DropdownMenuItem>
                 )}
                 {walletNetwork !== 'base' && (
                   <DropdownMenuItem onClick={() => switchWalletNetwork('base')}>
-                    Base Mainnet
+                    {t('baseMainnet')}
                   </DropdownMenuItem>
                 )}
                 {walletNetwork !== 'solana' && (
                   <DropdownMenuItem onClick={() => switchWalletNetwork('solana')}>
-                    Solana
+                    {t('solana')}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDisconnectWallet}>
-                  Disconnect
+                  {t('disconnect')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -283,28 +285,57 @@ export function Header() {
           >
             <Wallet className="mr-2 h-5 w-5" />
             <span className="text-base">
-              {isConnecting ? "Connecting..." : "Connect Wallet"}
+              {isConnecting ? t('connecting') : t('connectWallet')}
             </span>
         </Button>
         )}
 
-        <Button variant="ghost" size="icon" className="text-muted-foreground hidden sm:flex">
-          <Bell className="h-7 w-7" />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-7 w-7" />
+            <Button variant="ghost" size="icon" className="text-muted-foreground">
+              <Menu className="h-7 w-7" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="text-base">
-            <DropdownMenuLabel className="text-lg font-semibold">My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="text-base w-48">
+            <DropdownMenuLabel className="text-lg font-semibold">{t('language')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-base py-2">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-base py-2">Settings</DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-base py-2 cursor-pointer" 
+              onClick={() => setLanguage('en')}
+            >
+              <Languages className="h-4 w-4 mr-2" />
+              {t('english')}
+              {language === 'en' && <span className="ml-auto">✓</span>}
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-base py-2 cursor-pointer" 
+              onClick={() => setLanguage('zh')}
+            >
+              <Languages className="h-4 w-4 mr-2" />
+              {t('chinese')}
+              {language === 'zh' && <span className="ml-auto">✓</span>}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-base py-2">Logout</DropdownMenuItem>
+            <DropdownMenuLabel className="text-lg font-semibold">{t('links')}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="https://github.com/Stele-finance/interface" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <Github className="h-4 w-4" />
+                {t('github')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="#" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                {t('doc')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-base py-2" asChild>
+              <Link href="https://x.com/stelefinance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <Twitter className="h-4 w-4" />
+                X
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -28,6 +28,7 @@ import { useProposalVoteResult, useProposalDetails } from "@/app/subgraph/Propos
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { RPC_URL } from "@/lib/constants"
+import { useLanguage } from "@/lib/language-context"
 
 interface ProposalDetailPageProps {
   params: Promise<{
@@ -39,6 +40,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const router = useRouter()
   const searchParams = useSearchParams()
   const { id } = use(params)
+  const { t } = useLanguage()
   
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -787,7 +789,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       return (
         <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-900/70 border border-orange-600/50 text-orange-200">
           <Clock className="w-3 h-3 mr-1" />
-          Pending Queue
+          {t('pendingQueue')}
         </div>
       )
     }
@@ -799,56 +801,56 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900/70 border border-yellow-600/50 text-yellow-200">
               <Clock className="w-3 h-3 mr-1" />
-              Pending
+              {t('pending')}
             </div>
           )
         case 1: // Active
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/70 border border-green-600/50 text-green-200">
               <Clock className="w-3 h-3 mr-1" />
-              Active
+              {t('active')}
             </div>
           )
         case 2: // Canceled
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/70 border border-red-600/50 text-red-200">
               <FileText className="w-3 h-3 mr-1" />
-              Canceled
+              {t('canceled')}
             </div>
           )
         case 3: // Defeated
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/70 border border-red-600/50 text-red-200">
               <FileText className="w-3 h-3 mr-1" />
-              Defeated
+              {t('defeated')}
             </div>
           )
         case 4: // Succeeded
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/70 border border-blue-600/50 text-blue-200">
               <Check className="w-3 h-3 mr-1" />
-              Succeeded
+              {t('succeeded')}
             </div>
           )
         case 5: // Queued
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900/70 border border-purple-600/50 text-purple-200">
               <Clock className="w-3 h-3 mr-1" />
-              Queued
+              {t('queued')}
             </div>
           )
         case 6: // Expired
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-800/70 border border-gray-600/50 text-gray-300">
               <FileText className="w-3 h-3 mr-1" />
-              Expired
+              {t('expired')}
             </div>
           )
         case 7: // Executed
           return (
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/70 border border-green-600/50 text-green-200">
               <Check className="w-3 h-3 mr-1" />
-              Executed
+              {t('executed')}
             </div>
           )
         default:
@@ -861,21 +863,21 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       return (
         <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/70 border border-green-600/50 text-green-200">
           <Clock className="w-3 h-3 mr-1" />
-          Active
+          {t('active')}
         </div>
       )
     } else if (status === 'completed') {
       return (
         <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/70 border border-blue-600/50 text-blue-200">
           <Check className="w-3 h-3 mr-1" />
-          Completed
+          {t('completed')}
         </div>
       )
     } else {
       return (
         <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/70 border border-red-600/50 text-red-200">
           <FileText className="w-3 h-3 mr-1" />
-          Rejected
+          {t('defeated')}
         </div>
       )
     }
@@ -887,7 +889,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         <Link href="/vote">
           <Button variant="outline" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Proposals
+            {t('backToProposals')}
           </Button>
         </Link>
       </div>
@@ -909,20 +911,20 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <div className="text-sm text-gray-400 space-y-1">
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>Proposer: {proposal.fullProposer}</span>
+                  <span>{t('proposer')}: {proposal.fullProposer}</span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>Vote Start: {formatDate(proposal.startTime)}</span>
+                  <span>{t('voteStart')}: {formatDate(proposal.startTime)}</span>
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>Vote End: {formatDate(proposal.endTime)}</span>
+                  <span>{t('voteEnd')}: {formatDate(proposal.endTime)}</span>
                 </div>
                 {proposal.blockNumber && (
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>Block: {proposal.blockNumber}</span>
+                    <span>{t('blockNumber')}: {proposal.blockNumber}</span>
                   </div>
                 )}
               </div>
@@ -930,7 +932,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <Separator className="bg-gray-700" />
               
               <div>
-                <h3 className="text-lg font-medium mb-2 text-gray-100">Description</h3>
+                <h3 className="text-lg font-medium mb-2 text-gray-100">{t('description')}</h3>
                 <div className="prose max-w-none dark:prose-invert">
                   <p className="text-gray-300">{proposal.description}</p>
                 </div>
@@ -939,7 +941,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <Separator className="bg-gray-700" />
               
               <div>
-                <h3 className="text-lg font-medium mb-2 text-gray-100">Proposal Details</h3>
+                <h3 className="text-lg font-medium mb-2 text-gray-100">{t('proposalDetails')}</h3>
                 <div className="prose max-w-none dark:prose-invert whitespace-pre-line">
                   <p className="text-gray-300">{proposal.details}</p>
                 </div>
@@ -952,33 +954,33 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         <div>
           <Card className="bg-gray-900/50 border-gray-700/50">
             <CardHeader>
-              <CardTitle className="text-gray-100">Cast Your Vote</CardTitle>
+              <CardTitle className="text-gray-100">{t('castYourVote')}</CardTitle>
               <CardDescription className="text-gray-300">
                 {proposal.hasVoted 
-                  ? "You have already voted on this proposal"
-                  : "Select your voting option and submit your vote"
+                  ? t('youHaveAlreadyVoted')
+                  : t('selectYourVotingOption')
                 }
               </CardDescription>
               
               {/* Debug Information */}
               <div className="text-sm bg-gray-800/50 border border-gray-600 p-4 rounded-md space-y-2 text-gray-300">
-                <div className="font-bold text-gray-100">🔍 Debug Information:</div>
-                <div className="text-gray-300">⏰ Current Time: <span className="font-semibold text-gray-100">{currentTime}</span></div>
-                <div className="text-gray-300">📅 Vote End Time: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
-                <div className="text-gray-300">✅ Voting Ended: <span className={`font-semibold ${currentTime ? (new Date() > proposal.endTime ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
+                <div className="font-bold text-gray-100">🔍 {t('debugInformation')}:</div>
+                <div className="text-gray-300">⏰ {t('currentTime')}: <span className="font-semibold text-gray-100">{currentTime}</span></div>
+                <div className="text-gray-300">📅 {t('voteEndTime')}: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
+                <div className="text-gray-300">✅ {t('votingEnded')}: <span className={`font-semibold ${currentTime ? (new Date() > proposal.endTime ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
                   {currentTime ? (new Date() > proposal.endTime ? "Yes" : "No") : "Checking..."}
                 </span></div>
-                <div className="text-gray-300">👍 Votes For: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
-                <div className="text-gray-300">👎 Votes Against: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
-                <div className="text-gray-300">🤷 Abstain: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
-                <div className="text-gray-300">📊 Total Votes: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
+                <div className="text-gray-300">👍 {t('votesFor')}: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
+                <div className="text-gray-300">👎 {t('votesAgainst')}: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
+                <div className="text-gray-300">🤷 {t('abstainVotes')}: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
+                <div className="text-gray-300">📊 {t('totalVotes')}: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
                 {/* <div className="text-gray-300">🏆 Has Majority (For &gt; Against): <span className={`font-semibold ${proposal.votesFor > proposal.votesAgainst ? "text-green-400" : "text-red-400"}`}>
                   {proposal.votesFor > proposal.votesAgainst ? "Yes" : "No"}
                 </span></div>
                 <div className="text-gray-300">📈 Has Minimum Participation: <span className={`font-semibold ${(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "text-green-400" : "text-red-400"}`}>
                   {(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "Yes" : "No"}
                 </span></div> */}
-                <div className="text-gray-300">🏛️ Proposal State: <span className="font-semibold text-blue-400">{proposalState !== null ? `${proposalState} (${typeof proposalState})` : "Loading..."}</span></div>
+                <div className="text-gray-300">🏛️ {t('proposalState')}: <span className="font-semibold text-blue-400">{proposalState !== null ? `${proposalState} (${typeof proposalState})` : t('loading')}</span></div>
                 {/* <div className="text-gray-300">✨ Proposal State is Succeeded (4): <span className={`font-semibold ${proposalState === 4 ? "text-green-400" : "text-red-400"}`}>
                   {proposalState === 4 ? "Yes" : "No"}
                 </span></div> */}
@@ -1026,12 +1028,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   {isLoadingVotingPower ? (
                     <div className="flex items-center">
                       <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      Loading voting power...
+                      {t('loadingVotingPower')}
                     </div>
                   ) : (
                     <>
                       {/* <div>Token balance: {Number(proposal.cachedTokenBalance).toLocaleString()} STELE</div> */}
-                      <div>Your voting power: {Number(votingPower).toLocaleString()}</div>
+                      <div>{t('userVotingPower')}: {Number(votingPower).toLocaleString()}</div>
                       {/* {proposal.cachedDelegatedTo && (
                         <div>Delegated to: {
                           proposal.cachedDelegatedTo === "0x0000000000000000000000000000000000000000" 
@@ -1042,17 +1044,17 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                         }</div>
                       )} */}
                       {proposalState !== null && (
-                        <div>Proposal state: {
-                          isReadyForQueue() && proposalState !== 5 ? "Pending Queue" :
-                          proposalState === 0 ? "Pending" :
-                          proposalState === 1 ? "Active" :
-                          proposalState === 2 ? "Canceled" :
-                          proposalState === 3 ? "Defeated" :
-                          proposalState === 4 ? "Succeeded" :
-                          proposalState === 5 ? "Queued" :
-                          proposalState === 6 ? "Expired" :
-                          proposalState === 7 ? "Executed" :
-                          "Unknown"
+                        <div>{t('proposalState')}: {
+                          isReadyForQueue() && proposalState !== 5 ? t('pendingQueue') :
+                          proposalState === 0 ? t('pending') :
+                          proposalState === 1 ? t('active') :
+                          proposalState === 2 ? t('canceled') :
+                          proposalState === 3 ? t('defeated') :
+                          proposalState === 4 ? t('succeeded') :
+                          proposalState === 5 ? t('queued') :
+                          proposalState === 6 ? t('expired') :
+                          proposalState === 7 ? t('executed') :
+                          t('unknown')
                         }</div>
                       )}
                     </>
@@ -1069,15 +1071,15 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="for" id="for" />
-                    <Label htmlFor="for">Vote For</Label>
+                    <Label htmlFor="for">{t('voteFor')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="against" id="against" />
-                    <Label htmlFor="against">Vote Against</Label>
+                    <Label htmlFor="against">{t('voteAgainst')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="abstain" id="abstain" />
-                    <Label htmlFor="abstain">Abstain</Label>
+                    <Label htmlFor="abstain">{t('abstain')}</Label>
                   </div>
                 </RadioGroup>
 
@@ -1105,12 +1107,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   {isDelegating ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Delegating...
+                      {t('delegating')}
                     </div>
                   ) : (
                     <>
                       <VoteIcon className="mr-2 h-4 w-4" />
-                      Delegate Tokens to Enable Voting
+                      {t('delegateTokensToEnableVoting')}
                     </>
                   )}
                 </Button>
@@ -1125,23 +1127,23 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 {isVoting ? (
                   <div className="flex items-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting Vote...
+                    {t('submittingVote')}
                   </div>
                 ) : proposal.hasVoted ? (
-                  "Already Voted"
+                  t('alreadyVoted')
                 ) : !isConnected ? (
-                  "Connect Phantom Wallet to Vote"
+                  t('connectPhantomWalletToVote')
                                   ) : Number(votingPower) === 0 ? (
-                    "Insufficient Voting Power"
+                    t('insufficientVotingPower')
                 ) : isLoadingVotingPower ? (
                   <div className="flex items-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Checking Voting Power...
+                    {t('checkingVotingPower')}
                   </div>
                 ) : (
                   <>
                     <VoteIcon className="mr-2 h-4 w-4" />
-                    Submit Vote
+                    {t('submitVote')}
                   </>
                 )}
               </Button>
@@ -1157,17 +1159,17 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   {isQueuing ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Queuing Proposal...
+                      {t('queuingProposal')}
                     </div>
                   ) : isLoadingProposalDetails ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading Proposal Data...
+                      {t('loadingProposalData')}
                     </div>
                   ) : (
                     <>
                       <Clock className="mr-2 h-4 w-4" />
-                      Queue for Execution
+                      {t('queueForExecution')}
                     </>
                   )}
                 </Button>
@@ -1184,17 +1186,17 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   {isExecuting ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Executing Proposal...
+                      {t('executingProposal')}
                     </div>
                   ) : isLoadingProposalDetails ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading Proposal Data...
+                      {t('loadingProposalData')}
                     </div>
                   ) : (
                     <>
                       <CheckCircle className="mr-2 h-4 w-4" />
-                      Execute Proposal
+                      {t('executeProposal')}
                     </>
                   )}
                 </Button>
@@ -1204,21 +1206,21 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
           
           <Card className="mt-6 bg-gray-900/50 border-gray-700/50">
             <CardHeader>
-              <CardTitle className="text-gray-100">Current Results</CardTitle>
+              <CardTitle className="text-gray-100">{t('currentResults')}</CardTitle>
               <CardDescription className="text-gray-300">
-                {voteResult ? (
+                                  {voteResult ? (
                   <>
-                    Total votes: {parseFloat(ethers.formatUnits(voteResult.totalVotes || "0", STELE_DECIMALS)).toLocaleString()} STELE • 
-                    Voters: {parseInt(voteResult.voterCount || "0").toLocaleString()}
+                    {t('totalVotes')}: {parseFloat(ethers.formatUnits(voteResult.totalVotes || "0", STELE_DECIMALS)).toLocaleString()} STELE • 
+                    {t('voters')}: {parseInt(voteResult.voterCount || "0").toLocaleString()}
                   </>
                 ) : (
                   <>
-                    Total votes: {(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()} STELE
+                    {t('totalVotes')}: {(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()} STELE
                   </>
                 )}
                 <br />
                 <span className="text-xs text-gray-400">
-                  Participation: {((proposal.votesFor + proposal.votesAgainst + proposal.abstain) / parseFloat(ethers.formatUnits(STELE_TOTAL_SUPPLY, STELE_DECIMALS)) * 100).toFixed(2)}% of total supply
+                  {t('participation')}: {((proposal.votesFor + proposal.votesAgainst + proposal.abstain) / parseFloat(ethers.formatUnits(STELE_TOTAL_SUPPLY, STELE_DECIMALS)) * 100).toFixed(2)}% {t('ofTotalSupply')}
                 </span>
               </CardDescription>
             </CardHeader>
@@ -1226,20 +1228,20 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               {isLoadingVoteResult ? (
                 <div className="flex items-center justify-center py-8 text-gray-300">
                   <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                  Loading vote results...
+                  {t('loadingVoteResults')}
                 </div>
               ) : !voteResult ? (
                 <div className="text-center py-8 text-gray-400">
-                  <p>No vote data available yet.</p>
-                  <p className="text-sm mt-2">Votes may take a few minutes to appear after casting.</p>
+                  <p>{t('noVoteDataAvailable')}</p>
+                  <p className="text-sm mt-2">{t('noVoteDataDesc')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {/* For */}
-                  <div className="space-y-1">
+                                      <div className="space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">For</span>
-                      <span className="text-sm text-green-400">{percentages.for}% of total supply</span>
+                      <span className="text-sm font-medium text-gray-200">{t('voteFor')}</span>
+                      <span className="text-sm text-green-400">{percentages.for}% {t('ofTotalSupply')}</span>
                     </div>
                   <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
@@ -1255,8 +1257,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 {/* Against */}
                   <div className="space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">Against</span>
-                      <span className="text-sm text-red-400">{percentages.against}% of total supply</span>
+                      <span className="text-sm font-medium text-gray-200">{t('voteAgainst')}</span>
+                      <span className="text-sm text-red-400">{percentages.against}% {t('ofTotalSupply')}</span>
                     </div>
                   <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
@@ -1272,8 +1274,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 {/* Abstain */}
                   <div className="space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">Abstain</span>
-                      <span className="text-sm text-gray-400">{percentages.abstain}% of total supply</span>
+                      <span className="text-sm font-medium text-gray-200">{t('abstain')}</span>
+                      <span className="text-sm text-gray-400">{percentages.abstain}% {t('ofTotalSupply')}</span>
                     </div>
                   <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
