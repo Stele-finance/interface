@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Languages, Check, Globe } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { Language } from "@/lib/translations"
@@ -59,6 +60,14 @@ const languages: LanguageOption[] = [
     region: 'Middle East',
     description: 'Arabic (Saudi Arabia)'
   },
+  { 
+    code: 'bn', 
+    name: 'Bengali', 
+    nativeName: 'বাংলা', 
+    flag: '🇧🇩', 
+    region: 'South Asia',
+    description: 'Bengali (Bangladesh)'
+  },
 ];
 
 interface LanguageSelectorSidebarProps {
@@ -81,7 +90,7 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent side="right" className="w-80 sm:w-96">
+      <SheetContent side="right" className="w-80 sm:w-96 flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Globe className="h-5 w-5" />
@@ -89,7 +98,8 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
           </SheetTitle>
         </SheetHeader>
         
-        <div className="mt-6 space-y-6">
+        <ScrollArea className="flex-1 mt-6">
+          <div className="space-y-6 pr-4">
           {/* Current Language Section */}
           {currentLanguage && (
             <div className="space-y-3">
@@ -159,7 +169,8 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
               <p>• Settings are saved in your browser</p>
             </div>
           </div>
-        </div>
+          </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
