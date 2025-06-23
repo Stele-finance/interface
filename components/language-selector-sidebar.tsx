@@ -51,6 +51,14 @@ const languages: LanguageOption[] = [
     region: 'South Asia',
     description: 'Hindi language'
   },
+  { 
+    code: 'ar', 
+    name: 'Arabic', 
+    nativeName: 'العربية', 
+    flag: '🇸🇦', 
+    region: 'Middle East',
+    description: 'Arabic (Saudi Arabia)'
+  },
 ];
 
 interface LanguageSelectorSidebarProps {
@@ -147,13 +155,8 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
 
           {/* Additional Info */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Information
-            </h3>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>• Language changes are applied immediately</p>
               <p>• Settings are saved in your browser</p>
-              <p>• New language support is continuously added</p>
             </div>
           </div>
         </div>
