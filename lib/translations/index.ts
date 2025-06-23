@@ -4,6 +4,8 @@ import { es } from './es';
 import { hi } from './hi';
 import { ar } from './ar';
 import { bn } from './bn';
+import { pt } from './pt';
+import { ru } from './ru';
 
 export const translations = {
   en,
@@ -11,7 +13,9 @@ export const translations = {
   es,
   hi,
   ar,
-  bn
+  bn,
+  pt,
+  ru
 } as const;
 
 export type Language = keyof typeof translations;

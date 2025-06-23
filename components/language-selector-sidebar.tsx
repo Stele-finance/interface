@@ -68,6 +68,14 @@ const languages: LanguageOption[] = [
     region: 'South Asia',
     description: 'Bengali (Bangladesh)'
   },
+  { 
+    code: 'pt', 
+    name: 'Portuguese', 
+    nativeName: 'Português', 
+    flag: '🇵🇹', 
+    region: 'Europe',
+    description: 'Portuguese (Portugal)'
+  },
 ];
 
 interface LanguageSelectorSidebarProps {
