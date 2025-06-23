@@ -43,6 +43,14 @@ const languages: LanguageOption[] = [
     region: 'Europe & Americas',
     description: 'Castilian Spanish'
   },
+  { 
+    code: 'hi', 
+    name: 'Hindi', 
+    nativeName: 'हिंदी', 
+    flag: '🇮🇳', 
+    region: 'South Asia',
+    description: 'Hindi language'
+  },
 ];
 
 interface LanguageSelectorSidebarProps {
