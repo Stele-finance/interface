@@ -16,6 +16,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
 import { GOVERNANCE_CONTRACT_ADDRESS, STELE_CONTRACT_ADDRESS } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
+import { useLanguage } from "@/lib/language-context"
 
 // Predefined governance proposal templates
 interface ProposalTemplate {
@@ -31,99 +32,109 @@ interface ProposalTemplate {
   parameterDescriptions: string[]
 }
 
-const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
-  {
-    id: 'set-token',
-    name: 'Set Investable Token',
-    description: 'Add or update an investable token in the system',
-    icon: <Settings className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'setToken(address)',
-    parameterTypes: ['address'],
-    parameterLabels: ['Token Address'],
-    parameterPlaceholders: ['0x...'],
-    parameterDescriptions: ['The contract address of the token to be added as an investable asset']
-  },
-  {
-    id: 'reset-token',
-    name: 'Reset Investable Token',
-    description: 'Remove an investable token from the system',
-    icon: <Settings className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'removeToken(address)',
-    parameterTypes: ['address'],
-    parameterLabels: ['Token Address'],
-    parameterPlaceholders: ['0x...'],
-    parameterDescriptions: ['The contract address of the token to be removed from investable assets']
-  },
-  {
-    id: 'set-reward-ratio',
-    name: 'Set Reward Ratio',
-    description: 'Update the reward distribution ratios for different rankings',
-    icon: <DollarSign className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'setRewardRatio(uint256[5])',
-    parameterTypes: ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
-    parameterLabels: ['1st Place (%)', '2nd Place (%)', '3rd Place (%)', '4th Place (%)', '5th Place (%)'],
-    parameterPlaceholders: ['50', '30', '15', '3', '2'],
-    parameterDescriptions: ['Percentage for 1st place', 'Percentage for 2nd place', 'Percentage for 3rd place', 'Percentage for 4th place', 'Percentage for 5th place']
-  },
-  {
-    id: 'set-entry-fee',
-    name: 'Set Entry Fee',
-    description: 'Update the entry fee for participating in challenges',
-    icon: <DollarSign className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'setEntryFee(uint256)',
-    parameterTypes: ['uint256'],
-    parameterLabels: ['Entry Fee'],
-    parameterPlaceholders: ['50000000'],
-    parameterDescriptions: ['The new entry fee in wei (for USDC, multiply by 1,000,000 for each dollar)']
-  },
-  {
-    id: 'set-max-assets',
-    name: 'Set Max Assets',
-    description: 'Update the maximum number of assets allowed in a portfolio',
-    icon: <Settings className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'setMaxAssets(uint8)',
-    parameterTypes: ['uint8'],
-    parameterLabels: ['Max Assets Count'],
-    parameterPlaceholders: ['10'],
-    parameterDescriptions: ['The maximum number of different tokens that can be held in a portfolio (1-255)']
-  },
-  {
-    id: 'set-seed-money',
-    name: 'Set Seed Money',
-    description: 'Update the initial investment amount for mock trading',
-    icon: <DollarSign className="h-5 w-5" />,
-    targetContract: STELE_CONTRACT_ADDRESS,
-    functionSignature: 'setSeedMoney(uint256)',
-    parameterTypes: ['uint256'],
-    parameterLabels: ['Seed Money Amount'],
-    parameterPlaceholders: ['10000000000'],
-    parameterDescriptions: ['The initial mock investment amount in wei (for USDC, multiply by 1,000,000 for each dollar)']
-  },
-
-
-
-  {
-    id: 'set-voting-period',
-    name: 'Set Voting Period',
-    description: 'Update the duration of the voting period for proposals',
-    icon: <Settings className="h-5 w-5" />,
-    targetContract: GOVERNANCE_CONTRACT_ADDRESS,
-    functionSignature: 'setVotingPeriod(uint256)',
-    parameterTypes: ['uint256'],
-    parameterLabels: ['Voting Period (blocks)'],
-    parameterPlaceholders: ['50400'],
-    parameterDescriptions: ['Number of blocks the voting period lasts (50400 blocks ≈ 7 days on Ethereum)']
-  }
-]
-
 export default function CreateProposalPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { t, language } = useLanguage()
+
+  const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
+    {
+      id: 'set-token',
+      name: t('setInvestableTokenTemplate'),
+      description: t('setInvestableTokenDesc'),
+      icon: <Settings className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'setToken(address)',
+      parameterTypes: ['address'],
+      parameterLabels: [t('tokenAddressLabel')],
+      parameterPlaceholders: ['0x...'],
+      parameterDescriptions: [t('tokenAddressDesc')]
+    },
+    {
+      id: 'reset-token',
+      name: t('resetInvestableTokenTemplate'),
+      description: t('resetInvestableTokenDesc'),
+      icon: <Settings className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'removeToken(address)',
+      parameterTypes: ['address'],
+      parameterLabels: [t('tokenAddressLabel')],
+      parameterPlaceholders: ['0x...'],
+      parameterDescriptions: [t('tokenAddressRemoveDesc')]
+    },
+    {
+      id: 'set-reward-ratio',
+      name: t('setRewardRatioTemplate'),
+      description: t('setRewardRatioDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'setRewardRatio(uint256[5])',
+      parameterTypes: ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
+      parameterLabels: [
+        t('firstPlaceLabel'),
+        t('secondPlaceLabel'),
+        t('thirdPlaceLabel'),
+        t('fourthPlaceLabel'),
+        t('fifthPlaceLabel')
+      ],
+      parameterPlaceholders: ['50', '30', '15', '3', '2'],
+      parameterDescriptions: [
+        t('firstPlaceDesc'),
+        t('secondPlaceDesc'),
+        t('thirdPlaceDesc'),
+        t('fourthPlaceDesc'),
+        t('fifthPlaceDesc')
+      ]
+    },
+    {
+      id: 'set-entry-fee',
+      name: t('setEntryFeeTemplate'),
+      description: t('setEntryFeeDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'setEntryFee(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('entryFeeLabel')],
+      parameterPlaceholders: ['50000000'],
+      parameterDescriptions: [t('entryFeeParamDesc')]
+    },
+    {
+      id: 'set-max-assets',
+      name: t('setMaxAssetsTemplate'),
+      description: t('setMaxAssetsDesc'),
+      icon: <Settings className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'setMaxAssets(uint8)',
+      parameterTypes: ['uint8'],
+      parameterLabels: [t('maxAssetsCountLabel')],
+      parameterPlaceholders: ['10'],
+      parameterDescriptions: [t('maxAssetsParamDesc')]
+    },
+    {
+      id: 'set-seed-money',
+      name: t('setSeedMoneyTemplate'),
+      description: t('setSeedMoneyDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: STELE_CONTRACT_ADDRESS,
+      functionSignature: 'setSeedMoney(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('seedMoneyAmountLabel')],
+      parameterPlaceholders: ['10000000000'],
+      parameterDescriptions: [t('seedMoneyParamDesc')]
+    },
+    {
+      id: 'set-voting-period',
+      name: t('setVotingPeriodTemplate'),
+      description: t('setVotingPeriodDesc'),
+      icon: <Settings className="h-5 w-5" />,
+      targetContract: GOVERNANCE_CONTRACT_ADDRESS,
+      functionSignature: 'setVotingPeriod(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('votingPeriodBlocksLabel')],
+      parameterPlaceholders: ['50400'],
+      parameterDescriptions: [t('votingPeriodParamDesc')]
+    }
+  ]
   
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -191,7 +202,8 @@ export default function CreateProposalPage() {
 
   // Handle template selection
   const handleTemplateSelect = (templateName: string) => {
-    if (templateName === 'Custom Proposal') {
+    const customProposalText = language === 'zh' ? '自定义提案' : 'Custom Proposal';
+    if (templateName === customProposalText) {
       setIsCustomProposal(true);
       setSelectedTemplate('');
       setTemplateParameters([]);
@@ -530,14 +542,14 @@ export default function CreateProposalPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            {language === 'zh' ? '返回' : 'Back'}
           </button>
         </div>
         
         <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-100">Create Proposal</h1>
-            <p className="text-gray-400 mt-1">Submit a new governance proposal to the community</p>
+            <h1 className="text-3xl font-bold text-gray-100">{language === 'zh' ? '创建提案' : 'Create Proposal'}</h1>
+            <p className="text-gray-400 mt-1">{language === 'zh' ? '向社区提交新的治理提案' : 'Submit a new governance proposal to the community'}</p>
           </div>
         </div>
         <Card className="bg-transparent border border-gray-700/50">
@@ -547,10 +559,12 @@ export default function CreateProposalPage() {
               
               <div className="grid gap-6">
                 <div className="space-y-3">
-                  <Label htmlFor="title" className="text-gray-200 text-base font-medium">Proposal Title *</Label>
+                  <Label htmlFor="title" className="text-gray-200 text-base font-medium">
+                    {language === 'zh' ? '提案标题 *' : 'Proposal Title *'}
+                  </Label>
                   <Input 
                     id="title" 
-                    placeholder="Enter a clear and concise title for your proposal." 
+                    placeholder={language === 'zh' ? '为您的提案输入一个清晰简洁的标题。' : 'Enter a clear and concise title for your proposal.'} 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={isSubmitting}
@@ -559,10 +573,12 @@ export default function CreateProposalPage() {
                 </div>
                 
                 <div className="space-y-3">
-                  <Label htmlFor="description" className="text-gray-200 text-base font-medium">Short Description *</Label>
+                  <Label htmlFor="description" className="text-gray-200 text-base font-medium">
+                    {language === 'zh' ? '简短描述 *' : 'Short Description *'}
+                  </Label>
                   <Textarea 
                     id="description" 
-                    placeholder="Provide a brief summary of what your proposal aims to achieve." 
+                    placeholder={language === 'zh' ? '简要说明您的提案旨在实现什么。' : 'Provide a brief summary of what your proposal aims to achieve.'} 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     disabled={isSubmitting}
@@ -571,10 +587,12 @@ export default function CreateProposalPage() {
                 </div>
                 
                 <div className="space-y-3">
-                  <Label htmlFor="details" className="text-gray-200 text-base font-medium">Detailed Description</Label>
+                  <Label htmlFor="details" className="text-gray-200 text-base font-medium">
+                    {language === 'zh' ? '详细描述' : 'Detailed Description'}
+                  </Label>
                   <Textarea 
                     id="details" 
-                    placeholder="Explain your proposal in detail." 
+                    placeholder={language === 'zh' ? '详细解释您的提案。' : 'Explain your proposal in detail.'} 
                     className="min-h-[200px] bg-gray-800/30 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500/20 text-base"
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
@@ -589,17 +607,21 @@ export default function CreateProposalPage() {
               <div className="border-b border-gray-700/50 pb-4">
                 <h3 className="text-lg font-semibold text-gray-200 flex items-center gap-2">
                   <Settings className="h-5 w-5" />
-                  Governance Action
+                  {language === 'zh' ? '治理行动' : 'Governance Action'}
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">Define the on-chain action this proposal will execute</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {language === 'zh' ? '定义此提案将执行的链上操作' : 'Define the on-chain action this proposal will execute'}
+                </p>
               </div>
               
               <div className="bg-gray-800/20 border border-gray-600/50 rounded-lg p-6 space-y-6">
                 <div className="space-y-3">
-                  <Label htmlFor="template" className="text-gray-200 text-base font-medium">Select Proposal Type</Label>
+                  <Label htmlFor="template" className="text-gray-200 text-base font-medium">
+                    {language === 'zh' ? '选择提案类型' : 'Select Proposal Type'}
+                  </Label>
                   <Select onValueChange={handleTemplateSelect} disabled={isSubmitting}>
                     <SelectTrigger className="bg-gray-800/30 border-gray-600 text-gray-100 focus:border-blue-500 focus:ring-blue-500/20 h-12">
-                      <SelectValue placeholder="Choose a governance action..." />
+                      <SelectValue placeholder={language === 'zh' ? '选择治理行动...' : 'Choose a governance action...'} />
                     </SelectTrigger>
                     <SelectContent className="bg-black/80 border-gray-600">
                       {PROPOSAL_TEMPLATES.map((template) => (
@@ -607,8 +629,8 @@ export default function CreateProposalPage() {
                           {template.name}
                         </SelectItem>
                       ))}
-                      <SelectItem value="Custom Proposal" className="text-gray-100 focus:bg-gray-700">
-                        Custom Proposal
+                      <SelectItem value={language === 'zh' ? '自定义提案' : 'Custom Proposal'} className="text-gray-100 focus:bg-gray-700">
+                        {language === 'zh' ? '自定义提案' : 'Custom Proposal'}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -618,7 +640,9 @@ export default function CreateProposalPage() {
                 {/* Template Parameters */}
                 {selectedTemplate && !isCustomProposal && (
                   <div className="space-y-4 bg-gray-700/20 border border-gray-600/30 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-300">Template Parameters</h4>
+                    <h4 className="text-sm font-medium text-gray-300">
+                      {language === 'zh' ? '模板参数' : 'Template Parameters'}
+                    </h4>
                     <div className="space-y-4">
                       {PROPOSAL_TEMPLATES.find(t => t.id === selectedTemplate)?.parameterLabels.map((label, index) => {
                         const template = PROPOSAL_TEMPLATES.find(t => t.id === selectedTemplate)!;
@@ -644,10 +668,14 @@ export default function CreateProposalPage() {
                 {/* Custom Proposal Fields */}
                 {isCustomProposal && (
                   <div className="space-y-4 bg-gray-700/20 border border-gray-600/30 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-300">Custom Contract Interaction</h4>
+                    <h4 className="text-sm font-medium text-gray-300">
+                      {language === 'zh' ? '自定义合约交互' : 'Custom Contract Interaction'}
+                    </h4>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="target" className="text-gray-200 text-sm font-medium">Target Contract Address</Label>
+                        <Label htmlFor="target" className="text-gray-200 text-sm font-medium">
+                          {language === 'zh' ? '目标合约地址' : 'Target Contract Address'}
+                        </Label>
                         <Input 
                           id="target" 
                           placeholder="0x..." 
@@ -659,10 +687,12 @@ export default function CreateProposalPage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="function" className="text-gray-200 text-sm font-medium">Function Signature</Label>
+                        <Label htmlFor="function" className="text-gray-200 text-sm font-medium">
+                          {language === 'zh' ? '函数签名' : 'Function Signature'}
+                        </Label>
                         <Input 
                           id="function" 
-                          placeholder="e.g. setRewardAmount(uint256)" 
+                          placeholder={language === 'zh' ? '例如: setRewardAmount(uint256)' : 'e.g. setRewardAmount(uint256)'} 
                           value={functionSignature}
                           onChange={(e) => setFunctionSignature(e.target.value)}
                           disabled={isSubmitting}
@@ -671,10 +701,12 @@ export default function CreateProposalPage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="params" className="text-gray-200 text-sm font-medium">Function Parameters (comma separated)</Label>
+                        <Label htmlFor="params" className="text-gray-200 text-sm font-medium">
+                          {language === 'zh' ? '函数参数（逗号分隔）' : 'Function Parameters (comma separated)'}
+                        </Label>
                         <Input 
                           id="params" 
-                          placeholder="e.g. 150000000" 
+                          placeholder={language === 'zh' ? '例如: 150000000' : 'e.g. 150000000'} 
                           value={functionParams}
                           onChange={(e) => setFunctionParams(e.target.value)}
                           disabled={isSubmitting}
@@ -698,12 +730,12 @@ export default function CreateProposalPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    Submitting...
+                    {language === 'zh' ? '提交中...' : 'Submitting...'}
                   </>
                 ) : (
                   <>
                     <Plus className="mr-3 h-5 w-5" />
-                    Create Proposal
+                    {language === 'zh' ? '创建提案' : 'Create Proposal'}
                   </>
                 )}
               </Button>

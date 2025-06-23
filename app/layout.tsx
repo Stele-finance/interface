@@ -7,6 +7,7 @@ import { Header } from "@/components/header"
 
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
+import { LanguageProvider } from "@/lib/language-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,15 +27,17 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <EntryFeeProvider>
-              <div className="flex flex-col min-h-screen">
-                <Header />
+            <LanguageProvider>
+              <EntryFeeProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Header />
 
-                <main className="flex-1 p-4 md:p-6">
-                  {children}
-                </main>
-              </div>
-            </EntryFeeProvider>
+                  <main className="flex-1 p-4 md:p-6">
+                    {children}
+                  </main>
+                </div>
+              </EntryFeeProvider>
+            </LanguageProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { useInvestorPortfolio } from "@/app/hooks/useInvestorPortfolio"
 import { useChallenge } from "@/app/hooks/useChallenge"
+import { useLanguage } from "@/lib/language-context"
 import Link from "next/link"
 import { ethers } from "ethers"
 import { USDC_DECIMALS } from "@/lib/constants"
@@ -35,6 +36,7 @@ interface PortfolioPageProps {
 
 export default function PortfolioPage({ params }: PortfolioPageProps) {
   const { walletAddress } = use(params)
+  const { t } = useLanguage()
   
   // Use hooks - ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const { data: portfolioData, isLoading, error } = useInvestorPortfolio(walletAddress)
@@ -94,17 +96,17 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
   const getChallengeTitle = (challengeType: number) => {
     switch(challengeType) {
       case 0:
-        return '1 Week'
+        return t('oneWeekChallenge')
       case 1:
-        return '1 Month'
+        return t('oneMonthChallenge')
       case 2:
-        return '3 Months'
+        return t('threeMonthsChallenge')
       case 3:
-        return '6 Months'
+        return t('sixMonthsChallenge')
       case 4:
-        return '1 Year'
+        return t('oneYearChallenge')
       default:
-        return `Challenge Type ${challengeType}`
+        return `${t('challengeType')} ${challengeType}`
     }
   }
 
@@ -168,14 +170,13 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     }
 
     return (
-            <tr 
+      <tr 
         className="hover:bg-gray-800/30 transition-colors cursor-pointer" 
         onClick={handleRowClick}
       >
         <td className="py-6 px-6">
           <div className="flex items-center gap-3">
             <div>
- 
               <div className="text-sm text-gray-400 pl-8">
                 {investor.challengeId}
               </div>
@@ -201,33 +202,37 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             </span>
           </div>
         </td>
-        <td className="py-6 px-4">
-          <div className="text-sm text-gray-400">
-            {challengeData?.challenge?.startTime ? formatDateTime(challengeData.challenge.startTime) : 'Loading...'}
+        <td className="py-6 px-4 text-gray-300">
+          <div>
+            {challengeData?.challenge?.startTime ? 
+              formatDateTime(challengeData.challenge.startTime) : 
+              '-'
+            }
           </div>
         </td>
-        <td className="py-6 px-4">
-          <div className="text-sm text-gray-400">
-            {challengeData?.challenge?.endTime ? formatDateTime(challengeData.challenge.endTime) : 'Loading...'}
+        <td className="py-6 px-4 text-gray-300">
+          <div>
+            {challengeData?.challenge?.endTime ? 
+              formatDateTime(challengeData.challenge.endTime) : 
+              '-'
+            }
           </div>
         </td>
         <td className="py-6 px-6">
-          <div className="flex flex-row items-center gap-2">
-            {/* Challenge Status */}
-            {/* Registration Status */}
-            {investor.isClosed && (
+          <div className="flex items-center gap-2">
+            {investor.isRegistered && (
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Badge 
-                      variant="outline"
-                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs w-fit"
+                      variant="default"
+                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
                     >
                       <UserCheck className="h-3 w-3" />
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Registered</p>
+                    <p>{t('registered')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -238,7 +243,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                 className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
               >
                 <Clock className="h-3 w-3 mr-1" />
-                Active
+                {t('active')}
               </Badge>
             ) : (
               <Badge 
@@ -246,7 +251,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                 className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
               >
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Completed
+                {t('completed')}
               </Badge>
             )}
           </div>
@@ -267,12 +272,12 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-14">ID</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">Type</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">Profit</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">Start Date</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">End Date</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">State</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-14">{t('id')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">{t('type')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('startDate')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('endDate')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('state')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -389,7 +394,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between w-full gap-4">
-              <h1 className="text-3xl text-gray-100">Portfolio</h1>
+              <h1 className="text-3xl text-gray-100">{t('portfolio')}</h1>
               <p className="text-xl text-gray-400 font-mono">
                 {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
               </p>
@@ -402,13 +407,13 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
           <Card className="bg-gray-900/50 border-gray-700/50">
             <CardContent className="text-center py-12">
               <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
-              <h3 className="text-lg font-medium text-gray-100 mb-2">No Challenges Found</h3>
+              <h3 className="text-lg font-medium text-gray-100 mb-2">{t('noChallengesFoundPortfolio')}</h3>
               <p className="text-gray-400 mb-4">
-                This wallet address hasn't participated in any challenges yet.
+                {t('thisWalletHasntParticipated')}
               </p>
               <Link href="/challenges">
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                  Browse Challenges
+                  {t('browseChallenges')}
                 </Button>
               </Link>
             </CardContent>

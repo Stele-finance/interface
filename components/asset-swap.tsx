@@ -16,12 +16,15 @@ import SteleABI from "@/app/abis/Stele.json"
 import { useParams } from "next/navigation"
 import { useInvestableTokensForSwap, getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useInvestableTokens"
 import { ethers } from "ethers"
+import { useLanguage } from "@/lib/language-context"
 
 interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
 }
 
 export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapProps) {
+  const { t } = useLanguage()
+  
   // Convert userTokens to TokenInfo format for uniswap price fetching
   const tokenInfos: TokenInfo[] = userTokens.map(token => ({
     symbol: token.symbol,
@@ -158,7 +161,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const hasFromTokenData = fromToken ? priceData?.tokens?.[fromToken] !== undefined : true;
   const hasToTokenData = toToken ? priceData?.tokens?.[toToken] !== undefined : true;
 
-  const isDataReady = !isLoading && !error && priceData && !isLoadingInvestableTokens && !investableTokensError && hasFromTokenData && hasToTokenData;
+  // Simplified data ready check - focus on essential conditions
+  const isDataReady = !isLoadingInvestableTokens && !investableTokensError;
 
   // Get the reason why data is not ready
   const getDisabledReason = (): string => {
@@ -606,7 +610,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
               onMouseEnter={() => setIsHoveringFromToken(true)}
               onMouseLeave={() => setIsHoveringFromToken(false)}
             >
-              <div className="text-sm text-gray-400 mb-3">Sell</div>
+                              <div className="text-sm text-gray-400 mb-3">{t('sell')}</div>
               <div className="flex items-center justify-between min-h-[60px]">
                 <div className="flex-1 min-w-0 pr-4">
                   <Input
@@ -678,7 +682,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                         paddingRight: '2.5rem'
                       }}
                     >
-                      <option value="">Select</option>
+                      <option value="">{t('select')}</option>
                       {availableFromTokens.map((token) => (
                         <option key={token} value={token}>{token}</option>
                       ))}
@@ -711,7 +715,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
           {/* To Token */}
           <div className="space-y-2">
             <div className="p-4 bg-transparent border border-gray-600 rounded-2xl">
-              <div className="text-sm text-gray-400 mb-3">Buy</div>
+                              <div className="text-sm text-gray-400 mb-3">{t('buy')}</div>
               <div className="flex items-center justify-between min-h-[60px]">
                 <div className="flex-1 min-w-0 pr-4">
                   <div 
@@ -784,18 +788,18 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
             {isSwapping ? (
               <div className="flex items-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Swapping...
+                {t('swapping')}
               </div>
             ) : !isDataReady ? (
-              'Loading Data...'
+              t('loadingData')
             ) : !fromAmount || parseFloat(fromAmount) <= 0 || !fromToken || !toToken ? (
-              'Enter Amount'
+              t('enterAmount')
             ) : isAmountExceedsBalance() ? (
-              'Insufficient Balance'
+              t('insufficientBalance')
             ) : isBelowMinimumSwapAmount() ? (
-              'Minimum Amount Required'
+              t('minimumAmountRequired')
             ) : (
-              'Swap'
+              t('swap')
             )}
           </Button>
         </CardContent>

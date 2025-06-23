@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button"
 import { Trophy, Users, Clock } from "lucide-react"
 import Link from "next/link"
 import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
+import { useLanguage } from "@/lib/language-context"
 
 export function RecentChallengesTable() {
+  const { t } = useLanguage()
   const { data, isLoading, error } = useRecentChallenges()
   const [currentTime, setCurrentTime] = useState(new Date())
 
@@ -34,14 +36,14 @@ export function RecentChallengesTable() {
     const typeStr = String(type)
     
     switch (typeStr) {
-      case "0": return "1 week"
-      case "1": return "1 month"
-      case "2": return "3 months"
-      case "3": return "6 months"
-      case "4": return "1 year"
+      case "0": return t('oneWeek')
+      case "1": return t('oneMonth')
+      case "2": return t('threeMonths')
+      case "3": return t('sixMonths')
+      case "4": return t('oneYear')
       default: 
         console.log('No match found for type:', typeStr)
-        return "Unknown"
+        return t('unknown')
     }
   }
 
@@ -66,15 +68,15 @@ export function RecentChallengesTable() {
         return (
           <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit">
             <Clock className="h-3 w-3" />
-            Active
+            {t('active')}
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300">Pending</Badge>
+        return <Badge variant="outline" className="border-gray-600 text-gray-300">{t('pending')}</Badge>
       case "completed":
-        return <Badge className="bg-blue-500 text-white">Completed</Badge>
+        return <Badge className="bg-blue-500 text-white">{t('completed')}</Badge>
       default:
-        return <Badge variant="secondary">Unknown</Badge>
+        return <Badge variant="secondary">{t('unknown')}</Badge>
     }
   }
 
@@ -98,7 +100,7 @@ export function RecentChallengesTable() {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
-          <CardTitle className="text-gray-100">Recent Challenges</CardTitle>
+          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -115,11 +117,11 @@ export function RecentChallengesTable() {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
-          <CardTitle className="text-gray-100">Recent Challenges</CardTitle>
+          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-400">Error loading challenges</p>
+            <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
           </div>
         </CardContent>
       </Card>
@@ -130,7 +132,7 @@ export function RecentChallengesTable() {
     <Card className="bg-transparent border-0">
       <CardHeader>
         <h2 className="text-3xl text-gray-100">
-          Total Challenges
+          {t('totalChallenges')}
         </h2>
       </CardHeader>
       <CardContent>
@@ -138,13 +140,13 @@ export function RecentChallengesTable() {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                <TableHead className="text-gray-300 pl-12">ID</TableHead>
-                <TableHead className="text-gray-300 pl-6">Type</TableHead>
-                <TableHead className="text-gray-300 pl-10">Users</TableHead>
-                <TableHead className="text-gray-300 pl-8">Prize</TableHead>
-                <TableHead className="text-gray-300 pl-20">Start Date</TableHead>
-                <TableHead className="text-gray-300 pl-16">End Date</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
+                <TableHead className="text-gray-300 pl-12">{t('id')}</TableHead>
+                <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
+                <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
+                <TableHead className="text-gray-300 pl-8">{t('prize')}</TableHead>
+                <TableHead className="text-gray-300 pl-20">{t('startDate')}</TableHead>
+                <TableHead className="text-gray-300 pl-16">{t('endDate')}</TableHead>
+                <TableHead className="text-gray-300">{t('status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -153,7 +155,7 @@ export function RecentChallengesTable() {
                   <TableCell colSpan={7} className="text-center py-8">
                     <div className="flex flex-col items-center gap-2">
                       <Trophy className="h-8 w-8 text-gray-500" />
-                      <p className="text-gray-400">No challenges found</p>
+                      <p className="text-gray-400">{t('noChallengesFound')}</p>
                     </div>
                   </TableCell>
                 </TableRow>
