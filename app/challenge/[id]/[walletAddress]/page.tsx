@@ -32,6 +32,7 @@ import {
 } from "lucide-react"
 import { AssetSwap } from "@/components/asset-swap"
 import { InvestorCharts } from "@/components/investor-charts"
+import { useLanguage } from "@/lib/language-context"
 import { useInvestorData } from "@/app/subgraph/Account"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
@@ -59,6 +60,7 @@ interface InvestorPageProps {
 }
 
 export default function InvestorPage({ params }: InvestorPageProps) {
+  const { t } = useLanguage()
   const { id: challengeId, walletAddress } = use(params)
   const router = useRouter()
   
@@ -553,7 +555,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
-            Go to Challenge {challengeId}
+{t('goToChallenge')} {challengeId}
           </button>
         </div>
         
@@ -561,7 +563,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl text-gray-400">Investor</h1>
+              <h1 className="text-2xl text-gray-400">{t('investor')}</h1>
               <p className="text-2xl">
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
               </p>
@@ -581,12 +583,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   {isSwapMode ? (
                     <>
                       <X className="mr-3 h-5 w-5" />
-                      Close
+                      {t('close')}
                     </>
                   ) : (
                     <>
                       <Repeat className="mr-3 h-5 w-5" />
-                      Swap
+                      {t('swap')}
                     </>
                   )}
                 </Button>
@@ -600,12 +602,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   {isRegistering ? (
                     <>
                       <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      Registering...
+                      {t('registering')}
                     </>
                   ) : (
                     <>
                       <FileText className="mr-3 h-5 w-5" />
-                      Register
+                      {t('register')}
                     </>
                   )}
                 </Button>
@@ -629,17 +631,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Portfolio
+                  {t('portfolio')}
                 </TabsTrigger>
                 <TabsTrigger value="transactions" className="flex items-center gap-2">
                   <Activity className="h-4 w-4" />
-                  Transactions
+                  {t('transactions')}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
                   <CardHeader>
-                    <CardTitle className="text-gray-100">Token Holdings</CardTitle>
+                    <CardTitle className="text-gray-100">{t('tokenHoldings')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -661,11 +663,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                 <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
                                 {/* Show real-time price */}
                                 {isLoadingPrice ? (
-                                  <p className="text-xs text-gray-500">Loading price...</p>
+                                  <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
                                 ) : tokenPrice > 0 ? (
-                                  <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} per token</p>
+                                  <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
                                 ) : (
-                                  <p className="text-xs text-gray-500">Price unavailable</p>
+                                  <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
                                 )}
                               </div>
                             </div>
@@ -673,7 +675,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               <p className="font-medium text-gray-100">{token.amount}</p>
                               {/* Show USD value */}
                               {isLoadingPrice ? (
-                                <p className="text-sm text-gray-500">Loading...</p>
+                                <p className="text-sm text-gray-500">{t('loading')}</p>
                               ) : tokenValue > 0 ? (
                                 <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
                               ) : (
@@ -687,7 +689,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       {userTokens.length === 0 && (
                         <div className="text-center py-8 text-gray-400">
                           <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>No tokens found in this portfolio</p>
+                          <p>{t('noTokensFound')}</p>
                         </div>
                       )}
                     </div>
@@ -698,19 +700,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <TabsContent value="transactions" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
                   <CardHeader>
-                    <CardTitle className="text-gray-100">Recent Transactions</CardTitle>
+                    <CardTitle className="text-gray-100">{t('recentTransactions')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {isLoadingTransactions ? (
                         <div className="flex items-center justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin" />
-                          <span className="ml-2 text-gray-400">Loading transactions...</span>
+                          <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
                         </div>
                       ) : transactionsError ? (
                         <div className="text-center py-8 text-red-400">
                           <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p className="font-medium">Error loading transactions</p>
+                          <p className="font-medium">{t('errorLoadingTransactions')}</p>
                           <p className="text-sm text-gray-400 mt-2">Please try again later</p>
                         </div>
                       ) : investorTransactions.length > 0 ? (
@@ -850,18 +852,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 <CardContent className="p-8 space-y-8">
                   {/* Status */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">Status</span>
+                    <span className="text-base text-gray-400">{t('status')}</span>
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${challengeData?.challenge?.isActive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
                       <span className={`text-xl font-medium ${challengeData?.challenge?.isActive ? 'text-green-400' : 'text-gray-400'}`}>
-                        {challengeData?.challenge?.isActive ? 'Active' : 'Inactive'}
+                        {challengeData?.challenge?.isActive ? t('active') : 'Inactive'}
                       </span>
                     </div>
                   </div>
 
                   {/* Portfolio Value */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">On-Chain Value</span>
+                    <span className="text-base text-gray-400">{t('onChainValue')}</span>
                     <div className="text-4xl text-white">
                       ${currentValue.toFixed(2)}
                     </div>
@@ -870,21 +872,21 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       <div className="space-y-1">
                         <div className="text-base text-green-400 flex items-center gap-2">
                           <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-                          Live: ${realTimePortfolio.totalValue.toFixed(2)}
+{t('live')}: ${realTimePortfolio.totalValue.toFixed(2)}
                         </div>
                       </div>
                     )}
                     {isLoadingUniswap && (
                       <div className="text-sm text-gray-500 flex items-center gap-1">
                         <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-                        Loading live prices...
+{t('loadingLivePrices')}
                       </div>
                     )}
                   </div>
 
                   {/* Gain/Loss */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">Gain/Loss</span>
+                    <span className="text-base text-gray-400">{t('gainLoss')}</span>
                     <div className="flex items-baseline gap-3">
                       <div className={`text-4xl ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                         {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
@@ -905,7 +907,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <div>
                               <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
                                 <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-                                Live: {isRealTimePositive ? '+' : ''}${realTimeGainLoss.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
+{t('live')}: {isRealTimePositive ? '+' : ''}${realTimeGainLoss.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
                               </div>
                             </div>
                           )
@@ -923,20 +925,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 <CardContent className="p-8 space-y-8">
                   {/* Challenge Type */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">Challenge Type</span>
+                    <span className="text-base text-gray-400">{t('challengeType')}</span>
                     <div className="text-3xl text-white">
                       {(() => {
                         switch (challengeId) {
                           case '1':
-                            return '1 Week';
+                            return t('oneWeek');
                           case '2':
-                            return '1 Month';
+                            return t('oneMonth');
                           case '3':
-                            return '3 Months';
+                            return t('threeMonths');
                           case '4':
-                            return '6 Months';
+                            return t('sixMonths');
                           case '5':
-                            return '1 Year';
+                            return t('oneYear');
                           default:
                             return `Type ${challengeId}`;
                         }
@@ -946,7 +948,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
                   {/* Challenge ID */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">Challenge ID</span>
+                    <span className="text-base text-gray-400">{t('challengeId')}</span>
                     <div className="text-3xl text-white">
                       {challengeId}
                     </div>
@@ -954,7 +956,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
                   {/* Seed Money */}
                   <div className="space-y-2">
-                    <span className="text-base text-gray-400">Seed Money</span>
+                    <span className="text-base text-gray-400">{t('seedMoney')}</span>
                     <div className="text-3xl text-white">
                       {(() => {
                         // If we have challenge data and seedMoney is available
@@ -971,7 +973,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   {/* Progress */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-base text-gray-400">Progress</span>
+                      <span className="text-base text-gray-400">{t('progress')}</span>
                       <span className="text-base font-medium text-gray-300">
                         {(() => {
                           if (!challengeDetails || !isClient) return '0%';
@@ -1019,8 +1021,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
-                      <span>Started: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
-                      <span>Ends: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('started')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('ends')}: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
                     </div>
                   </div>
                 </CardContent>

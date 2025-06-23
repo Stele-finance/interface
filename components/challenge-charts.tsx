@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useLanguage } from "@/lib/language-context"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
@@ -23,6 +24,7 @@ interface ChallengeChartsProps {
 }
 
 export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
+  const { t } = useLanguage()
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30)
   const { data: challengeData } = useChallenge(challengeId)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
@@ -113,15 +115,15 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
     const getChallengeTypeLabel = (challengeType: number) => {
       switch(challengeType) {
         case 0:
-          return '1 Week'
+          return t('oneWeek')
         case 1:
-          return '1 Month'
+          return t('oneMonth')
         case 2:
-          return '3 Months'
+          return t('threeMonths')
         case 3:
-          return '6 Months'
+          return t('sixMonths')
         case 4:
-          return '1 Year'
+          return t('oneYear')
         default:
           return `Type ${challengeType}`
       }
@@ -170,7 +172,7 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
           <p className="text-gray-100 text-sm font-medium">
-            Rewards: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {t('rewards')}: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
       )
@@ -227,7 +229,7 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
-              <p className="text-gray-400">No data available</p>
+              <p className="text-gray-400">{t('noDataAvailable')}</p>
             </div>
           </CardContent>
         </Card>
@@ -250,7 +252,7 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
       {/* Total Rewards Chart - Takes 2 columns */}
       <Card className="bg-transparent border-0 lg:col-span-2">
         <CardHeader className="pb-6">
-          <h3 className="text-3xl text-gray-100 mb-2">Total Prize</h3>
+                          <h3 className="text-3xl text-gray-100 mb-2">{t('totalPrize')}</h3>
           <CardTitle className="text-4xl text-gray-100">
             ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </CardTitle>
@@ -320,18 +322,18 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
         <CardContent className="p-8 space-y-8">
           {/* Status */}
           <div className="space-y-2">
-            <span className="text-base text-gray-400">Status</span>
+            <span className="text-base text-gray-400">{t('status')}</span>
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${challengeDetails.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className={`text-xl font-medium ${challengeDetails.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                {challengeDetails.isActive ? 'Active' : 'Inactive'}
+                {challengeDetails.isActive ? t('active') : 'Inactive'}
               </span>
             </div>
           </div>
 
           {/* Total Prize */}
           <div className="space-y-2">
-            <span className="text-base text-gray-400">Total Prize</span>
+                            <span className="text-base text-gray-400">{t('totalPrize')}</span>
             <div className="text-4xl text-yellow-400">
               ${challengeDetails.totalPrize >= 1000000 
                 ? `${(challengeDetails.totalPrize / 1000000).toFixed(1)}M` 
@@ -344,14 +346,14 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
 
           {/* Participants */}
           <div className="space-y-2">
-            <span className="text-base text-gray-400">Participants</span>
+            <span className="text-base text-gray-400">{t('participants')}</span>
             <div className="text-4xl text-white">{challengeDetails.participants.toLocaleString()}</div>
           </div>
 
           {/* Progress */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-base text-gray-400">Progress</span>
+              <span className="text-base text-gray-400">{t('progress')}</span>
               <span className="text-base font-medium text-gray-300">{progressPercentage}%</span>
             </div>
             
@@ -365,8 +367,8 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
             
             {/* Time Info */}
             <div className="flex justify-between text-sm text-gray-500">
-              <span>Started: {challengeDetails.startTime.toLocaleDateString()}</span>
-              <span>Ends: {challengeDetails.endTime.toLocaleDateString()}</span>
+              <span>{t('started')}: {challengeDetails.startTime.toLocaleDateString()}</span>
+              <span>{t('ends')}: {challengeDetails.endTime.toLocaleDateString()}</span>
             </div>
           </div>
         </CardContent>

@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useActiveChallengesSnapshots } from '@/app/hooks/useActiveChallengesSnapshots'
 import { Users, DollarSign, TrendingUp, Calendar } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useLanguage } from '@/lib/language-context'
 
 interface ChartDataPoint {
   id: string
@@ -18,6 +19,7 @@ interface ChartDataPoint {
 }
 
 export function DashboardCharts() {
+  const { t } = useLanguage()
   const { data, isLoading, error } = useActiveChallengesSnapshots(30)
   const [activeIndexParticipants, setActiveIndexParticipants] = useState<number | null>(null)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
@@ -90,7 +92,7 @@ export function DashboardCharts() {
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
           <p className="text-gray-100 text-sm font-medium">
-            {dataKey === 'totalParticipants' ? `Participants: ${value?.toLocaleString()}` : `Rewards: $${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            {dataKey === 'totalParticipants' ? `${t('participants')}: ${value?.toLocaleString()}` : `${t('rewards')}: $${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
         </div>
       )
@@ -138,7 +140,7 @@ export function DashboardCharts() {
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
-              <p className="text-gray-400">No data available</p>
+              <p className="text-gray-400">{t('noDataAvailable')}</p>
             </div>
           </CardContent>
         </Card>
@@ -154,20 +156,20 @@ export function DashboardCharts() {
             <div className="flex items-center justify-between">
               <div>
                 <TabsContent value="participants" className="m-0">
-                  <h3 className="text-3xl text-gray-100">Total Participants</h3>
+                  <h3 className="text-3xl text-gray-100">{t('totalParticipants')}</h3>
                 </TabsContent>
                 <TabsContent value="rewards" className="m-0">
-                  <h3 className="text-2xl text-gray-100">Total Rewards</h3>
+                  <h3 className="text-2xl text-gray-100">{t('totalRewards')}</h3>
                 </TabsContent>
               </div>
               <TabsList className="grid grid-cols-2 bg-gray-800/50">
                 <TabsTrigger value="participants" className="data-[state=active]:bg-gray-700">
                   <Users className="h-4 w-4 mr-2" />
-                  Participants
+                  {t('participants')}
                 </TabsTrigger>
                 <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700">
                   <DollarSign className="h-4 w-4 mr-2" />
-                  Rewards
+                  {t('rewards')}
                 </TabsTrigger>
               </TabsList>
             </div>

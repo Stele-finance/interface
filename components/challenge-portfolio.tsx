@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
@@ -33,6 +34,7 @@ interface ChallengePortfolioProps {
 
 // Ranking Section Component
 function RankingSection({ challengeId }: { challengeId: string }) {
+  const { t } = useLanguage()
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
 
   const formatAddress = (address: string) => {
@@ -88,19 +90,19 @@ function RankingSection({ challengeId }: { challengeId: string }) {
 
   return (
     <div>
-      <h2 className="text-3xl text-gray-100 mb-6">Ranking</h2>
+      <h2 className="text-3xl text-gray-100 mb-6">{t('totalRanking')}</h2>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-6">
           <div className="space-y-3">
             {isLoadingRanking ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                <span className="ml-2 text-gray-400">Loading rankings...</span>
+                <span className="ml-2 text-gray-400">{t('loadingRankings')}</span>
               </div>
             ) : rankingError ? (
               <div className="text-center py-8 text-red-400">
                 <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="font-medium">Error loading rankings</p>
+                <p className="font-medium">{t('errorLoadingRankings')}</p>
                 <p className="text-sm text-gray-500 mt-2">{rankingError.message}</p>
               </div>
             ) : rankingData && rankingData.topUsers.length > 0 ? (
@@ -126,13 +128,13 @@ function RankingSection({ challengeId }: { challengeId: string }) {
                           )}
                         </div>
                         <div className="text-sm text-gray-400">
-                          Rank #{rank}
+                          {t('rank')} #{rank}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="font-bold text-lg">{formatProfitRatio(profitRatio, user)}</div>
-                      <div className="text-xs text-gray-400">Profit Ratio</div>
+                      <div className="text-xs text-gray-400">{t('profitRatio')}</div>
                     </div>
                   </div>
                 );
@@ -140,8 +142,8 @@ function RankingSection({ challengeId }: { challengeId: string }) {
             ) : (
               <div className="text-center py-8 text-gray-400">
                 <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No ranking data available</p>
-                <p className="text-sm mt-1">Rankings will appear once users start trading</p>
+                <p>{t('noRankingDataFound')}</p>
+                                  <p className="text-sm mt-1">{t('rankingsWillAppear')}</p>
               </div>
             )}
           </div>
@@ -159,6 +161,7 @@ function RankingSection({ challengeId }: { challengeId: string }) {
 }
 
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
+  const { t } = useLanguage()
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
@@ -373,19 +376,19 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       let baseTitle = '';
       switch(challengeType) {
         case 0:
-          baseTitle = '1 Week Challenge';
+          baseTitle = `${t('oneWeek')} ${t('challenge')}`;
           break;
         case 1:
-          baseTitle = '1 Month Challenge';
+          baseTitle = `${t('oneMonth')} ${t('challenge')}`;
           break;
         case 2:
-          baseTitle = '3 Month Challenge';
+          baseTitle = `${t('threeMonths')} ${t('challenge')}`;
           break;
         case 3:
-          baseTitle = '6 Month Challenge';
+          baseTitle = `${t('sixMonths')} ${t('challenge')}`;
           break;
         case 4:
-          baseTitle = '1 Year Challenge';
+          baseTitle = `${t('oneYear')} ${t('challenge')}`;
           break;
         default:
           baseTitle = `Challenge Type ${challengeType}`;
@@ -397,22 +400,22 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     let baseTitle = '';
     switch(challengeId) {
       case 'one-week-challenge':
-        baseTitle = 'One Week Challenge';
+        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
         break;
       case 'one-month-challenge':
-        baseTitle = 'One Month Challenge';
+        baseTitle = `${t('oneMonth')} ${t('challenge')}`;
         break;
       case 'three-month-challenge':
-        baseTitle = 'Three Month Challenge';
+        baseTitle = `${t('threeMonths')} ${t('challenge')}`;
         break;
       case 'six-month-challenge':
-        baseTitle = 'Six Month Challenge';
+        baseTitle = `${t('sixMonths')} ${t('challenge')}`;
         break;
       case 'one-year-challenge':
-        baseTitle = 'One Year Challenge';
+        baseTitle = `${t('oneYear')} ${t('challenge')}`;
         break;
       default:
-        baseTitle = 'One Week Challenge';
+        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
     }
     return `${baseTitle} (ID: ${challengeId})`;
   };
@@ -588,7 +591,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           description: "Your join challenge transaction has been sent to the network.",
           action: (
             <ToastAction altText={`View on ${joinExplorerName}`} onClick={() => window.open(joinExplorerUrl, '_blank')}>
-              View on {joinExplorerName}
+              {t('view')} on {joinExplorerName}
             </ToastAction>
           ),
         });
@@ -598,11 +601,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         
         // Show toast notification for transaction confirmed
         toast({
-          title: "Challenge Joined",
+          title: t('joinChallenge'),
           description: "You have successfully joined the challenge!",
           action: (
             <ToastAction altText={`View on ${joinExplorerName}`} onClick={() => window.open(joinExplorerUrl, '_blank')}>
-              View on {joinExplorerName}
+              {t('view')} on {joinExplorerName}
             </ToastAction>
           ),
         });
@@ -821,7 +824,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
             >
               <User className="mr-3 h-5 w-5" />
-              My Account
+              {t('myAccount')}
             </Button>
           ) : !isChallengeEnded() && (
             <Button 
@@ -838,12 +841,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               {isJoining ? (
                 <>
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Joining...
+                  {t('joining')}
                 </>
               ) : isLoadingEntryFee || isLoadingBalance ? (
                 <>
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Loading...
+                  {t('loading')}
                 </>
               ) : isInsufficientBalance() ? (
                 <>
@@ -853,7 +856,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               ) : (
                 <>
                   <Plus className="mr-2 h-5 w-5" />
-                  Join
+                  {t('join')}
                   <UserPlus className="ml-2 h-5 w-5" />
                 </>
               )}
@@ -869,7 +872,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Transactions */}
         <div>
-          <h2 className="text-3xl text-gray-100 mb-6">Recent Transactions</h2>
+          <h2 className="text-3xl text-gray-100 mb-6">{t('recentTransactions')}</h2>
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-6">
               <div className="space-y-4">

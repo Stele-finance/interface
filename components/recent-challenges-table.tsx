@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button"
 import { Trophy, Users, Clock } from "lucide-react"
 import Link from "next/link"
 import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
+import { useLanguage } from "@/lib/language-context"
 
 export function RecentChallengesTable() {
+  const { t } = useLanguage()
   const { data, isLoading, error } = useRecentChallenges()
   const [currentTime, setCurrentTime] = useState(new Date())
 
@@ -130,7 +132,7 @@ export function RecentChallengesTable() {
     <Card className="bg-transparent border-0">
       <CardHeader>
         <h2 className="text-3xl text-gray-100">
-          Total Challenges
+          {t('totalChallenges')}
         </h2>
       </CardHeader>
       <CardContent>
@@ -138,13 +140,13 @@ export function RecentChallengesTable() {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                <TableHead className="text-gray-300 pl-12">ID</TableHead>
-                <TableHead className="text-gray-300 pl-6">Type</TableHead>
-                <TableHead className="text-gray-300 pl-10">Users</TableHead>
-                <TableHead className="text-gray-300 pl-8">Prize</TableHead>
-                <TableHead className="text-gray-300 pl-20">Start Date</TableHead>
-                <TableHead className="text-gray-300 pl-16">End Date</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
+                <TableHead className="text-gray-300 pl-12">{t('id')}</TableHead>
+                <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
+                <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
+                <TableHead className="text-gray-300 pl-8">{t('prize')}</TableHead>
+                <TableHead className="text-gray-300 pl-20">{t('startDate')}</TableHead>
+                <TableHead className="text-gray-300 pl-16">{t('endDate')}</TableHead>
+                <TableHead className="text-gray-300">{t('status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -153,7 +155,7 @@ export function RecentChallengesTable() {
                   <TableCell colSpan={7} className="text-center py-8">
                     <div className="flex flex-col items-center gap-2">
                       <Trophy className="h-8 w-8 text-gray-500" />
-                      <p className="text-gray-400">No challenges found</p>
+                      <p className="text-gray-400">{t('noChallengesFound')}</p>
                     </div>
                   </TableCell>
                 </TableRow>

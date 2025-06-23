@@ -20,6 +20,7 @@ import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { RPC_URL } from "@/lib/constants"
+import { useLanguage } from "@/lib/language-context"
 
 // Interface for proposal data
 interface Proposal {
@@ -42,6 +43,7 @@ interface Proposal {
 }
 
 export default function VotePage() {
+  const { t } = useLanguage()
   // Use global wallet hook instead of local state
   const { address: walletAddress, isConnected } = useWallet()
   const queryClient = useQueryClient()
@@ -1021,7 +1023,7 @@ export default function VotePage() {
   return (
     <div className="container mx-auto px-20 py-16">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl text-gray-100">Governance</h1>
+        <h1 className="text-3xl text-gray-100">{t('governance')}</h1>
         <div className="flex items-center gap-4">
           <Button 
             variant="default" 
@@ -1033,12 +1035,12 @@ export default function VotePage() {
             {isInitialLoading ? (
               <>
                 <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                Refreshing...
+                {t('loading')}
               </>
             ) : (
               <>
                 <Clock className="mr-3 h-5 w-5" />
-                Refresh Data
+                {t('refresh')}
               </>
             )}
           </Button>
@@ -1049,7 +1051,7 @@ export default function VotePage() {
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
             >
               <Plus className="mr-3 h-5 w-5" />
-              Create Proposal
+              {t('createProposal')}
             </Button>
           </Link>
         </div>
@@ -1172,9 +1174,9 @@ export default function VotePage() {
 
       <Tabs defaultValue="active" value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="all">All Proposals</TabsTrigger>
+          <TabsTrigger value="active">{t('active')}</TabsTrigger>
+          <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
+          <TabsTrigger value="all">All {t('proposals')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
@@ -1182,11 +1184,11 @@ export default function VotePage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-12">Title</TableHead>
+                  <TableHead className="text-gray-300 pl-12">{t('title')}</TableHead>
                   <TableHead className="text-gray-300 pl-20">Progress</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote Start</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote End</TableHead>
-                  <TableHead className="text-gray-300 text-center pl-6">Status</TableHead>
+                  <TableHead className="text-gray-300 pl-14">{t('started')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14">{t('ends')}</TableHead>
+                  <TableHead className="text-gray-300 text-center pl-6">{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

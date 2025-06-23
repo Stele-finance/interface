@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, Loader2 } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useLanguage } from "@/lib/language-context"
 
 export default function PortfolioPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { address, isConnected, connectWallet } = useWallet()
 
@@ -32,15 +34,15 @@ export default function PortfolioPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-100 mb-2">My Portfolio</h1>
+            <h1 className="text-3xl font-bold text-gray-100 mb-2">{t('myPortfolio')}</h1>
             <p className="text-gray-400">
-              Connect your wallet to view your challenge portfolio and performance
+              {t('connectToViewPortfolio')}
             </p>
           </div>
 
           <Card className="bg-gray-900/50 border-gray-700/50">
             <CardHeader>
-              <CardTitle className="text-center text-gray-100">Connect Wallet</CardTitle>
+              <CardTitle className="text-center text-gray-100">{t('connectWallet')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-center">
@@ -49,16 +51,16 @@ export default function PortfolioPage() {
               
               {isConnected && address ? (
                 <div className="text-center space-y-2">
-                  <p className="text-sm text-gray-400">Connected Wallet:</p>
+                  <p className="text-sm text-gray-400">{t('connectedWallet')}</p>
                   <p className="font-mono text-gray-100">
                     {address.slice(0, 6)}...{address.slice(-4)}
                   </p>
-                  <p className="text-sm text-gray-400">Redirecting...</p>
+                  <p className="text-sm text-gray-400">{t('redirecting')}</p>
                 </div>
               ) : (
                 <div className="text-center space-y-4">
                   <p className="text-gray-400">
-                    Connect your wallet to access your portfolio dashboard
+                    {t('connectToAccess')}
                   </p>
                   
                   <Button 
@@ -66,7 +68,7 @@ export default function PortfolioPage() {
                     className="bg-blue-500 hover:bg-blue-600 text-white"
                   >
                     <Wallet className="mr-2 h-4 w-4" />
-                    Connect Phantom Wallet
+                    {t('connectPhantomWallet')}
                   </Button>
                 </div>
               )}
