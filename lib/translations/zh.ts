@@ -231,6 +231,7 @@ export const zh = {
   sixMonths: "6个月",
   sixMonthsChallenge: "6个月",
   solana: "Solana",
+  spanish: "Español",
   started: "开始时间",
   startDate: "开始日期",
   state: "状态",
