@@ -202,8 +202,7 @@ export default function CreateProposalPage() {
 
   // Handle template selection
   const handleTemplateSelect = (templateName: string) => {
-    const customProposalText = language === 'zh' ? '自定义提案' : 'Custom Proposal';
-    if (templateName === customProposalText) {
+    if (templateName === t('customProposal')) {
       setIsCustomProposal(true);
       setSelectedTemplate('');
       setTemplateParameters([]);
@@ -542,14 +541,14 @@ export default function CreateProposalPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            {language === 'zh' ? '返回' : 'Back'}
+            {t('back')}
           </button>
         </div>
         
         <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-100">{language === 'zh' ? '创建提案' : 'Create Proposal'}</h1>
-            <p className="text-gray-400 mt-1">{language === 'zh' ? '向社区提交新的治理提案' : 'Submit a new governance proposal to the community'}</p>
+            <h1 className="text-3xl font-bold text-gray-100">{t('createProposal')}</h1>
+            <p className="text-gray-400 mt-1">{t('submitNewGovernanceProposal')}</p>
           </div>
         </div>
         <Card className="bg-transparent border border-gray-700/50">
@@ -560,11 +559,11 @@ export default function CreateProposalPage() {
               <div className="grid gap-6">
                 <div className="space-y-3">
                   <Label htmlFor="title" className="text-gray-200 text-base font-medium">
-                    {language === 'zh' ? '提案标题 *' : 'Proposal Title *'}
+                    {t('proposalTitle')}
                   </Label>
                   <Input 
                     id="title" 
-                    placeholder={language === 'zh' ? '为您的提案输入一个清晰简洁的标题。' : 'Enter a clear and concise title for your proposal.'} 
+                    placeholder={t('enterProposalTitle')} 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={isSubmitting}
@@ -574,11 +573,11 @@ export default function CreateProposalPage() {
                 
                 <div className="space-y-3">
                   <Label htmlFor="description" className="text-gray-200 text-base font-medium">
-                    {language === 'zh' ? '简短描述 *' : 'Short Description *'}
+                    {t('shortDescription')}
                   </Label>
                   <Textarea 
                     id="description" 
-                    placeholder={language === 'zh' ? '简要说明您的提案旨在实现什么。' : 'Provide a brief summary of what your proposal aims to achieve.'} 
+                    placeholder={t('provideProposalSummary')} 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     disabled={isSubmitting}
@@ -588,11 +587,11 @@ export default function CreateProposalPage() {
                 
                 <div className="space-y-3">
                   <Label htmlFor="details" className="text-gray-200 text-base font-medium">
-                    {language === 'zh' ? '详细描述' : 'Detailed Description'}
+                    {t('detailedDescriptionVote')}
                   </Label>
                   <Textarea 
                     id="details" 
-                    placeholder={language === 'zh' ? '详细解释您的提案。' : 'Explain your proposal in detail.'} 
+                    placeholder={t('detailedDescriptionPlaceholder')} 
                     className="min-h-[200px] bg-gray-800/30 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500/20 text-base"
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
@@ -607,21 +606,21 @@ export default function CreateProposalPage() {
               <div className="border-b border-gray-700/50 pb-4">
                 <h3 className="text-lg font-semibold text-gray-200 flex items-center gap-2">
                   <Settings className="h-5 w-5" />
-                  {language === 'zh' ? '治理行动' : 'Governance Action'}
+                  {t('governanceActionVote')}
                 </h3>
                 <p className="text-sm text-gray-400 mt-1">
-                  {language === 'zh' ? '定义此提案将执行的链上操作' : 'Define the on-chain action this proposal will execute'}
+                  {t('defineOnChainAction')}
                 </p>
               </div>
               
               <div className="bg-gray-800/20 border border-gray-600/50 rounded-lg p-6 space-y-6">
                 <div className="space-y-3">
                   <Label htmlFor="template" className="text-gray-200 text-base font-medium">
-                    {language === 'zh' ? '选择提案类型' : 'Select Proposal Type'}
+                    {t('selectProposalTypeVote')}
                   </Label>
                   <Select onValueChange={handleTemplateSelect} disabled={isSubmitting}>
                     <SelectTrigger className="bg-gray-800/30 border-gray-600 text-gray-100 focus:border-blue-500 focus:ring-blue-500/20 h-12">
-                      <SelectValue placeholder={language === 'zh' ? '选择治理行动...' : 'Choose a governance action...'} />
+                      <SelectValue placeholder={t('chooseGovernanceAction')} />
                     </SelectTrigger>
                     <SelectContent className="bg-black/80 border-gray-600">
                       {PROPOSAL_TEMPLATES.map((template) => (
@@ -629,8 +628,8 @@ export default function CreateProposalPage() {
                           {template.name}
                         </SelectItem>
                       ))}
-                      <SelectItem value={language === 'zh' ? '自定义提案' : 'Custom Proposal'} className="text-gray-100 focus:bg-gray-700">
-                        {language === 'zh' ? '自定义提案' : 'Custom Proposal'}
+                      <SelectItem value={t('customProposal')} className="text-gray-100 focus:bg-gray-700">
+                        {t('customProposal')}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -641,7 +640,7 @@ export default function CreateProposalPage() {
                 {selectedTemplate && !isCustomProposal && (
                   <div className="space-y-4 bg-gray-700/20 border border-gray-600/30 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-gray-300">
-                      {language === 'zh' ? '模板参数' : 'Template Parameters'}
+                      {t('templateParametersVote')}
                     </h4>
                     <div className="space-y-4">
                       {PROPOSAL_TEMPLATES.find(t => t.id === selectedTemplate)?.parameterLabels.map((label, index) => {
@@ -669,12 +668,12 @@ export default function CreateProposalPage() {
                 {isCustomProposal && (
                   <div className="space-y-4 bg-gray-700/20 border border-gray-600/30 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-gray-300">
-                      {language === 'zh' ? '自定义合约交互' : 'Custom Contract Interaction'}
+                      {t('customContractInteraction')}
                     </h4>
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="target" className="text-gray-200 text-sm font-medium">
-                          {language === 'zh' ? '目标合约地址' : 'Target Contract Address'}
+                          {t('targetContractAddressVote')}
                         </Label>
                         <Input 
                           id="target" 
@@ -688,11 +687,11 @@ export default function CreateProposalPage() {
                       
                       <div className="space-y-2">
                         <Label htmlFor="function" className="text-gray-200 text-sm font-medium">
-                          {language === 'zh' ? '函数签名' : 'Function Signature'}
+                          {t('functionSignatureVote')}
                         </Label>
                         <Input 
                           id="function" 
-                          placeholder={language === 'zh' ? '例如: setRewardAmount(uint256)' : 'e.g. setRewardAmount(uint256)'} 
+                          placeholder={t('exampleFunctionSignature')} 
                           value={functionSignature}
                           onChange={(e) => setFunctionSignature(e.target.value)}
                           disabled={isSubmitting}
@@ -702,11 +701,11 @@ export default function CreateProposalPage() {
                       
                       <div className="space-y-2">
                         <Label htmlFor="params" className="text-gray-200 text-sm font-medium">
-                          {language === 'zh' ? '函数参数（逗号分隔）' : 'Function Parameters (comma separated)'}
+                          {t('functionParametersCommaSeparated')}
                         </Label>
                         <Input 
                           id="params" 
-                          placeholder={language === 'zh' ? '例如: 150000000' : 'e.g. 150000000'} 
+                          placeholder={t('exampleFunctionParameter')} 
                           value={functionParams}
                           onChange={(e) => setFunctionParams(e.target.value)}
                           disabled={isSubmitting}
@@ -730,12 +729,12 @@ export default function CreateProposalPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    {language === 'zh' ? '提交中...' : 'Submitting...'}
+                    {t('submittingProposal')}
                   </>
                 ) : (
                   <>
                     <Plus className="mr-3 h-5 w-5" />
-                    {language === 'zh' ? '创建提案' : 'Create Proposal'}
+                    {t('createProposal')}
                   </>
                 )}
               </Button>

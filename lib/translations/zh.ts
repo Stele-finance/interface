@@ -35,6 +35,7 @@ export const zh = {
   chinese: "中文",
   chooseGovernanceAction: "选择治理行动...",
   close: "关闭",
+  commandPaletteDescription: "用于搜索和选择选项的命令面板",
   completed: "已完成",
   confirm: "确认",
   connectPhantomWallet: "连接 Phantom 钱包",
