@@ -76,6 +76,14 @@ const languages: LanguageOption[] = [
     region: 'Europe',
     description: 'Portuguese (Portugal)'
   },
+  { 
+    code: 'ru', 
+    name: 'Russian', 
+    nativeName: 'Русский', 
+    flag: '🇷🇺', 
+    region: 'Eastern Europe',
+    description: 'Russian (Russia)'
+  },
 ];
 
 interface LanguageSelectorSidebarProps {
