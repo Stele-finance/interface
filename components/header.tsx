@@ -25,6 +25,7 @@ import {
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
+import { LanguageSelectorSidebar } from "./language-selector-sidebar"
 
 export function Header() {
   const pathname = usePathname()
@@ -290,54 +291,45 @@ export function Header() {
         </Button>
         )}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <div className="flex items-center gap-2">
+          {/* Language Selector Sidebar */}
+          <LanguageSelectorSidebar>
             <Button variant="ghost" size="icon" className="text-muted-foreground">
-              <Menu className="h-7 w-7" />
+              <Languages className="h-6 w-6" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="text-base w-48">
-            <DropdownMenuLabel className="text-lg font-semibold">{t('language')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-base py-2 cursor-pointer" 
-              onClick={() => setLanguage('en')}
-            >
-              <Languages className="h-4 w-4 mr-2" />
-              {t('english')}
-              {language === 'en' && <span className="ml-auto">✓</span>}
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="text-base py-2 cursor-pointer" 
-              onClick={() => setLanguage('zh')}
-            >
-              <Languages className="h-4 w-4 mr-2" />
-              {t('chinese')}
-              {language === 'zh' && <span className="ml-auto">✓</span>}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-lg font-semibold">{t('links')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-base py-2" asChild>
-              <Link href="https://github.com/Stele-finance/interface" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <Github className="h-4 w-4" />
-                {t('github')}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-base py-2" asChild>
-              <Link href="#" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                {t('doc')}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-base py-2" asChild>
-              <Link href="https://x.com/stelefinance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <Twitter className="h-4 w-4" />
-                X
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </LanguageSelectorSidebar>
+
+          {/* Menu Dropdown for Links */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground">
+                <Menu className="h-7 w-7" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="text-base w-48">
+              <DropdownMenuLabel className="text-lg font-semibold">{t('links')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-base py-2" asChild>
+                <Link href="https://github.com/Stele-finance/interface" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <Github className="h-4 w-4" />
+                  {t('github')}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-base py-2" asChild>
+                <Link href="#" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  {t('doc')}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-base py-2" asChild>
+                <Link href="https://x.com/stelefinance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <Twitter className="h-4 w-4" />
+                  X
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   )
