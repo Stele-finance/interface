@@ -629,17 +629,17 @@ export default function VotePage() {
       realTimeStatus = 'EXECUTED'
       statusColor = 'bg-green-100 text-green-800'
       statusIcon = '✨'
-      statusText = 'Executed'
+      statusText = t('executed')
     } else if (proposal.status === 'canceled') {
       realTimeStatus = 'CANCELED'
       statusColor = 'bg-gray-100 text-gray-800'
       statusIcon = '🚫'
-      statusText = 'Canceled'
+      statusText = t('canceled')
     } else if (proposal.status === 'queued') {
       realTimeStatus = 'QUEUED'
       statusColor = 'bg-blue-100 text-blue-800'
       statusIcon = '🔄'
-      statusText = 'Queued'
+      statusText = t('queued')
     } else {
       // Calculate status based on time and vote results
       if (now < startTime) {
@@ -647,13 +647,13 @@ export default function VotePage() {
         realTimeStatus = 'PENDING'
         statusColor = 'bg-yellow-100 text-yellow-800'
         statusIcon = '⏳'
-        statusText = 'Pending'
+        statusText = t('pending')
       } else if (now >= startTime && now <= endTime) {
         // Currently in voting period
         realTimeStatus = 'ACTIVE'
         statusColor = 'bg-green-100 text-green-800'
         statusIcon = '🗳️'
-        statusText = 'Voting'
+        statusText = t('voting')
       } else {
         // Voting period has ended - check vote results
         const totalDecisiveVotes = votesFor + votesAgainst
@@ -663,7 +663,7 @@ export default function VotePage() {
           realTimeStatus = 'DEFEATED'
           statusColor = 'bg-red-100 text-red-800'
           statusIcon = '❌'
-          statusText = 'Defeated'
+          statusText = t('defeated')
         } else if (votesFor > votesAgainst) {
           // More votes for than against - passed, pending queue
           realTimeStatus = 'PENDING_QUEUE'
@@ -675,7 +675,7 @@ export default function VotePage() {
           realTimeStatus = 'DEFEATED'
           statusColor = 'bg-red-100 text-red-800'
           statusIcon = '❌'
-          statusText = 'Defeated'
+          statusText = t('defeated')
         }
       }
     }
@@ -992,11 +992,11 @@ export default function VotePage() {
       <div className="container mx-auto px-20 py-16 flex flex-col items-center justify-center min-h-[50vh]">
         <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
         <p className="text-muted-foreground">
-          {isInitialLoading ? 'Loading latest proposals and vote results...' :
-           isLoadingBlockNumber ? 'Loading block information...' : 
-           isLoadingGovernanceConfig ? 'Loading governance configuration...' :
-           isLoadingWalletTokenInfo ? 'Loading wallet token information...' :
-           'Loading proposals and vote results...'}
+          {isInitialLoading ? t('loadingLatestProposals') :
+           isLoadingBlockNumber ? t('loadingBlockInfo') : 
+           isLoadingGovernanceConfig ? t('loadingGovernanceConfig') :
+           isLoadingWalletTokenInfo ? t('loadingWalletTokenInfo') :
+           t('loadingProposalsAndResults')}
         </p>
       </div>
     )
@@ -1096,7 +1096,7 @@ export default function VotePage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <h3 className="text-sm font-medium text-gray-400">Connected Wallet</h3>
+                <h3 className="text-sm font-medium text-gray-400">{t('connectedWallet')}</h3>
                 <p className="text-sm font-mono text-gray-100">{walletAddress}</p>
               </div>
               
@@ -1108,11 +1108,11 @@ export default function VotePage() {
               ) : walletTokenInfo ? (
                 <div className="text-right space-y-1">
                   <div className="text-sm">
-                    <span className="font-medium text-gray-300">Balance: </span>
+                    <span className="font-medium text-gray-300">{t('balance')}: </span>
                     <span className="font-mono text-gray-100">{Number(walletTokenInfo.formattedBalance).toLocaleString()} STELE</span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    <span>Delegated to: </span>
+                    <span>{t('delegatedTo')}: </span>
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
                       <span className="text-orange-400">Not delegated</span>
                     ) : walletTokenInfo.delegatedTo === walletAddress ? (
@@ -1126,7 +1126,7 @@ export default function VotePage() {
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
                       <span className="text-orange-400">⚠️ Delegate tokens to vote</span>
                     ) : Number(walletTokenInfo.formattedBalance) > 0 ? (
-                      <span className="text-green-400">✅ Ready to vote</span>
+                      <span className="text-green-400">✅ {t('readyToVote')}</span>
                     ) : (
                       <span className="text-gray-500">No STELE tokens</span>
                     )}
@@ -1176,7 +1176,7 @@ export default function VotePage() {
         <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="active">{t('active')}</TabsTrigger>
           <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
-          <TabsTrigger value="all">All {t('proposals')}</TabsTrigger>
+          <TabsTrigger value="all">{t('allProposals')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
@@ -1185,7 +1185,7 @@ export default function VotePage() {
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                   <TableHead className="text-gray-300 pl-12">{t('title')}</TableHead>
-                  <TableHead className="text-gray-300 pl-20">Progress</TableHead>
+                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
                   <TableHead className="text-gray-300 pl-14">{t('started')}</TableHead>
                   <TableHead className="text-gray-300 pl-14">{t('ends')}</TableHead>
                   <TableHead className="text-gray-300 text-center pl-6">{t('status')}</TableHead>
@@ -1241,7 +1241,7 @@ export default function VotePage() {
             <div className="flex justify-between items-center">
               {(actionableCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
                 <div>
-                  Showing {((activeProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(activeProposalsPage * ITEMS_PER_PAGE, actionableCount?.proposals?.length || 0)} of {actionableCount?.proposals?.length || 0} proposals
+                  {t('showing')} {((activeProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(activeProposalsPage * ITEMS_PER_PAGE, actionableCount?.proposals?.length || 0)} {t('of')} {actionableCount?.proposals?.length || 0} {t('proposals')}
                 </div>
               )}
             </div>
@@ -1254,7 +1254,7 @@ export default function VotePage() {
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                   <TableHead className="text-gray-300 rounded-tl-lg pl-12">Title</TableHead>
-                  <TableHead className="text-gray-300 pl-20">Progress</TableHead>
+                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
                   <TableHead className="text-gray-300 pl-14">Vote Start</TableHead>
                   <TableHead className="text-gray-300 pl-14">Vote End</TableHead>
                   <TableHead className="text-gray-300 text-center rounded-tr-lg pl-6">Status</TableHead>                
@@ -1310,7 +1310,7 @@ export default function VotePage() {
             <div className="flex justify-between items-center mb-2">
               {(completedCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
                 <div>
-                  Showing {((completedProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(completedProposalsPage * ITEMS_PER_PAGE, completedCount?.proposals?.length || 0)} of {completedCount?.proposals?.length || 0} proposals
+                  {t('showing')} {((completedProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(completedProposalsPage * ITEMS_PER_PAGE, completedCount?.proposals?.length || 0)} {t('of')} {completedCount?.proposals?.length || 0} {t('proposals')}
                 </div>
               )}
             </div>
@@ -1323,7 +1323,7 @@ export default function VotePage() {
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                   <TableHead className="text-gray-300 rounded-tl-lg pl-12">Title</TableHead>
-                  <TableHead className="text-gray-300 pl-20">Progress</TableHead>
+                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
                   <TableHead className="text-gray-300 pl-14">Vote Start</TableHead>
                   <TableHead className="text-gray-300 pl-14">Vote End</TableHead>
                   <TableHead className="text-gray-300 text-center rounded-tr-lg pl-6">Status</TableHead>
@@ -1379,7 +1379,7 @@ export default function VotePage() {
             <div className="flex justify-between items-center mb-2">
               {(allCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
                 <div>
-                  Showing {((allProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(allProposalsPage * ITEMS_PER_PAGE, allCount?.proposals?.length || 0)} of {allCount?.proposals?.length || 0} proposals
+                  {t('showing')} {((allProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(allProposalsPage * ITEMS_PER_PAGE, allCount?.proposals?.length || 0)} {t('of')} {allCount?.proposals?.length || 0} {t('proposals')}
                 </div>
               )}
             </div>

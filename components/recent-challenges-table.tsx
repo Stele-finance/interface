@@ -36,14 +36,14 @@ export function RecentChallengesTable() {
     const typeStr = String(type)
     
     switch (typeStr) {
-      case "0": return "1 week"
-      case "1": return "1 month"
-      case "2": return "3 months"
-      case "3": return "6 months"
-      case "4": return "1 year"
+      case "0": return t('oneWeek')
+      case "1": return t('oneMonth')
+      case "2": return t('threeMonths')
+      case "3": return t('sixMonths')
+      case "4": return t('oneYear')
       default: 
         console.log('No match found for type:', typeStr)
-        return "Unknown"
+        return t('unknown')
     }
   }
 
@@ -68,15 +68,15 @@ export function RecentChallengesTable() {
         return (
           <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit">
             <Clock className="h-3 w-3" />
-            Active
+            {t('active')}
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300">Pending</Badge>
+        return <Badge variant="outline" className="border-gray-600 text-gray-300">{t('pending')}</Badge>
       case "completed":
-        return <Badge className="bg-blue-500 text-white">Completed</Badge>
+        return <Badge className="bg-blue-500 text-white">{t('completed')}</Badge>
       default:
-        return <Badge variant="secondary">Unknown</Badge>
+        return <Badge variant="secondary">{t('unknown')}</Badge>
     }
   }
 
@@ -100,7 +100,7 @@ export function RecentChallengesTable() {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
-          <CardTitle className="text-gray-100">Recent Challenges</CardTitle>
+          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -117,11 +117,11 @@ export function RecentChallengesTable() {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
-          <CardTitle className="text-gray-100">Recent Challenges</CardTitle>
+          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-400">Error loading challenges</p>
+            <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
           </div>
         </CardContent>
       </Card>
