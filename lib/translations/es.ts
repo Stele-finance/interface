@@ -35,6 +35,7 @@ export const es = {
   chinese: "中文",
   chooseGovernanceAction: "Elegir una acción de gobernanza...",
   close: "Cerrar",
+  commandPaletteDescription: "Paleta de comandos para buscar y seleccionar opciones",
   completed: "Completado",
   confirm: "Confirmar",
   connectPhantomWallet: "Conectar Billetera Phantom",
