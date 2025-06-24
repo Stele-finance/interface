@@ -1,15 +1,15 @@
 // Language configuration utility - manage all language settings here when adding new languages
 
 export const LANGUAGE_CONFIGS = {
-  en: { name: 'English', nativeName: 'English', flag: '🇺🇸' },
-  zh: { name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
-  es: { name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-  hi: { name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
-  ar: { name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
-  bn: { name: 'Bengali', nativeName: 'বাংলা', flag: '🇧🇩' },
-  pt: { name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
-  ru: { name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
-  jp: { name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' }
+  en: { name: 'English', nativeName: 'English' },
+  zh: { name: 'Chinese', nativeName: '中文' },
+  es: { name: 'Spanish', nativeName: 'Español' },
+  hi: { name: 'Hindi', nativeName: 'हिन्दी' },
+  ar: { name: 'Arabic', nativeName: 'العربية' },
+  bn: { name: 'Bengali', nativeName: 'বাংলা' },
+  pt: { name: 'Portuguese', nativeName: 'Português' },
+  ru: { name: 'Russian', nativeName: 'Русский' },
+  jp: { name: 'Japanese', nativeName: '日本語' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;

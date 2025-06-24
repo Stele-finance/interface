@@ -3,56 +3,47 @@ export const SUPPORTED_LANGUAGES = {
   en: {
     code: 'en',
     name: 'English',
-    nativeName: 'English',
-    flag: '🇺🇸'
+    nativeName: 'English'
   },
   zh: {
     code: 'zh',
     name: 'Chinese',
-    nativeName: '中文',
-    flag: '🇨🇳'
+    nativeName: '中文'
   },
   es: {
     code: 'es',
     name: 'Spanish',
-    nativeName: 'Español',
-    flag: '🇪🇸'
+    nativeName: 'Español'
   },
   hi: {
     code: 'hi',
     name: 'Hindi',
-    nativeName: 'हिन्दी',
-    flag: '🇮🇳'
+    nativeName: 'हिन्दी'
   },
   ar: {
     code: 'ar',
     name: 'Arabic',
-    nativeName: 'العربية',
-    flag: '🇸🇦'
+    nativeName: 'العربية'
   },
   bn: {
     code: 'bn',
     name: 'Bengali',
-    nativeName: 'বাংলা',
-    flag: '🇧🇩'
+    nativeName: 'বাংলা'
   },
   pt: {
     code: 'pt',
     name: 'Portuguese',
-    nativeName: 'Português',
-    flag: '🇧🇷'
+    nativeName: 'Português'
   },
   ru: {
     code: 'ru',
     name: 'Russian',
-    nativeName: 'Русский',
-    flag: '🇷🇺'
+    nativeName: 'Русский'
   },
   jp: {
     code: 'jp',
     name: 'Japanese',
-    nativeName: '日本語',
-    flag: '🇯🇵'
+    nativeName: '日本語'
   }
 } as const;
 

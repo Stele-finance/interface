@@ -30,7 +30,7 @@ export function LanguageSelectorExample() {
       >
         {languageOptions.map((lang) => (
           <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.nativeName} ({lang.name})
+            {lang.nativeName} ({lang.name})
           </option>
         ))}
       </select>
@@ -45,7 +45,7 @@ export function LanguageSelectorExample() {
 
 // Usage:
 // To add a new language (e.g., Korean):
-// 1. Add ko: { name: 'Korean', nativeName: '한국어', flag: '🇰🇷' } to LANGUAGE_CONFIGS in language-config.ts
+// 1. Add ko: { name: 'Korean', nativeName: '한국어' } to LANGUAGE_CONFIGS in language-config.ts
 // 2. Create translations/ko.ts file
 // 3. Import and add ko to translations/index.ts
 // 

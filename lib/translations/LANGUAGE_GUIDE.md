@@ -12,8 +12,7 @@ Add new language to `LANGUAGE_CONFIGS` in `lib/translations/language-config.ts`:
 ```typescript
 export const LANGUAGE_CONFIGS = {
   // ... existing languages
-  ko: { name: 'Korean', nativeName: '한국어', flag: '🇰🇷' }, // newly added
-  fr: { name: 'French', nativeName: 'Français', flag: '🇫🇷' }, // newly added
+  fr: { name: 'French', nativeName: 'Français' }, // newly added
 } as const;
 ```
 
@@ -21,10 +20,10 @@ export const LANGUAGE_CONFIGS = {
 Create a new language file in `lib/translations/` folder:
 
 ```typescript
-// lib/translations/ko.ts
-export const ko = {
-  abstain: "기권",
-  active: "활성",
+// lib/translations/fr.ts
+export const fr = {
+  abstain: "abstention",
+  active: "actif",
   // ... all translation keys
 } as const;
 ```
@@ -33,12 +32,10 @@ export const ko = {
 Add new language to `lib/translations/index.ts`:
 
 ```typescript
-import { ko } from './ko'; // newly added
 import { fr } from './fr'; // newly added
 
 export const translations = {
   // ... existing languages
-  ko, // newly added
   fr, // newly added
 } as const;
 ```
@@ -83,8 +80,8 @@ const languages = getAllLanguageInfos();
 ```typescript
 import { isLanguageSupported } from '@/lib/translations/language-config';
 
-if (isLanguageSupported('ko')) {
-  // Korean is supported
+if (isLanguageSupported('fr')) {
+  // French is supported
 }
 ```
 
