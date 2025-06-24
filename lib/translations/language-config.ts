@@ -14,6 +14,7 @@ export const LANGUAGE_CONFIGS = {
   el: { name: 'Greek', nativeName: 'Ελληνικά' },
   he: { name: 'Hebrew', nativeName: 'עברית' },
   hi: { name: 'Hindi', nativeName: 'हिन्दी' },
+  hu: { name: 'Hungarian', nativeName: 'Magyar' },
   id: { name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
   it: { name: 'Italian', nativeName: 'Italiano' },
   jp: { name: 'Japanese', nativeName: '日本語' },
