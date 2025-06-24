@@ -54,6 +54,11 @@ export const SUPPORTED_LANGUAGES = {
     code: 'kr',
     name: 'Korean',
     nativeName: '한국어'
+  },
+  da: {
+    code: 'da',
+    name: 'Danish',
+    nativeName: 'Dansk'
   }
 } as const;
 
