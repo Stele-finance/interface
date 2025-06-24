@@ -1021,8 +1021,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
-                      <span>{t('started')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
-                      <span>{t('ends')}: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('voteStart')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('voteEnd')}: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
                     </div>
                   </div>
                 </CardContent>

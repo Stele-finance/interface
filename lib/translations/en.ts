@@ -236,7 +236,7 @@ export const en = {
   sixMonthsChallenge: "6 Months",
   solana: "Solana",
   spanish: "Español",
-  started: "Started",
+  start: "Start",
   startDate: "Start Date",
   state: "State",
   status: "Status",
