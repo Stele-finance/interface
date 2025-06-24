@@ -18,6 +18,7 @@ import { ms } from './ms';
 import { vi } from './vi';
 import { th } from './th';
 import { it } from './it';
+import { fi } from './fi';
 
 export const translations = {
   en,
@@ -39,7 +40,8 @@ export const translations = {
   ms,
   vi,
   th,
-  it
+  it,
+  fi
 } as const;
 
 export type Language = keyof typeof translations;
