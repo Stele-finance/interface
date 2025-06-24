@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { ArrowDown, RefreshCw, TrendingUp, TrendingDown, Loader2, XCircle } from "lucide-react"
 import { HTMLAttributes, useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { useUniswapBatchPrices, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
+import { useSwapTokenPrices, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
 import { Badge } from "@/components/ui/badge"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
@@ -25,14 +25,6 @@ interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
 export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   
-  // Convert userTokens to TokenInfo format for uniswap price fetching
-  const tokenInfos: TokenInfo[] = userTokens.map(token => ({
-    symbol: token.symbol,
-    address: token.address,
-    decimals: parseInt(token.decimals) || 18
-  }))
-  
-  const { data: priceData, isLoading, error, refetch } = useUniswapBatchPrices(tokenInfos);
   const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap();
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
@@ -46,6 +38,70 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   // Get challengeId from URL params for contract call
   const params = useParams()
   const challengeId = params?.id || params?.challengeId || "1"
+
+  // Get token address by symbol - enhanced with investable tokens
+  const getTokenAddress = (tokenSymbol: string): string => {
+    // First check user tokens (for from token)
+    if (userTokens.length > 0) {
+      const userToken = userTokens.find(token => token.symbol === tokenSymbol);
+      if (userToken?.address) return userToken.address;
+    }
+    
+    // Then check investable tokens (for to token)
+    const investableTokenAddress = getTokenAddressBySymbol(investableTokens, tokenSymbol);
+    if (investableTokenAddress) return investableTokenAddress;
+    
+    // Fallback for common tokens - use ethers.getAddress to ensure proper checksum
+    const tokenAddresses: Record<string, string> = {
+      'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Ethereum USDC
+      'ETH': '0xc02aaa39b223fe8c0a0e5c4f27ead9083c756cc2', // Ethereum WETH (ETH maps to WETH)
+      'WETH': '0xc02aaa39b223fe8c0a0e5c4f27ead9083c756cc2', // Ethereum WETH
+      'USDT': '0xdac17f958d2ee523a2206206994597c13d831ec7', // Ethereum USDT
+      'WBTC': '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', // Ethereum WBTC
+    };
+    
+    const address = tokenAddresses[tokenSymbol];
+    if (address) {
+      try {
+        return ethers.getAddress(address);
+      } catch (error) {
+        console.error(`Invalid address for token ${tokenSymbol}: ${address}`, error);
+        return '';
+      }
+    }
+    return '';
+  };
+
+  // Get token decimals by symbol - enhanced with investable tokens
+  const getTokenDecimals = (tokenSymbol: string): number => {
+    // First check user tokens (for from token)
+    if (userTokens.length > 0) {
+      const userToken = userTokens.find(token => token.symbol === tokenSymbol);
+      if (userToken?.decimals) return parseInt(userToken.decimals);
+    }
+    
+    // Then check investable tokens (for to token)
+    const investableTokenDecimals = getTokenDecimalsBySymbol(investableTokens, tokenSymbol);
+    if (investableTokenDecimals !== 18) return investableTokenDecimals; // 18 is default, so if different, use it
+    
+    // Common token decimals fallback
+    const tokenDecimals: Record<string, number> = {
+      'USDC': 6,
+      'ETH': 18,
+      'WETH': 18,
+      'BTC': 8,
+      'WBTC': 8,
+    };
+    return tokenDecimals[tokenSymbol] || 18;
+  };
+
+  // Use new hook to get prices for selected tokens only
+  const { data: priceData, isLoading, error, refetch } = useSwapTokenPrices(
+    fromToken || null,
+    toToken || null,
+    getTokenAddress,
+    getTokenDecimals
+  );
 
   // Helper function to format token amounts for display
   const formatTokenAmount = (rawAmount: string, decimals: string): string => {
@@ -340,50 +396,6 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       }
     }
     return '0'; // Default balance if no user tokens
-  };
-
-  // Get token address by symbol - enhanced with investable tokens
-  const getTokenAddress = (tokenSymbol: string): string => {
-    // First check user tokens (for from token)
-    if (userTokens.length > 0) {
-      const userToken = userTokens.find(token => token.symbol === tokenSymbol);
-      if (userToken?.address) return userToken.address;
-    }
-    
-    // Then check investable tokens (for to token)
-    const investableTokenAddress = getTokenAddressBySymbol(investableTokens, tokenSymbol);
-    if (investableTokenAddress) return investableTokenAddress;
-    
-    // Fallback for common tokens
-    const tokenAddresses: Record<string, string> = {
-      'USDC': '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // Base USDC
-      'ETH': '0x4200000000000000000000000000000000000006', // Base ETH (WETH)
-      'WETH': '0x4200000000000000000000000000000000000006', // Base WETH
-    };
-    return tokenAddresses[tokenSymbol] || '';
-  };
-
-  // Get token decimals by symbol - enhanced with investable tokens
-  const getTokenDecimals = (tokenSymbol: string): number => {
-    // First check user tokens (for from token)
-    if (userTokens.length > 0) {
-      const userToken = userTokens.find(token => token.symbol === tokenSymbol);
-      if (userToken?.decimals) return parseInt(userToken.decimals);
-    }
-    
-    // Then check investable tokens (for to token)
-    const investableTokenDecimals = getTokenDecimalsBySymbol(investableTokens, tokenSymbol);
-    if (investableTokenDecimals !== 18) return investableTokenDecimals; // 18 is default, so if different, use it
-    
-    // Common token decimals fallback
-    const tokenDecimals: Record<string, number> = {
-      'USDC': 6,
-      'ETH': 18,
-      'WETH': 18,
-      'BTC': 8,
-      'WBTC': 8,
-    };
-    return tokenDecimals[tokenSymbol] || 18;
   };
 
   const handleTokenSwap = () => {

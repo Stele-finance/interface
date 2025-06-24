@@ -120,14 +120,29 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
     const normalizedTokenIn = ethers.getAddress(tokenInAddress)
     const normalizedTokenOut = ethers.getAddress(tokenOutAddress)
     
+    // Log the parameters being sent to Quoter
+    console.log('🔍 Uniswap Quoter Parameters:', {
+      tokenIn: normalizedTokenIn,
+      tokenOut: normalizedTokenOut,
+      fee: 3000,
+      amountIn: amountIn.toString(),
+      amountInFormatted: ethers.formatUnits(amountIn, decimalsIn),
+      decimalsIn: decimalsIn,
+      sqrtPriceLimitX96: 0
+    })
+    
     // Try 0.3% fee tier first (most common)
-    return quoterInterface.encodeFunctionData("quoteExactInputSingle", [
+    const callData = quoterInterface.encodeFunctionData("quoteExactInputSingle", [
       normalizedTokenIn,
       normalizedTokenOut,
       3000, // 0.3% fee
       amountIn,
       0 // No price limit
     ])
+    
+    console.log('📦 Generated CallData:', callData)
+    
+    return callData
   }, [])
 
   const fetchBatchPrices = useCallback(async (forceRefresh: boolean = false) => {
@@ -174,12 +189,17 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
       const tokenCallMap: Array<{ token: TokenInfo; callIndex: number }> = []
 
       // Add calls for each token against USDC or WETH
+      console.log('🚀 Starting batch price fetch for tokens:', tokens.map(t => `${t.symbol} (${t.address})`))
+      
       tokens.forEach((token) => {
         try {
           // Skip USDC - we'll set it to $1
           if (token.address.toLowerCase() === usdcAddress.toLowerCase()) {
+            console.log(`⏭️ Skipping ${token.symbol} - will set to $1.00`)
             return
           }
+
+          console.log(`💱 Processing token: ${token.symbol} → USDC`)
 
           // Validate token address format
           const validTokenAddress = ethers.getAddress(token.address)
@@ -208,6 +228,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
       })
 
       if (calls.length === 0) {
+        console.log('⚠️ No calls to make - only USDC available')
         setPriceData({
           tokens: {
             USDC: {
@@ -224,8 +245,25 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
         return
       }
 
+      console.log(`📞 Making ${calls.length} Multicall2 calls:`, calls.map((call, index) => ({
+        index,
+        target: call.target,
+        callDataLength: call.callData.length,
+        token: tokenCallMap[index]?.token.symbol
+      })))
+
       // Execute multicall using aggregate (Multicall2 standard)
       const [blockNumber, returnData] = await multicallContract.aggregate.staticCall(calls)
+      
+      console.log('📋 Multicall2 Response:', {
+        blockNumber: blockNumber.toString(),
+        returnDataCount: returnData.length,
+        returnDataSample: returnData.slice(0, 3).map((data: string, i: number) => ({
+          index: i,
+          data: data,
+          length: data.length
+        }))
+      })
 
       const processedTokens: Record<string, TokenPrice> = {}
 
@@ -322,6 +360,44 @@ export function useUserTokenPrices(userTokens: Array<{ symbol: string; address: 
     address: token.address,
     decimals: parseInt(token.decimals) || 18
   }))
+
+  return useUniswapBatchPrices(tokenInfos)
+}
+
+// Hook for getting prices of selected swap tokens only
+export function useSwapTokenPrices(
+  fromTokenSymbol: string | null,
+  toTokenSymbol: string | null,
+  getTokenAddress: (symbol: string) => string,
+  getTokenDecimals: (symbol: string) => number
+) {
+  const tokenInfos: TokenInfo[] = useMemo(() => {
+    const tokens: TokenInfo[] = []
+    
+    if (fromTokenSymbol) {
+      const address = getTokenAddress(fromTokenSymbol)
+      if (address) {
+        tokens.push({
+          symbol: fromTokenSymbol,
+          address: address,
+          decimals: getTokenDecimals(fromTokenSymbol)
+        })
+      }
+    }
+    
+    if (toTokenSymbol && toTokenSymbol !== fromTokenSymbol) {
+      const address = getTokenAddress(toTokenSymbol)
+      if (address) {
+        tokens.push({
+          symbol: toTokenSymbol,
+          address: address,
+          decimals: getTokenDecimals(toTokenSymbol)
+        })
+      }
+    }
+    
+    return tokens
+  }, [fromTokenSymbol, toTokenSymbol, getTokenAddress, getTokenDecimals])
 
   return useUniswapBatchPrices(tokenInfos)
 } 
