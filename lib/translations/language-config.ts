@@ -15,7 +15,8 @@ export const LANGUAGE_CONFIGS = {
   fr: { name: 'French', nativeName: 'Français' },
   de: { name: 'German', nativeName: 'Deutsch' },
   da: { name: 'Danish', nativeName: 'Dansk' },
-  nl: { name: 'Dutch', nativeName: 'Nederlands' }
+  nl: { name: 'Dutch', nativeName: 'Nederlands' },
+  id: { name: 'Indonesian', nativeName: 'Bahasa Indonesia' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;

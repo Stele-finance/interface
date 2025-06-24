@@ -13,6 +13,7 @@ import { fr } from './fr';
 import { de } from './de';
 import { da } from './da';
 import { nl } from './nl';
+import { id } from './id';
 
 export const translations = {
   en,
@@ -29,7 +30,8 @@ export const translations = {
   fr,
   de,
   da,
-  nl
+  nl,
+  id
 } as const;
 
 export type Language = keyof typeof translations;
