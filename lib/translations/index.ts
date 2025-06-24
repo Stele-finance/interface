@@ -20,6 +20,7 @@ import { th } from './th';
 import { it } from './it';
 import { fi } from './fi';
 import { el } from './el';
+import { he } from './he';
 
 export const translations = {
   en,
@@ -43,7 +44,8 @@ export const translations = {
   th,
   it,
   fi,
-  el
+  el,
+  he
 } as const;
 
 export type Language = keyof typeof translations;

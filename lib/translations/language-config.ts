@@ -22,7 +22,8 @@ export const LANGUAGE_CONFIGS = {
   th: { name: 'Thai', nativeName: 'ภาษาไทย' },
   it: { name: 'Italian', nativeName: 'Italiano' },
   fi: { name: 'Finnish', nativeName: 'Suomi' },
-  el: { name: 'Greek', nativeName: 'Ελληνικά' }
+  el: { name: 'Greek', nativeName: 'Ελληνικά' },
+  he: { name: 'Hebrew', nativeName: 'עברית' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
