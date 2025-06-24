@@ -8,6 +8,7 @@ import { bn } from './bn';
 import { pt } from './pt';
 import { ru } from './ru';
 import { jp } from './jp';
+import { kr } from './kr';
 
 export const translations = {
   en,
@@ -19,7 +20,8 @@ export const translations = {
   bn,
   pt,
   ru,
-  jp
+  jp,
+  kr
 } as const;
 
 export type Language = keyof typeof translations;

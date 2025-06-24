@@ -7,10 +7,11 @@ export const LANGUAGE_CONFIGS = {
   es: { name: 'Spanish', nativeName: 'Español' },
   hi: { name: 'Hindi', nativeName: 'हिन्दी' },
   ar: { name: 'Arabic', nativeName: 'العربية' },
-  bn: { name: 'Bengali', nativeName: 'বাংলা' },
+  bn: { name: 'Bangladeshi', nativeName: 'বাংলা' },
   pt: { name: 'Portuguese', nativeName: 'Português' },
   ru: { name: 'Russian', nativeName: 'Русский' },
-  jp: { name: 'Japanese', nativeName: '日本語' }
+  jp: { name: 'Japanese', nativeName: '日本語' },
+  kr: { name: 'Korean', nativeName: '한국어' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;

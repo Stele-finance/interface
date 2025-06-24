@@ -95,10 +95,11 @@ if (isLanguageSupported('fr')) {
 | es | Spanish | Español | ✅ |
 | hi | Hindi | हिन्दी | ✅ |
 | ar | Arabic | العربية | ✅ |
-| bn | Bengali | বাংলা | ✅ |
+| bn | Bangladeshi | বাংলা | ✅ |
 | pt | Portuguese | Português | ✅ |
 | ru | Russian | Русский | ✅ |
 | jp | Japanese | 日本語 | ✅ |
+| kr | Korean | 한국어 | ✅ |
 
 ## 🚀 Future Expansion
 

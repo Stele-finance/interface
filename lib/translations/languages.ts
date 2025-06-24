@@ -32,7 +32,7 @@ export const SUPPORTED_LANGUAGES = {
   },
   bn: {
     code: 'bn',
-    name: 'Bengali',
+    name: 'Bangladeshi',
     nativeName: 'বাংলা'
   },
   pt: {
@@ -49,6 +49,11 @@ export const SUPPORTED_LANGUAGES = {
     code: 'jp',
     name: 'Japanese',
     nativeName: '日本語'
+  },
+  kr: {
+    code: 'kr',
+    name: 'Korean',
+    nativeName: '한국어'
   }
 } as const;
 

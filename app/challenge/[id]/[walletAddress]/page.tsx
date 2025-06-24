@@ -555,7 +555,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
-{t('goToChallenge')} {challengeId}
+            {t('goToChallenge')} {challengeId}
           </button>
         </div>
         
