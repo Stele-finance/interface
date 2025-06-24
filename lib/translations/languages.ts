@@ -59,6 +59,11 @@ export const SUPPORTED_LANGUAGES = {
     code: 'da',
     name: 'Danish',
     nativeName: 'Dansk'
+  },
+  nl: {
+    code: 'nl',
+    name: 'Dutch',
+    nativeName: 'Nederlands'
   }
 } as const;
 

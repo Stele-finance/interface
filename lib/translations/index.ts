@@ -12,6 +12,7 @@ import { kr } from './kr';
 import { fr } from './fr';
 import { de } from './de';
 import { da } from './da';
+import { nl } from './nl';
 
 export const translations = {
   en,
@@ -27,7 +28,8 @@ export const translations = {
   kr,
   fr,
   de,
-  da
+  da,
+  nl
 } as const;
 
 export type Language = keyof typeof translations;

@@ -13,7 +13,9 @@ export const LANGUAGE_CONFIGS = {
   jp: { name: 'Japanese', nativeName: '日本語' },
   kr: { name: 'Korean', nativeName: '한국어' },
   fr: { name: 'French', nativeName: 'Français' },
-  de: { name: 'German', nativeName: 'Deutsch' }
+  de: { name: 'German', nativeName: 'Deutsch' },
+  da: { name: 'Danish', nativeName: 'Dansk' },
+  nl: { name: 'Dutch', nativeName: 'Nederlands' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
