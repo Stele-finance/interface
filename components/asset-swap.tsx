@@ -96,9 +96,11 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   };
 
   // Use new hook to get prices for selected tokens only
+  // Only fetch prices when both tokens are selected to avoid unnecessary API calls
+  const shouldFetchPrices = fromToken && toToken && fromToken !== toToken;
   const { data: priceData, isLoading, error, refetch } = useSwapTokenPrices(
-    fromToken || null,
-    toToken || null,
+    shouldFetchPrices ? fromToken : null,
+    shouldFetchPrices ? toToken : null,
     getTokenAddress,
     getTokenDecimals
   );
