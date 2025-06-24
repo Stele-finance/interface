@@ -1096,22 +1096,22 @@ export default function VotePage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <h3 className="text-sm font-medium text-gray-400">{t('connectedWallet')}</h3>
-                <p className="text-sm font-mono text-gray-100">{walletAddress}</p>
+                <h3 className="text-base font-medium text-gray-400">{t('connectedWallet')}</h3>
+                <p className="text-base font-mono text-gray-100">{walletAddress}</p>
               </div>
               
               {isLoadingWalletTokenInfo ? (
                 <div className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                  <span className="text-sm text-gray-400">Loading token info...</span>
+                  <span className="text-base text-gray-400">Loading token info...</span>
                 </div>
               ) : walletTokenInfo ? (
                 <div className="text-right space-y-1">
-                  <div className="text-sm">
+                  <div className="text-base">
                     <span className="font-medium text-gray-300">{t('balance')}: </span>
                     <span className="font-mono text-gray-100">{Number(walletTokenInfo.formattedBalance).toLocaleString()} STELE</span>
                   </div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-sm text-gray-400">
                     <span>{t('delegatedTo')}: </span>
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
                       <span className="text-orange-400">Not delegated</span>
@@ -1122,7 +1122,7 @@ export default function VotePage() {
                     )}
                   </div>
                   {/* Voting Power Status */}
-                  <div className="text-xs">
+                  <div className="text-sm">
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
                       <span className="text-orange-400">⚠️ Delegate tokens to vote</span>
                     ) : Number(walletTokenInfo.formattedBalance) > 0 ? (
@@ -1134,7 +1134,7 @@ export default function VotePage() {
                 </div>
               ) : (
                 <div className="text-right">
-                  <div className="text-sm text-gray-400">Token info unavailable</div>
+                  <div className="text-base text-gray-400">Token info unavailable</div>
                 </div>
               )}
             </div>
@@ -1173,10 +1173,10 @@ export default function VotePage() {
       )}
 
       <Tabs defaultValue="active" value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="active">{t('active')}</TabsTrigger>
-          <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
-          <TabsTrigger value="all">{t('allProposals')}</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-gray-800/50">
+          <TabsTrigger value="active" className="text-base font-medium data-[state=active]:bg-gray-700">{t('active')}</TabsTrigger>
+          <TabsTrigger value="completed" className="text-base font-medium data-[state=active]:bg-gray-700">{t('completed')}</TabsTrigger>
+          <TabsTrigger value="all" className="text-base font-medium data-[state=active]:bg-gray-700">{t('allProposals')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
@@ -1184,11 +1184,11 @@ export default function VotePage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-12">{t('title')}</TableHead>
-                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14">{t('started')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14">{t('ends')}</TableHead>
-                  <TableHead className="text-gray-300 text-center pl-6">{t('status')}</TableHead>
+                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1253,11 +1253,11 @@ export default function VotePage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 rounded-tl-lg pl-12">Title</TableHead>
-                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote Start</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote End</TableHead>
-                  <TableHead className="text-gray-300 text-center rounded-tr-lg pl-6">Status</TableHead>                
+                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1322,11 +1322,11 @@ export default function VotePage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 rounded-tl-lg pl-12">Title</TableHead>
-                  <TableHead className="text-gray-300 pl-20">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote Start</TableHead>
-                  <TableHead className="text-gray-300 pl-14">Vote End</TableHead>
-                  <TableHead className="text-gray-300 text-center rounded-tr-lg pl-6">Status</TableHead>
+                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

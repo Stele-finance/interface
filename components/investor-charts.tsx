@@ -353,7 +353,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               dot={false}
               activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
             />
-                        {/* 실시간 데이터 포인트를 ReferenceDot으로 표시 */}
+            {/* Display real-time data points as ReferenceDot */}
             {realTimePortfolio && realTimePortfolio.totalValue > 0 && chartData.length > 0 && (() => {
               const lastDataPoint = chartData[chartData.length - 1]
               if (lastDataPoint && lastDataPoint.isRealTime) {
