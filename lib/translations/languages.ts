@@ -5,10 +5,15 @@ export const SUPPORTED_LANGUAGES = {
     name: 'English',
     nativeName: 'English'
   },
-  zh: {
-    code: 'zh',
-    name: 'Chinese',
-    nativeName: '中文'
+  'zh-cn': {
+    code: 'zh-cn',
+    name: 'Chinese - Simplified',
+    nativeName: '中文 - 简体'
+  },
+  'zh-tw': {
+    code: 'zh-tw',
+    name: 'Chinese - Traditional',
+    nativeName: '中文 - 繁體'
   },
   es: {
     code: 'es',

@@ -90,7 +90,8 @@ if (isLanguageSupported('fr')) {
 | Code | Language | Native Name | Status |
 |------|----------|-------------|--------|
 | en | English | English | ✅ |
-| zh | Chinese | 中文 | ✅ |
+| zh-cn | Chinese - Simplified | 中文 - 简体 | ✅ |
+| zh-tw | Chinese - Traditional | 中文 - 繁體 | ✅ |
 | es | Spanish | Español | ✅ |
 | hi | Hindi | हिन्दी | ✅ |
 | ar | Arabic | العربية | ✅ |

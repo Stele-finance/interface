@@ -2,7 +2,8 @@
 
 export const LANGUAGE_CONFIGS = {
   en: { name: 'English', nativeName: 'English' },
-  zh: { name: 'Chinese', nativeName: '中文' },
+  'zh-cn': { name: 'Chinese - Simplified', nativeName: '中文 - 简体' },
+  'zh-tw': { name: 'Chinese - Traditional', nativeName: '中文 - 繁體' },
   es: { name: 'Spanish', nativeName: 'Español' },
   hi: { name: 'Hindi', nativeName: 'हिन्दी' },
   ar: { name: 'Arabic', nativeName: 'العربية' },

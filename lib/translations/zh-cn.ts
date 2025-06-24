@@ -1,4 +1,4 @@
-export const zh = {
+export const zhCn = {
   abstain: "弃权",
   abstainVotes: "弃权",
   active: "活跃",

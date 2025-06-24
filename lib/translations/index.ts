@@ -1,5 +1,6 @@
 import { en } from './en';
-import { zh } from './zh';
+import { zhCn } from './zh-cn';
+import { zhTw } from './zh-tw';
 import { es } from './es';
 import { hi } from './hi';
 import { ar } from './ar';
@@ -10,7 +11,8 @@ import { jp } from './jp';
 
 export const translations = {
   en,
-  zh,
+  'zh-cn': zhCn,
+  'zh-tw': zhTw,
   es,
   hi,
   ar,
