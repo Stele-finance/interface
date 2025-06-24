@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Languages, Check, Globe } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { Language } from "@/lib/translations"
+import { getAllLanguageInfos } from "@/lib/translations/language-config"
 
 interface LanguageOption {
   code: Language;
@@ -19,72 +20,31 @@ interface LanguageOption {
   description: string;
 }
 
-const languages: LanguageOption[] = [
-  { 
-    code: 'en', 
-    name: 'English', 
-    nativeName: 'English', 
-    flag: '🇺🇸', 
-    region: 'North America',
-    description: 'Global business language'
-  },
-  { 
-    code: 'zh', 
-    name: 'Chinese', 
-    nativeName: '中文', 
-    flag: '🇨🇳', 
-    region: 'East Asia',
-    description: 'Simplified Chinese'
-  },
-  { 
-    code: 'es', 
-    name: 'Spanish', 
-    nativeName: 'Español', 
-    flag: '🇪🇸', 
-    region: 'Europe & Americas',
-    description: 'Castilian Spanish'
-  },
-  { 
-    code: 'hi', 
-    name: 'Hindi', 
-    nativeName: 'हिंदी', 
-    flag: '🇮🇳', 
-    region: 'South Asia',
-    description: 'Hindi language'
-  },
-  { 
-    code: 'ar', 
-    name: 'Arabic', 
-    nativeName: 'العربية', 
-    flag: '🇸🇦', 
-    region: 'Middle East',
-    description: 'Arabic (Saudi Arabia)'
-  },
-  { 
-    code: 'bn', 
-    name: 'Bengali', 
-    nativeName: 'বাংলা', 
-    flag: '🇧🇩', 
-    region: 'South Asia',
-    description: 'Bengali (Bangladesh)'
-  },
-  { 
-    code: 'pt', 
-    name: 'Portuguese', 
-    nativeName: 'Português', 
-    flag: '🇵🇹', 
-    region: 'Europe',
-    description: 'Portuguese (Portugal)'
-  },
-  { 
-    code: 'ru', 
-    name: 'Russian', 
-    nativeName: 'Русский', 
-    flag: '🇷🇺', 
-    region: 'Eastern Europe',
-    description: 'Russian (Russia)'
-  },
-];
+// Extended language data with regions and descriptions
+const getLanguageDetails = (): LanguageOption[] => {
+  const baseLanguages = getAllLanguageInfos();
+  
+  const languageDetails: Record<string, { region: string; description: string }> = {
+    'en': { region: 'North America', description: 'Global business language' },
+    'zh': { region: 'East Asia', description: 'Simplified Chinese' },
+    'es': { region: 'Europe & Americas', description: 'Castilian Spanish' },
+    'hi': { region: 'South Asia', description: 'Hindi language' },
+    'ar': { region: 'Middle East', description: 'Arabic (Saudi Arabia)' },
+    'bn': { region: 'South Asia', description: 'Bengali (Bangladesh)' },
+    'pt': { region: 'Europe', description: 'Portuguese (Portugal)' },
+    'ru': { region: 'Eastern Europe', description: 'Russian (Russia)' },
+    'jp': { region: 'East Asia', description: 'Japanese language' }
+  };
+
+  return baseLanguages.map(lang => ({
+    code: lang.code as Language,
+    name: lang.name,
+    nativeName: lang.nativeName,
+    flag: lang.flag,
+    region: languageDetails[lang.code]?.region || 'Global',
+    description: languageDetails[lang.code]?.description || `${lang.name} language`
+  }));
+};
 
 interface LanguageSelectorSidebarProps {
   children?: React.ReactNode;
@@ -93,8 +53,9 @@ interface LanguageSelectorSidebarProps {
 export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarProps) {
   const { language, setLanguage, t } = useLanguage();
   const [open, setOpen] = useState(false);
-
-  const currentLanguage = languages.find(lang => lang.code === language);
+  
+  const languages = getLanguageDetails();
+  const currentLanguage = languages.find((lang: LanguageOption) => lang.code === language);
 
   const handleLanguageSelect = (languageCode: Language) => {
     setLanguage(languageCode);
@@ -147,7 +108,7 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
               Available Languages
             </h3>
             <div className="space-y-2">
-              {languages.map((lang) => (
+              {languages.map((lang: LanguageOption) => (
                 <Button
                   key={lang.code}
                   variant={language === lang.code ? "default" : "ghost"}
