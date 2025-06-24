@@ -65,6 +65,7 @@ export const ru = {
     delegatedTo: "Делегировано",
     description: "Описание",
     detailedDescriptionVote: "Подробное описание",
+    detailedDescriptionPlaceholder: "Объясните ваше предложение подробно.",
     disconnect: "Отключить",
     doc: "Документ",
     duration: "Продолжительность",
