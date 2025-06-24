@@ -17,7 +17,8 @@ export const LANGUAGE_CONFIGS = {
   da: { name: 'Danish', nativeName: 'Dansk' },
   nl: { name: 'Dutch', nativeName: 'Nederlands' },
   id: { name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
-  ms: { name: 'Malay', nativeName: 'Bahasa Melayu' }
+  ms: { name: 'Malay', nativeName: 'Bahasa Melayu' },
+  vi: { name: 'Vietnamese', nativeName: 'Tiếng Việt' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
