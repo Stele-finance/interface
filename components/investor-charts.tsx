@@ -192,6 +192,15 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
 
   const metrics = getInvestorMetrics()
 
+  // Ranking data (mock data for visualization)
+  const rankingData = [
+    { rank: 1, value: 1200, color: '#F59E0B', emoji: '👑' },
+    { rank: 2, value: 800, color: '#9CA3AF', emoji: '🥈' },
+    { rank: 3, value: 600, color: '#CD7F32', emoji: '🥉' },
+    { rank: 4, value: 500, color: '#3B82F6', emoji: '4️⃣' },
+    { rank: 5, value: 400, color: '#10B981', emoji: '5️⃣' }
+  ]
+
   // Get current date for header
   const currentDate = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -209,17 +218,60 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
       const isRealTime = dataPoint?.isRealTime
       
       return (
-        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
-          <p className="text-gray-100 text-sm font-medium">
+        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-4 py-3 shadow-xl backdrop-blur-sm min-w-[280px]">
+          <p className="text-gray-100 text-sm font-medium mb-2">
             {t('portfolioValue')}: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           {isRealTime && (
-            <div className="flex items-center gap-1 mt-1">
+            <div className="flex items-center gap-1 mb-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               <p className="text-green-400 text-xs">{t('liveUniswapV3')}</p>
             </div>
           )}
-          <p className="text-gray-400 text-xs mt-1">
+          
+          {/* Show ranking information when hovering over real-time data */}
+          {isRealTime && (
+            <div className="border-t border-gray-600 pt-2 mt-2">
+              <p className="text-gray-300 text-xs font-medium mb-2">Current Rankings:</p>
+              <div className="space-y-1">
+                {rankingData.map((ranking) => (
+                  <div key={ranking.rank} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full border border-white flex items-center justify-center"
+                        style={{ backgroundColor: ranking.color }}
+                      >
+                        <span className="text-white text-[8px] font-bold">{ranking.rank}</span>
+                      </div>
+                      <span className="text-gray-300 text-xs">
+                        {ranking.rank === 1 ? '🥇' : ranking.rank === 2 ? '🥈' : ranking.rank === 3 ? '🥉' : `${ranking.rank}위`}
+                      </span>
+                    </div>
+                    <span className="text-gray-100 text-xs font-medium">
+                      ${ranking.value.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Show current user's position relative to rankings */}
+              <div className="border-t border-gray-600 pt-2 mt-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-orange-500 border border-white flex items-center justify-center">
+                      <span className="text-white text-[8px] font-bold">You</span>
+                    </div>
+                    <span className="text-orange-400 text-xs font-medium">Your Position</span>
+                  </div>
+                  <span className="text-orange-400 text-xs font-medium">
+                    ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <p className="text-gray-400 text-xs mt-2">
             {dataPoint?.fullDate}
           </p>
         </div>
@@ -385,6 +437,54 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
                 )
               }
               return null
+            })()}
+            
+            {/* Display ranking dots at current time position */}
+            {chartData.length > 0 && (() => {
+              const lastDataPoint = chartData[chartData.length - 1]
+              if (!lastDataPoint) return null
+              
+              return rankingData.map((ranking) => {
+                const RankingPulsingDot = (props: any) => (
+                  <g>
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={8}
+                      fill={ranking.color}
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                    >
+                      <animate
+                        attributeName="opacity"
+                        values="1;0.4;1"
+                        dur={`${1.5 + ranking.rank * 0.2}s`}
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                    <text
+                      x={props.cx}
+                      y={props.cy + 1}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize="10"
+                      fill="#ffffff"
+                      fontWeight="bold"
+                    >
+                      {ranking.rank}
+                    </text>
+                  </g>
+                )
+                
+                return (
+                  <ReferenceDot
+                    key={`ranking-dot-${ranking.rank}`}
+                    x={lastDataPoint.timeLabel}
+                    y={ranking.value}
+                    shape={<RankingPulsingDot />}
+                  />
+                )
+              })
             })()}
           </AreaChart>
         </ResponsiveContainer>
