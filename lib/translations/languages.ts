@@ -69,6 +69,11 @@ export const SUPPORTED_LANGUAGES = {
     code: 'id',
     name: 'Indonesian',
     nativeName: 'Bahasa Indonesia'
+  },
+  ms: {
+    code: 'ms',
+    name: 'Malay',
+    nativeName: 'Bahasa Melayu'
   }
 } as const;
 
