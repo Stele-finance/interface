@@ -15,6 +15,13 @@ import { da } from './da';
 import { nl } from './nl';
 import { id } from './id';
 import { ms } from './ms';
+import { vi } from './vi';
+import { th } from './th';
+import { it } from './it';
+import { fi } from './fi';
+import { el } from './el';
+import { he } from './he';
+import { hu } from './hu';
 
 export const translations = {
   en,
@@ -33,7 +40,14 @@ export const translations = {
   da,
   nl,
   id,
-  ms
+  ms,
+  vi,
+  th,
+  it,
+  fi,
+  el,
+  he,
+  hu
 } as const;
 
 export type Language = keyof typeof translations;

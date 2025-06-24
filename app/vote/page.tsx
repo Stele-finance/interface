@@ -778,8 +778,8 @@ export default function VotePage() {
     if (!walletAddress) {
       toast({
         variant: "destructive",
-        title: "Phantom Wallet Not Connected",
-        description: "Please connect your Phantom wallet to delegate",
+        title: t('phantomWalletNotConnected'),
+        description: t('connectPhantomWalletToDelegate'),
       })
       return
     }
@@ -789,7 +789,7 @@ export default function VotePage() {
     try {
       // Check if Phantom wallet is available
       if (!window.phantom?.ethereum) {
-        throw new Error("Phantom wallet is not installed or Ethereum support is not enabled")
+        throw new Error(t('phantomWalletNotInstalled'))
       }
 
       // Request wallet connection
@@ -804,22 +804,22 @@ export default function VotePage() {
       const tx = await votesContract.delegate(walletAddress)
 
       toast({
-        title: "Transaction Submitted",
-        description: "Your delegation is being processed...",
+        title: t('transactionSubmitted'),
+        description: t('delegationProcessing'),
       })
 
       // Wait for transaction confirmation
       const receipt = await tx.wait()
 
       toast({
-        title: "Delegation Successful",
-        description: "You have successfully delegated your tokens to yourself. Your voting power should now be available.",
+        title: t('delegationSuccessful'),
+        description: t('delegationSuccessfulMessage'),
         action: (
                       <ToastAction 
-              altText="View on Etherscan"
+              altText={t('viewOnEtherscan')}
               onClick={() => window.open(`https://etherscan.io/tx/${receipt.hash}`, '_blank')}
             >
-              View on Etherscan
+              {t('viewOnEtherscan')}
             </ToastAction>
         ),
       })
@@ -833,19 +833,19 @@ export default function VotePage() {
     } catch (error: any) {
       console.error("Delegation error:", error)
       
-      let errorMessage = "There was an error delegating your tokens. Please try again."
+      let errorMessage = t('errorDelegatingTokens')
       
       if (error.code === 4001) {
-        errorMessage = "Transaction was rejected by user"
+        errorMessage = t('transactionRejected')
       } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees"
+        errorMessage = t('insufficientFundsGas')
       } else if (error.message?.includes("Phantom wallet is not installed")) {
-        errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
+        errorMessage = t('phantomWalletNotInstalled')
       }
 
       toast({
         variant: "destructive",
-        title: "Delegation Failed",
+        title: t('delegationFailed'),
         description: errorMessage,
       })
     } finally {
@@ -880,18 +880,18 @@ export default function VotePage() {
       // Wait for both minimum loading time and data fetching
       await Promise.all([minLoadingTime, refetchPromises])
       
-      toast({
-        title: "Success",
-        description: "Data refreshed successfully",
-        variant: "default",
-      })
+              toast({
+          title: t('success'),
+          description: t('dataRefreshedSuccessfully'),
+          variant: "default",
+        })
     } catch (error) {
       console.error('Error refreshing data:', error)
-      toast({
-        title: "Error",
-        description: "Failed to refresh data",
-        variant: "destructive",
-      })
+              toast({
+          title: "Error",
+          description: t('failedToRefreshData'),
+          variant: "destructive",
+        })
     } finally {
       setIsInitialLoading(false)
     }
@@ -1014,7 +1014,7 @@ export default function VotePage() {
             refetchActionable()
             refetchCompletedByStatus()
             refetchAllByStatus()
-          }} className="bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700">Retry</Button>
+          }} className="bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700">{t('retry')}</Button>
         </div>
       </div>
     )
@@ -1067,8 +1067,8 @@ export default function VotePage() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h3 className="text-sm font-medium text-orange-400">⚠️ Delegate Required to Vote</h3>
-                  <p className="text-xs text-gray-400">You need to delegate your tokens to participate in governance</p>
+                  <h3 className="text-sm font-medium text-orange-400">{t('delegateRequiredToVote')}</h3>
+                  <p className="text-xs text-gray-400">{t('youNeedToDelegate')}</p>
                 </div>
                 <Button 
                   variant="outline"
@@ -1080,12 +1080,12 @@ export default function VotePage() {
                   {isDelegating ? (
                     <div className="flex items-center">
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                      Delegating...
+                      {t('delegating')}
                     </div>
                   ) : (
                     <>
                       <VoteIcon className="mr-2 h-3 w-3" />
-                      Delegate to Self
+                      {t('delegateToSelf')}
                     </>
                   )}
                 </Button>
@@ -1103,7 +1103,7 @@ export default function VotePage() {
               {isLoadingWalletTokenInfo ? (
                 <div className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                  <span className="text-base text-gray-400">Loading token info...</span>
+                  <span className="text-base text-gray-400">{t('loadingTokenInfo')}</span>
                 </div>
               ) : walletTokenInfo ? (
                 <div className="text-right space-y-1">
@@ -1114,7 +1114,7 @@ export default function VotePage() {
                   <div className="text-sm text-gray-400">
                     <span>{t('delegatedTo')}: </span>
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
-                      <span className="text-orange-400">Not delegated</span>
+                      <span className="text-orange-400">{t('notDelegated')}</span>
                     ) : walletTokenInfo.delegatedTo === walletAddress ? (
                       <span className="text-green-400">Self</span>
                     ) : (
@@ -1124,17 +1124,17 @@ export default function VotePage() {
                   {/* Voting Power Status */}
                   <div className="text-sm">
                     {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
-                      <span className="text-orange-400">⚠️ Delegate tokens to vote</span>
+                      <span className="text-orange-400">{t('delegateTokensToVote')}</span>
                     ) : Number(walletTokenInfo.formattedBalance) > 0 ? (
                       <span className="text-green-400">✅ {t('readyToVote')}</span>
                     ) : (
-                      <span className="text-gray-500">No STELE tokens</span>
+                      <span className="text-gray-500">{t('noSTELETokens')}</span>
                     )}
                   </div>
                 </div>
               ) : (
                 <div className="text-right">
-                  <div className="text-base text-gray-400">Token info unavailable</div>
+                  <div className="text-base text-gray-400">{t('tokenInfoUnavailable')}</div>
                 </div>
               )}
             </div>
@@ -1148,11 +1148,11 @@ export default function VotePage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <h3 className="text-sm font-medium text-gray-400">Wallet Not Connected</h3>
-                <p className="text-xs text-gray-400">Connect your wallet to view token balance and vote on proposals</p>
+                <h3 className="text-sm font-medium text-gray-400">{t('walletNotConnected')}</h3>
+                <p className="text-xs text-gray-400">{t('connectWalletToViewBalance')}</p>
               </div>
               <div className="text-right">
-                <div className="text-sm text-orange-400">🔗 Please connect your wallet</div>
+                <div className="text-sm text-orange-400">{t('pleaseConnectWallet')}</div>
               </div>
             </div>
           </CardContent>
@@ -1161,7 +1161,7 @@ export default function VotePage() {
 
       {(errorActionable || errorCompletedByStatus || errorAllByStatus || governanceConfigError) && (
         <div className="bg-amber-900/20 border border-amber-700/50 text-amber-400 px-4 py-3 rounded-md mb-6">
-          <p>Warning: {(() => {
+          <p>{t('warning')}: {(() => {
             const displayError = errorActionable || errorCompletedByStatus || errorAllByStatus || governanceConfigError
             return typeof displayError === 'string' ? displayError : displayError?.message || 'Failed to load data'
           })()}</p>
@@ -1225,7 +1225,7 @@ export default function VotePage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12 text-gray-400">
-                      No active proposals found.
+                      {t('noActiveProposalsFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -1294,7 +1294,7 @@ export default function VotePage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-12 text-gray-400">
-                      No completed proposals found.
+                      {t('noCompletedProposalsFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -1363,7 +1363,7 @@ export default function VotePage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12 text-gray-400">
-                      No proposals found.
+                      {t('noProposalsFound')}
                     </TableCell>
                   </TableRow>
                 )}

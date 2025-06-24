@@ -2,22 +2,29 @@
 
 export const LANGUAGE_CONFIGS = {
   en: { name: 'English', nativeName: 'English' },
-  'zh-cn': { name: 'Chinese - Simplified', nativeName: '中文 - 简体' },
-  'zh-tw': { name: 'Chinese - Traditional', nativeName: '中文 - 繁體' },
-  es: { name: 'Spanish', nativeName: 'Español' },
-  hi: { name: 'Hindi', nativeName: 'हिन्दी' },
   ar: { name: 'Arabic', nativeName: 'العربية' },
   bn: { name: 'Bangladeshi', nativeName: 'বাংলা' },
-  pt: { name: 'Portuguese', nativeName: 'Português' },
-  ru: { name: 'Russian', nativeName: 'Русский' },
-  jp: { name: 'Japanese', nativeName: '日本語' },
-  kr: { name: 'Korean', nativeName: '한국어' },
-  fr: { name: 'French', nativeName: 'Français' },
-  de: { name: 'German', nativeName: 'Deutsch' },
+  'zh-cn': { name: 'Chinese - Simplified', nativeName: '中文 - 简体' },
+  'zh-tw': { name: 'Chinese - Traditional', nativeName: '中文 - 繁體' },
   da: { name: 'Danish', nativeName: 'Dansk' },
   nl: { name: 'Dutch', nativeName: 'Nederlands' },
+  fi: { name: 'Finnish', nativeName: 'Suomi' },
+  fr: { name: 'French', nativeName: 'Français' },
+  de: { name: 'German', nativeName: 'Deutsch' },
+  el: { name: 'Greek', nativeName: 'Ελληνικά' },
+  he: { name: 'Hebrew', nativeName: 'עברית' },
+  hi: { name: 'Hindi', nativeName: 'हिन्दी' },
+  hu: { name: 'Hungarian', nativeName: 'Magyar' },
   id: { name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
-  ms: { name: 'Malay', nativeName: 'Bahasa Melayu' }
+  it: { name: 'Italian', nativeName: 'Italiano' },
+  jp: { name: 'Japanese', nativeName: '日本語' },
+  kr: { name: 'Korean', nativeName: '한국어' },
+  ms: { name: 'Malay', nativeName: 'Bahasa Melayu' },
+  pt: { name: 'Portuguese', nativeName: 'Português' },
+  ru: { name: 'Russian', nativeName: 'Русский' },
+  es: { name: 'Spanish', nativeName: 'Español' },
+  th: { name: 'Thai', nativeName: 'ภาษาไทย' },
+  vi: { name: 'Vietnamese', nativeName: 'Tiếng Việt' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
