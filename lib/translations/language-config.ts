@@ -11,7 +11,8 @@ export const LANGUAGE_CONFIGS = {
   pt: { name: 'Portuguese', nativeName: 'Português' },
   ru: { name: 'Russian', nativeName: 'Русский' },
   jp: { name: 'Japanese', nativeName: '日本語' },
-  kr: { name: 'Korean', nativeName: '한국어' }
+  kr: { name: 'Korean', nativeName: '한국어' },
+  fr: { name: 'French', nativeName: 'Français' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
