@@ -19,7 +19,8 @@ export const LANGUAGE_CONFIGS = {
   id: { name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
   ms: { name: 'Malay', nativeName: 'Bahasa Melayu' },
   vi: { name: 'Vietnamese', nativeName: 'Tiếng Việt' },
-  th: { name: 'Thai', nativeName: 'ภาษาไทย' }
+  th: { name: 'Thai', nativeName: 'ภาษาไทย' },
+  it: { name: 'Italian', nativeName: 'Italiano' }
 } as const;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIGS;
