@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { ArrowRight, BarChart3, LineChart, PieChart, Loader2, User, Receipt, ArrowLeftRight, Trophy, Medal, Crown, DollarSign, UserPlus, Plus } from "lucide-react"
+import { ArrowRight, BarChart3, LineChart, PieChart, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
@@ -36,6 +36,8 @@ interface ChallengePortfolioProps {
 function RankingSection({ challengeId }: { challengeId: string }) {
   const { t } = useLanguage()
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const formatAddress = (address: string) => {
     // Check if address is empty or zero address
@@ -63,34 +65,92 @@ function RankingSection({ challengeId }: { challengeId: string }) {
   };
 
   const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Crown className="h-5 w-5 text-yellow-500" />;
-      case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
-      case 3:
-        return <Medal className="h-5 w-5 text-amber-600" />;
-      default:
-        return <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">{rank}</div>;
+    if (rank <= 3) {
+      const emojis = ['🥇', '🥈', '🥉'];
+      return <span className="text-3xl">{emojis[rank - 1]}</span>;
+    } else if (rank <= 5) {
+      return (
+        <div className="relative w-8 h-8 flex items-center justify-center">
+          <svg width="32" height="32" viewBox="0 0 24 24">
+            {/* Outer medal circle */}
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              fill={rank === 4 ? '#4F46E5' : '#10B981'}
+              stroke="#FFD700"
+              strokeWidth="2"
+            />
+            {/* Inner circle */}
+            <circle
+              cx="12"
+              cy="12"
+              r="6"
+              fill="none"
+              stroke="#FFD700"
+              strokeWidth="1"
+            />
+            {/* Number */}
+            <text
+              x="12"
+              y="13"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="8"
+              fill="#FFFFFF"
+              fontWeight="bold"
+            >
+              {rank}
+            </text>
+          </svg>
+        </div>
+      );
+    } else {
+      return <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">{rank}</div>;
     }
   };
 
   const getRankColor = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-700/50 text-yellow-100';
-      case 2:
-        return 'bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-600/50 text-gray-100';
-      case 3:
-        return 'bg-gradient-to-r from-amber-900/20 to-amber-800/20 border-amber-700/50 text-amber-100';
-      default:
-        return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
-    }
+    return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
   };
+
+  // Calculate pagination
+  const totalUsers = rankingData?.topUsers?.length || 0;
+  const totalPages = Math.ceil(totalUsers / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = rankingData?.topUsers?.slice(startIndex, endIndex) || [];
 
   return (
     <div>
-      <h2 className="text-3xl text-gray-100 mb-6">{t('totalRanking')}</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-3xl text-gray-100">Ranking</h2>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              <ArrowLeftRight className="h-4 w-4 rotate-180" />
+            </Button>
+            <span className="text-sm text-gray-400">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-6">
           <div className="space-y-3">
@@ -106,9 +166,9 @@ function RankingSection({ challengeId }: { challengeId: string }) {
                 <p className="text-sm text-gray-500 mt-2">{rankingError.message}</p>
               </div>
             ) : rankingData && rankingData.topUsers.length > 0 ? (
-              rankingData.topUsers.map((user, index) => {
-                const rank = index + 1;
-                const profitRatio = rankingData.profitRatios[index];
+              currentUsers.map((user, index) => {
+                const rank = startIndex + index + 1;
+                const profitRatio = rankingData.profitRatios[startIndex + index];
                 const formattedAddress = formatAddress(user);
                 const isEmptySlot = !formattedAddress;
 
@@ -117,7 +177,7 @@ function RankingSection({ challengeId }: { challengeId: string }) {
                     key={`${user}-${rank}`} 
                     className={`flex items-center justify-between p-3 rounded-lg border ${getRankColor(rank)}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-6">
                       {getRankIcon(rank)}
                       <div>
                         <div className="font-medium">
@@ -143,11 +203,23 @@ function RankingSection({ challengeId }: { challengeId: string }) {
               <div className="text-center py-8 text-gray-400">
                 <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>{t('noRankingDataFound')}</p>
-                                  <p className="text-sm mt-1">{t('rankingsWillAppear')}</p>
+                <p className="text-sm mt-1">{t('rankingsWillAppear')}</p>
               </div>
             )}
           </div>
-          {rankingData && (
+          {rankingData && totalPages > 1 && (
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <div className="flex justify-between items-center">
+                <div className="text-xs text-gray-500">
+                  Showing {startIndex + 1}-{Math.min(endIndex, totalUsers)} of {totalUsers} users
+                </div>
+                <div className="text-xs text-gray-500">
+                  Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          )}
+          {rankingData && totalPages <= 1 && (
             <div className="mt-4 pt-4 border-t border-gray-700">
               <div className="text-xs text-gray-500 text-center">
                 Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}

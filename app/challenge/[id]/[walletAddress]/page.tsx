@@ -112,6 +112,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [rankingCurrentPage, setRankingCurrentPage] = useState(1)
   const itemsPerPage = 5
   const maxPages = 5
 
@@ -878,10 +879,21 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           <p className="text-sm text-gray-400 mt-2">Please try again later</p>
                         </div>
                       ) : rankingData && rankingData.topUsers.length > 0 ? (
-                        rankingData.topUsers.map((user, index) => {
-                          const rank = index + 1;
-                          const score = rankingData.scores[index];
-                          const profitRatio = rankingData.profitRatios[index];
+                        (() => {
+                          // Calculate pagination for ranking
+                          const totalRankingUsers = Math.min(rankingData.topUsers.length, maxPages * itemsPerPage);
+                          const rankingStartIndex = (rankingCurrentPage - 1) * itemsPerPage;
+                          const rankingEndIndex = Math.min(rankingStartIndex + itemsPerPage, totalRankingUsers);
+                          const paginatedUsers = rankingData.topUsers.slice(rankingStartIndex, rankingEndIndex);
+                          const rankingTotalPages = Math.min(Math.ceil(totalRankingUsers / itemsPerPage), maxPages);
+
+                          return (
+                            <div className="space-y-4">
+                              {paginatedUsers.map((user, paginatedIndex) => {
+                                const actualIndex = rankingStartIndex + paginatedIndex;
+                                const rank = actualIndex + 1;
+                                const score = rankingData.scores[actualIndex];
+                                const profitRatio = rankingData.profitRatios[actualIndex];
                           
                           // Format address
                           const formatAddress = (address: string) => {
@@ -920,6 +932,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                 return '🥈';
                               case 3:
                                 return '🥉';
+                              case 4:
+                                return '4️⃣';
+                              case 5:
+                                return '5️⃣';
                               default:
                                 return rank.toString();
                             }
@@ -951,7 +967,71 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center justify-center w-10 h-10">
                                   {rank <= 3 ? (
-                                    <span className="text-2xl">{getRankIcon(rank)}</span>
+                                    <span className="text-3xl">{getRankIcon(rank)}</span>
+                                  ) : rank === 4 ? (
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          fill="#4F46E5"
+                                          stroke="#FFD700"
+                                          strokeWidth="2"
+                                        />
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="6"
+                                          fill="none"
+                                          stroke="#FFD700"
+                                          strokeWidth="1"
+                                        />
+                                        <text
+                                          x="12"
+                                          y="13"
+                                          textAnchor="middle"
+                                          dominantBaseline="middle"
+                                          fontSize="8"
+                                          fill="#FFFFFF"
+                                          fontWeight="bold"
+                                        >
+                                          4
+                                        </text>
+                                      </svg>
+                                    </div>
+                                  ) : rank === 5 ? (
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          fill="#10B981"
+                                          stroke="#FFD700"
+                                          strokeWidth="2"
+                                        />
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="6"
+                                          fill="none"
+                                          stroke="#FFD700"
+                                          strokeWidth="1"
+                                        />
+                                        <text
+                                          x="12"
+                                          y="13"
+                                          textAnchor="middle"
+                                          dominantBaseline="middle"
+                                          fontSize="8"
+                                          fill="#FFFFFF"
+                                          fontWeight="bold"
+                                        >
+                                          5
+                                        </text>
+                                      </svg>
+                                    </div>
                                   ) : (
                                     <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                                       <span className="text-sm font-bold text-white">{rank}</span>
@@ -986,8 +1066,46 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               </div>
                             </div>
                           );
-                        })
-                      ) : (
+                        })}
+                        
+                        {/* Pagination for Ranking */}
+                        {rankingTotalPages > 1 && (
+                          <div className="flex justify-center mt-6">
+                            <Pagination>
+                              <PaginationContent>
+                                <PaginationItem>
+                                  <PaginationPrevious 
+                                    onClick={() => setRankingCurrentPage(Math.max(1, rankingCurrentPage - 1))}
+                                    className={rankingCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                  />
+                                </PaginationItem>
+                                
+                                {Array.from({ length: rankingTotalPages }, (_, i) => i + 1).map((page) => (
+                                  <PaginationItem key={page}>
+                                    <PaginationLink
+                                      onClick={() => setRankingCurrentPage(page)}
+                                      isActive={rankingCurrentPage === page}
+                                      className="cursor-pointer"
+                                    >
+                                      {page}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                ))}
+                                
+                                <PaginationItem>
+                                  <PaginationNext 
+                                    onClick={() => setRankingCurrentPage(Math.min(rankingTotalPages, rankingCurrentPage + 1))}
+                                    className={rankingCurrentPage === rankingTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                  />
+                                </PaginationItem>
+                              </PaginationContent>
+                            </Pagination>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()
+                ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No ranking data found</p>
