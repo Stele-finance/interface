@@ -27,6 +27,7 @@ import { useChallenge } from "@/app/hooks/useChallenge"
 import { useTransactions } from "@/app/hooks/useTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useInvestorData } from "@/app/subgraph/Account"
+import Image from "next/image"
 
 interface ChallengePortfolioProps {
   challengeId: string
@@ -211,9 +212,6 @@ function RankingSection({ challengeId }: { challengeId: string }) {
             <div className="mt-4 pt-4 border-t border-gray-700">
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500">
-                  Showing {startIndex + 1}-{Math.min(endIndex, totalUsers)} of {totalUsers} users
-                </div>
-                <div className="text-xs text-gray-500">
                   Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
                 </div>
               </div>
@@ -286,6 +284,35 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId);
   const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId);
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+
+  // Get token logo path based on symbol
+  const getTokenLogo = (symbol: string) => {
+    const symbolLower = symbol.toLowerCase()
+    // Check if we have a logo for this token
+    const availableLogos = ['usdc', 'eth', 'weth']
+    if (availableLogos.includes(symbolLower)) {
+      return `/tokens/${symbolLower}.png`
+    }
+    // Return null if no logo exists
+    return null
+  }
+
+  // Get swap details from transaction data
+  const getSwapDetails = (transaction: any) => {
+    if (transaction.type !== 'swap') return null
+    
+    // Use the swap data from the transaction
+    if (transaction.fromAssetSymbol && transaction.toAssetSymbol) {
+      return {
+        fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
+        fromToken: transaction.fromAssetSymbol,
+        toAmount: parseFloat(transaction.toAmount).toFixed(4),
+        toToken: transaction.toAssetSymbol
+      }
+    }
+    
+    return null
+  }
   
   // Check if current user has joined this challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
@@ -941,9 +968,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       <ChallengeCharts challengeId={challengeId} />
 
       {/* Transactions and Ranking Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Transactions */}
-        <div>
+        <div className="lg:col-span-2">
           <h2 className="text-3xl text-gray-100 mb-6">{t('recentTransactions')}</h2>
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-6">
@@ -1030,8 +1057,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               <div className={`w-8 h-8 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
                                 {getTransactionIcon(transaction.type)}
                               </div>
-                              <div>
-                                <div className="font-medium text-gray-100">{transaction.details}</div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-100">
+                                  {transaction.type === 'swap' ? 'Swapped' : transaction.details}
+                                </div>
                                 <div className="text-sm text-gray-400">
                                   {formatTimestamp(transaction.timestamp)}
                                   {transaction.user && ` • ${formatUserAddress(transaction.user)}`}
@@ -1039,7 +1068,55 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              {transaction.type === 'swap' ? (
+                                (() => {
+                                  const swapDetails = getSwapDetails(transaction)
+                                  if (swapDetails) {
+                                    const fromLogo = getTokenLogo(swapDetails.fromToken)
+                                    const toLogo = getTokenLogo(swapDetails.toToken)
+                                    return (
+                                      <div className="flex items-center gap-3 justify-end">
+                                        <div className="flex items-center gap-2">
+                                          {fromLogo ? (
+                                            <Image 
+                                              src={fromLogo} 
+                                              alt={swapDetails.fromToken}
+                                              width={20}
+                                              height={20}
+                                              className="rounded-full"
+                                            />
+                                          ) : (
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                              {swapDetails.fromToken.slice(0, 1)}
+                                            </div>
+                                          )}
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
+                                        </div>
+                                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                                        <div className="flex items-center gap-2">
+                                          {toLogo ? (
+                                            <Image 
+                                              src={toLogo} 
+                                              alt={swapDetails.toToken}
+                                              width={20}
+                                              height={20}
+                                              className="rounded-full"
+                                            />
+                                          ) : (
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                              {swapDetails.toToken.slice(0, 1)}
+                                            </div>
+                                          )}
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toToken}</span>
+                                        </div>
+                                      </div>
+                                    )
+                                  }
+                                  return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                })()
+                              ) : (
+                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              )}
                             </div>
                           </div>
                         ))}

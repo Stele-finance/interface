@@ -25,6 +25,7 @@ import {
   User,
   Trophy,
   ArrowLeft,
+  ArrowRight,
   Loader2,
   Receipt,
   FileText,
@@ -41,6 +42,7 @@ import { useInvestorTransactions } from "@/app/hooks/useInvestorTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
@@ -115,6 +117,55 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [rankingCurrentPage, setRankingCurrentPage] = useState(1)
   const itemsPerPage = 5
   const maxPages = 5
+
+  // Get token logo path based on symbol
+  const getTokenLogo = (symbol: string) => {
+    const symbolLower = symbol.toLowerCase()
+    // Check if we have a logo for this token
+    const availableLogos = ['usdc', 'eth', 'weth']
+    if (availableLogos.includes(symbolLower)) {
+      return `/tokens/${symbolLower}.png`
+    }
+    // Return null if no logo exists
+    return null
+  }
+
+  // Get swap details from transaction data
+  const getSwapDetails = (transaction: any) => {
+    if (transaction.type !== 'swap') return null
+    
+    // First try: Use the swap data from the transaction
+    if (transaction.fromAssetSymbol && transaction.toAssetSymbol && transaction.fromAmount && transaction.toAmount) {
+      const swapDetails = {
+        fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
+        fromToken: transaction.fromAssetSymbol,
+        toAmount: parseFloat(transaction.toAmount).toFixed(4),
+        toToken: transaction.toAssetSymbol
+      }
+      return swapDetails
+    }
+    
+    // Second try: Parse from details string (format: "USDC → ETH" or "ETH → USDC")
+    if (transaction.details && transaction.amount) {
+      const arrowPattern = /(\w+)\s*→\s*(\w+)/i
+      const match = transaction.details.match(arrowPattern)
+      
+      if (match) {
+        // Extract amount from transaction.amount field (format: "0.1000 ETH")
+        const amountMatch = transaction.amount.match(/([\d.]+)\s+(\w+)/)
+        
+        const swapDetails = {
+          fromAmount: amountMatch ? amountMatch[1] : '0',
+          fromToken: match[1],
+          toAmount: '0', // We don't have the toAmount in this format
+          toToken: match[2]
+        }
+        return swapDetails
+      }
+    }
+    
+    return null
+  }
 
   // Ensure client-side rendering for time calculations
   useEffect(() => {
@@ -800,13 +851,65 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     <div className={`h-10 w-10 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
                                       {getTransactionIcon(transaction.type)}
                                     </div>
-                                    <div>
-                                      <p className="font-medium text-gray-100">{transaction.details}</p>
+                                    <div className="flex-1">
+                                      <div className="font-medium text-gray-100">
+                                        {transaction.type === 'swap' ? 'Swapped' : transaction.details}
+                                      </div>
                                       <p className="text-sm text-gray-400">{formatTimestamp(transaction.timestamp)}</p>
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <p className="font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                    {transaction.type === 'swap' ? (
+                                      (() => {
+                                        const swapDetails = getSwapDetails(transaction)
+                                        if (swapDetails) {
+                                          const fromLogo = getTokenLogo(swapDetails.fromToken)
+                                          const toLogo = getTokenLogo(swapDetails.toToken)
+                                          return (
+                                            <div className="flex items-center gap-3 justify-end">
+                                              <div className="flex items-center gap-2">
+                                                {fromLogo ? (
+                                                  <Image 
+                                                    src={fromLogo} 
+                                                    alt={swapDetails.fromToken}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                                    {swapDetails.fromToken.slice(0, 1)}
+                                                  </div>
+                                                )}
+                                                <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
+                                              </div>
+                                              <ArrowRight className="h-4 w-4 text-gray-400" />
+                                              <div className="flex items-center gap-2">
+                                                {toLogo ? (
+                                                  <Image 
+                                                    src={toLogo} 
+                                                    alt={swapDetails.toToken}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                                    {swapDetails.toToken.slice(0, 1)}
+                                                  </div>
+                                                )}
+                                                <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{swapDetails.toToken}</span>
+                                              </div>
+                                            </div>
+                                          )
+                                        }
+                                        return <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                      })()
+                                    ) : transaction.type === 'join' ? (
+                                      <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                    ) : (
+                                      <p className="font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                    )}
                                   </div>
                                 </div>
                               ))}

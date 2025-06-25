@@ -36,14 +36,10 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
   // Format profit ratio as percentage
   const formatProfitRatio = (profitRatio: string) => {
     const ratio = parseFloat(profitRatio)
-    return `${(ratio * 100).toFixed(2)}%`
+    return `${ratio.toFixed(2)}%`
   }
 
-  // Format score
-  const formatScore = (score: string) => {
-    const scoreValue = parseFloat(score)
-    return scoreValue.toFixed(4)
-  }
+
 
   if (isLoading) {
     return (
@@ -91,9 +87,9 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
         </Badge>
       </div>
       <Card className="bg-transparent border border-gray-700/50">
-        <CardContent>
+        <CardContent className="p-0">
         {rankings.length === 0 ? (
-          <div className="text-center py-8">
+          <div className="text-center py-8 px-6">
             <p className="text-gray-400">{t('noRankingDataFound')}</p>
           </div>
         ) : (
@@ -102,12 +98,11 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b border-gray-700 hover:bg-gray-800/50">
-                    <TableHead className="text-gray-300 text-base">{t('rank')}</TableHead>
-                    <TableHead className="text-gray-300 pl-12 text-base">{t('user')}</TableHead>
-                    <TableHead className="text-gray-300 text-base">{t('challenge')}</TableHead>
-                    <TableHead className="text-gray-300 pl-6 text-base">{t('score')}</TableHead>
-                    <TableHead className="text-gray-300 pl-6 text-base">{t('profitRatio')}</TableHead>
+                  <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+                    <TableHead className="text-gray-300 text-base px-6">{t('rank')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6 pl-12">{t('user')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6">{t('challenge')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6">{t('profitRatio')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -117,25 +112,22 @@ export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
                     
                     return (
                       <TableRow key={ranking.id} className="border-b border-gray-700 hover:bg-gray-800/30">
-                        <TableCell className="font-medium text-gray-100 text-base">
-                          <div className="flex items-center gap-2 pl-2">
+                        <TableCell className="font-medium text-gray-100 text-base px-6">
+                          <div className="flex items-center gap-2">
                             <span>#{index + 1}</span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="px-6">
                           <code className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded">
                             {formatAddress(ranking.user)}
                           </code>
                         </TableCell>
-                        <TableCell className="pl-8">
+                        <TableCell className="px-6 pl-8">
                           <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
                             {getChallengeType(ranking.challengeId)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium text-gray-100 text-base">
-                          {formatScore(ranking.score)}
-                        </TableCell>
-                        <TableCell>
+                        <TableCell className="px-6">
                           <div className={cn(
                             "flex items-center gap-1 font-medium text-base",
                             isPositive ? "text-green-400" : "text-red-400"
