@@ -16,6 +16,49 @@ interface InvestorPortfolioProps {
   walletAddress: string
 }
 
+// Token Logo Component
+const TokenLogo = ({ symbol }: { symbol: string }) => {  
+  const getLogoPath = (tokenSymbol: string) => {
+    if (!tokenSymbol) return null
+    const symbolLower = tokenSymbol.toLowerCase().trim()
+    const availableLogos = ['usdc', 'eth', 'weth']
+    
+    if (availableLogos.includes(symbolLower)) {
+      return `/tokens/${symbolLower}.png`
+    }
+    return null
+  }
+
+  const logoPath = getLogoPath(symbol)
+  const tokenSymbol = symbol || 'Unknown'
+
+  if (logoPath) {
+    return (
+      <img
+        src={logoPath}
+        alt={tokenSymbol}
+        className="w-8 h-8 rounded-full object-cover"
+        onLoad={() => console.log('Token logo loaded successfully:', logoPath)}
+        onError={(e) => {
+          console.error('Failed to load token logo:', logoPath)
+          const target = e.target as HTMLImageElement
+          target.outerHTML = `
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+              ${tokenSymbol.slice(0, 2)}
+            </div>
+          `
+        }}
+      />
+    )
+  }
+
+  return (
+    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+      {tokenSymbol.slice(0, 2)}
+    </div>
+  )
+}
+
 export function InvestorPortfolio({ challengeId, walletAddress }: InvestorPortfolioProps) {
   const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
@@ -176,13 +219,9 @@ export function InvestorPortfolio({ challengeId, walletAddress }: InvestorPortfo
                     return (
                       <TableRow key={`${token.address}-${index}`}>
                         <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                              <span className="text-xs font-bold text-white">
-                                {token.symbol?.slice(0, 2) || '??'}
-                              </span>
-                            </div>
-                            {token.symbol || 'Unknown'}
+                          <div className="flex items-center gap-3">
+                            <TokenLogo symbol={token.symbol || ''} />
+                            <span>{token.symbol || 'Unknown'}</span>
                           </div>
                         </TableCell>
                         <TableCell>
