@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2 } from "lucide-react"
 import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
+import Image from "next/image"
 
 export function InvestableTokens() {
   const { t } = useLanguage()
@@ -14,6 +15,18 @@ export function InvestableTokens() {
   // Format token address for display
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
+  // Get token logo path based on symbol
+  const getTokenLogo = (symbol: string) => {
+    const symbolLower = symbol.toLowerCase()
+    // Check if we have a logo for this token
+    const availableLogos = ['usdc', 'eth', 'weth']
+    if (availableLogos.includes(symbolLower)) {
+      return `/tokens/${symbolLower}.png`
+    }
+    // Return a default placeholder or null if no logo exists
+    return null
   }
 
   // Format timestamp to readable date
@@ -99,7 +112,22 @@ export function InvestableTokens() {
                     onClick={() => handleRowClick(token.tokenAddress)}
                   >
                     <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
-                      {token.symbol}
+                      <div className="flex items-center gap-3">
+                        {getTokenLogo(token.symbol) ? (
+                          <Image
+                            src={getTokenLogo(token.symbol)!}
+                            alt={token.symbol}
+                            width={24}
+                            height={24}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                            {token.symbol.slice(0, 2)}
+                          </div>
+                        )}
+                        <span>{token.symbol}</span>
+                      </div>
                     </TableCell>
                     <TableCell className="py-6">
                       <code className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded">
