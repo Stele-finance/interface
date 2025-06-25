@@ -17,6 +17,7 @@ export const getInvestorQuery = (investorId: string) => gql`{
     tokensSymbols
     profitUSD
     profitRatio
+    isClosed
   }
 }`
 
@@ -34,6 +35,7 @@ export interface InvestorData {
     tokensSymbols: string[]
     profitUSD: string
     profitRatio: string
+    isClosed: boolean
   }
 }
 

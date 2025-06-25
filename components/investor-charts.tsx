@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '@/app/hooks/useInvestorSnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
+import { useRanking } from '@/app/hooks/useRanking'
 import { DollarSign, TrendingUp, TrendingDown, User, Trophy } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ethers } from 'ethers'
@@ -40,6 +41,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
   const { t } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30)
   const { data: challengeData } = useChallenge(challengeId)
+  const { data: rankingResponse } = useRanking(challengeId)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
 
   // Helper function to safely format USD values
@@ -192,6 +194,59 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
 
   const metrics = getInvestorMetrics()
 
+    // Process real ranking data
+  const rankingData = useMemo(() => {
+    const colors = ['#FFD700', '#C0C0C0', '#CD7F32', '#4F46E5', '#10B981']
+    const emojis = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣']
+
+    // If no data, return default 5 rankings with score 0
+    if (!rankingResponse?.topUsers || !rankingResponse?.scores) {
+      return Array.from({ length: 5 }, (_, index) => ({
+        rank: index + 1,
+        user: `User ${index + 1}`,
+        value: 0,
+        color: colors[index],
+        emoji: emojis[index],
+        bgGradient: `linear-gradient(45deg, ${colors[index]}, ${colors[index]})`
+      }))
+    }
+
+         // Process real data, fill missing slots with 0 scores
+     const result = []
+     for (let i = 0; i < 5; i++) {
+       const user = rankingResponse.topUsers[i] || `User ${i + 1}`
+       const score = rankingResponse.scores[i]
+       
+       // Check if score is already formatted (contains decimal) or needs conversion
+       let scoreValue = 0
+       if (score) {
+         try {
+           if (score.includes('.')) {
+             // Already formatted as decimal string
+             scoreValue = parseFloat(score)
+           } else {
+             // Raw integer string, needs conversion from USDC units
+             scoreValue = parseFloat(ethers.formatUnits(score, USDC_DECIMALS))
+           }
+         } catch (error) {
+           console.warn('Error parsing score:', score, error)
+           scoreValue = 0
+         }
+       }
+       
+       result.push({
+         rank: i + 1,
+         user: user,
+         value: scoreValue,
+         color: colors[i],
+         emoji: emojis[i],
+         bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
+       })
+     }
+
+    return result
+  }, [rankingResponse])
+
   // Get current date for header
   const currentDate = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -209,17 +264,92 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
       const isRealTime = dataPoint?.isRealTime
       
       return (
-        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
-          <p className="text-gray-100 text-sm font-medium">
+        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-4 py-3 shadow-xl backdrop-blur-sm min-w-[280px]">
+          <p className="text-gray-100 text-sm font-medium mb-2">
             {t('portfolioValue')}: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           {isRealTime && (
-            <div className="flex items-center gap-1 mt-1">
+            <div className="flex items-center gap-1 mb-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               <p className="text-green-400 text-xs">{t('liveUniswapV3')}</p>
             </div>
           )}
-          <p className="text-gray-400 text-xs mt-1">
+          
+          {/* Show ranking information when hovering over real-time data */}
+          {isRealTime && (
+            <div className="border-t border-gray-600 pt-2 mt-2">
+              <p className="text-gray-300 text-xs font-medium mb-2">Current Rankings:</p>
+              <div className="space-y-1">
+                {rankingData.map((ranking) => (
+                  <div key={ranking.rank} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {/* Use same icons as chart */}
+                      {(ranking.rank === 4 || ranking.rank === 5) ? (
+                        <div className="relative w-4 h-4 flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              fill={ranking.color}
+                              stroke="#FFD700"
+                              strokeWidth="2"
+                            />
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="6"
+                              fill="none"
+                              stroke="#FFD700"
+                              strokeWidth="1"
+                            />
+                            <text
+                              x="12"
+                              y="13"
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="8"
+                              fill="#FFFFFF"
+                              fontWeight="bold"
+                            >
+                              {ranking.rank}
+                            </text>
+                          </svg>
+                        </div>
+                      ) : (
+                        <span className="text-sm">
+                          {ranking.emoji}
+                        </span>
+                      )}
+                      <span className="text-gray-300 text-xs">
+                        {ranking.rank === 1 ? '1st' : ranking.rank === 2 ? '2nd' : ranking.rank === 3 ? '3rd' : `${ranking.rank}th`}
+                      </span>
+                    </div>
+                    <span className="text-gray-100 text-xs font-medium">
+                      ${ranking.value.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Show current user's position relative to rankings */}
+              <div className="border-t border-gray-600 pt-2 mt-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-orange-500 border border-white flex items-center justify-center">
+                      <span className="text-white text-[8px] font-bold">You</span>
+                    </div>
+                    <span className="text-orange-400 text-xs font-medium">Your Position</span>
+                  </div>
+                  <span className="text-orange-400 text-xs font-medium">
+                    ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <p className="text-gray-400 text-xs mt-2">
             {dataPoint?.fullDate}
           </p>
         </div>
@@ -324,7 +454,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               interval="preserveStartEnd"
             />
             <YAxis 
-              orientation="right"
+              orientation="left"
               stroke="#9CA3AF"
               fontSize={11}
               tick={{ fill: '#9CA3AF' }}
@@ -353,7 +483,85 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               dot={false}
               activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
             />
-            {/* Display real-time data points as ReferenceDot */}
+            {/* Display ranking dots at current time position */}
+            {chartData.length > 0 && (() => {
+              const lastDataPoint = chartData[chartData.length - 1]
+              if (!lastDataPoint) return null
+              
+              return rankingData.map((ranking) => {
+                const RankingPulsingDot = (props: any) => (
+                  <g>
+                    <defs>
+                      <filter id={`glow-${ranking.rank}`}>
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge> 
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    
+                    {/* Custom medal for 4th and 5th place */}
+                    {(ranking.rank === 4 || ranking.rank === 5) ? (
+                      <g filter={`url(#glow-${ranking.rank})`}>
+                        {/* Medal circle */}
+                        <circle
+                          cx={props.cx}
+                          cy={props.cy}
+                          r="10"
+                          fill={ranking.color}
+                          stroke="#FFD700"
+                          strokeWidth="2"
+                        />
+                        {/* Inner circle */}
+                        <circle
+                          cx={props.cx}
+                          cy={props.cy}
+                          r="6"
+                          fill="none"
+                          stroke="#FFD700"
+                          strokeWidth="1"
+                        />
+                        {/* Number */}
+                        <text
+                          x={props.cx}
+                          y={props.cy + 1}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="10"
+                          fill="#FFFFFF"
+                          fontWeight="bold"
+                        >
+                          {ranking.rank}
+                        </text>
+                      </g>
+                    ) : (
+                      /* Standard emoji for 1st, 2nd, 3rd place */
+                      <text
+                        x={props.cx}
+                        y={props.cy + 1}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="32"
+                      >
+                        {ranking.emoji}
+                      </text>
+                    )}
+                  </g>
+                )
+                
+                return (
+                  <ReferenceDot
+                    key={`ranking-dot-${ranking.rank}`}
+                    x={lastDataPoint.timeLabel}
+                    y={ranking.value}
+                    shape={<RankingPulsingDot />}
+                  />
+                )
+              })
+            })()}
+            
+            {/* Display real-time data points as ReferenceDot - HIGHEST PRIORITY */}
             {realTimePortfolio && realTimePortfolio.totalValue > 0 && chartData.length > 0 && (() => {
               const lastDataPoint = chartData[chartData.length - 1]
               if (lastDataPoint && lastDataPoint.isRealTime) {
@@ -361,10 +569,11 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
                   <circle
                     cx={props.cx}
                     cy={props.cy}
-                    r={6}
+                    r={8}
                     fill="#22c55e"
                     stroke="#ffffff"
-                    strokeWidth={2}
+                    strokeWidth={3}
+                    style={{ zIndex: 1000 }}
                   >
                     <animate
                       attributeName="opacity"
