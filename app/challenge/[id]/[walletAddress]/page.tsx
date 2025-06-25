@@ -1268,10 +1268,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         )
                       })()}
                     </div>
-                    {/* Debug info */}
-                    <div className="text-xs text-gray-500">
-                      Debug: isClosed = {JSON.stringify(investorData?.investor?.isClosed)}
-                    </div>
                   </div>
 
                   {/* Portfolio Value */}
