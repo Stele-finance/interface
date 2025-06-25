@@ -33,8 +33,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const [toToken, setToToken] = useState<string>("WETH")
   const [isSwapping, setIsSwapping] = useState(false)
   const [isHoveringFromToken, setIsHoveringFromToken] = useState(false)
-  const [isFromTokenDropdownOpen, setIsFromTokenDropdownOpen] = useState(false)
-  const [isToTokenDropdownOpen, setIsToTokenDropdownOpen] = useState(false)
+  const [isFromDropdownOpen, setIsFromDropdownOpen] = useState(false)
+  const [isToDropdownOpen, setIsToDropdownOpen] = useState(false)
 
   // Minimum swap amount in USD (greater than or equal to)
   const MINIMUM_SWAP_USD = 10.0;
@@ -144,22 +144,6 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     }
   }, [investableTokens, toToken]);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.token-dropdown')) {
-        setIsFromTokenDropdownOpen(false);
-        setIsToTokenDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   // Auto-change toToken if it becomes the same as fromToken
   useEffect(() => {
     if (fromToken && toToken && fromToken === toToken) {
@@ -173,6 +157,22 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       }
     }
   }, [fromToken, toToken, investableTokens]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.token-dropdown')) {
+        setIsFromDropdownOpen(false);
+        setIsToDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Calculate swap quote using Uniswap V3 pricing data
   const calculateUniswapSwapQuote = (
@@ -713,45 +713,47 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                     <div className="relative token-dropdown">
                       <Button
                         variant="ghost"
-                        onClick={() => setIsFromTokenDropdownOpen(!isFromTokenDropdownOpen)}
-                        className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200"
+                        onClick={() => setIsFromDropdownOpen(!isFromDropdownOpen)}
+                        className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
                       >
-                        {fromToken ? (
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={getTokenLogo(fromToken)}
-                              alt={fromToken}
-                              width={20}
-                              height={20}
-                              className="rounded-full"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement
-                                target.style.display = 'none'
-                                const avatar = target.nextElementSibling as HTMLElement
-                                if (avatar) avatar.style.display = 'flex'
-                              }}
-                            />
-                            <Avatar className="w-5 h-5" style={{ display: 'none' }}>
-                              <AvatarFallback className="text-xs bg-gradient-to-br from-pink-400 to-purple-600 text-white">
-                                {fromToken.substring(0, 2)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{fromToken}</span>
-                          </div>
-                        ) : (
-                          <span>{t('select')}</span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {fromToken ? (
+                            <>
+                              <Image
+                                src={getTokenLogo(fromToken)}
+                                alt={fromToken}
+                                width={20}
+                                height={20}
+                                className="rounded-full"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.style.display = 'none'
+                                  const avatar = target.nextElementSibling as HTMLElement
+                                  if (avatar) avatar.style.display = 'flex'
+                                }}
+                              />
+                              <Avatar className="w-5 h-5" style={{ display: 'none' }}>
+                                <AvatarFallback className="text-xs bg-gradient-to-br from-pink-400 to-purple-600 text-white">
+                                  {fromToken.substring(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{fromToken}</span>
+                            </>
+                          ) : (
+                            <span>{t('select')}</span>
+                          )}
+                        </div>
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                       
-                      {isFromTokenDropdownOpen && (
+                      {isFromDropdownOpen && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                           {!fromToken && (
                             <div
                               className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-gray-400 text-sm"
                               onClick={() => {
                                 setFromToken("")
-                                setIsFromTokenDropdownOpen(false)
+                                setIsFromDropdownOpen(false)
                               }}
                             >
                               <span>{t('select')}</span>
@@ -763,7 +765,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                               className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm"
                               onClick={() => {
                                 setFromToken(token)
-                                setIsFromTokenDropdownOpen(false)
+                                setIsFromDropdownOpen(false)
                               }}
                             >
                               <Image
@@ -845,38 +847,40 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                   <div className="relative token-dropdown">
                     <Button
                       variant="ghost"
-                      onClick={() => setIsToTokenDropdownOpen(!isToTokenDropdownOpen)}
-                      className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200"
+                      onClick={() => setIsToDropdownOpen(!isToDropdownOpen)}
+                      className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
                     >
-                      {toToken ? (
-                        <div className="flex items-center gap-2">
-                          <Image
-                            src={getTokenLogo(toToken)}
-                            alt={toToken}
-                            width={20}
-                            height={20}
-                            className="rounded-full"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.style.display = 'none'
-                              const avatar = target.nextElementSibling as HTMLElement
-                              if (avatar) avatar.style.display = 'flex'
-                            }}
-                          />
-                          <Avatar className="w-5 h-5" style={{ display: 'none' }}>
-                            <AvatarFallback className="text-xs bg-gradient-to-br from-pink-400 to-purple-600 text-white">
-                              {toToken.substring(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{toToken}</span>
-                        </div>
-                      ) : (
-                        <span>{t('select')}</span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {toToken ? (
+                          <>
+                            <Image
+                              src={getTokenLogo(toToken)}
+                              alt={toToken}
+                              width={20}
+                              height={20}
+                              className="rounded-full"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.style.display = 'none'
+                                const avatar = target.nextElementSibling as HTMLElement
+                                if (avatar) avatar.style.display = 'flex'
+                              }}
+                            />
+                            <Avatar className="w-5 h-5" style={{ display: 'none' }}>
+                              <AvatarFallback className="text-xs bg-gradient-to-br from-pink-400 to-purple-600 text-white">
+                                {toToken.substring(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{toToken}</span>
+                          </>
+                        ) : (
+                          <span>{t('select')}</span>
+                        )}
+                      </div>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                     
-                    {isToTokenDropdownOpen && (
+                    {isToDropdownOpen && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                         {availableToTokens.map((token) => (
                           <div
@@ -884,7 +888,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                             className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm"
                             onClick={() => {
                               setToToken(token)
-                              setIsToTokenDropdownOpen(false)
+                              setIsToDropdownOpen(false)
                             }}
                           >
                             <Image

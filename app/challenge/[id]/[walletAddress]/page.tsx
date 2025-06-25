@@ -538,8 +538,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const chainId = await window.phantom.ethereum.request({
         method: 'eth_chainId'
       });
-
-      console.log('Current network chain ID for registration:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
@@ -730,9 +728,34 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         return (
                           <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0">
                             <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                {token.symbol.slice(0, 2)}
-                              </div>
+                              {(() => {
+                                const logoPath = getTokenLogo(token.symbol)
+                                
+                                if (logoPath) {
+                                  return (
+                                    <img
+                                      src={logoPath}
+                                      alt={token.symbol}
+                                      className="h-10 w-10 rounded-full object-cover"
+                                      onError={(e: any) => {
+                                        console.error('Failed to load token logo:', logoPath)
+                                        const target = e.target as HTMLImageElement
+                                        target.outerHTML = `
+                                          <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                            ${token.symbol.slice(0, 2)}
+                                          </div>
+                                        `
+                                      }}
+                                    />
+                                  )
+                                } else {
+                                  return (
+                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                      {token.symbol.slice(0, 2)}
+                                    </div>
+                                  )
+                                }
+                              })()}
                               <div>
                                 <p className="font-medium text-gray-100">{token.symbol}</p>
                                 <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
