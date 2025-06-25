@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useActiveChallengesSnapshots } from '@/app/hooks/useActiveChallengesSnapshots'
 import { Users, DollarSign, TrendingUp, Calendar } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -183,59 +183,63 @@ export function DashboardCharts() {
                 <p className="text-sm text-gray-400">{currentDate}</p>
               </div>
               <ResponsiveContainer width="100%" height={320}>
-                <BarChart 
+                <AreaChart 
                   data={chartData} 
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  barCategoryGap="5%"
-                  maxBarSize={200}
-                  onMouseMove={(state) => {
+                  onMouseMove={(state: any) => {
                     if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                       setActiveIndexParticipants(state.activeTooltipIndex)
                     }
                   }}
                   onMouseLeave={() => setActiveIndexParticipants(null)}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="transparent" vertical={false} />
+                  <defs>
+                    <linearGradient id="participantsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
                   <XAxis 
-                    dataKey="dateLabel" 
+                    dataKey="timeLabel" 
                     stroke="#9CA3AF"
-                    fontSize={12}
+                    fontSize={11}
                     tick={{ fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
                     interval="preserveStartEnd"
                   />
                   <YAxis 
-                    orientation="right"
+                    orientation="left"
                     stroke="#9CA3AF"
-                    fontSize={12}
+                    fontSize={11}
                     tick={{ fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value.toString()}
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) {
+                        return `${(value / 1000000).toFixed(1)}M`
+                      } else if (value >= 1000) {
+                        return `${(value / 1000).toFixed(0)}K`
+                      } else {
+                        return `${value.toFixed(0)}`
+                      }
+                    }}
                   />
                   <Tooltip 
                     content={<CustomTooltip />} 
-                    cursor={<CustomCursor />}
+                    cursor={{ stroke: '#f97316', strokeWidth: 1 }}
                   />
-                  <Bar 
-                    dataKey="totalParticipants" 
-                    radius={[3, 3, 0, 0]}
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-participants-${index}`} 
-                        fill={
-                          activeIndexParticipants === null 
-                            ? "#EC4899" // All bars pink when no hover
-                            : activeIndexParticipants === index 
-                            ? "#EC4899" // Hovered bar stays pink
-                            : "#3A1A3BA0" // Other bars become dark maroon purple with less transparency
-                        } 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Area
+                    type="monotone"
+                    dataKey="totalParticipants"
+                    stroke="#f97316"
+                    strokeWidth={2}
+                    fill="url(#participantsGradient)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </TabsContent>
 
@@ -247,59 +251,63 @@ export function DashboardCharts() {
                 <p className="text-sm text-gray-400">{currentDate}</p>
               </div>
               <ResponsiveContainer width="100%" height={320}>
-                <BarChart 
+                <AreaChart 
                   data={chartData} 
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  barCategoryGap="5%"
-                  maxBarSize={200}
-                  onMouseMove={(state) => {
+                  onMouseMove={(state: any) => {
                     if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                       setActiveIndexRewards(state.activeTooltipIndex)
                     }
                   }}
                   onMouseLeave={() => setActiveIndexRewards(null)}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="transparent" vertical={false} />
+                  <defs>
+                    <linearGradient id="rewardsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
                   <XAxis 
-                    dataKey="dateLabel" 
+                    dataKey="timeLabel" 
                     stroke="#9CA3AF"
-                    fontSize={12}
+                    fontSize={11}
                     tick={{ fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
                     interval="preserveStartEnd"
                   />
                   <YAxis 
-                    orientation="right"
+                    orientation="left"
                     stroke="#9CA3AF"
-                    fontSize={12}
+                    fontSize={11}
                     tick={{ fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) {
+                        return `$${(value / 1000000).toFixed(1)}M`
+                      } else if (value >= 1000) {
+                        return `$${(value / 1000).toFixed(0)}K`
+                      } else {
+                        return `$${value.toFixed(0)}`
+                      }
+                    }}
                   />
                   <Tooltip 
                     content={<CustomTooltip />} 
-                    cursor={<CustomCursor />}
+                    cursor={{ stroke: '#f97316', strokeWidth: 1 }}
                   />
-                  <Bar 
-                    dataKey="totalRewards" 
-                    radius={[3, 3, 0, 0]}
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-rewards-${index}`} 
-                        fill={
-                          activeIndexRewards === null 
-                            ? "#EC4899" // All bars pink when no hover
-                            : activeIndexRewards === index 
-                            ? "#EC4899" // Hovered bar stays pink
-                            : "#3A1A3BA0" // Other bars become dark maroon purple with less transparency
-                        } 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Area
+                    type="monotone"
+                    dataKey="totalRewards"
+                    stroke="#f97316"
+                    strokeWidth={2}
+                    fill="url(#rewardsGradient)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </TabsContent>
           </CardContent>

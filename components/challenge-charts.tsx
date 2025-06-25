@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { Users, DollarSign, Clock, Trophy, Calendar } from 'lucide-react'
@@ -252,67 +252,75 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
       {/* Total Rewards Chart - Takes 2 columns */}
       <Card className="bg-transparent border-0 lg:col-span-2">
         <CardHeader className="pb-6">
-                          <h3 className="text-3xl text-gray-100 mb-2">{t('totalPrize')}</h3>
-          <CardTitle className="text-4xl text-gray-100">
-            ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-          </CardTitle>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
+          </div>
+          <div className="flex items-baseline gap-3">
+            <CardTitle className="text-4xl font-bold text-gray-100">
+              ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </CardTitle>
+          </div>
           <p className="text-sm text-gray-400">{currentDate}</p>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart 
+            <AreaChart 
               data={chartData} 
               margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              barCategoryGap="5%"
-              maxBarSize={200}
-              onMouseMove={(state) => {
+              onMouseMove={(state: any) => {
                 if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                   setActiveIndexRewards(state.activeTooltipIndex)
                 }
               }}
               onMouseLeave={() => setActiveIndexRewards(null)}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="transparent" vertical={false} />
+              <defs>
+                <linearGradient id="rewardGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
               <XAxis 
-                dataKey="dateLabel" 
+                dataKey="timeLabel" 
                 stroke="#9CA3AF"
-                fontSize={12}
+                fontSize={11}
                 tick={{ fill: '#9CA3AF' }}
                 axisLine={false}
                 tickLine={false}
                 interval="preserveStartEnd"
               />
               <YAxis 
-                orientation="right"
+                orientation="left"
                 stroke="#9CA3AF"
-                fontSize={12}
+                fontSize={11}
                 tick={{ fill: '#9CA3AF' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                tickFormatter={(value) => {
+                  if (value >= 1000000) {
+                    return `$${(value / 1000000).toFixed(1)}M`
+                  } else if (value >= 1000) {
+                    return `$${(value / 1000).toFixed(0)}K`
+                  } else {
+                    return `$${value.toFixed(0)}`
+                  }
+                }}
               />
               <Tooltip 
                 content={<CustomTooltip />} 
-                cursor={<CustomCursor />}
+                cursor={{ stroke: '#f97316', strokeWidth: 1 }}
               />
-              <Bar 
-                dataKey="rewardAmountUSD" 
-                radius={[3, 3, 0, 0]}
-              >
-                {chartData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-rewards-${index}`} 
-                    fill={
-                      activeIndexRewards === null 
-                        ? "#EC4899" // All bars pink when no hover
-                        : activeIndexRewards === index 
-                        ? "#EC4899" // Hovered bar stays pink
-                        : "#3A1A3BA0" // Other bars become dark maroon purple with less transparency
-                    } 
-                  />
-                ))}
-              </Bar>
-            </BarChart>
+              <Area
+                type="monotone"
+                dataKey="rewardAmountUSD"
+                stroke="#f97316"
+                strokeWidth={2}
+                fill="url(#rewardGradient)"
+                dot={false}
+                activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
