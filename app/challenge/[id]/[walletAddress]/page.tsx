@@ -71,11 +71,15 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress)
   
-  // Get real-time prices for user's tokens using Uniswap V3 onchain data
-  const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(userTokens)
+  // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
+  const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
+    investorData?.investor?.isClosed ? [] : userTokens
+  )
 
-  // Calculate real-time portfolio value
+  // Calculate real-time portfolio value - only if not closed
   const calculateRealTimePortfolioValue = useCallback(() => {
+    // Don't calculate real-time portfolio if investor is closed
+    if (investorData?.investor?.isClosed) return null
     if (!uniswapPrices?.tokens || userTokens.length === 0) return null
     
     let totalValue = 0
@@ -96,7 +100,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       totalTokens: userTokens.length,
       timestamp: uniswapPrices.timestamp || Date.now()
     }
-  }, [uniswapPrices, userTokens])
+  }, [uniswapPrices, userTokens, investorData?.investor?.isClosed])
 
   const realTimePortfolio = calculateRealTimePortfolioValue()
 
@@ -867,10 +871,27 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <div className="space-y-2">
                     <span className="text-base text-gray-400">{t('status')}</span>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${challengeData?.challenge?.isActive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
-                      <span className={`text-xl font-medium ${challengeData?.challenge?.isActive ? 'text-green-400' : 'text-gray-400'}`}>
-                        {challengeData?.challenge?.isActive ? t('active') : 'Inactive'}
-                      </span>
+                      {(() => {
+                        // If investor is closed, show as Finished
+                        if (investorData?.investor?.isClosed) {
+                          return (
+                            <>
+                              <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                              <span className="text-xl font-medium text-red-400">{t('finished')}</span>
+                            </>
+                          )
+                        }
+                        // Otherwise show challenge active status
+                        const isActive = challengeData?.challenge?.isActive
+                        return (
+                          <>
+                            <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+                            <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-gray-400'}`}>
+                              {isActive ? t('active') : 'Inactive'}
+                            </span>
+                          </>
+                        )
+                      })()}
                     </div>
                   </div>
 
