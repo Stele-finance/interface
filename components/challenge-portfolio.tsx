@@ -106,7 +106,7 @@ function RankingSection({ challengeId }: { challengeId: string }) {
         </div>
       );
     } else {
-      return <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">{rank}</div>;
+      return <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">{rank}</div>;
     }
   };
 
@@ -177,7 +177,7 @@ function RankingSection({ challengeId }: { challengeId: string }) {
                     key={`${user}-${rank}`} 
                     className={`flex items-center justify-between p-3 rounded-lg border ${getRankColor(rank)}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-6">
                       {getRankIcon(rank)}
                       <div>
                         <div className="font-medium">
