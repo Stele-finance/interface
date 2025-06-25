@@ -570,9 +570,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             </div>
           </div>
           <div className="space-y-4">            
-            {/* Swap and Register Buttons - Only show if connected wallet matches investor address */}
+            {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
             {connectedAddress && walletAddress && 
-             connectedAddress.toLowerCase() === walletAddress.toLowerCase() && (
+             connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
+             !investorData?.investor?.isClosed && (
               <div className="flex justify-end gap-4">
                 <Button 
                   variant="outline" 
@@ -611,6 +612,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     </>
                   )}
                 </Button>
+              </div>
+            )}
+            
+            {/* Show completion message if investor is closed */}
+            {investorData?.investor?.isClosed && (
+              <div className="flex justify-end">
+                <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-green-400 font-medium">{t('registered')}</span>
+                  </div>
+                </div>
               </div>
             )}
           </div>

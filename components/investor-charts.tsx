@@ -211,22 +211,38 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
       }))
     }
 
-    // Process real data, fill missing slots with 0 scores
-    const result = []
-    for (let i = 0; i < 5; i++) {
-      const user = rankingResponse.topUsers[i] || `User ${i + 1}`
-      const score = rankingResponse.scores[i]
-      const scoreValue = score ? parseFloat(ethers.formatUnits(score, USDC_DECIMALS)) : 0
-      
-      result.push({
-        rank: i + 1,
-        user: user,
-        value: scoreValue,
-        color: colors[i],
-        emoji: emojis[i],
-        bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
-      })
-    }
+         // Process real data, fill missing slots with 0 scores
+     const result = []
+     for (let i = 0; i < 5; i++) {
+       const user = rankingResponse.topUsers[i] || `User ${i + 1}`
+       const score = rankingResponse.scores[i]
+       
+       // Check if score is already formatted (contains decimal) or needs conversion
+       let scoreValue = 0
+       if (score) {
+         try {
+           if (score.includes('.')) {
+             // Already formatted as decimal string
+             scoreValue = parseFloat(score)
+           } else {
+             // Raw integer string, needs conversion from USDC units
+             scoreValue = parseFloat(ethers.formatUnits(score, USDC_DECIMALS))
+           }
+         } catch (error) {
+           console.warn('Error parsing score:', score, error)
+           scoreValue = 0
+         }
+       }
+       
+       result.push({
+         rank: i + 1,
+         user: user,
+         value: scoreValue,
+         color: colors[i],
+         emoji: emojis[i],
+         bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
+       })
+     }
 
     return result
   }, [rankingResponse])
@@ -467,40 +483,6 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               dot={false}
               activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
             />
-            {/* Display real-time data points as ReferenceDot */}
-            {realTimePortfolio && realTimePortfolio.totalValue > 0 && chartData.length > 0 && (() => {
-              const lastDataPoint = chartData[chartData.length - 1]
-              if (lastDataPoint && lastDataPoint.isRealTime) {
-                const PulsingDot = (props: any) => (
-                  <circle
-                    cx={props.cx}
-                    cy={props.cy}
-                    r={6}
-                    fill="#22c55e"
-                    stroke="#ffffff"
-                    strokeWidth={2}
-                  >
-                    <animate
-                      attributeName="opacity"
-                      values="1;0.3;1"
-                      dur="2s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                )
-                
-                return (
-                  <ReferenceDot
-                    key={`realtime-ref-dot-${lastDataPoint.id}`}
-                    x={lastDataPoint.timeLabel}
-                    y={lastDataPoint.currentUSD}
-                    shape={<PulsingDot />}
-                  />
-                )
-              }
-              return null
-            })()}
-            
             {/* Display ranking dots at current time position */}
             {chartData.length > 0 && (() => {
               const lastDataPoint = chartData[chartData.length - 1]
@@ -577,6 +559,41 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
                   />
                 )
               })
+            })()}
+            
+            {/* Display real-time data points as ReferenceDot - HIGHEST PRIORITY */}
+            {realTimePortfolio && realTimePortfolio.totalValue > 0 && chartData.length > 0 && (() => {
+              const lastDataPoint = chartData[chartData.length - 1]
+              if (lastDataPoint && lastDataPoint.isRealTime) {
+                const PulsingDot = (props: any) => (
+                  <circle
+                    cx={props.cx}
+                    cy={props.cy}
+                    r={8}
+                    fill="#22c55e"
+                    stroke="#ffffff"
+                    strokeWidth={3}
+                    style={{ zIndex: 1000 }}
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="1;0.3;1"
+                      dur="2s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                )
+                
+                return (
+                  <ReferenceDot
+                    key={`realtime-ref-dot-${lastDataPoint.id}`}
+                    x={lastDataPoint.timeLabel}
+                    y={lastDataPoint.currentUSD}
+                    shape={<PulsingDot />}
+                  />
+                )
+              }
+              return null
             })()}
           </AreaChart>
         </ResponsiveContainer>
