@@ -90,6 +90,11 @@ export interface InvestorTransactionData {
   details: string
   timestamp: number
   transactionHash: string
+  // Additional data for swaps
+  fromAssetSymbol?: string
+  toAssetSymbol?: string
+  fromAmount?: string
+  toAmount?: string
 }
 
 interface GraphQLResponse {
@@ -185,6 +190,11 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               details: `${fromSymbol} → ${toSymbol}`,
               timestamp: parseInt(swap.blockTimestamp),
               transactionHash: swap.transactionHash,
+              // Add swap-specific data
+              fromAssetSymbol: fromSymbol,
+              toAssetSymbol: toSymbol,
+              fromAmount: swap.fromAmount,
+              toAmount: swap.toAmount,
             })
           })
         }

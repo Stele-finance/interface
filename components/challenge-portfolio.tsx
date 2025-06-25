@@ -1059,56 +1059,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               </div>
                               <div className="flex-1">
                                 <div className="font-medium text-gray-100">
-                                  {transaction.type === 'swap' ? (
-                                    (() => {
-                                      const swapDetails = getSwapDetails(transaction)
-                                      if (swapDetails) {
-                                        const fromLogo = getTokenLogo(swapDetails.fromToken)
-                                        const toLogo = getTokenLogo(swapDetails.toToken)
-                                        return (
-                                          <div className="flex items-center gap-2">
-                                            <span>Swapped</span>
-                                            <div className="flex items-center gap-1">
-                                              {fromLogo ? (
-                                                <Image 
-                                                  src={fromLogo} 
-                                                  alt={swapDetails.fromToken}
-                                                  width={16}
-                                                  height={16}
-                                                  className="rounded-full"
-                                                />
-                                              ) : (
-                                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
-                                                  {swapDetails.fromToken.slice(0, 1)}
-                                                </div>
-                                              )}
-                                              <span className="text-sm">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
-                                            </div>
-                                            <ArrowRight className="h-3 w-3 text-gray-400" />
-                                            <div className="flex items-center gap-1">
-                                              {toLogo ? (
-                                                <Image 
-                                                  src={toLogo} 
-                                                  alt={swapDetails.toToken}
-                                                  width={16}
-                                                  height={16}
-                                                  className="rounded-full"
-                                                />
-                                              ) : (
-                                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
-                                                  {swapDetails.toToken.slice(0, 1)}
-                                                </div>
-                                              )}
-                                              <span className="text-sm">{swapDetails.toAmount} {swapDetails.toToken}</span>
-                                            </div>
-                                          </div>
-                                        )
-                                      }
-                                      return transaction.details
-                                    })()
-                                  ) : (
-                                    transaction.details
-                                  )}
+                                  {transaction.type === 'swap' ? 'Swapped' : transaction.details}
                                 </div>
                                 <div className="text-sm text-gray-400">
                                   {formatTimestamp(transaction.timestamp)}
@@ -1117,7 +1068,55 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              {transaction.type === 'swap' ? (
+                                (() => {
+                                  const swapDetails = getSwapDetails(transaction)
+                                  if (swapDetails) {
+                                    const fromLogo = getTokenLogo(swapDetails.fromToken)
+                                    const toLogo = getTokenLogo(swapDetails.toToken)
+                                    return (
+                                      <div className="flex items-center gap-3 justify-end">
+                                        <div className="flex items-center gap-2">
+                                          {fromLogo ? (
+                                            <Image 
+                                              src={fromLogo} 
+                                              alt={swapDetails.fromToken}
+                                              width={20}
+                                              height={20}
+                                              className="rounded-full"
+                                            />
+                                          ) : (
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                              {swapDetails.fromToken.slice(0, 1)}
+                                            </div>
+                                          )}
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
+                                        </div>
+                                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                                        <div className="flex items-center gap-2">
+                                          {toLogo ? (
+                                            <Image 
+                                              src={toLogo} 
+                                              alt={swapDetails.toToken}
+                                              width={20}
+                                              height={20}
+                                              className="rounded-full"
+                                            />
+                                          ) : (
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                              {swapDetails.toToken.slice(0, 1)}
+                                            </div>
+                                          )}
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toToken}</span>
+                                        </div>
+                                      </div>
+                                    )
+                                  }
+                                  return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                })()
+                              ) : (
+                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              )}
                             </div>
                           </div>
                         ))}
