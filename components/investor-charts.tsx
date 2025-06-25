@@ -247,6 +247,25 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
     return result
   }, [rankingResponse])
 
+  // Calculate Y-axis domain
+  const yAxisDomain = useMemo(() => {
+    if (!chartData.length) return undefined // Let chart auto-scale if no data
+    
+    // Get current user's maximum value
+    const userMaxValue = Math.max(...chartData.map(d => d.currentUSD))
+    
+    // Get ranking 1st place value
+    const firstPlaceValue = rankingData[0]?.value || 0
+    
+    // Set maximum to the higher value between user max and 1st place
+    const maxValue = Math.max(userMaxValue, firstPlaceValue)
+    
+    // Add 10% padding to the top, but ensure minimum of 100
+    const paddedMaxValue = Math.max(maxValue * 1.1, 100)
+    
+    return [0, paddedMaxValue] as [number, number]
+  }, [chartData, rankingData])
+
   // Get current date for header
   const currentDate = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -459,6 +478,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               tick={{ fill: '#9CA3AF' }}
               axisLine={false}
               tickLine={false}
+              domain={yAxisDomain}
               tickFormatter={(value) => {
                 if (value >= 1000000) {
                   return `$${(value / 1000000).toFixed(1)}M`

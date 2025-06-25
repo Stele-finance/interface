@@ -957,12 +957,68 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                   {rank <= 3 ? (
                                     <span className="text-3xl">{getRankIcon(rank)}</span>
                                   ) : rank === 4 ? (
-                                    <div className="w-8 h-8 rounded-full bg-yellow-500 border-2 border-yellow-400 flex items-center justify-center">
-                                      <span className="text-sm font-bold text-white">4</span>
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          fill="#4F46E5"
+                                          stroke="#FFD700"
+                                          strokeWidth="2"
+                                        />
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="6"
+                                          fill="none"
+                                          stroke="#FFD700"
+                                          strokeWidth="1"
+                                        />
+                                        <text
+                                          x="12"
+                                          y="13"
+                                          textAnchor="middle"
+                                          dominantBaseline="middle"
+                                          fontSize="8"
+                                          fill="#FFFFFF"
+                                          fontWeight="bold"
+                                        >
+                                          4
+                                        </text>
+                                      </svg>
                                     </div>
                                   ) : rank === 5 ? (
-                                    <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-green-400 flex items-center justify-center">
-                                      <span className="text-sm font-bold text-white">5</span>
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          fill="#10B981"
+                                          stroke="#FFD700"
+                                          strokeWidth="2"
+                                        />
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="6"
+                                          fill="none"
+                                          stroke="#FFD700"
+                                          strokeWidth="1"
+                                        />
+                                        <text
+                                          x="12"
+                                          y="13"
+                                          textAnchor="middle"
+                                          dominantBaseline="middle"
+                                          fontSize="8"
+                                          fill="#FFFFFF"
+                                          fontWeight="bold"
+                                        >
+                                          5
+                                        </text>
+                                      </svg>
                                     </div>
                                   ) : (
                                     <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
