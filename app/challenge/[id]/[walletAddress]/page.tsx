@@ -38,6 +38,7 @@ import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "@/app/hooks/useInvestorTransactions"
+import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -70,16 +71,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress)
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
-    investorData?.investor?.isClosed ? [] : userTokens
+    investorData?.investor?.isClosed === true ? [] : userTokens
   )
 
   // Calculate real-time portfolio value - only if not closed
   const calculateRealTimePortfolioValue = useCallback(() => {
     // Don't calculate real-time portfolio if investor is closed
-    if (investorData?.investor?.isClosed) return null
+    if (investorData?.investor?.isClosed === true) return null
     if (!uniswapPrices?.tokens || userTokens.length === 0) return null
     
     let totalValue = 0
@@ -577,7 +579,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
             {connectedAddress && walletAddress && 
              connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
-             !investorData?.investor?.isClosed && (
+             investorData?.investor?.isClosed !== true && (
               <div className="flex justify-end gap-4">
                 <Button 
                   variant="outline" 
@@ -620,7 +622,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             )}
             
             {/* Show completion message if investor is closed */}
-            {investorData?.investor?.isClosed && (
+            {investorData?.investor?.isClosed === true && (
               <div className="flex justify-end">
                 <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -645,7 +647,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               realTimePortfolio={realTimePortfolio}
             />
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   {t('portfolio')}
@@ -653,6 +655,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 <TabsTrigger value="transactions" className="flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   {t('transactions')}
+                </TabsTrigger>
+                <TabsTrigger value="ranking" className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  Ranking
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
@@ -853,6 +859,154 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </Card>
               </TabsContent>
 
+              <TabsContent value="ranking" className="space-y-4">
+                <Card className="bg-transparent border border-gray-700/50">
+                  <CardHeader>
+                    <CardTitle className="text-gray-100">Ranking</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {isLoadingRanking ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                          <span className="ml-2 text-gray-400">Loading rankings...</span>
+                        </div>
+                      ) : rankingError ? (
+                        <div className="text-center py-8 text-red-400">
+                          <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p className="font-medium">Error loading rankings</p>
+                          <p className="text-sm text-gray-400 mt-2">Please try again later</p>
+                        </div>
+                      ) : rankingData && rankingData.topUsers.length > 0 ? (
+                        rankingData.topUsers.map((user, index) => {
+                          const rank = index + 1;
+                          const score = rankingData.scores[index];
+                          const profitRatio = rankingData.profitRatios[index];
+                          
+                          // Format address
+                          const formatAddress = (address: string) => {
+                            if (!address || address === '0x0000000000000000000000000000000000000000') {
+                              return '';
+                            }
+                            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+                          };
+                          
+                          // Format score (USDC value)
+                          const formatScore = (score: string) => {
+                            try {
+                              const scoreValue = parseFloat(score);
+                              return `$${scoreValue.toFixed(2)}`;
+                            } catch {
+                              return '$0.00';
+                            }
+                          };
+                          
+                          // Format profit ratio
+                          const formatProfitRatio = (profitRatio: string) => {
+                            try {
+                              const ratioValue = parseFloat(profitRatio);
+                              return `${ratioValue >= 0 ? '+' : ''}${ratioValue.toFixed(2)}%`;
+                            } catch {
+                              return '0.00%';
+                            }
+                          };
+                          
+                          // Get rank icon
+                          const getRankIcon = (rank: number) => {
+                            switch (rank) {
+                              case 1:
+                                return '🥇';
+                              case 2:
+                                return '🥈';
+                              case 3:
+                                return '🥉';
+                              default:
+                                return rank.toString();
+                            }
+                          };
+                          
+                          // Get rank color
+                          const getRankColor = (rank: number) => {
+                            switch (rank) {
+                              case 1:
+                                return 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-700/50 text-yellow-100';
+                              case 2:
+                                return 'bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-600/50 text-gray-100';
+                              case 3:
+                                return 'bg-gradient-to-r from-amber-900/20 to-amber-800/20 border-amber-700/50 text-amber-100';
+                              default:
+                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
+                            }
+                          };
+                          
+                          const formattedAddress = formatAddress(user);
+                          const isEmptySlot = !formattedAddress;
+                          const isCurrentUser = walletAddress && user.toLowerCase() === walletAddress.toLowerCase();
+
+                          return (
+                            <div 
+                              key={`${user}-${rank}`} 
+                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''}`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-center w-10 h-10">
+                                  {rank <= 3 ? (
+                                    <span className="text-2xl">{getRankIcon(rank)}</span>
+                                  ) : (
+                                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                      <span className="text-sm font-bold text-white">{rank}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="font-medium flex items-center gap-2">
+                                    {isEmptySlot ? (
+                                      <span className="text-gray-500 italic">Empty Slot</span>
+                                    ) : (
+                                      <>
+                                        <span>{formattedAddress}</span>
+                                        {isCurrentUser && (
+                                          <Badge variant="outline" className="text-xs border-blue-500 text-blue-400">
+                                            You
+                                          </Badge>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                  <div className="text-sm text-gray-400">
+                                    Rank #{rank}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-lg">{formatScore(score)}</div>
+                                <div className={`text-sm ${parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {formatProfitRatio(profitRatio)}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="text-center py-8 text-gray-400">
+                          <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No ranking data found</p>
+                          <p className="text-sm mt-1">Rankings will appear once users register for the challenge</p>
+                        </div>
+                      )}
+                      
+                      {rankingData && (
+                        <div className="mt-6 pt-4 border-t border-gray-700">
+                          <div className="text-xs text-gray-500 text-center">
+                            Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
             </Tabs>
           </div>
           
@@ -873,7 +1027,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <div className="flex items-center gap-2">
                       {(() => {
                         // If investor is closed, show as Finished
-                        if (investorData?.investor?.isClosed) {
+                        if (investorData?.investor?.isClosed === true) {
                           return (
                             <>
                               <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -892,6 +1046,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           </>
                         )
                       })()}
+                    </div>
+                    {/* Debug info */}
+                    <div className="text-xs text-gray-500">
+                      Debug: isClosed = {JSON.stringify(investorData?.investor?.isClosed)}
                     </div>
                   </div>
 
