@@ -920,6 +920,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                 return '🥈';
                               case 3:
                                 return '🥉';
+                              case 4:
+                                return '4️⃣';
+                              case 5:
+                                return '5️⃣';
                               default:
                                 return rank.toString();
                             }
@@ -951,7 +955,15 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center justify-center w-10 h-10">
                                   {rank <= 3 ? (
-                                    <span className="text-2xl">{getRankIcon(rank)}</span>
+                                    <span className="text-3xl">{getRankIcon(rank)}</span>
+                                  ) : rank === 4 ? (
+                                    <div className="w-8 h-8 rounded-full bg-yellow-500 border-2 border-yellow-400 flex items-center justify-center">
+                                      <span className="text-sm font-bold text-white">4</span>
+                                    </div>
+                                  ) : rank === 5 ? (
+                                    <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-green-400 flex items-center justify-center">
+                                      <span className="text-sm font-bold text-white">5</span>
+                                    </div>
                                   ) : (
                                     <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                                       <span className="text-sm font-bold text-white">{rank}</span>

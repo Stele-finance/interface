@@ -336,12 +336,11 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               <div className="border-t border-gray-600 pt-2 mt-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-500 border border-white flex items-center justify-center">
-                      <span className="text-white text-[8px] font-bold">You</span>
+                    <div className="w-3 h-3 rounded-full bg-green-400 border border-white flex items-center justify-center">
                     </div>
-                    <span className="text-orange-400 text-xs font-medium">Your Position</span>
+                    <span className="text-green-400 text-xs font-medium">Your Position</span>
                   </div>
-                  <span className="text-orange-400 text-xs font-medium">
+                  <span className="text-green-400 text-xs font-medium">
                     ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
