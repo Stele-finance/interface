@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '@/app/hooks/useInvestorSnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
+import { useRanking } from '@/app/hooks/useRanking'
 import { DollarSign, TrendingUp, TrendingDown, User, Trophy } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ethers } from 'ethers'
@@ -40,6 +41,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
   const { t } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30)
   const { data: challengeData } = useChallenge(challengeId)
+  const { data: rankingResponse } = useRanking(challengeId)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
 
   // Helper function to safely format USD values
@@ -192,14 +194,42 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
 
   const metrics = getInvestorMetrics()
 
-  // Ranking data (mock data for visualization)
-  const rankingData = [
-    { rank: 1, value: 1200, color: '#FFD700', emoji: '🥇', bgGradient: 'linear-gradient(45deg, #FFD700, #FFA500)' },
-    { rank: 2, value: 800, color: '#C0C0C0', emoji: '🥈', bgGradient: 'linear-gradient(45deg, #C0C0C0, #A0A0A0)' },
-    { rank: 3, value: 600, color: '#CD7F32', emoji: '🥉', bgGradient: 'linear-gradient(45deg, #CD7F32, #B8860B)' },
-    { rank: 4, value: 500, color: '#4F46E5', emoji: '4️⃣', bgGradient: 'linear-gradient(45deg, #4F46E5, #3B82F6)' },
-    { rank: 5, value: 400, color: '#10B981', emoji: '5️⃣', bgGradient: 'linear-gradient(45deg, #059669, #10B981)' }
-  ]
+    // Process real ranking data
+  const rankingData = useMemo(() => {
+    const colors = ['#FFD700', '#C0C0C0', '#CD7F32', '#4F46E5', '#10B981']
+    const emojis = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣']
+
+    // If no data, return default 5 rankings with score 0
+    if (!rankingResponse?.topUsers || !rankingResponse?.scores) {
+      return Array.from({ length: 5 }, (_, index) => ({
+        rank: index + 1,
+        user: `User ${index + 1}`,
+        value: 0,
+        color: colors[index],
+        emoji: emojis[index],
+        bgGradient: `linear-gradient(45deg, ${colors[index]}, ${colors[index]})`
+      }))
+    }
+
+    // Process real data, fill missing slots with 0 scores
+    const result = []
+    for (let i = 0; i < 5; i++) {
+      const user = rankingResponse.topUsers[i] || `User ${i + 1}`
+      const score = rankingResponse.scores[i]
+      const scoreValue = score ? parseFloat(ethers.formatUnits(score, USDC_DECIMALS)) : 0
+      
+      result.push({
+        rank: i + 1,
+        user: user,
+        value: scoreValue,
+        color: colors[i],
+        emoji: emojis[i],
+        bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
+      })
+    }
+
+    return result
+  }, [rankingResponse])
 
   // Get current date for header
   const currentDate = new Date().toLocaleDateString('en-US', { 
