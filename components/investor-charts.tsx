@@ -194,11 +194,11 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
 
   // Ranking data (mock data for visualization)
   const rankingData = [
-    { rank: 1, value: 1200, color: '#F59E0B', emoji: '👑' },
-    { rank: 2, value: 800, color: '#9CA3AF', emoji: '🥈' },
-    { rank: 3, value: 600, color: '#CD7F32', emoji: '🥉' },
-    { rank: 4, value: 500, color: '#3B82F6', emoji: '4️⃣' },
-    { rank: 5, value: 400, color: '#10B981', emoji: '5️⃣' }
+    { rank: 1, value: 1200, color: '#FFD700', emoji: '🥇', bgGradient: 'linear-gradient(45deg, #FFD700, #FFA500)' },
+    { rank: 2, value: 800, color: '#C0C0C0', emoji: '🥈', bgGradient: 'linear-gradient(45deg, #C0C0C0, #A0A0A0)' },
+    { rank: 3, value: 600, color: '#CD7F32', emoji: '🥉', bgGradient: 'linear-gradient(45deg, #CD7F32, #B8860B)' },
+    { rank: 4, value: 500, color: '#4F46E5', emoji: '4️⃣', bgGradient: 'linear-gradient(45deg, #4F46E5, #3B82F6)' },
+    { rank: 5, value: 400, color: '#10B981', emoji: '5️⃣', bgGradient: 'linear-gradient(45deg, #059669, #10B981)' }
   ]
 
   // Get current date for header
@@ -237,14 +237,46 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
                 {rankingData.map((ranking) => (
                   <div key={ranking.rank} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full border border-white flex items-center justify-center"
-                        style={{ backgroundColor: ranking.color }}
-                      >
-                        <span className="text-white text-[8px] font-bold">{ranking.rank}</span>
-                      </div>
+                      {/* Use same icons as chart */}
+                      {(ranking.rank === 4 || ranking.rank === 5) ? (
+                        <div className="relative w-4 h-4 flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              fill={ranking.color}
+                              stroke="#FFD700"
+                              strokeWidth="2"
+                            />
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="6"
+                              fill="none"
+                              stroke="#FFD700"
+                              strokeWidth="1"
+                            />
+                            <text
+                              x="12"
+                              y="13"
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="8"
+                              fill="#FFFFFF"
+                              fontWeight="bold"
+                            >
+                              {ranking.rank}
+                            </text>
+                          </svg>
+                        </div>
+                      ) : (
+                        <span className="text-sm">
+                          {ranking.emoji}
+                        </span>
+                      )}
                       <span className="text-gray-300 text-xs">
-                        {ranking.rank === 1 ? '🥇' : ranking.rank === 2 ? '🥈' : ranking.rank === 3 ? '🥉' : `${ranking.rank}위`}
+                        {ranking.rank === 1 ? '1st' : ranking.rank === 2 ? '2nd' : ranking.rank === 3 ? '3rd' : `${ranking.rank}th`}
                       </span>
                     </div>
                     <span className="text-gray-100 text-xs font-medium">
@@ -376,7 +408,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               interval="preserveStartEnd"
             />
             <YAxis 
-              orientation="right"
+              orientation="left"
               stroke="#9CA3AF"
               fontSize={11}
               tick={{ fill: '#9CA3AF' }}
@@ -447,32 +479,62 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
               return rankingData.map((ranking) => {
                 const RankingPulsingDot = (props: any) => (
                   <g>
-                    <circle
-                      cx={props.cx}
-                      cy={props.cy}
-                      r={8}
-                      fill={ranking.color}
-                      stroke="#ffffff"
-                      strokeWidth={2}
-                    >
-                      <animate
-                        attributeName="opacity"
-                        values="1;0.4;1"
-                        dur={`${1.5 + ranking.rank * 0.2}s`}
-                        repeatCount="indefinite"
-                      />
-                    </circle>
-                    <text
-                      x={props.cx}
-                      y={props.cy + 1}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize="10"
-                      fill="#ffffff"
-                      fontWeight="bold"
-                    >
-                      {ranking.rank}
-                    </text>
+                    <defs>
+                      <filter id={`glow-${ranking.rank}`}>
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge> 
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    
+                    {/* Custom medal for 4th and 5th place */}
+                    {(ranking.rank === 4 || ranking.rank === 5) ? (
+                      <g filter={`url(#glow-${ranking.rank})`}>
+                        {/* Medal circle */}
+                        <circle
+                          cx={props.cx}
+                          cy={props.cy}
+                          r="10"
+                          fill={ranking.color}
+                          stroke="#FFD700"
+                          strokeWidth="2"
+                        />
+                        {/* Inner circle */}
+                        <circle
+                          cx={props.cx}
+                          cy={props.cy}
+                          r="6"
+                          fill="none"
+                          stroke="#FFD700"
+                          strokeWidth="1"
+                        />
+                        {/* Number */}
+                        <text
+                          x={props.cx}
+                          y={props.cy + 1}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="10"
+                          fill="#FFFFFF"
+                          fontWeight="bold"
+                        >
+                          {ranking.rank}
+                        </text>
+                      </g>
+                    ) : (
+                      /* Standard emoji for 1st, 2nd, 3rd place */
+                      <text
+                        x={props.cx}
+                        y={props.cy + 1}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="32"
+                      >
+                        {ranking.emoji}
+                      </text>
+                    )}
                   </g>
                 )
                 
