@@ -257,8 +257,8 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
           </div>
           <div className="flex items-baseline gap-3">
             <CardTitle className="text-4xl font-bold text-gray-100">
-              ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </CardTitle>
+            ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </CardTitle>
           </div>
           <p className="text-sm text-gray-400">{currentDate}</p>
         </CardHeader>
@@ -313,7 +313,7 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
               />
               <Area
                 type="monotone"
-                dataKey="rewardAmountUSD"
+                dataKey="rewardAmountUSD" 
                 stroke="#f97316"
                 strokeWidth={2}
                 fill="url(#rewardGradient)"

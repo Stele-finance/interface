@@ -1115,7 +1115,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                   return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                 })()
                               ) : (
-                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                               )}
                             </div>
                           </div>
