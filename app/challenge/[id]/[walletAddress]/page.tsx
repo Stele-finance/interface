@@ -1191,16 +1191,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           
                           // Get rank color
                           const getRankColor = (rank: number) => {
-                            switch (rank) {
-                              case 1:
-                                return 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-700/50 text-yellow-100';
-                              case 2:
-                                return 'bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-600/50 text-gray-100';
-                              case 3:
-                                return 'bg-gradient-to-r from-amber-900/20 to-amber-800/20 border-amber-700/50 text-amber-100';
-                              default:
-                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
-                            }
+                            return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
                           };
                           
                           const formattedAddress = formatAddress(user);
