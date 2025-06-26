@@ -45,5 +45,5 @@ export const SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/110372/stele/
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"
 
-// STELE Token total supply (1 billion tokens = 1,000,000,000 * 10^18)
-export const STELE_TOTAL_SUPPLY = "1000000000000000000000000000";
+// STELE Token total supply (1 billion tokens = 100,000,000 * 10^18)
+export const STELE_TOTAL_SUPPLY = "100000000000000000000000000";
