@@ -46,10 +46,20 @@ export function useInvestorData(challengeId: string, walletAddress: string) {
     queryFn: async () => {
       return await request(SUBGRAPH_URL, getInvestorQuery(investorId), {}, headers)
     },
-    refetchInterval: 15000, // Refetch every 15 seconds for better real-time experience
-    staleTime: 10000, // Consider data fresh for 10 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds for better real-time experience
+    staleTime: 5000, // Consider data fresh for 5 seconds
     gcTime: 300000, // Keep in cache for 5 minutes
-    retry: 2, // Retry failed requests
+    retry: (failureCount, error) => {
+      // For new investors (404 errors), retry more aggressively
+      if (error.message?.includes('not found') || error.message?.includes('404')) {
+        return failureCount < 10; // Retry up to 10 times for 404 errors
+      }
+      return failureCount < 3; // Normal retry count for other errors
+    },
+    retryDelay: (attemptIndex) => {
+      // For new investors, use shorter delay
+      return Math.min(1000 * 2 ** attemptIndex, 30000); // Exponential backoff, max 30 seconds
+    },
     enabled: !!walletAddress, // Only run query when wallet address is available
   })
 }
