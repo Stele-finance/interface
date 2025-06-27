@@ -328,6 +328,7 @@ export function useProposalsByStatus(
       
       return result
     },
+    enabled: statuses.length > 0, // Only run query if statuses array is not empty
     refetchInterval: 60 * 1000, // Refetch every 1 minute
     staleTime: 30 * 1000, // 30 seconds
     retry: 1,
@@ -397,6 +398,7 @@ export function useProposalsByStatusPaginated(
       
       return result
     },
+    enabled: statuses.length > 0, // Only run query if statuses array is not empty
     refetchInterval: 60 * 1000, // Refetch every 1 minute
     staleTime: 30 * 1000, // 30 seconds
     retry: 1,
@@ -437,6 +439,7 @@ export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE']) {
       
       return result
     },
+    enabled: statuses.length > 0, // Only run query if statuses array is not empty
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (less frequent)
     staleTime: 60 * 1000, // 1 minute
     retry: 1,

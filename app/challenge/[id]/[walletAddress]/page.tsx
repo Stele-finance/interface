@@ -1,6 +1,6 @@
 "use client"
 
-import { notFound } from "next/navigation"
+
 import { useState, useMemo, use, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -217,6 +217,22 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             </div>
           </div>
 
+          {/* Loading Message for New Investors */}
+          {investorError && (
+            <div className="text-center py-8">
+              <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg px-6 py-8 max-w-md mx-auto">
+                <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin text-blue-400" />
+                <h3 className="text-lg font-medium text-blue-400 mb-2">{t('loadingInvestorData')}</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  {t('justJoinedWaitingForData')}
+                </p>
+                <p className="text-gray-400 text-xs">
+                  {t('dataUpdateInProgress')}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Main Content Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Side - Charts + Tabs */}
@@ -329,13 +345,119 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     )
   }
 
-  if (investorError || tokensError || challengeError || transactionsError) {
-    console.error('Page errors:', { investorError, tokensError, challengeError, transactionsError })
-    return notFound()
-  }
+  // Handle errors by showing loading UI instead of 404
+  if (investorError || tokensError || challengeError || transactionsError || !investorData?.investor) {    
+    return (
+      <div className="container mx-auto p-6 py-20">
+        <div className="max-w-6xl mx-auto space-y-4">
+          {/* Go to Challenge Button */}
+          <div className="mb-4">
+            <button 
+              onClick={() => router.push(`/challenge/${challengeId}`)}
+              className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              {t('goToChallenge')} {challengeId}
+            </button>
+          </div>
+          
+          {/* Loading Message for New Investors */}
+          <div className="text-center py-12">
+            <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg px-8 py-12 max-w-lg mx-auto">
+              <Loader2 className="h-12 w-12 mx-auto mb-6 animate-spin text-blue-400" />
+              <h3 className="text-xl font-medium text-blue-400 mb-4">{t('loadingInvestorData')}</h3>
+              <p className="text-gray-300 text-base mb-6">
+                {t('justJoinedWaitingForData')}
+              </p>
+              <p className="text-gray-400 text-sm">
+                {t('dataUpdateInProgress')}
+              </p>
+              
+              {/* Show wallet address being loaded */}
+              <div className="mt-6 p-4 bg-gray-800/50 rounded-lg">
+                <p className="text-gray-400 text-sm mb-2">{t('investor')}</p>
+                <p className="text-gray-200 font-mono text-base">
+                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                </p>
+              </div>
+            </div>
+          </div>
 
-  if (!investorData?.investor) {
-    return notFound()
+          {/* Skeleton Loading for Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+            {/* Left Side - Charts + Tabs */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Chart Loading */}
+              <div className="h-80 bg-gray-700 rounded-lg animate-pulse"></div>
+              
+              {/* Tabs Loading */}
+              <div className="space-y-4">
+                <div className="flex w-full">
+                  <div className="h-10 bg-gray-700 rounded-l w-1/2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-600 rounded-r w-1/2 animate-pulse"></div>
+                </div>
+                
+                {/* Tab Content Loading */}
+                <Card className="bg-transparent border border-gray-700/50">
+                  <CardHeader>
+                    <div className="h-6 bg-gray-700 rounded w-32 animate-pulse"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex items-center justify-between p-4 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-gray-700 animate-pulse"></div>
+                            <div className="space-y-2">
+                              <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
+                              <div className="h-3 bg-gray-700 rounded w-24 animate-pulse"></div>
+                            </div>
+                          </div>
+                          <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+            
+            {/* Right Side - Portfolio Summary */}
+            <div className="lg:col-span-1">
+              <div className="space-y-4">
+                {/* Portfolio Summary Loading */}
+                <Card className="bg-gray-900 border-0 rounded-2xl">
+                  <CardContent className="p-8 space-y-8">
+                    {/* Portfolio Value Loading */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                      <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
+                    </div>
+
+                    {/* Gain/Loss Loading */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                      <div className="h-10 bg-gray-700 rounded w-44 animate-pulse"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Challenge Info Loading */}
+                <Card className="bg-gray-900 border-0 rounded-2xl">
+                  <CardContent className="p-8 space-y-8">
+                    {/* Challenge Type Loading */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                      <div className="h-8 bg-gray-700 rounded w-32 animate-pulse"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const investor = investorData.investor
@@ -1069,16 +1191,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           
                           // Get rank color
                           const getRankColor = (rank: number) => {
-                            switch (rank) {
-                              case 1:
-                                return 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-700/50 text-yellow-100';
-                              case 2:
-                                return 'bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-600/50 text-gray-100';
-                              case 3:
-                                return 'bg-gradient-to-r from-amber-900/20 to-amber-800/20 border-amber-700/50 text-amber-100';
-                              default:
-                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
-                            }
+                            return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
                           };
                           
                           const formattedAddress = formatAddress(user);

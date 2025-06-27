@@ -79,27 +79,55 @@ export default function VotePage() {
   const [currentTab, setCurrentTab] = useState("active")
   const ITEMS_PER_PAGE = 10
 
-  // Fetch paginated proposals from subgraph
-  const { data: actionableProposals, isLoading: isLoadingActionable, error: errorActionable, refetch: refetchActionable } = useProposalsByStatusPaginated(['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'], activeProposalsPage, ITEMS_PER_PAGE)
-  const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(['EXECUTED'], completedProposalsPage, ITEMS_PER_PAGE)
-  const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'], allProposalsPage, ITEMS_PER_PAGE)
-  
-  // Fetch total counts for pagination
-  const { data: actionableCount } = useProposalsCountByStatus(['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'])
-  const { data: completedCount } = useProposalsCountByStatus(['EXECUTED'])
-  const { data: allCount } = useProposalsCountByStatus(['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'])
-  
-  // Get all proposal IDs for fetching vote results (from paginated data)
-  const allProposalIds = [
-    ...(actionableProposals?.proposals?.map(p => p.proposalId) || []),
-    ...(completedProposalsByStatus?.proposals?.map(p => p.proposalId) || []),
-    ...(allProposalsByStatus?.proposals?.map(p => p.proposalId) || [])
-  ].filter((id, index, self) => self.indexOf(id) === index) // Remove duplicates
-  
-  // Fetch vote results for all proposals
-  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(allProposalIds)
+  // Only fetch data for the current tab to avoid too many simultaneous requests
+  const shouldFetchActive = currentTab === "active"
+  const shouldFetchCompleted = currentTab === "completed"
+  const shouldFetchAll = currentTab === "all"
 
-  // Reset page to 1 when tab changes
+  // Fetch paginated proposals from subgraph - only for current tab
+  const { data: actionableProposals, isLoading: isLoadingActionable, error: errorActionable, refetch: refetchActionable } = useProposalsByStatusPaginated(
+    shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [], 
+    activeProposalsPage, 
+    ITEMS_PER_PAGE
+  )
+  
+  const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(
+    shouldFetchCompleted ? ['EXECUTED'] : [], 
+    completedProposalsPage, 
+    ITEMS_PER_PAGE
+  )
+  
+  const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(
+    shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [], 
+    allProposalsPage, 
+    ITEMS_PER_PAGE
+  )
+  
+  // Fetch total counts for pagination - only for current tab
+  const { data: actionableCount } = useProposalsCountByStatus(shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [])
+  const { data: completedCount } = useProposalsCountByStatus(shouldFetchCompleted ? ['EXECUTED'] : [])
+  const { data: allCount } = useProposalsCountByStatus(shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [])
+  
+  // Get proposal IDs only for current tab to reduce API calls
+  const getCurrentTabProposalIds = () => {
+    switch (currentTab) {
+      case "active":
+        return shouldFetchActive ? (actionableProposals?.proposals?.map(p => p.proposalId) || []) : []
+      case "completed":
+        return shouldFetchCompleted ? (completedProposalsByStatus?.proposals?.map(p => p.proposalId) || []) : []
+      case "all":
+        return shouldFetchAll ? (allProposalsByStatus?.proposals?.map(p => p.proposalId) || []) : []
+      default:
+        return []
+    }
+  }
+  
+  const currentTabProposalIds = getCurrentTabProposalIds()
+  
+  // Fetch vote results only for current tab's proposals
+  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds)
+
+  // Reset page to 1 when tab changes and enable data fetching for new tab
   const handleTabChange = (tab: string) => {
     setCurrentTab(tab)
     if (tab === "active") setActiveProposalsPage(1)
@@ -153,44 +181,29 @@ export default function VotePage() {
     getCurrentBlockInfo()
   }, [])
 
-  // Force fresh data when component mounts (when user navigates to vote page)
+  // Simplified initialization - only clear cache for current tab
   useEffect(() => {
-    // Update mount timestamp to ensure fresh mount detection
     const currentTimestamp = Date.now()
     setMountTimestamp(currentTimestamp)
-        
-    // Always set loading to true when component mounts
     setIsInitialLoading(true)
-    // Generate new refresh key to force fresh data
-    setRefreshKey(prev => prev + 1)
     
     const initializePageData = async () => {
       try {        
-        // Clear all proposal-related cache to force fresh data
-        queryClient.removeQueries({ queryKey: ['proposalsByStatusPaginated'] })
-        queryClient.removeQueries({ queryKey: ['multipleProposalVoteResults'] })
-        queryClient.removeQueries({ queryKey: ['proposalsCountByStatus'] })
+        // Only clear cache for the active tab initially
+        queryClient.removeQueries({ queryKey: ['proposalsByStatusPaginated', 'PENDING,ACTIVE,QUEUED,EXECUTED'] })
+        queryClient.removeQueries({ queryKey: ['proposalsCountByStatus', 'PENDING,ACTIVE,QUEUED,EXECUTED'] })
         
-        // Also invalidate for good measure
-        await queryClient.invalidateQueries({ queryKey: ['proposalsByStatusPaginated'] })
-        await queryClient.invalidateQueries({ queryKey: ['multipleProposalVoteResults'] })
-        await queryClient.invalidateQueries({ queryKey: ['proposalsCountByStatus'] })
-                
-        // Show loading for minimum 1 second to ensure user sees the refresh
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1000))
+        // Show loading for minimum 500ms
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500))
         
         // Small delay to ensure cache is cleared
         await new Promise(resolve => setTimeout(resolve, 100))
         
-        // Refetch all proposal data
-        const refetchPromises = Promise.all([
-          refetchActionable(),
-          refetchCompletedByStatus(), 
-          refetchAllByStatus()
-        ])
+        // Only refetch active proposals initially
+        const refetchPromise = refetchActionable()
         
         // Wait for both minimum loading time and data fetching
-        await Promise.all([minLoadingTime, refetchPromises])
+        await Promise.all([minLoadingTime, refetchPromise])
                 
       } catch (error) {
         console.error('Error initializing page data:', error)
@@ -556,15 +569,17 @@ export default function VotePage() {
 
   // Process all proposals data using useMemo (use paginated data)
   const processedProposals = useMemo(() => {
-    if (allProposalsByStatus?.proposals && allProposalsByStatus.proposals.length > 0) {
+    // Only process if we should fetch all data and have data
+    if (shouldFetchAll && allProposalsByStatus?.proposals && allProposalsByStatus.proposals.length > 0) {
       return allProposalsByStatus.proposals.map((proposal: any) => processStatusBasedProposalData(proposal))
     }
     return []
-  }, [allProposalsByStatus?.proposals, voteResultsData?.proposalVoteResults])
+  }, [shouldFetchAll, allProposalsByStatus?.proposals, voteResultsData?.proposalVoteResults])
 
   // Process active proposals data using useMemo (use paginated data)
   const processedActiveProposals = useMemo(() => {
-    if (actionableProposals?.proposals && actionableProposals.proposals.length > 0) {
+    // Only process if we should fetch active data and have data
+    if (shouldFetchActive && actionableProposals?.proposals && actionableProposals.proposals.length > 0) {
       return actionableProposals.proposals
         .map((proposal: any) => processStatusBasedProposalData(proposal))
         .filter((proposal: any) => {
@@ -575,17 +590,18 @@ export default function VotePage() {
         })
     }
     return []
-  }, [actionableProposals?.proposals, voteResultsData?.proposalVoteResults])
+  }, [shouldFetchActive, actionableProposals?.proposals, voteResultsData?.proposalVoteResults])
 
   // Process completed proposals data using useMemo (use paginated data)
   const processedCompletedProposals = useMemo(() => {
-    if (completedProposalsByStatus?.proposals && completedProposalsByStatus.proposals.length > 0) {
+    // Only process if we should fetch completed data and have data
+    if (shouldFetchCompleted && completedProposalsByStatus?.proposals && completedProposalsByStatus.proposals.length > 0) {
       return completedProposalsByStatus.proposals
         .map((proposal: any) => processStatusBasedProposalData(proposal))
         .filter((proposal: any) => proposal.status === 'executed') // Only show executed proposals
     }
     return []
-  }, [completedProposalsByStatus?.proposals, voteResultsData?.proposalVoteResults])
+  }, [shouldFetchCompleted, completedProposalsByStatus?.proposals, voteResultsData?.proposalVoteResults])
 
   // Update state when processed data changes
   useEffect(() => {
@@ -987,7 +1003,13 @@ export default function VotePage() {
     )
   }
 
-  if (isInitialLoading || isLoadingActionable || isLoadingCompletedByStatus || isLoadingAllByStatus || isLoadingVoteResults || isLoadingBlockNumber || isLoadingGovernanceConfig || isLoadingWalletTokenInfo) {
+  // Only show global loading for initial load and essential data
+  const isCurrentTabLoading = 
+    (currentTab === "active" && isLoadingActionable) ||
+    (currentTab === "completed" && isLoadingCompletedByStatus) ||
+    (currentTab === "all" && isLoadingAllByStatus)
+
+  if (isInitialLoading || isCurrentTabLoading || isLoadingVoteResults || isLoadingBlockNumber || isLoadingGovernanceConfig || isLoadingWalletTokenInfo) {
     return (
       <div className="container mx-auto px-20 py-16 flex flex-col items-center justify-center min-h-[50vh]">
         <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
@@ -1029,7 +1051,7 @@ export default function VotePage() {
             variant="default" 
             size="lg"
             onClick={handleRefresh}
-            disabled={isInitialLoading || isLoadingActionable || isLoadingCompletedByStatus || isLoadingAllByStatus} 
+            disabled={isInitialLoading || isCurrentTabLoading} 
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
           >
             {isInitialLoading ? (
@@ -1180,210 +1202,261 @@ export default function VotePage() {
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
-          <div className="rounded-lg border border-gray-700/50 bg-transparent">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
-                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedActiveProposals.length > 0 ? (
-                  paginatedActiveProposals.map((proposal) => (
-                    <TableRow 
-                      key={proposal.id} 
-                      className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                      onClick={() => window.location.href = createProposalUrl(proposal)}
-                    >
-                      <TableCell className="max-w-xs py-6">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
-                        </div>
-                      </TableCell>
-                      <TableCell className="min-w-52 py-6">
-                        <ProgressBar 
-                          votesFor={proposal.votesFor} 
-                          votesAgainst={proposal.votesAgainst} 
-                          abstain={proposal.abstain}
-                        />
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.startTime)}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.endTime)}
-                      </TableCell>
-                      <TableCell className="text-center py-6">
-                        <StatusBadge proposal={proposal} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-gray-400">
-                      {t('noActiveProposalsFound')}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <PaginationComponent 
-            currentPage={activeProposalsPage}
-            totalPages={totalActivePages}
-            onPageChange={setActiveProposalsPage}
-          />
-          <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
-            <div className="flex justify-between items-center">
-              {(actionableCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
-                <div>
-                  {t('showing')} {((activeProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(activeProposalsPage * ITEMS_PER_PAGE, actionableCount?.proposals?.length || 0)} {t('of')} {actionableCount?.proposals?.length || 0} {t('proposals')}
+          {currentTab === "active" ? (
+            <>
+              {isLoadingActionable ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
+                  <span className="text-gray-400">{t('loading')}</span>
                 </div>
+              ) : (
+                <>
+                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedActiveProposals.length > 0 ? (
+                          paginatedActiveProposals.map((proposal) => (
+                            <TableRow 
+                              key={proposal.id} 
+                              className="border-0 hover:bg-gray-800/30 cursor-pointer"
+                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                            >
+                              <TableCell className="max-w-xs py-6">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
+                                </div>
+                              </TableCell>
+                              <TableCell className="min-w-52 py-6">
+                                <ProgressBar 
+                                  votesFor={proposal.votesFor} 
+                                  votesAgainst={proposal.votesAgainst} 
+                                  abstain={proposal.abstain}
+                                />
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.startTime)}
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.endTime)}
+                              </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-12 text-gray-400">
+                              {t('noActiveProposalsFound')}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <PaginationComponent 
+                    currentPage={activeProposalsPage}
+                    totalPages={totalActivePages}
+                    onPageChange={setActiveProposalsPage}
+                  />
+                  <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
+                    <div className="flex justify-between items-center">
+                      {(actionableCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
+                        <div>
+                          {t('showing')} {((activeProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(activeProposalsPage * ITEMS_PER_PAGE, actionableCount?.proposals?.length || 0)} {t('of')} {actionableCount?.proposals?.length || 0} {t('proposals')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-400">
+              {t('clickActiveTabToView')}
             </div>
-          </div>
+          )}
         </TabsContent>
 
         <TabsContent value="completed" className="mt-4">
-          <div className="rounded-lg border border-gray-700/50 bg-transparent">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
-                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedCompletedProposals.length > 0 ? (
-                  paginatedCompletedProposals.map((proposal) => (
-                    <TableRow 
-                      key={proposal.id} 
-                      className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                      onClick={() => window.location.href = createProposalUrl(proposal)}
-                    >
-                      <TableCell className="max-w-xs py-6">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
-                        </div>
-                      </TableCell>
-                      <TableCell className="min-w-52 py-6">
-                        <ProgressBar 
-                          votesFor={proposal.votesFor} 
-                          votesAgainst={proposal.votesAgainst} 
-                          abstain={proposal.abstain}
-                        />
-                      </TableCell> 
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.startTime)}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.endTime)}
-                      </TableCell>
-                      <TableCell className="text-center py-6">
-                        <StatusBadge proposal={proposal} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12 text-gray-400">
-                      {t('noCompletedProposalsFound')}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <PaginationComponent 
-            currentPage={completedProposalsPage}
-            totalPages={totalCompletedPages}
-            onPageChange={setCompletedProposalsPage}
-          />
-          <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
-            <div className="flex justify-between items-center mb-2">
-              {(completedCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
-                <div>
-                  {t('showing')} {((completedProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(completedProposalsPage * ITEMS_PER_PAGE, completedCount?.proposals?.length || 0)} {t('of')} {completedCount?.proposals?.length || 0} {t('proposals')}
+          {currentTab === "completed" ? (
+            <>
+              {isLoadingCompletedByStatus ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
+                  <span className="text-gray-400">{t('loading')}</span>
                 </div>
+              ) : (
+                <>
+                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedCompletedProposals.length > 0 ? (
+                          paginatedCompletedProposals.map((proposal) => (
+                            <TableRow 
+                              key={proposal.id} 
+                              className="border-0 hover:bg-gray-800/30 cursor-pointer"
+                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                            >
+                              <TableCell className="max-w-xs py-6">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
+                                </div>
+                              </TableCell>
+                              <TableCell className="min-w-52 py-6">
+                                <ProgressBar 
+                                  votesFor={proposal.votesFor} 
+                                  votesAgainst={proposal.votesAgainst} 
+                                  abstain={proposal.abstain}
+                                />
+                              </TableCell> 
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.startTime)}
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.endTime)}
+                              </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-12 text-gray-400">
+                              {t('noCompletedProposalsFound')}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <PaginationComponent 
+                    currentPage={completedProposalsPage}
+                    totalPages={totalCompletedPages}
+                    onPageChange={setCompletedProposalsPage}
+                  />
+                  <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      {(completedCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
+                        <div>
+                          {t('showing')} {((completedProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(completedProposalsPage * ITEMS_PER_PAGE, completedCount?.proposals?.length || 0)} {t('of')} {completedCount?.proposals?.length || 0} {t('proposals')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-400">
+              {t('clickCompletedTabToView')}
             </div>
-          </div>
+          )}
         </TabsContent>
 
         <TabsContent value="all" className="mt-4">
-          <div className="rounded-lg border border-gray-700/50 bg-transparent">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                  <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                  <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
-                  <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedAllProposals.length > 0 ? (
-                  paginatedAllProposals.map((proposal) => (
-                    <TableRow 
-                      key={proposal.id} 
-                      className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                      onClick={() => window.location.href = createProposalUrl(proposal)}
-                    >
-                      <TableCell className="max-w-xs py-6">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
-                        </div>
-                      </TableCell>
-                      <TableCell className="min-w-52 py-6">
-                        <ProgressBar 
-                          votesFor={proposal.votesFor} 
-                          votesAgainst={proposal.votesAgainst} 
-                          abstain={proposal.abstain}
-                        />
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.startTime)}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300 py-6">
-                        {formatDate(proposal.endTime)}
-                      </TableCell>
-                      <TableCell className="text-center py-6">
-                        <StatusBadge proposal={proposal} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-gray-400">
-                      {t('noProposalsFound')}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <PaginationComponent 
-            currentPage={allProposalsPage}
-            totalPages={totalAllPages}
-            onPageChange={setAllProposalsPage}
-          />
-          <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
-            <div className="flex justify-between items-center mb-2">
-              {(allCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
-                <div>
-                  {t('showing')} {((allProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(allProposalsPage * ITEMS_PER_PAGE, allCount?.proposals?.length || 0)} {t('of')} {allCount?.proposals?.length || 0} {t('proposals')}
+          {currentTab === "all" ? (
+            <>
+              {isLoadingAllByStatus ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
+                  <span className="text-gray-400">{t('loading')}</span>
                 </div>
+              ) : (
+                <>
+                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedAllProposals.length > 0 ? (
+                          paginatedAllProposals.map((proposal) => (
+                            <TableRow 
+                              key={proposal.id} 
+                              className="border-0 hover:bg-gray-800/30 cursor-pointer"
+                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                            >
+                              <TableCell className="max-w-xs py-6">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
+                                </div>
+                              </TableCell>
+                              <TableCell className="min-w-52 py-6">
+                                <ProgressBar 
+                                  votesFor={proposal.votesFor} 
+                                  votesAgainst={proposal.votesAgainst} 
+                                  abstain={proposal.abstain}
+                                />
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.startTime)}
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-300 py-6">
+                                {formatDate(proposal.endTime)}
+                              </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-12 text-gray-400">
+                              {t('noProposalsFound')}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <PaginationComponent 
+                    currentPage={allProposalsPage}
+                    totalPages={totalAllPages}
+                    onPageChange={setAllProposalsPage}
+                  />
+                  <div className="mt-4 text-sm text-gray-400 border-t border-gray-700/50 pt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      {(allCount?.proposals?.length || 0) > ITEMS_PER_PAGE && (
+                        <div>
+                          {t('showing')} {((allProposalsPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(allProposalsPage * ITEMS_PER_PAGE, allCount?.proposals?.length || 0)} {t('of')} {allCount?.proposals?.length || 0} {t('proposals')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-400">
+              {t('clickAllTabToView')}
             </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

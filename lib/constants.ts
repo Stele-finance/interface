@@ -31,10 +31,10 @@ export const ETHEREUM_BLOCK_TIME_MS = 12; // ~12 seconds per block
 // Mainnet
 
 // Contract Addresses
-export const STELE_CONTRACT_ADDRESS = "0xbC84eE790B6D4d590925DFC8a0bC80313ffe9CE9";
-export const STELE_TOKEN_ADDRESS = "0xB82f40c4b42960BA4387c5FaC5763a3e86a1BF3c"; // Stele Token for voting
+export const STELE_CONTRACT_ADDRESS = "0xe362d7C3D7feB2E5a81c5D132eF135Fb7F9D719F";
+export const STELE_TOKEN_ADDRESS = "0x2665b58A57Aad89C0d0268F3A7677F6b76730801"; // Stele Token for voting
 export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // Mainnet USDC
-export const GOVERNANCE_CONTRACT_ADDRESS = "0x07632cB8376Cfed5Bad166513C2299226d78f442"; // Mainnet Governance
+export const GOVERNANCE_CONTRACT_ADDRESS = "0x53Ed5DaB444c5459cd2E1E86b4781563f8dEd275"; // Mainnet Governance
 export const RPC_URL = 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY;
 
 // Token decimals
@@ -45,5 +45,5 @@ export const SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/110372/stele/
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"
 
-// STELE Token total supply (1 billion tokens = 1,000,000,000 * 10^18)
-export const STELE_TOTAL_SUPPLY = "1000000000000000000000000000";
+// STELE Token total supply (1 billion tokens = 100,000,000 * 10^18)
+export const STELE_TOTAL_SUPPLY = "100000000000000000000000000";

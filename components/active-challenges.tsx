@@ -418,9 +418,19 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       case "pending":
         return <Badge variant="outline" className="border-gray-600 text-gray-300 px-3 py-1.5 text-sm">{t('pending')}</Badge>
       case "completed":
-        return <Badge className="bg-blue-500 text-white px-3 py-1.5 text-sm">{t('completed')}</Badge>
+        return (
+          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
+            <Trophy className="h-4 w-4" />
+            {t('completed')}
+          </Badge>
+        )
       case "finished":
-        return <Badge className="bg-orange-500 text-white px-3 py-1.5 text-sm">{t('finished')}</Badge>
+        return (
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
+            <Clock className="h-4 w-4" />
+            {t('finished')}
+          </Badge>
+        )
       default:
         return <Badge variant="secondary" className="px-3 py-1.5 text-sm">{t('unknown')}</Badge>
     }

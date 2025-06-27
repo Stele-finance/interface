@@ -232,7 +232,7 @@ export function DashboardCharts() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="totalParticipants"
+                    dataKey="totalParticipants" 
                     stroke="#f97316"
                     strokeWidth={2}
                     fill="url(#participantsGradient)"
@@ -300,7 +300,7 @@ export function DashboardCharts() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="totalRewards"
+                    dataKey="totalRewards" 
                     stroke="#f97316"
                     strokeWidth={2}
                     fill="url(#rewardsGradient)"

@@ -714,7 +714,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         
         // Start refetching investor data to check for subgraph updates
         let attempts = 0;
-        const maxAttempts = 10; // Try for 5 minutes (30s * 10)
+        const maxAttempts = 4; // Try for 1 minutes (15s * 4)
         const checkInterval = setInterval(async () => {
           attempts++;
           try {
@@ -731,8 +731,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           // Stop trying after max attempts
           if (attempts >= maxAttempts) {
             clearInterval(checkInterval);
+            console.log('Max refetch attempts reached. Data may take longer to update.');
           }
-        }, 30000); // Check every 30 seconds
+        }, 5000); // Check every 5 seconds
       } catch (joinError: any) {
         console.error("❌ Join challenge failed:", joinError);
         
@@ -1115,7 +1116,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                   return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                 })()
                               ) : (
-                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                               )}
                             </div>
                           </div>
