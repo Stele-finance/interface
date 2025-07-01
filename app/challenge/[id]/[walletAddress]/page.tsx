@@ -1191,7 +1191,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           
                           // Get rank color
                           const getRankColor = (rank: number) => {
-                            return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
+                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
                           };
                           
                           const formattedAddress = formatAddress(user);
