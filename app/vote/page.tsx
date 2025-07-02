@@ -10,7 +10,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Check, Clock, XCircle, Plus, FileText, Vote as VoteIcon, Loader2 } from "lucide-react"
 import { useProposalsData, useActiveProposalsData, useMultipleProposalVoteResults, useProposalsByStatus, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
 import { useQueryClient } from '@tanstack/react-query'
-import { BASE_BLOCK_TIME_MS, STELE_DECIMALS, STELE_TOKEN_ADDRESS } from "@/lib/constants"
+import { ARBITRUM_BLOCK_TIME_MS, STELE_DECIMALS, STELE_TOKEN_ADDRESS } from "@/lib/constants"
 import { ethers } from "ethers"
 import { useGovernanceConfig } from "@/app/hooks/useGovernanceConfig"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
@@ -458,8 +458,8 @@ export default function VotePage() {
       const votingDelayBlocks = governanceConfig?.votingDelay || 7200 // Default: ~1 day at 2 sec/block
       
       // Convert blocks to milliseconds (Base mainnet: ~2 seconds per block)
-      const votingPeriodMs = votingPeriodBlocks * BASE_BLOCK_TIME_MS
-      const votingDelayMs = votingDelayBlocks * BASE_BLOCK_TIME_MS
+              const votingPeriodMs = votingPeriodBlocks * ARBITRUM_BLOCK_TIME_MS
+        const votingDelayMs = votingDelayBlocks * ARBITRUM_BLOCK_TIME_MS
       
       if (proposalData.status === 'PENDING') {
         // For pending proposals, voting hasn't started yet

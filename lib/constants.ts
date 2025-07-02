@@ -1,17 +1,17 @@
-// Base Chain Mainnet Information
-export const BASE_CHAIN_ID = '0x2105'; // Base mainnet chain ID (hexadecimal)
-export const BASE_CHAIN_CONFIG = {
-  chainId: BASE_CHAIN_ID,
-  chainName: 'Base Mainnet',
+// Arbitrum One Mainnet Information
+export const ARBITRUM_CHAIN_ID = '0xa4b1'; // Arbitrum One chain ID (hexadecimal)
+export const ARBITRUM_CHAIN_CONFIG = {
+  chainId: ARBITRUM_CHAIN_ID,
+  chainName: 'Arbitrum',
   nativeCurrency: {
     name: 'Ethereum',
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['https://mainnet.base.org'],
-  blockExplorerUrls: ['https://basescan.org']
+  rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+  blockExplorerUrls: ['https://arbiscan.io']
 };
-export const BASE_BLOCK_TIME_MS = 2; // 2 seconds per block
+export const ARBITRUM_BLOCK_TIME_MS = 1; // ~1 second per block
 
 // Ethereum Mainnet Information
 export const ETHEREUM_CHAIN_ID = '0x1'; // Ethereum mainnet chain ID (hexadecimal)

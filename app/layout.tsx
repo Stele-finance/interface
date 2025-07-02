@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/header"
+import { Toaster } from "@/components/ui/toaster"
 
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
@@ -40,6 +41,7 @@ export default function RootLayout({
             </LanguageProvider>
           </ThemeProvider>
         </QueryProvider>
+        <Toaster />
       </body>
     </html>
   )
