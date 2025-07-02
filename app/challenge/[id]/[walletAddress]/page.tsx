@@ -77,13 +77,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
-    investorData?.investor?.isClosed === true ? [] : userTokens
+    investorData?.investor?.isRegistered === true ? [] : userTokens
   )
 
   // Calculate real-time portfolio value - only if not closed
   const calculateRealTimePortfolioValue = useCallback(() => {
     // Don't calculate real-time portfolio if investor is closed
-    if (investorData?.investor?.isClosed === true) return null
+    if (investorData?.investor?.isRegistered === true) return null
     if (!uniswapPrices?.tokens || userTokens.length === 0) return null
     
     let totalValue = 0
@@ -104,7 +104,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       totalTokens: userTokens.length,
       timestamp: uniswapPrices.timestamp || Date.now()
     }
-  }, [uniswapPrices, userTokens, investorData?.investor?.isClosed])
+  }, [uniswapPrices, userTokens, investorData?.investor?.isRegistered])
 
   const realTimePortfolio = calculateRealTimePortfolioValue()
 
@@ -751,7 +751,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
             {connectedAddress && walletAddress && 
              connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
-             investorData?.investor?.isClosed !== true && (
+             investorData?.investor?.isRegistered !== true && (
               <div className="flex justify-end gap-4">
                 <Button 
                   variant="outline" 
@@ -794,7 +794,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             )}
             
             {/* Show completion message if investor is closed */}
-            {investorData?.investor?.isClosed === true && (
+            {investorData?.investor?.isRegistered === true && (
               <div className="flex justify-end">
                 <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -1384,7 +1384,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <div className="flex items-center gap-2">
                       {(() => {
                         // If investor is closed, show as Finished
-                        if (investorData?.investor?.isClosed === true) {
+                        if (investorData?.investor?.isRegistered === true) {
                           return (
                             <>
                               <div className="w-3 h-3 rounded-full bg-red-400"></div>
