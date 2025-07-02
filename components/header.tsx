@@ -14,6 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -153,30 +159,30 @@ export function Header() {
 
   // Switch between Networks
   const switchWalletNetwork = async (targetNetwork: 'solana' | 'ethereum' | 'arbitrum') => {
+    // Immediate validation before any async operations
+    if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
+      toast({
+        variant: "destructive",
+        title: "🚫 Network Not Supported",
+        description: "Phantom wallet does not support Arbitrum network. Please disconnect and connect with MetaMask to access Arbitrum.",
+        duration: 5000,
+      })
+      return
+    }
+    
     try {
       setIsConnecting(true)
       
-      // Check if trying to switch to Arbitrum from Solana with Phantom wallet
-      if (targetNetwork === 'arbitrum' && walletNetwork === 'solana' && walletType === 'phantom') {
-        toast({
-          variant: "destructive",
-          title: "Network Not Supported",
-          description: "Phantom wallet does not support Arbitrum network. Please use MetaMask to access Arbitrum.",
-        })
-        return
-      }
-      
-      // Check if trying to switch to Arbitrum with Phantom wallet (even from Ethereum)
-      if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
-        toast({
-          variant: "destructive",
-          title: "Network Not Supported",
-          description: "Phantom wallet does not support Arbitrum network. Please use MetaMask to access Arbitrum.",
-        })
-        return
-      }
-      
       await switchNetwork(targetNetwork)
+      
+      // Success feedback
+      toast({
+        variant: "default",
+        title: "✅ Network Switched",
+        description: `Successfully switched to ${targetNetwork === 'ethereum' ? 'Ethereum Mainnet' : 'Arbitrum One'}`,
+        duration: 3000,
+      })
+      
     } catch (error) {
       console.error("Wallet switch error:", error)
       // Show user-friendly error message
@@ -368,9 +374,34 @@ export function Header() {
                   </DropdownMenuItem>
                 )}
                 {walletNetwork !== 'arbitrum' && (
-                  <DropdownMenuItem onClick={() => switchWalletNetwork('arbitrum')}>
-                    Arbitrum
-                  </DropdownMenuItem>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <DropdownMenuItem 
+                            onClick={() => switchWalletNetwork('arbitrum')}
+                            disabled={walletType === 'phantom'}
+                            className={walletType === 'phantom' ? 'opacity-50 cursor-not-allowed' : ''}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span>Arbitrum One</span>
+                              {walletType === 'phantom' && (
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  🚫
+                                </span>
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        </div>
+                      </TooltipTrigger>
+                      {walletType === 'phantom' && (
+                        <TooltipContent>
+                          <p>Arbitrum is not supported by Phantom wallet.</p>
+                          <p>Please use MetaMask to access Arbitrum network.</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDisconnectWallet}>
