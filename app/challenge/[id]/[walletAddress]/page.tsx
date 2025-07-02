@@ -68,7 +68,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, isConnected } = useWallet()
+  const { address: connectedAddress, isConnected, walletType } = useWallet()
   const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
@@ -631,41 +631,63 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     setIsRegistering(true);
     
     try {
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      // Check if Ethereum provider is available
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
       // Verify the connected wallet matches the investor address
-      const connectedAddress = accounts[0].toLowerCase();
-      if (connectedAddress !== walletAddress.toLowerCase()) {
+      const connectedWalletAddress = accounts[0].toLowerCase();
+      if (connectedWalletAddress !== walletAddress.toLowerCase()) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
       // Get current network information
-      const chainId = await window.phantom.ethereum.request({
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
       
       // Get the signer
       const signer = await provider.getSigner();

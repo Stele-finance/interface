@@ -45,7 +45,7 @@ interface Proposal {
 export default function VotePage() {
   const { t } = useLanguage()
   // Use global wallet hook instead of local state
-  const { address: walletAddress, isConnected } = useWallet()
+  const { address: walletAddress, isConnected, walletType } = useWallet()
   const queryClient = useQueryClient()
   const [isDelegating, setIsDelegating] = useState(false)
   const [proposals, setProposals] = useState<Proposal[]>([])
@@ -803,16 +803,43 @@ export default function VotePage() {
     setIsDelegating(true)
 
     try {
-      // Check if Phantom wallet is available
-      if (!window.phantom?.ethereum) {
-        throw new Error(t('phantomWalletNotInstalled'))
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
+
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request wallet connection
-      await window.phantom.ethereum.request({ method: 'eth_requestAccounts' })
+      await walletProvider.request({ method: 'eth_requestAccounts' })
       
-      // Connect to provider with signer using Phantom's ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum)
+      // Connect to provider with signer
+      const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
       const votesContract = new ethers.Contract(STELE_TOKEN_ADDRESS, ERC20VotesABI.abi, signer)
 
