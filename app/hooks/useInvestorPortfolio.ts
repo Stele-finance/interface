@@ -24,7 +24,7 @@ export const INVESTOR_PORTFOLIO_QUERY = gql`
       tokensSymbols
       profitUSD
       profitRatio
-      isClosed
+      isRegistered
     }
   }
 `
@@ -43,7 +43,7 @@ export interface InvestorPortfolio {
   tokensSymbols: string[]
   profitUSD: string
   profitRatio: string
-  isClosed: boolean
+  isRegistered: boolean
 }
 
 export interface InvestorPortfolioData {

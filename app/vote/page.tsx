@@ -886,12 +886,18 @@ export default function VotePage() {
       // Show loading for minimum 0.5 seconds
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500))
       
-      // Refetch all proposal data
-      const refetchPromises = Promise.all([
-        refetchActionable(),
-        refetchCompletedByStatus(),
-        refetchAllByStatus()
-      ])
+      // Only refetch current tab data to avoid GraphQL errors with empty arrays
+      let refetchPromises: Promise<any>
+      if (currentTab === "active") {
+        refetchPromises = refetchActionable()
+      } else if (currentTab === "completed") {
+        refetchPromises = refetchCompletedByStatus()
+      } else if (currentTab === "all") {
+        refetchPromises = refetchAllByStatus()
+      } else {
+        // Default to active tab
+        refetchPromises = refetchActionable()
+      }
       
       // Wait for both minimum loading time and data fetching
       await Promise.all([minLoadingTime, refetchPromises])
@@ -1033,9 +1039,17 @@ export default function VotePage() {
         </div>
         <div className="mt-4">
           <Button variant="outline" onClick={() => {
-            refetchActionable()
-            refetchCompletedByStatus()
-            refetchAllByStatus()
+            // Only refetch current tab data to avoid GraphQL errors with empty arrays
+            if (currentTab === "active") {
+              refetchActionable()
+            } else if (currentTab === "completed") {
+              refetchCompletedByStatus()
+            } else if (currentTab === "all") {
+              refetchAllByStatus()
+            } else {
+              // Default to active tab
+              refetchActionable()
+            }
           }} className="bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700">{t('retry')}</Button>
         </div>
       </div>
