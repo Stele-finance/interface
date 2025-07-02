@@ -44,6 +44,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -82,7 +83,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
-    investorData?.investor?.isRegistered === true ? [] : userTokens
+    investorData?.investor?.isRegistered === true ? [] : userTokens,
+    subgraphNetwork
   )
 
   // Calculate real-time portfolio value - only if not closed
@@ -117,7 +119,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isClient, setIsClient] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isRegistering, setIsRegistering] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
+  
+  // Use React Query client for better data management
+  const queryClient = useQueryClient()
   const [currentPage, setCurrentPage] = useState(1)
   const [rankingCurrentPage, setRankingCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -737,6 +743,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           </ToastAction>
         ),
       });
+
+      // Start refreshing process
+      setIsRefreshing(true);
+
+      // Refresh data after 3 seconds using React Query
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork] });
+        setIsRefreshing(false);
+      }, 3000);
       
     } catch (error: any) {
       console.error("Error registering investor:", error);
@@ -754,10 +772,40 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   };
 
   return (
-    <div className="container mx-auto p-6 py-12">
-      <div className="max-w-6xl mx-auto space-y-4">
-        {/* Go to Challenge Button */}
-        <div className="mb-4">
+    <>
+      {/* Loading Overlay */}
+      {isRefreshing && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+          {/* Simple Rotating Spinner */}
+          <div className="w-16 h-16">
+            <svg 
+              className="w-16 h-16 animate-spin text-blue-500" 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24"
+            >
+              <circle 
+                className="opacity-25" 
+                cx="12" 
+                cy="12" 
+                r="10" 
+                stroke="currentColor" 
+                strokeWidth="4"
+              />
+              <path 
+                className="opacity-75" 
+                fill="currentColor" 
+                d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      <div className="container mx-auto p-6 py-12">
+        <div className="max-w-6xl mx-auto space-y-4">
+          {/* Go to Challenge Button */}
+          <div className="mb-4">
           <button 
             onClick={() => router.push(`/challenge/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
@@ -875,8 +923,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         // Get price from Uniswap data
                         const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
                         const isLoadingPrice = isLoadingUniswap
+                        const hasValidPrice = tokenPrice > 0
                         const tokenAmount = parseFloat(token.amount) || 0
-                        const tokenValue = tokenPrice * tokenAmount
+                        const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
                         
                         return (
                           <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0">
@@ -1608,5 +1657,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       </div>
     </div>
+    </>
   )
 } 

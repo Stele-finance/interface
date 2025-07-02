@@ -23,6 +23,7 @@ import { ExternalLink, Users, Clock, Trophy, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface ChallengeCardProps {
   id?: string
@@ -116,9 +117,13 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const [isCreating, setIsCreating] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Use wallet hook to get current wallet info
   const { walletType, network } = useWallet();
+  
+  // Use React Query client for better data management
+  const queryClient = useQueryClient();
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
@@ -263,6 +268,15 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
           </ToastAction>
         ),
       });
+
+      // Start refreshing process
+      setIsRefreshing(true);
+
+      // Refresh data after 3 seconds using React Query
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['activeChallenges', subgraphNetwork] });
+        setIsRefreshing(false);
+      }, 3000);
       
     } catch (error: any) {
       console.error("Error creating challenge:", error);
@@ -494,15 +508,27 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
-        <ChallengeTypeModal 
-          onCreateChallenge={handleCreateChallenge}
-          isCreating={isCreating}
-          activeChallenges={activeChallengesData}
-        />
-      </div>
+    <>
+      {/* Refreshing Spinner Overlay */}
+      {isRefreshing && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
+            <div className="text-white text-lg font-medium">Challenge created successfully!</div>
+            <div className="text-gray-300 text-sm">Refreshing data...</div>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
+          <ChallengeTypeModal 
+            onCreateChallenge={handleCreateChallenge}
+            isCreating={isCreating}
+            activeChallenges={activeChallengesData}
+          />
+        </div>
 
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-0">
@@ -582,5 +608,6 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         </CardContent>
       </Card>
     </div>
+    </>
   )
 }

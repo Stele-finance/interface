@@ -37,7 +37,14 @@ const NETWORK_CONTRACTS = {
     GOVERNANCE_CONTRACT_ADDRESS: "0x57b0150F4435C1524926c9b999Ee72b178852a24",
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
-    EXPLORER_NAME: 'Etherscan'
+    EXPLORER_NAME: 'Etherscan',
+    // Uniswap V3 addresses
+    UNISWAP_V3_QUOTER: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
+    MULTICALL_CONTRACT: "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696",
+    WETH_TOKEN_ADDRESS: "0xC02aaA39b223FE8C0A0e5C4F27eAD9083C756Cc2",
+    WBTC_TOKEN_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    UNI_TOKEN_ADDRESS: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   arbitrum: {
     STELE_CONTRACT_ADDRESS: "0xFBeFb660a91584afB282e2aE8A689765c66a8Fb3",
@@ -46,7 +53,14 @@ const NETWORK_CONTRACTS = {
     GOVERNANCE_CONTRACT_ADDRESS: "0x0940B5dbc3971065e3766c58fdB86a631E631481",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://arbiscan.io',
-    EXPLORER_NAME: 'Arbiscan'
+    EXPLORER_NAME: 'Arbiscan',
+    // Uniswap V3 addresses (Arbitrum)
+    UNISWAP_V3_QUOTER: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
+    MULTICALL_CONTRACT: "0xadF885960B47eA2CD9B55E6DAc6B42b7Cb2806dB", // Multicall on Arbitrum
+    WETH_TOKEN_ADDRESS: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // Arbitrum WETH
+    WBTC_TOKEN_ADDRESS: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // Arbitrum WBTC
+    UNI_TOKEN_ADDRESS: "0xfb3CB973B2a9e2E09746393C59e7FB0d5189d290",   // Arbitrum UNI
+    LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
   }
 } as const;
 
@@ -94,6 +108,37 @@ export const getExplorerUrl = (network: 'ethereum' | 'arbitrum' | null): string 
 export const getExplorerName = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.EXPLORER_NAME;
   return NETWORK_CONTRACTS.ethereum.EXPLORER_NAME; // Default to Ethereum
+};
+
+// Uniswap V3 related helper functions
+export const getUniswapQuoterAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.UNISWAP_V3_QUOTER;
+  return NETWORK_CONTRACTS.ethereum.UNISWAP_V3_QUOTER; // Default to Ethereum
+};
+
+export const getMulticallAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.MULTICALL_CONTRACT;
+  return NETWORK_CONTRACTS.ethereum.MULTICALL_CONTRACT; // Default to Ethereum
+};
+
+export const getWETHAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.WETH_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.WETH_TOKEN_ADDRESS; // Default to Ethereum
+};
+
+export const getWBTCAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.WBTC_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.WBTC_TOKEN_ADDRESS; // Default to Ethereum
+};
+
+export const getUNIAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.UNI_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.UNI_TOKEN_ADDRESS; // Default to Ethereum
+};
+
+export const getLINKAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.LINK_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.LINK_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 // Legacy exports for backward compatibility (these will use Ethereum by default)

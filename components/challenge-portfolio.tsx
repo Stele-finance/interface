@@ -29,6 +29,7 @@ import { useRanking } from "@/app/hooks/useRanking"
 import { useInvestorData } from "@/app/subgraph/Account"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface ChallengePortfolioProps {
   challengeId: string
@@ -234,6 +235,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { t } = useLanguage()
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [isGettingRewards, setIsGettingRewards] = useState(false);
@@ -244,6 +246,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [usdcBalance, setUsdcBalance] = useState<string>('0');
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshProgress, setRefreshProgress] = useState(0);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -797,28 +801,33 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         // Update local state immediately for instant UI feedback
         setHasJoinedLocally(true);
         
-        // Start refetching investor data to check for subgraph updates
-        let attempts = 0;
-        const maxAttempts = 4; // Try for 1 minutes (15s * 4)
-        const checkInterval = setInterval(async () => {
-          attempts++;
-          try {
-            const result = await refetchInvestorData();
-            if (result.data?.investor) {
-              // Subgraph has been updated, clear interval and refresh page
-              clearInterval(checkInterval);
-              window.location.reload();
+        // Show refreshing spinner with progress
+        setIsRefreshing(true);
+        setRefreshProgress(0);
+        
+        // Animate progress from 0% to 100% over 3 seconds
+        const progressInterval = setInterval(() => {
+          setRefreshProgress(prev => {
+            if (prev >= 100) {
+              clearInterval(progressInterval);
+              return 100;
             }
-          } catch (error) {
-            console.log('Refetch attempt', attempts, 'failed:', error);
-          }
+            return prev + (100 / 30); // Increment by ~3.33% every 100ms
+          });
+        }, 100);
+        
+        // After 3 seconds, invalidate queries and hide spinner
+        setTimeout(() => {
+          // Invalidate queries to refetch fresh data
+          queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, walletAddress, subgraphNetwork] });
           
-          // Stop trying after max attempts
-          if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            console.log('Max refetch attempts reached. Data may take longer to update.');
-          }
-        }, 5000); // Check every 5 seconds
+          // Hide spinner
+          setIsRefreshing(false);
+          setRefreshProgress(0);
+        }, 3000);
       } catch (joinError: any) {
         console.error("❌ Join challenge failed:", joinError);
         
@@ -970,6 +979,17 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   return (
     <div className="space-y-4">
+      {/* Refreshing Spinner Overlay */}
+      {isRefreshing && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
+            <div className="text-white text-lg font-medium">Join request successful!</div>
+            <div className="text-gray-300 text-sm">Refreshing data...</div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between">
         {isLoadingChallenge ? (
           <div className="flex items-center gap-2">

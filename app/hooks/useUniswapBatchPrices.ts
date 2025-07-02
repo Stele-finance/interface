@@ -2,22 +2,16 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { ethers } from "ethers"
-import { RPC_URL } from "@/lib/constants"
-
-// Uniswap V3 Quoter Contract Address (Ethereum Mainnet)
-const QUOTER_CONTRACT_ADDRESS = "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6"
-// Multicall2 Contract Address (Ethereum Mainnet - stable and widely used)
-const MULTICALL_CONTRACT_ADDRESS = "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696"
-
-// Ethereum Mainnet token addresses (correct checksum format)
-const TOKEN_ADDRESSES = {
-  WETH: "0xC02aaA39b223FE8C0A0e5C4F27eAD9083C756Cc2", // Ethereum WETH
-  USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // Ethereum USDC (correct checksum)
-  USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // Ethereum USDT
-  WBTC: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // Ethereum WBTC
-  UNI: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",   // Ethereum UNI
-  LINK: "0x514910771AF9Ca656af840dff83E8264EcF986CA",  // Ethereum LINK
-}
+import { 
+  getRPCUrl,
+  getUniswapQuoterAddress,
+  getMulticallAddress,
+  getUSDCTokenAddress,
+  getWETHAddress,
+  getWBTCAddress,
+  getUNIAddress,
+  getLINKAddress
+} from "@/lib/constants"
 
 // Quoter ABI (simplified)
 const QUOTER_ABI = [
@@ -82,7 +76,7 @@ export interface TokenInfo {
   decimals: number
 }
 
-export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
+export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   const [priceData, setPriceData] = useState<BatchPriceData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -104,9 +98,9 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
       }
     }
     
-    // Use RPC_URL from constants (Ethereum Mainnet Infura)
-    return new ethers.JsonRpcProvider(RPC_URL)
-  }, [])
+    // Use network-specific RPC URL
+    return new ethers.JsonRpcProvider(getRPCUrl(network))
+  }, [network])
 
   const createQuoteCallData = useCallback((
     tokenInAddress: string,
@@ -162,14 +156,14 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
       
       const provider = await getProvider()
       const multicallContract = new ethers.Contract(
-        MULTICALL_CONTRACT_ADDRESS,
+        getMulticallAddress(network),
         MULTICALL_ABI,
         provider
       )
 
-      // Use Ethereum mainnet token addresses
-      const usdcAddress = TOKEN_ADDRESSES.USDC
-      const wethAddress = TOKEN_ADDRESSES.WETH
+      // Use network-specific token addresses
+      const usdcAddress = getUSDCTokenAddress(network)
+      const wethAddress = getWETHAddress(network)
       
       // Prepare multicall for all token prices
       const calls: Array<{ target: string; callData: string }> = []
@@ -194,7 +188,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
           )
 
           calls.push({
-            target: QUOTER_CONTRACT_ADDRESS,
+            target: getUniswapQuoterAddress(network),
             callData
           })
 
@@ -230,7 +224,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
 
       const processedTokens: Record<string, TokenPrice> = {}
 
-      // Add USDC as base reference
+      // Add USDC as base reference (using network-specific address)
       processedTokens.USDC = {
         symbol: 'USDC',
         address: usdcAddress,
@@ -317,14 +311,14 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = []) {
 }
 
 // Hook for getting prices of user's specific tokens
-export function useUserTokenPrices(userTokens: Array<{ symbol: string; address: string; decimals: string }>) {
+export function useUserTokenPrices(userTokens: Array<{ symbol: string; address: string; decimals: string }>, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   const tokenInfos: TokenInfo[] = userTokens.map(token => ({
     symbol: token.symbol,
     address: token.address,
     decimals: parseInt(token.decimals) || 18
   }))
 
-  return useUniswapBatchPrices(tokenInfos)
+  return useUniswapBatchPrices(tokenInfos, network)
 }
 
 // Hook for getting prices of selected swap tokens only
@@ -332,7 +326,8 @@ export function useSwapTokenPrices(
   fromTokenSymbol: string | null,
   toTokenSymbol: string | null,
   getTokenAddress: (symbol: string) => string,
-  getTokenDecimals: (symbol: string) => number
+  getTokenDecimals: (symbol: string) => number,
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
 ) {
   const tokenInfos: TokenInfo[] = useMemo(() => {
     // Don't fetch anything if either token is missing
@@ -365,5 +360,5 @@ export function useSwapTokenPrices(
     return tokens
   }, [fromTokenSymbol, toTokenSymbol, getTokenAddress, getTokenDecimals])
 
-  return useUniswapBatchPrices(tokenInfos)
+  return useUniswapBatchPrices(tokenInfos, network)
 } 
