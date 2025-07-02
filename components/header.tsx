@@ -163,8 +163,8 @@ export function Header() {
     if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
       toast({
         variant: "destructive",
-        title: "🚫 Network Not Supported",
-        description: "Phantom wallet does not support Arbitrum network. Please disconnect and connect with MetaMask to access Arbitrum.",
+        title: `🚫 ${t('networkNotSupported')}`,
+        description: t('phantomDoesNotSupportArbitrum'),
         duration: 5000,
       })
       return
@@ -178,26 +178,26 @@ export function Header() {
       // Success feedback
       toast({
         variant: "default",
-        title: "✅ Network Switched",
-        description: `Successfully switched to ${targetNetwork === 'ethereum' ? 'Ethereum Mainnet' : 'Arbitrum One'}`,
+        title: `✅ ${t('networkSwitched')}`,
+        description: targetNetwork === 'ethereum' ? t('successfullySwitchedToEthereum') : t('successfullySwitchedToArbitrum'),
         duration: 3000,
       })
       
     } catch (error) {
       console.error("Wallet switch error:", error)
       // Show user-friendly error message
-      let title = "Network Switch Failed"
+      let title = t('networkSwitchFailed')
       let description = "Failed to switch network. Please try again."
       
       if (error instanceof Error) {
         if (error.message.includes("cancelled by user")) {
-          title = "Network Switch Cancelled"
-          description = "You cancelled the network switch request."
+          title = t('networkSwitchCancelled')
+          description = t('youCancelledNetworkSwitch')
         } else if (error.message.includes("manually")) {
-          title = "Manual Action Required"
+          title = t('manualActionRequired')
           description = error.message
         } else if (error.message.includes("not support")) {
-          title = "Network Not Supported"
+          title = t('networkNotSupported')
           description = error.message
         } else {
           description = error.message
@@ -384,7 +384,7 @@ export function Header() {
                             className={walletType === 'phantom' ? 'opacity-50 cursor-not-allowed' : ''}
                           >
                             <div className="flex items-center justify-between w-full">
-                              <span>Arbitrum One</span>
+                              <span>Arbitrum</span>
                               {walletType === 'phantom' && (
                                 <span className="text-xs text-muted-foreground ml-2">
                                   🚫
@@ -396,8 +396,8 @@ export function Header() {
                       </TooltipTrigger>
                       {walletType === 'phantom' && (
                         <TooltipContent>
-                          <p>Arbitrum is not supported by Phantom wallet.</p>
-                          <p>Please use MetaMask to access Arbitrum network.</p>
+                          <p>{t('arbitrumNotSupportedByPhantom')}</p>
+                          <p>{t('pleaseUseMetaMaskForArbitrum')}</p>
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -428,7 +428,7 @@ export function Header() {
               <DialogHeader>
                 <DialogTitle>{t('connectWallet')}</DialogTitle>
                 <DialogDescription>
-                  Select a wallet to connect
+                  {t('selectWalletToConnect')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid grid-cols-1 gap-4 py-4">
@@ -448,7 +448,7 @@ export function Header() {
                   />
                   <div className="text-left">
                     <div className="font-semibold">MetaMask</div>
-                    <div className="text-sm text-muted-foreground">Browser Extension</div>
+                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
                   </div>
                 </Button>
                 
@@ -468,7 +468,7 @@ export function Header() {
                   />
                   <div className="text-left">
                     <div className="font-semibold">Phantom</div>
-                    <div className="text-sm text-muted-foreground">Browser Extension</div>
+                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
                   </div>
                 </Button>
               </div>

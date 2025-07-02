@@ -9,11 +9,13 @@ export const ar = {
   allProposals: "جميع المقترحات",
   alreadyActive: "نشط بالفعل",
   alreadyVoted: "تم التصويت بالفعل",
+  arbitrumNotSupportedByPhantom: "محفظة Phantom لا تدعم Arbitrum.",
   back: "رجوع",
   backToProposals: "العودة إلى المقترحات",
   balance: "الرصيد",
   baseMainnet: "شبكة Base الرئيسية",
   blockNumber: "الكتلة",
+  browserExtension: "ملحق المتصفح",
   browseChallenges: "تصفح التحديات",
   buy: "شراء",
   cancel: "إلغاء",
@@ -153,6 +155,7 @@ export const ar = {
   loadingVoteResults: "جاري تحميل نتائج التصويت...",
   loadingVotingPower: "جاري تحميل قوة التصويت...",
   loadingWalletTokenInfo: "جاري تحميل معلومات رموز المحفظة...",
+  manualActionRequired: "العمل اليدوي مطلوب",
   marketCap: "رأس المال السوقي",
   maxAssetsCountLabel: "الحد الأقصى لعدد الأصول",
   maxAssetsParamDesc: "العدد الأقصى للرموز المختلفة التي يمكن الاحتفاظ بها في المحفظة (1-255)",
@@ -163,6 +166,10 @@ export const ar = {
   myPortfolio: "محفظتي",
   myPortfolios: "محافظي",
   network: "الشبكة",
+  networkNotSupported: "الشبكة غير مدعومة",
+  networkSwitchCancelled: "تم إلغاء تبديل الشبكة",
+  networkSwitchFailed: "فشل تبديل الشبكة",
+  networkSwitched: "تم تبديل الشبكة",
   next: "التالي",
   noActiveProposalsFound: "لم يتم العثور على مقترحات نشطة.",
   noChallengesFound: "لم يتم العثور على تحديات",
@@ -194,9 +201,11 @@ export const ar = {
   pendingQueue: "طابور الانتظار",
   performance: "الأداء",
   perToken: "لكل رمز",
+  phantomDoesNotSupportArbitrum: "محفظة Phantom لا تدعم شبكة Arbitrum. يرجى قطع الاتصال والاتصال مع MetaMask للوصول إلى Arbitrum.",
   phantomWalletNotConnected: "محفظة Phantom غير متصلة",
   phantomWalletNotInstalled: "محفظة Phantom غير مثبتة أو دعم Ethereum غير مُفعل",
   pleaseConnectWallet: "🔗 يرجى ربط محفظتك",
+  pleaseUseMetaMaskForArbitrum: "يرجى استخدام MetaMask للوصول إلى شبكة Arbitrum.",
   portfolio: "المحفظة",
   portfolioValue: "قيمة المحفظة",
   previous: "السابق",
@@ -240,6 +249,7 @@ export const ar = {
   seedMoneyParamDesc: "مبلغ الاستثمار الوهمي الأولي بالوحدة wei (لـ USDC، اضرب في 1,000,000 لكل دولار)",
   select: "اختيار",
   selectChallengeType: "اختر نوع التحدي الذي تريد إنشاؤه",
+  selectWalletToConnect: "اختر محفظة للاتصال",
   selectProposalTypeVote: "اختر نوع المقترح",
   selectYourVotingOption: "اختر خيار التصويت الخاص بك وأرسل صوتك",
   sell: "بيع",
@@ -273,6 +283,8 @@ export const ar = {
   success: "نجح",
   succeeded: "نجح",
   successfullyJoinedChallenge: "لقد انضممت بنجاح إلى التحدي!",
+  successfullySwitchedToArbitrum: "تم التبديل بنجاح إلى Arbitrum One",
+  successfullySwitchedToEthereum: "تم التبديل بنجاح إلى Ethereum Mainnet",
   swap: "تبديل",
   swapping: "جاري التبديل...",
   switchNetwork: "تبديل الشبكة",
@@ -331,6 +343,7 @@ export const ar = {
   volume: "الحجم",
   walletNotConnected: "المحفظة غير متصلة",
   warning: "تحذير",
+  youCancelledNetworkSwitch: "لقد ألغيت طلب تبديل الشبكة.",
   youHaveAlreadyVoted: "لقد صوتت بالفعل على هذا المقترح",
   youNeedToDelegate: "تحتاج إلى تفويض رموزك للمشاركة في الحوكمة"
 } as const; 
