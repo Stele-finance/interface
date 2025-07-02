@@ -501,7 +501,6 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
           onCreateChallenge={handleCreateChallenge}
           isCreating={isCreating}
           activeChallenges={activeChallengesData}
-          buttonText={t('createChallenge')}
         />
       </div>
 

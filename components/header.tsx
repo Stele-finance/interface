@@ -34,7 +34,8 @@ import {
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
   STELE_CONTRACT_ADDRESS,
-  USDC_DECIMALS
+  USDC_DECIMALS,
+  getRPCUrl
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -98,7 +99,7 @@ export function Header() {
     }
   };
 
-  // Fetch wallet balance
+  // Fetch wallet balance using network-specific RPC
   const fetchBalance = async () => {
     if (!walletAddress) return;
     
@@ -113,22 +114,17 @@ export function Header() {
           setBalance('1.234');
         }
       } else {
-        // Get Ethereum/Base balance
-        const provider = walletType === 'metamask' ? (window as any).ethereum : window.phantom?.ethereum
+        // Use network-specific RPC URL for accurate balance
+        const networkToUse = walletNetwork === 'ethereum' || walletNetwork === 'arbitrum' ? walletNetwork : 'ethereum';
+        const rpcUrl = getRPCUrl(networkToUse);
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
         
-        if (provider) {
-          const balanceHex = await provider.request({
-            method: 'eth_getBalance',
-            params: [walletAddress, 'latest'],
-          });
-          
-          // Convert from Wei to ETH (1 ETH = 10^18 Wei)
-          const balanceInWei = parseInt(balanceHex, 16);
-          const balanceInEth = balanceInWei / Math.pow(10, 18);
-          
-          // Display up to 4 decimal places
-          setBalance(balanceInEth.toFixed(4));
-        }
+        // Get ETH balance using ethers provider
+        const balanceWei = await provider.getBalance(walletAddress);
+        const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
+        
+        // Display up to 4 decimal places
+        setBalance(balanceInEth.toFixed(4));
       }
     } catch (error) {
       console.error("Error fetching balance:", error);
