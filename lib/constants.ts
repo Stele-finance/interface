@@ -31,10 +31,10 @@ export const ETHEREUM_BLOCK_TIME_MS = 12; // ~12 seconds per block
 // Mainnet
 
 // Contract Addresses
-export const STELE_CONTRACT_ADDRESS = "0xe362d7C3D7feB2E5a81c5D132eF135Fb7F9D719F";
-export const STELE_TOKEN_ADDRESS = "0x2665b58A57Aad89C0d0268F3A7677F6b76730801"; // Stele Token for voting
+export const STELE_CONTRACT_ADDRESS = "0x80b8366298341d5c913f4b2AfCfc141ec7635360";
+export const STELE_TOKEN_ADDRESS = "0x80E27E3a5e5e7025C67b79A8801366BAd87DA78A"; // Stele Token for voting
 export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // Mainnet USDC
-export const GOVERNANCE_CONTRACT_ADDRESS = "0x53Ed5DaB444c5459cd2E1E86b4781563f8dEd275"; // Mainnet Governance
+export const GOVERNANCE_CONTRACT_ADDRESS = "0xeaa6b8d7c61C84db448c1DEE0678923B1a5dc15F"; // Mainnet Governance
 export const RPC_URL = 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY;
 
 // Token decimals
