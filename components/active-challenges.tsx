@@ -119,8 +119,11 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   
   // Use wallet hook to get current wallet info
   const { walletType, network } = useWallet();
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
 
-  const { data } = useActiveChallenges()
+  const { data } = useActiveChallenges(subgraphNetwork)
 
   // Translate time left text
   const translateTimeLeft = (timeLeft: string): string => {

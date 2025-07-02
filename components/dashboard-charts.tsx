@@ -18,9 +18,15 @@ interface ChartDataPoint {
   dateLabel: string
 }
 
-export function DashboardCharts() {
+interface DashboardChartsProps {
+  network?: 'ethereum' | 'arbitrum' | 'solana' | null
+}
+
+export function DashboardCharts({ network }: DashboardChartsProps) {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useActiveChallengesSnapshots(30)
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  const { data, isLoading, error } = useActiveChallengesSnapshots(30, subgraphNetwork)
   const [activeIndexParticipants, setActiveIndexParticipants] = useState<number | null>(null)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
 

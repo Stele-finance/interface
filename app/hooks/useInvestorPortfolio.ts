@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { SUBGRAPH_URL, headers } from '@/lib/constants'
+import { getSubgraphUrl, headers } from '@/lib/constants'
 
 // GraphQL query for Investor portfolio
 export const INVESTOR_PORTFOLIO_QUERY = gql`
@@ -50,12 +50,14 @@ export interface InvestorPortfolioData {
   investors: InvestorPortfolio[]
 }
 
-export function useInvestorPortfolio(investor: string, limit: number = 100) {
+export function useInvestorPortfolio(investor: string, limit: number = 100, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<InvestorPortfolioData>({
-    queryKey: ['investorPortfolio', investor, limit],
+    queryKey: ['investorPortfolio', investor, limit, network],
     queryFn: async () => {
       return await request(
-        SUBGRAPH_URL, 
+        subgraphUrl, 
         INVESTOR_PORTFOLIO_QUERY, 
         {
           investor,

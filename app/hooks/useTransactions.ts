@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { SUBGRAPH_URL, USDC_DECIMALS } from '@/lib/constants'
+import { getSubgraphUrl, USDC_DECIMALS } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 // Simple test query to check if subgraph is working
@@ -226,12 +226,14 @@ interface GraphQLResponse {
   }>
 }
 
-export function useTransactions(challengeId: string) {
+export function useTransactions(challengeId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery({
-    queryKey: ['transactions', challengeId],
+    queryKey: ['transactions', challengeId, network],
     queryFn: async () => {      
       try {
-        const data = await request<GraphQLResponse>(SUBGRAPH_URL, GET_TRANSACTIONS_QUERY, {
+        const data = await request<GraphQLResponse>(subgraphUrl, GET_TRANSACTIONS_QUERY, {
           challengeId: challengeId
         })
 
@@ -340,7 +342,7 @@ export function useTransactions(challengeId: string) {
         // If no transactions found for this challengeId, let's also try to fetch some general data
         if (allTransactions.length === 0) {          
           try {
-            const allData = await request<GraphQLResponse>(SUBGRAPH_URL, GET_ALL_TRANSACTIONS_QUERY) 
+            const allData = await request<GraphQLResponse>(subgraphUrl, GET_ALL_TRANSACTIONS_QUERY) 
             if (allData) {
               // Show what challengeIds are available
               const availableChallengeIds = new Set()

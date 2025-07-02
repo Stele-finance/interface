@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { SUBGRAPH_URL } from '@/lib/constants'
+import { getSubgraphUrl } from '@/lib/constants'
 
 const GET_TOTAL_RANKING_QUERY = `
   query GetTotalRanking($first: Int = 100, $orderBy: TotalRanking_orderBy = profitRatio, $orderDirection: OrderDirection = desc) {
@@ -32,13 +32,15 @@ interface GraphQLResponse {
   totalRankings: TotalRankingData[]
 }
 
-export function useTotalRanking() {
+export function useTotalRanking(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery({
-    queryKey: ['totalRanking'],
+    queryKey: ['totalRanking', network],
     queryFn: async (): Promise<TotalRankingData[]> => {
       try {
         const data = await request<GraphQLResponse>(
-          SUBGRAPH_URL,
+          subgraphUrl,
           GET_TOTAL_RANKING_QUERY,
           { 
             first: 100, 

@@ -10,7 +10,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Check, Clock, XCircle, Plus, FileText, Vote as VoteIcon, Loader2 } from "lucide-react"
 import { useProposalsData, useActiveProposalsData, useMultipleProposalVoteResults, useProposalsByStatus, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
 import { useQueryClient } from '@tanstack/react-query'
-import { ARBITRUM_BLOCK_TIME_MS, STELE_DECIMALS, STELE_TOKEN_ADDRESS } from "@/lib/constants"
+import { ARBITRUM_BLOCK_TIME_MS, STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"
 import { useGovernanceConfig } from "@/app/hooks/useGovernanceConfig"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
@@ -19,7 +19,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { RPC_URL } from "@/lib/constants"
+
 import { useLanguage } from "@/lib/language-context"
 
 // Interface for proposal data
@@ -45,7 +45,7 @@ interface Proposal {
 export default function VotePage() {
   const { t } = useLanguage()
   // Use global wallet hook instead of local state
-  const { address: walletAddress, isConnected, walletType } = useWallet()
+  const { address: walletAddress, isConnected, walletType, network } = useWallet()
   const queryClient = useQueryClient()
   const [isDelegating, setIsDelegating] = useState(false)
   const [proposals, setProposals] = useState<Proposal[]>([])
@@ -61,8 +61,11 @@ export default function VotePage() {
   // Get current block number with global caching
   const { data: blockInfo, isLoading: isLoadingBlockNumber } = useBlockNumber()
 
-  // Get wallet token info with global caching
-  const { data: walletTokenInfo, isLoading: isLoadingWalletTokenInfo, refetch: refetchWalletTokenInfo } = useWalletTokenInfo(walletAddress)
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+
+  // Get wallet token info with global caching (use network-specific token)
+  const { data: walletTokenInfo, isLoading: isLoadingWalletTokenInfo, refetch: refetchWalletTokenInfo } = useWalletTokenInfo(walletAddress, subgraphNetwork)
 
   // State for current block info (for timestamp calculation)
   const [currentBlockInfo, setCurrentBlockInfo] = useState<{blockNumber: number, timestamp: number} | null>(null)
@@ -88,25 +91,28 @@ export default function VotePage() {
   const { data: actionableProposals, isLoading: isLoadingActionable, error: errorActionable, refetch: refetchActionable } = useProposalsByStatusPaginated(
     shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [], 
     activeProposalsPage, 
-    ITEMS_PER_PAGE
+    ITEMS_PER_PAGE,
+    subgraphNetwork
   )
   
   const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(
     shouldFetchCompleted ? ['EXECUTED'] : [], 
     completedProposalsPage, 
-    ITEMS_PER_PAGE
+    ITEMS_PER_PAGE,
+    subgraphNetwork
   )
   
   const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(
     shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [], 
     allProposalsPage, 
-    ITEMS_PER_PAGE
+    ITEMS_PER_PAGE,
+    subgraphNetwork
   )
   
   // Fetch total counts for pagination - only for current tab
-  const { data: actionableCount } = useProposalsCountByStatus(shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [])
-  const { data: completedCount } = useProposalsCountByStatus(shouldFetchCompleted ? ['EXECUTED'] : [])
-  const { data: allCount } = useProposalsCountByStatus(shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [])
+  const { data: actionableCount } = useProposalsCountByStatus(shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [], subgraphNetwork)
+  const { data: completedCount } = useProposalsCountByStatus(shouldFetchCompleted ? ['EXECUTED'] : [], subgraphNetwork)
+  const { data: allCount } = useProposalsCountByStatus(shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [], subgraphNetwork)
   
   // Get proposal IDs only for current tab to reduce API calls
   const getCurrentTabProposalIds = () => {
@@ -125,7 +131,7 @@ export default function VotePage() {
   const currentTabProposalIds = getCurrentTabProposalIds()
   
   // Fetch vote results only for current tab's proposals
-  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds)
+  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds, subgraphNetwork)
 
   // Reset page to 1 when tab changes and enable data fetching for new tab
   const handleTabChange = (tab: string) => {
@@ -141,7 +147,7 @@ export default function VotePage() {
     
     setIsLoadingBlockInfo(true)
     try {
-      const rpcUrl = RPC_URL
+      const rpcUrl = getRPCUrl(subgraphNetwork)
         
       const provider = new ethers.JsonRpcProvider(rpcUrl)
       const currentBlock = await provider.getBlock('latest')
@@ -841,7 +847,8 @@ export default function VotePage() {
       // Connect to provider with signer
       const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
-      const votesContract = new ethers.Contract(STELE_TOKEN_ADDRESS, ERC20VotesABI.abi, signer)
+      const steleTokenAddress = getSteleTokenAddress(subgraphNetwork)
+      const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
       // Delegate to self
       const tx = await votesContract.delegate(walletAddress)

@@ -53,6 +53,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   
   // Filter network to supported types for contracts (exclude 'solana')
   const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -71,9 +73,9 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const [isExecuting, setIsExecuting] = useState(false)
   
   // Fetch vote results from subgraph
-  const { data: voteResultData, isLoading: isLoadingVoteResult } = useProposalVoteResult(id)
+  const { data: voteResultData, isLoading: isLoadingVoteResult } = useProposalVoteResult(id, subgraphNetwork)
   // Fetch proposal details for queue function
-  const { data: proposalDetailsData, isLoading: isLoadingProposalDetails } = useProposalDetails(id)
+  const { data: proposalDetailsData, isLoading: isLoadingProposalDetails } = useProposalDetails(id, subgraphNetwork)
   // Get current block number with global caching
   const { data: blockInfo, isLoading: isLoadingBlockNumber } = useBlockNumber()
   const queryClient = useQueryClient()

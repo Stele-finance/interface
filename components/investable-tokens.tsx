@@ -8,9 +8,15 @@ import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
 import Image from "next/image"
 
-export function InvestableTokens() {
+interface InvestableTokensProps {
+  network?: 'ethereum' | 'arbitrum' | 'solana' | null
+}
+
+export function InvestableTokens({ network }: InvestableTokensProps) {
   const { t } = useLanguage()
-  const { data: tokensData, isLoading, error } = useInvestableTokens()
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  const { data: tokensData, isLoading, error } = useInvestableTokens(subgraphNetwork)
 
   // Format token address for display
   const formatAddress = (address: string) => {

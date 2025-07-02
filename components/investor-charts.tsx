@@ -33,15 +33,16 @@ interface RealTimePortfolio {
 interface InvestorChartsProps {
   challengeId: string
   investor: string
+  network: 'ethereum' | 'arbitrum' | null
   investorData?: any // Add investor data prop for calculations
   realTimePortfolio?: RealTimePortfolio | null
 }
 
-export function InvestorCharts({ challengeId, investor, investorData, realTimePortfolio }: InvestorChartsProps) {
+export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio }: InvestorChartsProps) {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30)
-  const { data: challengeData } = useChallenge(challengeId)
-  const { data: rankingResponse } = useRanking(challengeId)
+  const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
+  const { data: challengeData } = useChallenge(challengeId, network)
+  const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
 
   // Helper function to safely format USD values

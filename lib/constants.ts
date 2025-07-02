@@ -107,7 +107,18 @@ export const RPC_URL = NETWORK_CONTRACTS.ethereum.RPC_URL;
 export const USDC_DECIMALS = 6;
 export const STELE_DECIMALS = 18;
 
-export const SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/110372/stele/version/latest'
+// Network-specific subgraph URLs
+export const NETWORK_SUBGRAPHS = {
+  ethereum: 'https://api.studio.thegraph.com/query/110372/stele/version/latest',
+  arbitrum: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest'
+} as const
+
+// Helper function to get subgraph URL based on network
+export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
+  // Filter to supported networks (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  return NETWORK_SUBGRAPHS[subgraphNetwork]
+}
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"
 

@@ -21,12 +21,13 @@ interface ChartDataPoint {
 
 interface ChallengeChartsProps {
   challengeId: string
+  network: 'ethereum' | 'arbitrum' | null
 }
 
-export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
+export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30)
-  const { data: challengeData } = useChallenge(challengeId)
+  const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
+  const { data: challengeData } = useChallenge(challengeId, network)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
 

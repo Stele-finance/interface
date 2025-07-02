@@ -35,9 +35,9 @@ interface ChallengePortfolioProps {
 }
 
 // Ranking Section Component
-function RankingSection({ challengeId }: { challengeId: string }) {
+function RankingSection({ challengeId, network }: { challengeId: string; network: 'ethereum' | 'arbitrum' | null }) {
   const { t } = useLanguage()
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, network);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -250,6 +250,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   
   // Use wallet hook to get current wallet info
   const { walletType, network } = useWallet();
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
 
   // Get appropriate explorer URL based on chain ID
   const getExplorerUrl = (chainId: string, txHash: string) => {
@@ -285,9 +288,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         return 'Block Explorer';
     }
   };
-  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId);
-  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId);
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork);
+  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
 
   // Get token logo path based on symbol
   const getTokenLogo = (symbol: string) => {
@@ -321,7 +324,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Check if current user has joined this challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
     challengeId, 
-    walletAddress || ""
+    walletAddress || "",
+    subgraphNetwork
   );
 
   // Check if user has joined the challenge (combining local state with subgraph data)
@@ -360,6 +364,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check if USDC balance is insufficient
   const isInsufficientBalance = () => {
+    // If challenge data is not loaded yet, don't show insufficient balance
+    if (!challengeData?.challenge || isLoadingChallenge) return false;
     if (!entryFee || !usdcBalance || isLoadingBalance || isLoadingEntryFee) return false;
     
     const balance = parseFloat(usdcBalance);
@@ -1005,7 +1011,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           )}
           
           {/* Entry Fee Display - only show when join button is visible */}
-          {!hasJoinedChallenge && !isChallengeEnded() && entryFee && (
+          {!hasJoinedChallenge && !isChallengeEnded() && challengeData?.challenge && entryFee && (
             <div className={`flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium border ${
               isInsufficientBalance() 
                 ? "bg-red-500/10 text-red-400 border-red-500/20" 
@@ -1035,7 +1041,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               variant="outline" 
               size="lg" 
               onClick={handleJoinChallenge} 
-              disabled={isJoining || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
+              disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
               className={`font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
                 isInsufficientBalance() 
                   ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
@@ -1046,6 +1052,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 <>
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                   {t('joining')}
+                </>
+              ) : isLoadingChallenge || !challengeData?.challenge ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  Loading challenge info...
                 </>
               ) : isLoadingEntryFee || isLoadingBalance ? (
                 <>
@@ -1070,7 +1081,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       </div>
 
       {/* Challenge Charts */}
-      <ChallengeCharts challengeId={challengeId} />
+                      <ChallengeCharts challengeId={challengeId} network={subgraphNetwork} />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1275,7 +1286,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
 
         {/* Ranking Section */}
-        <RankingSection challengeId={challengeId} />
+        <RankingSection challengeId={challengeId} network={subgraphNetwork} />
       </div>
 
     </div>

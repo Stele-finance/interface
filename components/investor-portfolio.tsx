@@ -14,6 +14,7 @@ import { USDC_DECIMALS } from "@/lib/constants"
 interface InvestorPortfolioProps {
   challengeId: string
   walletAddress: string
+  network: 'ethereum' | 'arbitrum' | null
 }
 
 // Token Logo Component
@@ -59,9 +60,9 @@ const TokenLogo = ({ symbol }: { symbol: string }) => {
   )
 }
 
-export function InvestorPortfolio({ challengeId, walletAddress }: InvestorPortfolioProps) {
-  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
-  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
+export function InvestorPortfolio({ challengeId, walletAddress, network }: InvestorPortfolioProps) {
+  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress, network)
+  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, network)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(userTokens)

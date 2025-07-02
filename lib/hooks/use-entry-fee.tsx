@@ -10,7 +10,6 @@ import { ethers } from "ethers"
 import { 
   STELE_CONTRACT_ADDRESS, 
   USDC_DECIMALS,
-  BASE_CHAIN_ID,  
   RPC_URL
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"

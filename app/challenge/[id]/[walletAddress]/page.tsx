@@ -70,11 +70,15 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   
   // Use hooks
   const { address: connectedAddress, isConnected, walletType, network } = useWallet()
-  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
-  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
-  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
-  const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress)
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId)
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
+  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
+  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
+  const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
@@ -841,6 +845,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <InvestorCharts 
               challengeId={challengeId} 
               investor={walletAddress} 
+              network={subgraphNetwork}
               investorData={investorData}
               realTimePortfolio={realTimePortfolio}
             />

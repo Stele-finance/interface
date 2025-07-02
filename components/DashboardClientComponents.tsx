@@ -31,13 +31,17 @@ function LoadingSkeleton() {
   )
 }
 
-export function DashboardClientComponents() {
+interface DashboardClientComponentsProps {
+  network?: 'ethereum' | 'arbitrum' | 'solana' | null
+}
+
+export function DashboardClientComponents({ network }: DashboardClientComponentsProps) {
   return (
     <Suspense fallback={<LoadingSkeleton />}>
       <ActiveChallenges showCreateButton={true} />
       <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <InvestableTokens />
-        <TokenStatsOverview />
+        <InvestableTokens network={network} />
+        <TokenStatsOverview network={network} />
       </div>
     </Suspense>
   )

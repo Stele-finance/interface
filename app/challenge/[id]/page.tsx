@@ -3,6 +3,7 @@
 import { use } from "react"
 import { ChallengePortfolio } from "@/components/challenge-portfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
+import { useWallet } from '@/app/hooks/useWallet'
 
 interface ChallengePageProps {
   params: Promise<{
@@ -11,7 +12,12 @@ interface ChallengePageProps {
 }
 
 function ChallengeContent({ challengeId }: { challengeId: string }) {
-  const { data, isLoading, error } = useChallenge(challengeId)
+  const { network } = useWallet()
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  const { data, isLoading, error } = useChallenge(challengeId, subgraphNetwork)
 
   if (isLoading) {
     return (

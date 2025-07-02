@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { SUBGRAPH_URL, headers } from '@/lib/constants'
+import { getSubgraphUrl, headers } from '@/lib/constants'
 
 // GraphQL query for Challenge snapshots
 export const CHALLENGE_SNAPSHOTS_QUERY = gql`
@@ -36,12 +36,14 @@ export interface ChallengeSnapshotsData {
   challengeSnapshots: ChallengeSnapshot[]
 }
 
-export function useChallengeSnapshots(challengeId: string, limit: number = 30) {
+export function useChallengeSnapshots(challengeId: string, limit: number = 30, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ChallengeSnapshotsData>({
-    queryKey: ['challengeSnapshots', challengeId, limit],
+    queryKey: ['challengeSnapshots', challengeId, limit, network],
     queryFn: async () => {
       return await request(
-        SUBGRAPH_URL, 
+        subgraphUrl, 
         CHALLENGE_SNAPSHOTS_QUERY, 
         {
           challengeId,

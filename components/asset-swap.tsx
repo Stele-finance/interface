@@ -29,7 +29,10 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const { t } = useLanguage()
   const { walletType, network } = useWallet()
   
-  const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap();
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+  
+  const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("WETH")

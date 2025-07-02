@@ -1,15 +1,14 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
-import { STELE_TOKEN_ADDRESS, STELE_DECIMALS } from '@/lib/constants'
+import { getSteleTokenAddress, STELE_DECIMALS, getRPCUrl } from '@/lib/constants'
 import ERC20ABI from '@/app/abis/ERC20.json'
 import ERC20VotesABI from '@/app/abis/ERC20Votes.json'
-import { RPC_URL } from '@/lib/constants'
 
 // Hook for getting wallet token balance and delegation info
-export function useWalletTokenInfo(walletAddress: string | null) {
+export function useWalletTokenInfo(walletAddress: string | null, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   return useQuery({
-    queryKey: ['walletTokenInfo', walletAddress],
+    queryKey: ['walletTokenInfo', walletAddress, network],
     queryFn: async () => {
       if (!walletAddress) {
         return {
@@ -20,13 +19,14 @@ export function useWalletTokenInfo(walletAddress: string | null) {
       }
 
       try {
-        // Use Base public RPC to avoid rate limits
-        const rpcUrl = RPC_URL
+        // Get network-specific configurations
+        const rpcUrl = getRPCUrl(network)
+        const steleTokenAddress = getSteleTokenAddress(network)
         const provider = new ethers.JsonRpcProvider(rpcUrl)
         
         // Create contracts
-        const tokenContract = new ethers.Contract(STELE_TOKEN_ADDRESS, ERC20ABI.abi, provider)
-        const votesContract = new ethers.Contract(STELE_TOKEN_ADDRESS, ERC20VotesABI.abi, provider)
+        const tokenContract = new ethers.Contract(steleTokenAddress, ERC20ABI.abi, provider)
+        const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, provider)
 
         // Add delay to prevent overwhelming RPC
         await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))

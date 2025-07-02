@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { SUBGRAPH_URL, headers } from '@/lib/constants'
+import { getSubgraphUrl, headers } from '@/lib/constants'
 
 export const getInvestableTokensQuery = () => gql`{
   investableTokens(first: 30, orderBy: id, orderDirection: asc, where: { isInvestable: true }, subgraphError: allow) {
@@ -27,11 +27,13 @@ export interface TokensData {
   investableTokens: TokenData[]
 }
 
-export function useTokensData() {
+export function useTokensData(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<TokensData>({
-    queryKey: ['tokens'],
+    queryKey: ['tokens', network],
     queryFn: async () => {
-      return await request(SUBGRAPH_URL, getInvestableTokensQuery(), {}, headers)
+      return await request(subgraphUrl, getInvestableTokensQuery(), {}, headers)
     }
   })
 }
