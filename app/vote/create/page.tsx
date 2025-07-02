@@ -14,7 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
-import { GOVERNANCE_CONTRACT_ADDRESS, STELE_CONTRACT_ADDRESS } from "@/lib/constants"
+import { 
+  GOVERNANCE_CONTRACT_ADDRESS, 
+  STELE_CONTRACT_ADDRESS,
+  getSteleContractAddress,
+  getGovernanceContractAddress
+} from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -37,7 +42,10 @@ export default function CreateProposalPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { t, language } = useLanguage()
-  const { walletType } = useWallet()
+  const { walletType, network } = useWallet()
+  
+  // Filter network to supported types for contracts (exclude 'solana')
+  const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
 
   const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
     {
@@ -45,7 +53,7 @@ export default function CreateProposalPage() {
       name: t('setInvestableTokenTemplate'),
       description: t('setInvestableTokenDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'setToken(address)',
       parameterTypes: ['address'],
       parameterLabels: [t('tokenAddressLabel')],
@@ -57,7 +65,7 @@ export default function CreateProposalPage() {
       name: t('resetInvestableTokenTemplate'),
       description: t('resetInvestableTokenDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'removeToken(address)',
       parameterTypes: ['address'],
       parameterLabels: [t('tokenAddressLabel')],
@@ -69,7 +77,7 @@ export default function CreateProposalPage() {
       name: t('setRewardRatioTemplate'),
       description: t('setRewardRatioDesc'),
       icon: <DollarSign className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'setRewardRatio(uint256[5])',
       parameterTypes: ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
       parameterLabels: [
@@ -93,7 +101,7 @@ export default function CreateProposalPage() {
       name: t('setEntryFeeTemplate'),
       description: t('setEntryFeeDesc'),
       icon: <DollarSign className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'setEntryFee(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('entryFeeLabel')],
@@ -105,7 +113,7 @@ export default function CreateProposalPage() {
       name: t('setMaxAssetsTemplate'),
       description: t('setMaxAssetsDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'setMaxAssets(uint8)',
       parameterTypes: ['uint8'],
       parameterLabels: [t('maxAssetsCountLabel')],
@@ -117,7 +125,7 @@ export default function CreateProposalPage() {
       name: t('setSeedMoneyTemplate'),
       description: t('setSeedMoneyDesc'),
       icon: <DollarSign className="h-5 w-5" />,
-      targetContract: STELE_CONTRACT_ADDRESS,
+      targetContract: getSteleContractAddress(contractNetwork),
       functionSignature: 'setSeedMoney(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('seedMoneyAmountLabel')],
@@ -129,7 +137,7 @@ export default function CreateProposalPage() {
       name: t('setVotingPeriodTemplate'),
       description: t('setVotingPeriodDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: GOVERNANCE_CONTRACT_ADDRESS,
+      targetContract: getGovernanceContractAddress(contractNetwork),
       functionSignature: 'setVotingPeriod(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('votingPeriodBlocksLabel')],
@@ -405,8 +413,6 @@ export default function CreateProposalPage() {
       const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
-
-      console.log('Current network chain ID:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
@@ -419,7 +425,7 @@ export default function CreateProposalPage() {
       
       // Create contract instance
       const governorContract = new ethers.Contract(
-        GOVERNANCE_CONTRACT_ADDRESS,
+        getGovernanceContractAddress(contractNetwork),
         GovernorABI.abi,
         signer
       );

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { STELE_CONTRACT_ADDRESS, ETHEREUM_CHAIN_ID, ETHEREUM_CHAIN_CONFIG } from "@/lib/constants"
+import { getSteleContractAddress, getChainId, getChainConfig } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useParams } from "next/navigation"
 import { useInvestableTokensForSwap, getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useInvestableTokens"
@@ -27,7 +27,7 @@ interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
 
 export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapProps) {
   const { t } = useLanguage()
-  const { walletType } = useWallet()
+  const { walletType, network } = useWallet()
   
   const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap();
   const [fromAmount, setFromAmount] = useState<string>("")
@@ -543,18 +543,21 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
         method: 'eth_chainId'
       });
 
-      if (chainId !== ETHEREUM_CHAIN_ID) {
-        // Switch to Ethereum network
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      const targetChainId = getChainId(contractNetwork);
+      if (chainId !== targetChainId) {
+        // Switch to target network
         try {
           await walletProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: ETHEREUM_CHAIN_ID }],
+            params: [{ chainId: targetChainId }],
           });
         } catch (switchError: any) {
           if (switchError.code === 4902) {
             await walletProvider.request({
               method: 'wallet_addEthereumChain',
-              params: [ETHEREUM_CHAIN_CONFIG],
+              params: [getChainConfig(contractNetwork)],
             });
           } else {
             throw switchError;
@@ -568,7 +571,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );

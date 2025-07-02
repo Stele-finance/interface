@@ -51,7 +51,8 @@ import {
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
   STELE_CONTRACT_ADDRESS,
-  USDC_DECIMALS
+  USDC_DECIMALS,
+  getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 
@@ -68,7 +69,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, isConnected, walletType } = useWallet()
+  const { address: connectedAddress, isConnected, walletType, network } = useWallet()
   const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
@@ -692,9 +693,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );

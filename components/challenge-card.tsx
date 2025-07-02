@@ -9,9 +9,9 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS
+  getChainId,
+  getChainConfig, 
+  getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -40,7 +40,7 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
   const [isCreating, setIsCreating] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType } = useWallet();
+  const { walletType, network } = useWallet();
   
   useEffect(() => {
     // Handle display for challenges that haven't started yet
@@ -128,19 +128,23 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
         method: 'eth_chainId'
       });
 
-      if (chainId !== ETHEREUM_CHAIN_ID) { // Ethereum Mainnet Chain ID
-        // Switch to Ethereum network
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      const targetChainId = getChainId(contractNetwork);
+      
+      if (chainId !== targetChainId) {
+        // Switch to target network
         try {
           await walletProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: ETHEREUM_CHAIN_ID }], // Ethereum Mainnet
+            params: [{ chainId: targetChainId }],
           });
         } catch (switchError: any) {
           // This error code indicates that the chain has not been added to the wallet
           if (switchError.code === 4902) {
             await walletProvider.request({
               method: 'wallet_addEthereumChain',
-              params: [ETHEREUM_CHAIN_CONFIG],
+              params: [getChainConfig(contractNetwork)],
             });
           } else {
             throw switchError;
@@ -156,7 +160,7 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );

@@ -14,10 +14,10 @@ import { ToastAction } from "@/components/ui/toast"
 import { ChallengeCharts } from "@/components/challenge-charts"
 import { useRouter } from "next/navigation"
 import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
-  USDC_TOKEN_ADDRESS,
+  getChainId,
+  getChainConfig, 
+  getSteleContractAddress,
+  getUSDCTokenAddress,
   USDC_DECIMALS
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
@@ -249,7 +249,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { walletType } = useWallet();
+  const { walletType, network } = useWallet();
 
   // Get appropriate explorer URL based on chain ID
   const getExplorerUrl = (chainId: string, txHash: string) => {
@@ -408,9 +408,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       // Create a Web3Provider using the current wallet provider
       const provider = new ethers.BrowserProvider(walletProvider);
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create USDC contract instance
       const usdcContract = new ethers.Contract(
-        USDC_TOKEN_ADDRESS,
+        getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
         provider
       );
@@ -653,8 +656,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
-
-      console.log('Current network chain ID:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
@@ -669,15 +670,18 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instances
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
 
       const usdcContract = new ethers.Contract(
-        USDC_TOKEN_ADDRESS,
+        getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
         signer
       );
@@ -698,13 +702,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
       // Check current allowance
       try {
-        const currentAllowance = await usdcContract.allowance(userAddress, STELE_CONTRACT_ADDRESS);
+        const currentAllowance = await usdcContract.allowance(userAddress, getSteleContractAddress(contractNetwork));
         if (currentAllowance < discountedEntryFeeAmount) {
           
           // Estimate gas for approval
           try {
-            const approveGasEstimate = await usdcContract.approve.estimateGas(STELE_CONTRACT_ADDRESS, discountedEntryFeeAmount);
-            const approveTx = await usdcContract.approve(STELE_CONTRACT_ADDRESS, discountedEntryFeeAmount, {
+            const approveGasEstimate = await usdcContract.approve.estimateGas(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount);
+            const approveTx = await usdcContract.approve(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount, {
               gasLimit: approveGasEstimate + BigInt(10000) // Add 10k gas buffer
             });
                         
@@ -902,9 +906,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );

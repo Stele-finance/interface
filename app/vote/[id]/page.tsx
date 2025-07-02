@@ -20,7 +20,14 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
-import { GOVERNANCE_CONTRACT_ADDRESS, STELE_TOKEN_ADDRESS, STELE_DECIMALS, STELE_TOTAL_SUPPLY } from "@/lib/constants"
+import { 
+  GOVERNANCE_CONTRACT_ADDRESS, 
+  STELE_TOKEN_ADDRESS, 
+  STELE_DECIMALS, 
+  STELE_TOTAL_SUPPLY,
+  getGovernanceContractAddress,
+  getSteleTokenAddress
+} from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import ERC20ABI from "@/app/abis/ERC20.json"
@@ -42,7 +49,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const searchParams = useSearchParams()
   const { id } = use(params)
   const { t } = useLanguage()
-  const { walletType } = useWallet()
+  const { walletType, network } = useWallet()
+  
+  // Filter network to supported types for contracts (exclude 'solana')
+  const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -256,7 +266,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       const rpcUrl = RPC_URL
         
       const provider = new ethers.JsonRpcProvider(rpcUrl)
-      const governanceContract = new ethers.Contract(GOVERNANCE_CONTRACT_ADDRESS, GovernorABI.abi, provider)
+      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
       // Use cached block number from global hook, fallback to RPC call if not available
       let currentBlock: number
@@ -310,7 +320,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         }
       }
       
-      const governanceContract = new ethers.Contract(GOVERNANCE_CONTRACT_ADDRESS, GovernorABI.abi, provider)
+      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => 
@@ -394,7 +404,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Connect to provider with signer
       const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
-      const votesContract = new ethers.Contract(STELE_TOKEN_ADDRESS, ERC20VotesABI.abi, signer)
+      const votesContract = new ethers.Contract(getSteleTokenAddress(contractNetwork), ERC20VotesABI.abi, signer)
 
       // Delegate to self (current connected address)
       const tx = await votesContract.delegate(currentConnectedAddress)
@@ -528,7 +538,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Connect to provider with signer
       const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
-      const contract = new ethers.Contract(GOVERNANCE_CONTRACT_ADDRESS, GovernorABI.abi, signer)
+      const contract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
       // Convert vote option to support value
       // 0 = Against, 1 = For, 2 = Abstain
@@ -666,7 +676,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Connect to provider with signer
       const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
-      const governanceContract = new ethers.Contract(GOVERNANCE_CONTRACT_ADDRESS, GovernorABI.abi, signer)
+      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
       // Prepare queue parameters
       const targets = proposalDetails.targets || []
@@ -783,7 +793,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Connect to provider with signer
       const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
-      const governanceContract = new ethers.Contract(GOVERNANCE_CONTRACT_ADDRESS, GovernorABI.abi, signer)
+      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
       // Double-check proposal state before executing
       let currentState

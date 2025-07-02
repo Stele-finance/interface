@@ -13,9 +13,9 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS
+  getChainId,
+  getChainConfig, 
+  getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
@@ -118,7 +118,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const [currentTime, setCurrentTime] = useState(new Date());
   
   // Use wallet hook to get current wallet info
-  const { walletType } = useWallet();
+  const { walletType, network } = useWallet();
 
   const { data } = useActiveChallenges()
 
@@ -196,19 +196,23 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         method: 'eth_chainId'
       });
 
-      if (chainId !== ETHEREUM_CHAIN_ID) {
-        // Switch to Ethereum network
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      const targetChainId = getChainId(contractNetwork);
+      
+      if (chainId !== targetChainId) {
+        // Switch to target network
         try {
           await walletProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: ETHEREUM_CHAIN_ID }],
+            params: [{ chainId: targetChainId }],
           });
         } catch (switchError: any) {
           // This error code indicates that the chain has not been added to the wallet
           if (switchError.code === 4902) {
             await walletProvider.request({
               method: 'wallet_addEthereumChain',
-              params: [ETHEREUM_CHAIN_CONFIG],
+              params: [getChainConfig(contractNetwork)],
             });
           } else {
             throw switchError;
@@ -224,7 +228,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
