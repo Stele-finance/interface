@@ -15,14 +15,11 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Check, Clock, Calendar, User, FileText, Vote as VoteIcon, Loader2, CheckCircle } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
 import { 
-  GOVERNANCE_CONTRACT_ADDRESS, 
-  STELE_TOKEN_ADDRESS, 
   STELE_DECIMALS, 
   STELE_TOTAL_SUPPLY,
   getGovernanceContractAddress,
@@ -30,7 +27,6 @@ import {
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
-import ERC20ABI from "@/app/abis/ERC20.json"
 import { useProposalVoteResult, useProposalDetails } from "@/app/subgraph/Proposals"
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"

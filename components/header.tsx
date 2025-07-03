@@ -33,7 +33,6 @@ import { ethers } from "ethers"
 import { 
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
   USDC_DECIMALS,
   getRPCUrl
 } from "@/lib/constants"

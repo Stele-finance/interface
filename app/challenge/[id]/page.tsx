@@ -25,7 +25,6 @@ function ChallengeContent({ challengeId }: { challengeId: string }) {
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
           <div className="text-white text-lg font-medium">Loading challenge data...</div>
-          <div className="text-gray-300 text-sm">Please wait while we fetch the data</div>
         </div>
       </div>
     )

@@ -51,7 +51,6 @@ import { ToastAction } from "@/components/ui/toast"
 import { 
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
   USDC_DECIMALS,
   getSteleContractAddress
 } from "@/lib/constants"
@@ -473,29 +472,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
   const investor = investorData.investor
 
-  // Helper function to safely format USD values
-  const formatUSDValue = (value: string | undefined, decimals: number = USDC_DECIMALS): number => {
-    if (!value || value === "0") return 0
-    
-    // If the value contains a decimal point, it's already formatted
-    if (value.includes('.')) {
-      return parseFloat(value)
-    }
-    
-    // If no decimal point, it's likely a raw integer amount that needs formatting
-    try {
-      return parseFloat(ethers.formatUnits(value, decimals))
-    } catch (error) {
-      // Fallback: treat as already formatted number
-      return parseFloat(value)
-    }
-  }
+
 
   // Calculate portfolio metrics using the actual data structure
-  // Format the raw currentUSD amount using USDC_DECIMALS
-  const currentValue = formatUSDValue(investor.currentUSD)
-  // Format the raw seedMoney amount using USDC_DECIMALS
-  const formattedSeedMoney = formatUSDValue(investor.seedMoneyUSD)
+  // USD values from subgraph are already in USD format, just parse as float
+  const currentValue = parseFloat(investor.currentUSD) || 0
+  const formattedSeedMoney = parseFloat(investor.seedMoneyUSD) || 0
   const gainLoss = currentValue - formattedSeedMoney
   const gainLossPercentage = formattedSeedMoney > 0 ? (gainLoss / formattedSeedMoney) * 100 : 0
   const isPositive = gainLoss >= 0

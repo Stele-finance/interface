@@ -15,8 +15,6 @@ import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
 import { 
-  GOVERNANCE_CONTRACT_ADDRESS, 
-  STELE_CONTRACT_ADDRESS,
   getSteleContractAddress,
   getGovernanceContractAddress
 } from "@/lib/constants"
