@@ -160,6 +160,66 @@ const setupWalletEventListeners = (walletType: 'metamask' | 'phantom') => {
 export function useWallet() {
   const [walletState, setWalletState] = useState<WalletState>(globalWalletState)
 
+  // Function to get the correct provider for the active wallet
+  const getActiveProvider = useCallback(() => {
+    if (!globalWalletState.walletType) return null
+
+    if (globalWalletState.walletType === 'metamask') {
+      // For MetaMask, ensure we get the MetaMask provider specifically
+      if ((window as any).ethereum) {
+        if ((window as any).ethereum.providers) {
+          const metaMaskProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask)
+          return metaMaskProvider || null
+        }
+        if ((window as any).ethereum.isMetaMask) {
+          return (window as any).ethereum
+        }
+      }
+      return null
+    } else if (globalWalletState.walletType === 'phantom') {
+      return window.phantom?.ethereum?.isPhantom ? window.phantom.ethereum : null
+    }
+    
+    return null
+  }, [])
+
+  // Function to check and update current network state
+  const checkAndUpdateNetworkState = useCallback(async () => {
+    if (!globalWalletState.isConnected || !globalWalletState.walletType) return
+
+    try {
+      const provider = getActiveProvider()
+
+      if (provider) {
+        // For Ethereum-compatible networks only
+        if (globalWalletState.network !== 'solana') {
+          const currentChainId = await provider.request({ method: 'eth_chainId' })
+          
+          let detectedNetwork: 'ethereum' | 'arbitrum' = 'ethereum'
+          if (currentChainId === '0x1') {
+            detectedNetwork = 'ethereum'
+          } else if (currentChainId === '0xa4b1') {
+            detectedNetwork = 'arbitrum'
+          } else {
+            detectedNetwork = 'ethereum' // Default
+          }
+
+          // Only update if there's a genuine network change
+          if (detectedNetwork !== globalWalletState.network) {
+            console.log(`Network change detected on ${globalWalletState.walletType}: stored=${globalWalletState.network}, actual=${detectedNetwork}`)
+            localStorage.setItem('walletNetwork', detectedNetwork)
+            updateGlobalState({
+              network: detectedNetwork
+            })
+          }
+        }
+        // For Solana, skip chain ID checks as it uses different methods
+      }
+    } catch (error) {
+      console.warn('Failed to check network state:', error)
+    }
+  }, [getActiveProvider])
+
   useEffect(() => {
     // Initialize from localStorage on first load
     if (!globalWalletState.address) {
@@ -171,6 +231,99 @@ export function useWallet() {
     
     // Subscribe to state changes
     const unsubscribe = subscribe(setWalletState)
+    
+    // Set up continuous monitoring for connected wallets
+    if (globalWalletState.isConnected && globalWalletState.walletType) {
+      // Initial check
+      checkAndUpdateNetworkState()
+      
+             // Set up event listeners for the active wallet only
+       const setupEventListeners = () => {
+         const provider = getActiveProvider()
+         const currentWalletType = globalWalletState.walletType
+         
+         if (!provider || !currentWalletType) return
+
+         const handleChainChanged = (chainId: string) => {
+           console.log(`Chain changed detected by ${currentWalletType}:`, chainId)
+           
+           // Only process if this is still the active wallet
+           if (globalWalletState.isConnected && globalWalletState.walletType === currentWalletType) {
+             let network: 'arbitrum' | 'ethereum' = 'ethereum'
+             if (chainId === '0x1') {
+               network = 'ethereum'
+             } else if (chainId === '0xa4b1') {
+               network = 'arbitrum'
+             } else {
+               network = 'ethereum'
+             }
+             
+             localStorage.setItem('walletNetwork', network)
+             updateGlobalState({ network })
+           }
+         }
+
+         const handleAccountsChanged = (accounts: string[]) => {
+           console.log(`Accounts changed detected by ${currentWalletType}:`, accounts)
+           
+           // Only process if this is still the active wallet
+           if (globalWalletState.walletType === currentWalletType) {
+             if (accounts.length === 0) {
+               // Disconnect
+               localStorage.removeItem('walletAddress')
+               localStorage.removeItem('walletNetwork')
+               localStorage.removeItem('walletType')
+               updateGlobalState({
+                 address: null,
+                 isConnected: false,
+                 network: null,
+                 walletType: null
+               })
+             } else {
+               // Account switched
+               const newAddress = accounts[0]
+               localStorage.setItem('walletAddress', newAddress)
+               updateGlobalState({
+                 address: newAddress
+               })
+             }
+           }
+         }
+
+         if (provider.on) {
+           provider.on('chainChanged', handleChainChanged)
+           provider.on('accountsChanged', handleAccountsChanged)
+         }
+
+         // Return cleanup function
+         return () => {
+           if (provider.removeListener) {
+             provider.removeListener('chainChanged', handleChainChanged)
+             provider.removeListener('accountsChanged', handleAccountsChanged)
+           }
+         }
+       }
+
+             const cleanupEventListeners = setupEventListeners()
+
+       // Reduced polling - only check every 30 seconds as backup
+       const networkCheckInterval = setInterval(checkAndUpdateNetworkState, 30000)
+
+       // Check on window focus
+       const handleFocus = () => {
+         checkAndUpdateNetworkState()
+       }
+       window.addEventListener('focus', handleFocus)
+
+       return () => {
+         unsubscribe()
+         clearInterval(networkCheckInterval)
+         window.removeEventListener('focus', handleFocus)
+         if (cleanupEventListeners) {
+           cleanupEventListeners()
+         }
+       }
+    }
     
     return () => {
       unsubscribe()
