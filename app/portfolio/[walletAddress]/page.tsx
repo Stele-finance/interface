@@ -24,6 +24,7 @@ import {
 import { useInvestorPortfolio } from "@/app/hooks/useInvestorPortfolio"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useLanguage } from "@/lib/language-context"
+import { useWallet } from "@/app/hooks/useWallet"
 import Link from "next/link"
 import { ethers } from "ethers"
 import { USDC_DECIMALS } from "@/lib/constants"
@@ -37,9 +38,13 @@ interface PortfolioPageProps {
 export default function PortfolioPage({ params }: PortfolioPageProps) {
   const { walletAddress } = use(params)
   const { t } = useLanguage()
+  const { network } = useWallet()
+  
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
   // Use hooks - ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
-  const { data: portfolioData, isLoading, error } = useInvestorPortfolio(walletAddress)
+  const { data: portfolioData, isLoading, error } = useInvestorPortfolio(walletAddress, 100, subgraphNetwork)
 
   // Calculate derived state with useMemo
   const investors = portfolioData?.investors || []
@@ -146,7 +151,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
   // Challenge Table Row Component
   const ChallengeRow = ({ investor }: { investor: any }) => {
-    const { data: challengeData } = useChallenge(investor.challengeId)
+    const { data: challengeData } = useChallenge(investor.challengeId, subgraphNetwork)
     const initialInvestment = safeFormatUSD(investor.seedMoneyUSD)
     const currentValue = safeFormatUSD(investor.currentUSD)
     

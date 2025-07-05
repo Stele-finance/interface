@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { STELE_CONTRACT_ADDRESS, ETHEREUM_CHAIN_ID, ETHEREUM_CHAIN_CONFIG } from "@/lib/constants"
+import { getSteleContractAddress, getChainId, getChainConfig } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useParams } from "next/navigation"
 import { useInvestableTokensForSwap, getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useInvestableTokens"
@@ -19,6 +19,7 @@ import { ethers } from "ethers"
 import { useLanguage } from "@/lib/language-context"
 import Image from "next/image"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useWallet } from "@/app/hooks/useWallet"
 
 interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
@@ -26,8 +27,12 @@ interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
 
 export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapProps) {
   const { t } = useLanguage()
+  const { walletType, network } = useWallet()
   
-  const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap();
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+  
+  const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("WETH")
@@ -112,7 +117,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     shouldFetchPrices ? fromToken : null,
     shouldFetchPrices ? toToken : null,
     getTokenAddress,
-    getTokenDecimals
+    getTokenDecimals,
+    subgraphNetwork
   );
 
   // Helper function to format token amounts for display
@@ -495,41 +501,67 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       // Dynamic import of ethers to avoid SSR issues
       const { ethers } = await import('ethers');
 
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
-      // Check if we are on Base network
-      const chainId = await window.phantom.ethereum.request({
+      // Check if we are on correct network
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
 
-      if (chainId !== ETHEREUM_CHAIN_ID) {
-        // Switch to Ethereum network
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      const targetChainId = getChainId(contractNetwork);
+      if (chainId !== targetChainId) {
+        // Switch to target network
         try {
-          await window.phantom.ethereum.request({
+          await walletProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: ETHEREUM_CHAIN_ID }],
+            params: [{ chainId: targetChainId }],
           });
         } catch (switchError: any) {
           if (switchError.code === 4902) {
-            await window.phantom.ethereum.request({
+            await walletProvider.request({
               method: 'wallet_addEthereumChain',
-              params: [ETHEREUM_CHAIN_CONFIG],
+              params: [getChainConfig(contractNetwork)],
             });
           } else {
             throw switchError;
@@ -538,12 +570,12 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       }
 
       // Create provider and signer
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      const provider = new ethers.BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );

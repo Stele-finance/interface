@@ -6,8 +6,10 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
+import { useWallet } from '@/app/hooks/useWallet'
 import { Users, DollarSign, Clock, Trophy, Calendar } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface ChartDataPoint {
   id: string
@@ -21,12 +23,14 @@ interface ChartDataPoint {
 
 interface ChallengeChartsProps {
   challengeId: string
+  network: 'ethereum' | 'arbitrum' | null
 }
 
-export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
+export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30)
-  const { data: challengeData } = useChallenge(challengeId)
+  const { network: walletNetwork } = useWallet()
+  const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
+  const { data: challengeData } = useChallenge(challengeId, network)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
 
@@ -332,7 +336,36 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('status')}</span>
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${challengeDetails.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                {walletNetwork === 'ethereum' ? (
+                  <Image 
+                    src="/networks/ethereum.png" 
+                    alt="Ethereum Mainnet"
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                ) : walletNetwork === 'arbitrum' ? (
+                  <Image 
+                    src="/networks/arbitrum.png" 
+                    alt="Arbitrum One"
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                ) : (
+                  <Image 
+                    src="/networks/ethereum.png" 
+                    alt="Ethereum Mainnet"
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                )}
+              </div>
               <span className={`text-xl font-medium ${challengeDetails.isActive ? 'text-green-400' : 'text-red-400'}`}>
                 {challengeDetails.isActive ? t('active') : 'Inactive'}
               </span>
@@ -375,8 +408,8 @@ export function ChallengeCharts({ challengeId }: ChallengeChartsProps) {
             
             {/* Time Info */}
             <div className="flex justify-between text-sm text-gray-500">
-              <span>{t('started')}: {challengeDetails.startTime.toLocaleDateString()}</span>
-              <span>{t('ends')}: {challengeDetails.endTime.toLocaleDateString()}</span>
+              <span>Start: {challengeDetails.startTime.toLocaleDateString()}</span>
+              <span>End: {challengeDetails.endTime.toLocaleDateString()}</span>
             </div>
           </div>
         </CardContent>

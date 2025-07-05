@@ -16,10 +16,15 @@ import { Trophy, Users, Clock } from "lucide-react"
 import Link from "next/link"
 import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
+import { useWallet } from "@/app/hooks/useWallet"
 
 export function RecentChallengesTable() {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useRecentChallenges()
+  const { network } = useWallet()
+  
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  const { data, isLoading, error } = useRecentChallenges(subgraphNetwork)
   const [currentTime, setCurrentTime] = useState(new Date())
 
   // Update time every second for accurate status calculation

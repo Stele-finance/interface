@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Zap } from 'lucide-react'
 import { AssetSwap } from '@/components/asset-swap'
 import { useUserTokens } from '@/app/hooks/useUserTokens'
+import { useWallet } from '@/app/hooks/useWallet'
 import { Loader2 } from 'lucide-react'
 import { use } from 'react'
 
@@ -18,11 +19,16 @@ interface SwapPageProps {
 
 export default function SwapPage({ params }: SwapPageProps) {
   const { challengeId, walletAddress } = use(params)
+  const { network } = useWallet()
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
   // Use the new hook to get user tokens
   const { data: userTokens = [], isLoading, error } = useUserTokens(
     challengeId, 
-    walletAddress
+    walletAddress,
+    subgraphNetwork
   )
   
   let title = 'Swap Assets';

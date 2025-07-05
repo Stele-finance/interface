@@ -13,52 +13,94 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { ethers } from "ethers"
 import { 
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
-  USDC_DECIMALS
+  USDC_DECIMALS,
+  getRPCUrl
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSelectorSidebar } from "./language-selector-sidebar"
+import { useToast } from "@/components/ui/use-toast"
+import Image from "next/image"
+
+type WalletType = 'metamask' | 'phantom' | null
 
 export function Header() {
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
+  const { toast } = useToast()
   
   // Use global wallet hook
-  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork } = useWallet()
+  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType } = useWallet()
   
   const [isConnecting, setIsConnecting] = useState(false)
   const [balance, setBalance] = useState<string>('0')
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
+  const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   
   // Get entry fee from context
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee()
+
+  // Get wallet icon based on wallet type
+  const getWalletIcon = () => {
+    switch (walletType) {
+      case 'metamask':
+        return "/wallets/metamask.png"
+      case 'phantom':
+        return "/wallets/phantom.png"
+      default:
+        return null
+    }
+  }
+
+  // Get network icon based on network type
+  const getNetworkIcon = () => {
+    switch (walletNetwork) {
+      case 'ethereum':
+        return "/networks/ethereum.png"
+      case 'arbitrum':
+        return "/networks/arbitrum.png"
+      default:
+        return null
+    }
+  }
 
   // Get symbol and chain name based on network
   const getNetworkInfo = () => {
     switch (walletNetwork) {
       case 'ethereum':
         return { symbol: 'ETH', name: 'Ethereum Mainnet' };
-      case 'base':
-        return { symbol: 'ETH', name: 'Base Mainnet' };
-      case 'solana':
-        return { symbol: 'SOL', name: 'Solana' };
+      case 'arbitrum':
+        return { symbol: 'ETH', name: 'Arbitrum' };
       default:
         return { symbol: '', name: '' };
     }
   };
 
-  // Fetch wallet balance
+  // Fetch wallet balance using network-specific RPC
   const fetchBalance = async () => {
-    if (!walletAddress || !window.phantom) return;
+    if (!walletAddress) return;
     
     try {
       setIsLoadingBalance(true);
@@ -71,20 +113,17 @@ export function Header() {
           setBalance('1.234');
         }
       } else {
-        // Get Ethereum/Base balance
-        if (window.phantom?.ethereum) {
-          const balanceHex = await window.phantom.ethereum.request({
-            method: 'eth_getBalance',
-            params: [walletAddress, 'latest'],
-          });
-          
-          // Convert from Wei to ETH (1 ETH = 10^18 Wei)
-          const balanceInWei = parseInt(balanceHex, 16);
-          const balanceInEth = balanceInWei / Math.pow(10, 18);
-          
-          // Display up to 4 decimal places
-          setBalance(balanceInEth.toFixed(4));
-        }
+        // Use network-specific RPC URL for accurate balance
+        const networkToUse = walletNetwork === 'ethereum' || walletNetwork === 'arbitrum' ? walletNetwork : 'ethereum';
+        const rpcUrl = getRPCUrl(networkToUse);
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        
+        // Get ETH balance using ethers provider
+        const balanceWei = await provider.getBalance(walletAddress);
+        const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
+        
+        // Display up to 4 decimal places
+        setBalance(balanceInEth.toFixed(4));
       }
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -94,10 +133,13 @@ export function Header() {
     }
   };
 
-  const handleConnectWallet = async () => {
+  const handleConnectWallet = async (selectedWalletType: WalletType) => {
+    if (!selectedWalletType) return
+    
     try {
       setIsConnecting(true)
-      await connectWallet()
+      await connectWallet(selectedWalletType)
+      setWalletSelectOpen(false)
     } catch (error) {
       console.error("Wallet connection error:", error)
     } finally {
@@ -111,12 +153,57 @@ export function Header() {
   }
 
   // Switch between Networks
-  const switchWalletNetwork = async (targetNetwork: 'solana' | 'ethereum' | 'base') => {
+  const switchWalletNetwork = async (targetNetwork: 'solana' | 'ethereum' | 'arbitrum') => {
+    // Immediate validation before any async operations
+    if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
+      toast({
+        variant: "destructive",
+        title: `🚫 ${t('networkNotSupported')}`,
+        description: t('phantomDoesNotSupportArbitrum'),
+        duration: 5000,
+      })
+      return
+    }
+    
     try {
       setIsConnecting(true)
+      
       await switchNetwork(targetNetwork)
+      
+      // Success feedback
+      toast({
+        variant: "default",
+        title: `✅ ${t('networkSwitched')}`,
+        description: targetNetwork === 'ethereum' ? t('successfullySwitchedToEthereum') : t('successfullySwitchedToArbitrum'),
+        duration: 3000,
+      })
+      
     } catch (error) {
       console.error("Wallet switch error:", error)
+      // Show user-friendly error message
+      let title = t('networkSwitchFailed')
+      let description = "Failed to switch network. Please try again."
+      
+      if (error instanceof Error) {
+        if (error.message.includes("cancelled by user")) {
+          title = t('networkSwitchCancelled')
+          description = t('youCancelledNetworkSwitch')
+        } else if (error.message.includes("manually")) {
+          title = t('manualActionRequired')
+          description = error.message
+        } else if (error.message.includes("not support")) {
+          title = t('networkNotSupported')
+          description = error.message
+        } else {
+          description = error.message
+        }
+      }
+      
+      toast({
+        variant: "destructive",
+        title,
+        description,
+      })
     } finally {
       setIsConnecting(false)
     }
@@ -129,9 +216,8 @@ export function Header() {
     }
   }, [walletAddress, walletNetwork]);
 
-
-
   const { symbol, name } = getNetworkInfo();
+  const walletIcon = getWalletIcon();
 
   return (
     <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-background">
@@ -213,7 +299,19 @@ export function Header() {
         {walletAddress ? (
           <div className="flex items-center gap-3">
             <div className="hidden md:flex flex-col items-end px-3 py-2">
-              <span className="text-sm font-medium text-gray-300">{name}</span>
+              <div className="flex items-center gap-2">
+                {getNetworkIcon() && (
+                  <Image 
+                    src={getNetworkIcon()!} 
+                    alt={`${walletNetwork} network`}
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                    style={{ width: 'auto', height: '16px' }}
+                  />
+                )}
+                <span className="text-sm font-medium text-gray-300">{name}</span>
+              </div>
               <span className="text-base font-semibold text-white">
                 {isLoadingBalance ? (
                   <span className="text-gray-400">{t('loading')}</span>
@@ -225,7 +323,18 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10 hidden sm:flex font-medium px-4 py-2 h-auto">
-                  <Wallet className="mr-2 h-5 w-5" />
+                  {walletIcon ? (
+                    <Image 
+                      src={walletIcon} 
+                      alt={`${walletType} wallet`}
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                      style={{ width: 'auto', height: '20px' }}
+                    />
+                  ) : (
+                    <Wallet className="mr-2 h-5 w-5" />
+                  )}
                   <span className="text-base">
                     {walletNetwork === 'solana'
                       ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
@@ -256,18 +365,58 @@ export function Header() {
                 <DropdownMenuLabel>{t('switchNetwork')}</DropdownMenuLabel>
                 {walletNetwork !== 'ethereum' && (
                   <DropdownMenuItem onClick={() => switchWalletNetwork('ethereum')}>
-                    {t('ethereumMainnet')}
+                    <div className="flex items-center gap-2">
+                      <Image 
+                        src="/networks/ethereum.png" 
+                        alt="Ethereum Mainnet"
+                        width={16}
+                        height={16}
+                        className="rounded-full"
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>{t('ethereumMainnet')}</span>
+                    </div>
                   </DropdownMenuItem>
                 )}
-                {walletNetwork !== 'base' && (
-                  <DropdownMenuItem onClick={() => switchWalletNetwork('base')}>
-                    {t('baseMainnet')}
-                  </DropdownMenuItem>
-                )}
-                {walletNetwork !== 'solana' && (
-                  <DropdownMenuItem onClick={() => switchWalletNetwork('solana')}>
-                    {t('solana')}
-                  </DropdownMenuItem>
+                {walletNetwork !== 'arbitrum' && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <DropdownMenuItem 
+                            onClick={() => switchWalletNetwork('arbitrum')}
+                            disabled={walletType === 'phantom'}
+                            className={walletType === 'phantom' ? 'opacity-50 cursor-not-allowed' : ''}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center gap-2">
+                                <Image 
+                                  src="/networks/arbitrum.png" 
+                                  alt="Arbitrum One"
+                                  width={16}
+                                  height={16}
+                                  className="rounded-full"
+                                  style={{ width: '16px', height: '16px' }}
+                                />
+                                <span>Arbitrum</span>
+                              </div>
+                              {walletType === 'phantom' && (
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  🚫
+                                </span>
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        </div>
+                      </TooltipTrigger>
+                      {walletType === 'phantom' && (
+                        <TooltipContent>
+                          <p>{t('arbitrumNotSupportedByPhantom')}</p>
+                          <p>{t('pleaseUseMetaMaskForArbitrum')}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDisconnectWallet}>
@@ -277,18 +426,69 @@ export function Header() {
             </DropdownMenu>
           </div>
         ) : (
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="text-primary border-primary hover:bg-primary/10 hidden sm:flex font-medium px-4 py-2 h-auto"
-            onClick={handleConnectWallet}
-            disabled={isConnecting}
-          >
-            <Wallet className="mr-2 h-5 w-5" />
-            <span className="text-base">
-              {isConnecting ? t('connecting') : t('connectWallet')}
-            </span>
-        </Button>
+          <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-primary border-primary hover:bg-primary/10 hidden sm:flex font-medium px-4 py-2 h-auto"
+              >
+                <Wallet className="mr-2 h-5 w-5" />
+                <span className="text-base">
+                  {t('connectWallet')}
+                </span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>{t('connectWallet')}</DialogTitle>
+                <DialogDescription>
+                  {t('selectWalletToConnect')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-1 gap-4 py-4">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 flex items-center justify-start gap-4 p-4"
+                  onClick={() => handleConnectWallet('metamask')}
+                  disabled={isConnecting}
+                >
+                  <Image 
+                    src="/wallets/metamask.png" 
+                    alt="MetaMask"
+                    width={32}
+                    height={32}
+                    style={{ width: 'auto', height: '32px' }}
+                  />
+                  <div className="text-left">
+                    <div className="font-semibold">MetaMask</div>
+                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
+                  </div>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 flex items-center justify-start gap-4 p-4"
+                  onClick={() => handleConnectWallet('phantom')}
+                  disabled={isConnecting}
+                >
+                  <Image 
+                    src="/wallets/phantom.png" 
+                    alt="Phantom"
+                    width={32}
+                    height={32}
+                    style={{ width: 'auto', height: '32px' }}
+                  />
+                  <div className="text-left">
+                    <div className="font-semibold">Phantom</div>
+                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
+                  </div>
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
         <div className="flex items-center gap-2">

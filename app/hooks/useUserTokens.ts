@@ -10,16 +10,17 @@ export interface UserTokenInfo {
   decimals: string;
 }
 
-export function useUserTokens(challengeId: string, walletAddress: string) {
+export function useUserTokens(challengeId: string, walletAddress: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   // Get investor data
   const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(
     challengeId, 
-    walletAddress
+    walletAddress,
+    network
   );
 
   // Process and cache the token data
   return useQuery<UserTokenInfo[]>({
-    queryKey: ['userTokens', challengeId, walletAddress],
+    queryKey: ['userTokens', challengeId, walletAddress, network],
     queryFn: () => {
       if (!investorData?.investor) {
         return [];
@@ -48,8 +49,8 @@ export function useUserTokens(challengeId: string, walletAddress: string) {
 }
 
 // Additional helper hooks for specific use cases
-export function useUserTokenBalance(challengeId: string, walletAddress: string, tokenSymbol: string) {
-  const { data: userTokens } = useUserTokens(challengeId, walletAddress);
+export function useUserTokenBalance(challengeId: string, walletAddress: string, tokenSymbol: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const { data: userTokens } = useUserTokens(challengeId, walletAddress, network);
   
   const token = userTokens?.find(token => token.symbol === tokenSymbol);
   return {
@@ -60,7 +61,7 @@ export function useUserTokenBalance(challengeId: string, walletAddress: string, 
   };
 }
 
-export function useUserTokenBySymbol(challengeId: string, walletAddress: string, tokenSymbol: string) {
-  const { data: userTokens } = useUserTokens(challengeId, walletAddress);
+export function useUserTokenBySymbol(challengeId: string, walletAddress: string, tokenSymbol: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const { data: userTokens } = useUserTokens(challengeId, walletAddress, network);
   return userTokens?.find(token => token.symbol === tokenSymbol) || null;
 } 

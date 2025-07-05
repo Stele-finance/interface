@@ -14,10 +14,10 @@ import { ToastAction } from "@/components/ui/toast"
 import { ChallengeCharts } from "@/components/challenge-charts"
 import { useRouter } from "next/navigation"
 import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
-  USDC_TOKEN_ADDRESS,
+  getChainId,
+  getChainConfig, 
+  getSteleContractAddress,
+  getUSDCTokenAddress,
   USDC_DECIMALS
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
@@ -28,15 +28,17 @@ import { useTransactions } from "@/app/hooks/useTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useInvestorData } from "@/app/subgraph/Account"
 import Image from "next/image"
+import { useWallet } from "@/app/hooks/useWallet"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface ChallengePortfolioProps {
   challengeId: string
 }
 
 // Ranking Section Component
-function RankingSection({ challengeId }: { challengeId: string }) {
+function RankingSection({ challengeId, network }: { challengeId: string; network: 'ethereum' | 'arbitrum' | null }) {
   const { t } = useLanguage()
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, network);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -233,6 +235,7 @@ function RankingSection({ challengeId }: { challengeId: string }) {
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { t } = useLanguage()
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [isGettingRewards, setIsGettingRewards] = useState(false);
@@ -243,9 +246,17 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [usdcBalance, setUsdcBalance] = useState<string>('0');
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshProgress, setRefreshProgress] = useState(0);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
+  
+  // Use wallet hook to get current wallet info
+  const { walletType, network } = useWallet();
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
 
   // Get appropriate explorer URL based on chain ID
   const getExplorerUrl = (chainId: string, txHash: string) => {
@@ -281,9 +292,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         return 'Block Explorer';
     }
   };
-  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId);
-  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId);
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId);
+  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork);
+  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
 
   // Get token logo path based on symbol
   const getTokenLogo = (symbol: string) => {
@@ -317,7 +328,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Check if current user has joined this challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
     challengeId, 
-    walletAddress || ""
+    walletAddress || "",
+    subgraphNetwork
   );
 
   // Check if user has joined the challenge (combining local state with subgraph data)
@@ -356,6 +368,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check if USDC balance is insufficient
   const isInsufficientBalance = () => {
+    // If challenge data is not loaded yet, don't show insufficient balance
+    if (!challengeData?.challenge || isLoadingChallenge) return false;
     if (!entryFee || !usdcBalance || isLoadingBalance || isLoadingEntryFee) return false;
     
     const balance = parseFloat(usdcBalance);
@@ -370,18 +384,46 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     
     setIsLoadingBalance(true);
     try {
-      // Check if Phantom wallet is available
-      if (typeof window.phantom === 'undefined' || !window.phantom?.ethereum) {
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          setUsdcBalance('0');
+          return;
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          setUsdcBalance('0');
+          return;
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined' || !window.phantom?.ethereum) {
+          setUsdcBalance('0');
+          return;
+        }
+        walletProvider = window.phantom.ethereum;
+      } else {
         setUsdcBalance('0');
         return;
       }
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
+      
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
       
       // Create USDC contract instance
       const usdcContract = new ethers.Contract(
-        USDC_TOKEN_ADDRESS,
+        getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
         provider
       );
@@ -429,22 +471,46 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
     try {
-      // If wallet address is not in state, try to get it from Phantom wallet
+      // If wallet address is not in state, try to get it from current wallet
       if (!walletAddress) {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        let walletProvider;
+        
+        // Get the appropriate wallet provider based on connected wallet type
+        if (walletType === 'metamask') {
+          if (typeof (window as any).ethereum === 'undefined') {
+            throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+          }
+          
+          // For MetaMask, find the correct provider
+          if ((window as any).ethereum.providers) {
+            walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+          } else if ((window as any).ethereum.isMetaMask) {
+            walletProvider = (window as any).ethereum;
+          }
+          
+          if (!walletProvider) {
+            throw new Error("MetaMask provider not found");
+          }
+        } else if (walletType === 'phantom') {
+          if (typeof window.phantom === 'undefined') {
+            throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+          }
+
+          if (!window.phantom?.ethereum) {
+            throw new Error("Ethereum provider not found in Phantom wallet");
+          }
+          
+          walletProvider = window.phantom.ethereum;
+        } else {
+          throw new Error("No wallet connected. Please connect your wallet first.");
         }
 
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-
-        const accounts = await window.phantom.ethereum.request({
+        const accounts = await walletProvider.request({
           method: 'eth_requestAccounts'
         });
 
         if (!accounts || accounts.length === 0) {
-          throw new Error("No accounts found. Please connect to Phantom wallet first.");
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
         }
 
         // Save address to state and localStorage
@@ -553,33 +619,53 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     setIsJoining(true);
     
     try {      
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      // Check if Ethereum provider is available
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
       const userAddress = accounts[0];
 
       // Get current network information
-      const chainId = await window.phantom.ethereum.request({
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
-
-      console.log('Current network chain ID:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
@@ -588,21 +674,24 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         throw new Error("Entry fee not loaded yet. Please try again later.");
       }
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
       
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instances
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
 
       const usdcContract = new ethers.Contract(
-        USDC_TOKEN_ADDRESS,
+        getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
         signer
       );
@@ -623,13 +712,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
       // Check current allowance
       try {
-        const currentAllowance = await usdcContract.allowance(userAddress, STELE_CONTRACT_ADDRESS);
+        const currentAllowance = await usdcContract.allowance(userAddress, getSteleContractAddress(contractNetwork));
         if (currentAllowance < discountedEntryFeeAmount) {
           
           // Estimate gas for approval
           try {
-            const approveGasEstimate = await usdcContract.approve.estimateGas(STELE_CONTRACT_ADDRESS, discountedEntryFeeAmount);
-            const approveTx = await usdcContract.approve(STELE_CONTRACT_ADDRESS, discountedEntryFeeAmount, {
+            const approveGasEstimate = await usdcContract.approve.estimateGas(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount);
+            const approveTx = await usdcContract.approve(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount, {
               gasLimit: approveGasEstimate + BigInt(10000) // Add 10k gas buffer
             });
                         
@@ -712,28 +801,33 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         // Update local state immediately for instant UI feedback
         setHasJoinedLocally(true);
         
-        // Start refetching investor data to check for subgraph updates
-        let attempts = 0;
-        const maxAttempts = 4; // Try for 1 minutes (15s * 4)
-        const checkInterval = setInterval(async () => {
-          attempts++;
-          try {
-            const result = await refetchInvestorData();
-            if (result.data?.investor) {
-              // Subgraph has been updated, clear interval and refresh page
-              clearInterval(checkInterval);
-              window.location.reload();
+        // Show refreshing spinner with progress
+        setIsRefreshing(true);
+        setRefreshProgress(0);
+        
+        // Animate progress from 0% to 100% over 3 seconds
+        const progressInterval = setInterval(() => {
+          setRefreshProgress(prev => {
+            if (prev >= 100) {
+              clearInterval(progressInterval);
+              return 100;
             }
-          } catch (error) {
-            console.log('Refetch attempt', attempts, 'failed:', error);
-          }
+            return prev + (100 / 30); // Increment by ~3.33% every 100ms
+          });
+        }, 100);
+        
+        // After 3 seconds, invalidate queries and hide spinner
+        setTimeout(() => {
+          // Invalidate queries to refetch fresh data
+          queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, walletAddress, subgraphNetwork] });
           
-          // Stop trying after max attempts
-          if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            console.log('Max refetch attempts reached. Data may take longer to update.');
-          }
-        }, 5000); // Check every 5 seconds
+          // Hide spinner
+          setIsRefreshing(false);
+          setRefreshProgress(0);
+        }, 3000);
       } catch (joinError: any) {
         console.error("❌ Join challenge failed:", joinError);
         
@@ -770,27 +864,49 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     setIsGettingRewards(true);
     
     try {
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      // Check if Ethereum provider is available
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
       // Get current network information
-      const chainId = await window.phantom.ethereum.request({
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
 
@@ -799,15 +915,18 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
       
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
@@ -860,6 +979,17 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   return (
     <div className="space-y-4">
+      {/* Refreshing Spinner Overlay */}
+      {isRefreshing && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
+            <div className="text-white text-lg font-medium">Join request successful!</div>
+            <div className="text-gray-300 text-sm">Refreshing data...</div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between">
         {isLoadingChallenge ? (
           <div className="flex items-center gap-2">
@@ -901,7 +1031,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           )}
           
           {/* Entry Fee Display - only show when join button is visible */}
-          {!hasJoinedChallenge && !isChallengeEnded() && entryFee && (
+          {!hasJoinedChallenge && !isChallengeEnded() && challengeData?.challenge && entryFee && (
             <div className={`flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium border ${
               isInsufficientBalance() 
                 ? "bg-red-500/10 text-red-400 border-red-500/20" 
@@ -931,7 +1061,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               variant="outline" 
               size="lg" 
               onClick={handleJoinChallenge} 
-              disabled={isJoining || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
+              disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
               className={`font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
                 isInsufficientBalance() 
                   ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
@@ -942,6 +1072,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 <>
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                   {t('joining')}
+                </>
+              ) : isLoadingChallenge || !challengeData?.challenge ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  Loading challenge info...
                 </>
               ) : isLoadingEntryFee || isLoadingBalance ? (
                 <>
@@ -966,7 +1101,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       </div>
 
       {/* Challenge Charts */}
-      <ChallengeCharts challengeId={challengeId} />
+                      <ChallengeCharts challengeId={challengeId} network={subgraphNetwork} />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1171,7 +1306,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
 
         {/* Ranking Section */}
-        <RankingSection challengeId={challengeId} />
+        <RankingSection challengeId={challengeId} network={subgraphNetwork} />
       </div>
 
     </div>

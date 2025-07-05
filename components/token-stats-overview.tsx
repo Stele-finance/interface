@@ -10,11 +10,14 @@ import { useLanguage } from "@/lib/language-context"
 
 interface TokenStatsOverviewProps {
   className?: string
+  network?: 'ethereum' | 'arbitrum' | 'solana' | null
 }
 
-export function TokenStatsOverview({ className }: TokenStatsOverviewProps) {
+export function TokenStatsOverview({ className, network }: TokenStatsOverviewProps) {
   const { t } = useLanguage()
-  const { data: rankingData, isLoading, error } = useTotalRanking()
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  const { data: rankingData, isLoading, error } = useTotalRanking(subgraphNetwork)
 
   // Format wallet address for display
   const formatAddress = (address: string) => {

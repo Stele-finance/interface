@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { SUBGRAPH_URL } from '@/lib/constants'
+import { getSubgraphUrl } from '@/lib/constants'
 
 const GET_RANKING_QUERY = `
   query GetRanking($challengeId: String!) {
@@ -36,13 +36,15 @@ interface GraphQLResponse {
   ranking?: RankingData
 }
 
-export function useRanking(challengeId: string) {
+export function useRanking(challengeId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery({
-    queryKey: ['ranking', challengeId],
+    queryKey: ['ranking', challengeId, network],
     queryFn: async (): Promise<RankingData | null> => {
       try {
         const data = await request<GraphQLResponse>(
-          SUBGRAPH_URL,
+          subgraphUrl,
           GET_RANKING_QUERY,
           { challengeId }
         )

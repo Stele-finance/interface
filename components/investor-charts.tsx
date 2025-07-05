@@ -33,34 +33,19 @@ interface RealTimePortfolio {
 interface InvestorChartsProps {
   challengeId: string
   investor: string
+  network: 'ethereum' | 'arbitrum' | null
   investorData?: any // Add investor data prop for calculations
   realTimePortfolio?: RealTimePortfolio | null
 }
 
-export function InvestorCharts({ challengeId, investor, investorData, realTimePortfolio }: InvestorChartsProps) {
+export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio }: InvestorChartsProps) {
   const { t } = useLanguage()
-  const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30)
-  const { data: challengeData } = useChallenge(challengeId)
-  const { data: rankingResponse } = useRanking(challengeId)
+  const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
+  const { data: challengeData } = useChallenge(challengeId, network)
+  const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
 
-  // Helper function to safely format USD values
-  const formatUSDValue = (value: string | undefined, decimals: number = USDC_DECIMALS): number => {
-    if (!value || value === "0") return 0
-    
-    // If the value contains a decimal point, it's already formatted
-    if (value.includes('.')) {
-      return parseFloat(value)
-    }
-    
-    // If no decimal point, it's likely a raw integer amount that needs formatting
-    try {
-      return parseFloat(ethers.formatUnits(value, decimals))
-    } catch (error) {
-      // Fallback: treat as already formatted number
-      return parseFloat(value)
-    }
-  }
+
 
   const chartData = useMemo(() => {
     if (!data?.investorSnapshots) return []
@@ -72,8 +57,8 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
         
         return {
           id: `${snapshot.id}-${index}`,
-          // Format raw currentUSD amount using USDC_DECIMALS
-          currentUSD: formatUSDValue(snapshot.currentUSD),
+          // USD values are already in USD format from subgraph
+          currentUSD: parseFloat(snapshot.currentUSD) || 0,
           seedMoneyUSD: Number(snapshot.seedMoneyUSD),
           profitRatio: Number(snapshot.profitRatio),
           formattedDate: date.toLocaleDateString('en-US', { 
@@ -102,7 +87,7 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
     // Add real-time data point if available
     if (realTimePortfolio && realTimePortfolio.totalValue > 0) {
       const currentDate = new Date(realTimePortfolio.timestamp)
-      const seedMoney = investorData?.investor ? formatUSDValue(investorData.investor.seedMoneyUSD) : 0
+      const seedMoney = investorData?.investor ? (parseFloat(investorData.investor.seedMoneyUSD) || 0) : 0
       
       const realTimeDataPoint = {
         id: `realtime-${realTimePortfolio.timestamp}-${Date.now()}`,
@@ -161,12 +146,12 @@ export function InvestorCharts({ challengeId, investor, investorData, realTimePo
     }
 
     const investor = investorData.investor
-    const formattedSeedMoney = formatUSDValue(investor.seedMoneyUSD)
+    const formattedSeedMoney = parseFloat(investor.seedMoneyUSD) || 0
     
     // Use real-time portfolio value if available, otherwise use subgraph data
     const currentValue = realTimePortfolio && realTimePortfolio.totalValue > 0 
       ? realTimePortfolio.totalValue 
-      : formatUSDValue(investor.currentUSD)
+      : (parseFloat(investor.currentUSD) || 0)
     
     const gainLoss = currentValue - formattedSeedMoney
     const gainLossPercentage = formattedSeedMoney > 0 ? (gainLoss / formattedSeedMoney) * 100 : 0

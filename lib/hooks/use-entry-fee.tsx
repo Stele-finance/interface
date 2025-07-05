@@ -8,10 +8,9 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from "ethers"
 import { 
-  STELE_CONTRACT_ADDRESS, 
   USDC_DECIMALS,
-  BASE_CHAIN_ID,  
-  RPC_URL
+  getSteleContractAddress,
+  getRPCUrl
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 
@@ -31,12 +30,16 @@ function useEntryFeeQuery() {
       // Add delay to prevent overwhelming RPC
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))
       
-      // Create a read-only provider for Base
-      const provider = new ethers.JsonRpcProvider(RPC_URL)
+      // Use ethereum as default network for entry fee
+      const defaultNetwork = 'ethereum'
+      const rpcUrl = getRPCUrl(defaultNetwork)
+      
+      // Create a read-only provider
+      const provider = new ethers.JsonRpcProvider(rpcUrl)
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(defaultNetwork),
         SteleABI.abi,
         provider
       )

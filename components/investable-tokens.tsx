@@ -8,9 +8,15 @@ import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
 import Image from "next/image"
 
-export function InvestableTokens() {
+interface InvestableTokensProps {
+  network?: 'ethereum' | 'arbitrum' | 'solana' | null
+}
+
+export function InvestableTokens({ network }: InvestableTokensProps) {
   const { t } = useLanguage()
-  const { data: tokensData, isLoading, error } = useInvestableTokens()
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  const { data: tokensData, isLoading, error } = useInvestableTokens(subgraphNetwork)
 
   // Format token address for display
   const formatAddress = (address: string) => {
@@ -113,19 +119,34 @@ export function InvestableTokens() {
                   >
                     <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
                       <div className="flex items-center gap-3">
-                        {getTokenLogo(token.symbol) ? (
-                          <Image
-                            src={getTokenLogo(token.symbol)!}
-                            alt={token.symbol}
-                            width={24}
-                            height={24}
-                            className="rounded-full"
-                          />
-                        ) : (
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                            {token.symbol.slice(0, 2)}
-                          </div>
-                        )}
+                        <div className="relative">
+                          {getTokenLogo(token.symbol) ? (
+                            <Image
+                              src={getTokenLogo(token.symbol)!}
+                              alt={token.symbol}
+                              width={24}
+                              height={24}
+                              className="rounded-full"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                              {token.symbol.slice(0, 2)}
+                            </div>
+                          )}
+                          {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                          {network === 'arbitrum' && (
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                              <Image 
+                                src="/networks/arbitrum.png" 
+                                alt="Arbitrum"
+                                width={12}
+                                height={12}
+                                className="rounded-full"
+                                style={{ width: '12px', height: '12px' }}
+                              />
+                            </div>
+                          )}
+                        </div>
                         <span>{token.symbol}</span>
                       </div>
                     </TableCell>

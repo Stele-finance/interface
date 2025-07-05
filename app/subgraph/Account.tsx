@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { SUBGRAPH_URL, headers } from '@/lib/constants'
+import { getSubgraphUrl, headers } from '@/lib/constants'
 
 export const getInvestorQuery = (investorId: string) => gql`{
   investor(id: "${investorId}") {
@@ -39,12 +39,14 @@ export interface InvestorData {
   }
 }
 
-export function useInvestorData(challengeId: string, walletAddress: string) {
+export function useInvestorData(challengeId: string, walletAddress: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   const investorId = `${challengeId}-${walletAddress.toUpperCase()}`
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<InvestorData>({
-    queryKey: ['investor', investorId],
+    queryKey: ['investor', investorId, network],
     queryFn: async () => {
-      return await request(SUBGRAPH_URL, getInvestorQuery(investorId), {}, headers)
+      return await request(subgraphUrl, getInvestorQuery(investorId), {}, headers)
     },
     refetchInterval: 10000, // Refetch every 10 seconds for better real-time experience
     staleTime: 5000, // Consider data fresh for 5 seconds

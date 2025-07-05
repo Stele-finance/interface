@@ -3,6 +3,7 @@
 import { use } from "react"
 import { ChallengePortfolio } from "@/components/challenge-portfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
+import { useWallet } from '@/app/hooks/useWallet'
 
 interface ChallengePageProps {
   params: Promise<{
@@ -11,14 +12,19 @@ interface ChallengePageProps {
 }
 
 function ChallengeContent({ challengeId }: { challengeId: string }) {
-  const { data, isLoading, error } = useChallenge(challengeId)
+  const { network } = useWallet()
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  const { data, isLoading, error } = useChallenge(challengeId, subgraphNetwork)
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading challenge data...</p>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
+          <div className="text-white text-lg font-medium">Loading challenge data...</div>
         </div>
       </div>
     )

@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { SUBGRAPH_URL, headers, BASE_CHAIN_CONFIG } from '@/lib/constants'
+import { getSubgraphUrl, headers, getRPCUrl } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 // New query structure by status with voteResult and voting period info
@@ -217,13 +217,15 @@ export interface ProposalsByStatusResponse {
   proposals: ProposalWithVoteResult[]
 }
 
-export function useProposalsData() {
+export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalsData>({
-    queryKey: ['proposals'],
+    queryKey: ['proposals', network],
     queryFn: async () => {
       // Add small delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 200))
-      return await request(SUBGRAPH_URL, getProposalsQuery(), {}, headers)
+      return await request(subgraphUrl, getProposalsQuery(), {}, headers)
     },
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 60 * 1000, // Refetch every 1 minute
@@ -231,9 +233,11 @@ export function useProposalsData() {
   })
 }
 
-export function useActiveProposalsData(currentBlockNumber?: number) {
+export function useActiveProposalsData(currentBlockNumber?: number, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalsData>({
-    queryKey: ['activeProposals', currentBlockNumber],
+    queryKey: ['activeProposals', currentBlockNumber, network],
     queryFn: async () => {
       try {
         let blockNumberToUse: string
@@ -245,7 +249,7 @@ export function useActiveProposalsData(currentBlockNumber?: number) {
           // Fallback: fetch block number
           const rpcUrl = process.env.NEXT_PUBLIC_INFURA_API_KEY 
             ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
-            : BASE_CHAIN_CONFIG.rpcUrls[0]
+            : getRPCUrl(network)
             
           const provider = new ethers.JsonRpcProvider(rpcUrl)
           const fetchedBlockNumber = await provider.getBlockNumber()
@@ -255,12 +259,12 @@ export function useActiveProposalsData(currentBlockNumber?: number) {
         // Add delay to prevent overwhelming requests
         await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))
               
-        return await request(SUBGRAPH_URL, getActiveProposalsQuery(blockNumberToUse), {}, headers)
+        return await request(subgraphUrl, getActiveProposalsQuery(blockNumberToUse), {}, headers)
       } catch (error) {
         console.error('Error fetching active proposals:', error)
         // Fallback: use a very high block number to ensure we get all potentially active proposals
         const fallbackBlockNumber = "999999999"
-        return await request(SUBGRAPH_URL, getActiveProposalsQuery(fallbackBlockNumber), {}, headers)
+        return await request(subgraphUrl, getActiveProposalsQuery(fallbackBlockNumber), {}, headers)
       }
     },
     enabled: !!currentBlockNumber, // Only run when we have block number
@@ -270,13 +274,15 @@ export function useActiveProposalsData(currentBlockNumber?: number) {
   })
 }
 
-export function useProposalVoteResult(proposalId: string) {
+export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalVoteResultResponse>({
-    queryKey: ['proposalVoteResult', proposalId],
+    queryKey: ['proposalVoteResult', proposalId, network],
     queryFn: async () => {
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 300))
-      const result = await request(SUBGRAPH_URL, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
+      const result = await request(subgraphUrl, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
       return result
     },
     enabled: !!proposalId, // Only run query if proposalId is provided
@@ -286,16 +292,18 @@ export function useProposalVoteResult(proposalId: string) {
   })
 }
 
-export function useMultipleProposalVoteResults(proposalIds: string[]) {
+export function useMultipleProposalVoteResults(proposalIds: string[], network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<MultipleProposalVoteResultsResponse>({
-    queryKey: ['multipleProposalVoteResults', proposalIds],
+    queryKey: ['multipleProposalVoteResults', proposalIds, network],
     queryFn: async () => {
       if (proposalIds.length === 0) {
         return { proposalVoteResults: [] }
       }
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1200 + 600))
-      const result = await request(SUBGRAPH_URL, getMultipleProposalVoteResultsQuery(proposalIds), {}, headers) as MultipleProposalVoteResultsResponse
+      const result = await request(subgraphUrl, getMultipleProposalVoteResultsQuery(proposalIds), {}, headers) as MultipleProposalVoteResultsResponse
       return result
     },
     enabled: proposalIds.length > 0, // Only run query if there are proposal IDs
@@ -307,10 +315,13 @@ export function useMultipleProposalVoteResults(proposalIds: string[]) {
 
 // New hook for proposals by status with vote results
 export function useProposalsByStatus(
-  statuses: string[] = ['ACTIVE']
+  statuses: string[] = ['ACTIVE'],
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
 ) {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalsByStatusResponse>({
-    queryKey: ['proposalsByStatus', statuses],
+    queryKey: ['proposalsByStatus', statuses, network],
     queryFn: async () => {
       const variables = {
         statuses
@@ -320,7 +331,7 @@ export function useProposalsByStatus(
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 400))
       
       const result = await request(
-        SUBGRAPH_URL, 
+        subgraphUrl, 
         getProposalsByStatusQuery(),
         variables,
         headers
@@ -373,12 +384,14 @@ export const getProposalsByStatusPaginatedQuery = () => gql`
 export function useProposalsByStatusPaginated(
   statuses: string[] = ['ACTIVE'],
   page: number = 1,
-  pageSize: number = 10
+  pageSize: number = 10,
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
 ) {
   const skip = (page - 1) * pageSize
+  const subgraphUrl = getSubgraphUrl(network)
   
   return useQuery<ProposalsByStatusResponse>({
-    queryKey: ['proposalsByStatusPaginated', statuses, page, pageSize],
+    queryKey: ['proposalsByStatusPaginated', statuses, page, pageSize, network],
     queryFn: async () => {
       const variables = {
         statuses,
@@ -390,7 +403,7 @@ export function useProposalsByStatusPaginated(
       await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 200))
       
       const result = await request(
-        SUBGRAPH_URL, 
+        subgraphUrl, 
         getProposalsByStatusPaginatedQuery(),
         variables,
         headers
@@ -421,9 +434,11 @@ export interface ProposalsCountResponse {
 }
 
 // Hook to get total count of proposals by status
-export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE']) {
+export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE'], network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalsCountResponse>({
-    queryKey: ['proposalsCountByStatus', statuses],
+    queryKey: ['proposalsCountByStatus', statuses, network],
     queryFn: async () => {
       const variables = { statuses }
       
@@ -431,7 +446,7 @@ export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE']) {
       await new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 100))
       
       const result = await request(
-        SUBGRAPH_URL, 
+        subgraphUrl, 
         getProposalsCountByStatusQuery(),
         variables,
         headers
@@ -447,13 +462,15 @@ export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE']) {
 }
 
 // New hook for proposal details
-export function useProposalDetails(proposalId: string) {
+export function useProposalDetails(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+  const subgraphUrl = getSubgraphUrl(network)
+  
   return useQuery<ProposalDetailsResponse>({
-    queryKey: ['proposalDetails', proposalId],
+    queryKey: ['proposalDetails', proposalId, network],
     queryFn: async () => {
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 600 + 200))
-      const result = await request(SUBGRAPH_URL, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
+      const result = await request(subgraphUrl, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
       return result
     },
     enabled: !!proposalId, // Only run query if proposalId is provided

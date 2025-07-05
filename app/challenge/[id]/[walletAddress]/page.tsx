@@ -44,14 +44,15 @@ import { useWallet } from "@/app/hooks/useWallet"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
   ETHEREUM_CHAIN_ID, 
   ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS,
-  USDC_DECIMALS
+  USDC_DECIMALS,
+  getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 
@@ -68,16 +69,21 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, isConnected } = useWallet()
-  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress)
-  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress)
-  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId)
-  const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress)
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId)
+  const { address: connectedAddress, isConnected, walletType, network } = useWallet()
+  
+  // Filter network to supported types for subgraph (exclude 'solana')
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
+  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
+  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
+  const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
+  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
-    investorData?.investor?.isRegistered === true ? [] : userTokens
+    investorData?.investor?.isRegistered === true ? [] : userTokens,
+    subgraphNetwork
   )
 
   // Calculate real-time portfolio value - only if not closed
@@ -112,7 +118,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isClient, setIsClient] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isRegistering, setIsRegistering] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
+  
+  // Use React Query client for better data management
+  const queryClient = useQueryClient()
   const [currentPage, setCurrentPage] = useState(1)
   const [rankingCurrentPage, setRankingCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -223,9 +233,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg px-6 py-8 max-w-md mx-auto">
                 <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin text-blue-400" />
                 <h3 className="text-lg font-medium text-blue-400 mb-2">{t('loadingInvestorData')}</h3>
-                <p className="text-gray-300 text-sm mb-4">
-                  {t('justJoinedWaitingForData')}
-                </p>
                 <p className="text-gray-400 text-xs">
                   {t('dataUpdateInProgress')}
                 </p>
@@ -366,9 +373,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg px-8 py-12 max-w-lg mx-auto">
               <Loader2 className="h-12 w-12 mx-auto mb-6 animate-spin text-blue-400" />
               <h3 className="text-xl font-medium text-blue-400 mb-4">{t('loadingInvestorData')}</h3>
-              <p className="text-gray-300 text-base mb-6">
-                {t('justJoinedWaitingForData')}
-              </p>
               <p className="text-gray-400 text-sm">
                 {t('dataUpdateInProgress')}
               </p>
@@ -462,29 +466,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
   const investor = investorData.investor
 
-  // Helper function to safely format USD values
-  const formatUSDValue = (value: string | undefined, decimals: number = USDC_DECIMALS): number => {
-    if (!value || value === "0") return 0
-    
-    // If the value contains a decimal point, it's already formatted
-    if (value.includes('.')) {
-      return parseFloat(value)
-    }
-    
-    // If no decimal point, it's likely a raw integer amount that needs formatting
-    try {
-      return parseFloat(ethers.formatUnits(value, decimals))
-    } catch (error) {
-      // Fallback: treat as already formatted number
-      return parseFloat(value)
-    }
-  }
+
 
   // Calculate portfolio metrics using the actual data structure
-  // Format the raw currentUSD amount using USDC_DECIMALS
-  const currentValue = formatUSDValue(investor.currentUSD)
-  // Format the raw seedMoney amount using USDC_DECIMALS
-  const formattedSeedMoney = formatUSDValue(investor.seedMoneyUSD)
+  // USD values from subgraph are already in USD format, just parse as float
+  const currentValue = parseFloat(investor.currentUSD) || 0
+  const formattedSeedMoney = parseFloat(investor.seedMoneyUSD) || 0
   const gainLoss = currentValue - formattedSeedMoney
   const gainLossPercentage = formattedSeedMoney > 0 ? (gainLoss / formattedSeedMoney) * 100 : 0
   const isPositive = gainLoss >= 0
@@ -631,48 +618,73 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     setIsRegistering(true);
     
     try {
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      // Check if Ethereum provider is available
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
       // Verify the connected wallet matches the investor address
-      const connectedAddress = accounts[0].toLowerCase();
-      if (connectedAddress !== walletAddress.toLowerCase()) {
+      const connectedWalletAddress = accounts[0].toLowerCase();
+      if (connectedWalletAddress !== walletAddress.toLowerCase()) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
       // Get current network information
-      const chainId = await window.phantom.ethereum.request({
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
       
       // Get the signer
       const signer = await provider.getSigner();
       
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
@@ -707,6 +719,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           </ToastAction>
         ),
       });
+
+      // Start refreshing process
+      setIsRefreshing(true);
+
+      // Refresh data after 3 seconds using React Query
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork] });
+        setIsRefreshing(false);
+      }, 3000);
       
     } catch (error: any) {
       console.error("Error registering investor:", error);
@@ -724,10 +748,40 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   };
 
   return (
-    <div className="container mx-auto p-6 py-12">
-      <div className="max-w-6xl mx-auto space-y-4">
-        {/* Go to Challenge Button */}
-        <div className="mb-4">
+    <>
+      {/* Loading Overlay */}
+      {isRefreshing && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+          {/* Simple Rotating Spinner */}
+          <div className="w-16 h-16">
+            <svg 
+              className="w-16 h-16 animate-spin text-blue-500" 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24"
+            >
+              <circle 
+                className="opacity-25" 
+                cx="12" 
+                cy="12" 
+                r="10" 
+                stroke="currentColor" 
+                strokeWidth="4"
+              />
+              <path 
+                className="opacity-75" 
+                fill="currentColor" 
+                d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      <div className="container mx-auto p-6 py-12">
+        <div className="max-w-6xl mx-auto space-y-4">
+          {/* Go to Challenge Button */}
+          <div className="mb-4">
           <button 
             onClick={() => router.push(`/challenge/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
@@ -815,6 +869,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <InvestorCharts 
               challengeId={challengeId} 
               investor={walletAddress} 
+              network={subgraphNetwork}
               investorData={investorData}
               realTimePortfolio={realTimePortfolio}
             />
@@ -844,40 +899,56 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         // Get price from Uniswap data
                         const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
                         const isLoadingPrice = isLoadingUniswap
+                        const hasValidPrice = tokenPrice > 0
                         const tokenAmount = parseFloat(token.amount) || 0
-                        const tokenValue = tokenPrice * tokenAmount
+                        const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
                         
                         return (
                           <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0">
                             <div className="flex items-center gap-3">
-                              {(() => {
-                                const logoPath = getTokenLogo(token.symbol)
-                                
-                                if (logoPath) {
-                                  return (
-                                    <img
-                                      src={logoPath}
-                                      alt={token.symbol}
-                                      className="h-10 w-10 rounded-full object-cover"
-                                      onError={(e: any) => {
-                                        console.error('Failed to load token logo:', logoPath)
-                                        const target = e.target as HTMLImageElement
-                                        target.outerHTML = `
-                                          <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                            ${token.symbol.slice(0, 2)}
-                                          </div>
-                                        `
-                                      }}
+                              <div className="relative">
+                                {(() => {
+                                  const logoPath = getTokenLogo(token.symbol)
+                                  
+                                  if (logoPath) {
+                                    return (
+                                      <img
+                                        src={logoPath}
+                                        alt={token.symbol}
+                                        className="h-10 w-10 rounded-full object-cover"
+                                        onError={(e: any) => {
+                                          console.error('Failed to load token logo:', logoPath)
+                                          const target = e.target as HTMLImageElement
+                                          target.outerHTML = `
+                                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                              ${token.symbol.slice(0, 2)}
+                                            </div>
+                                          `
+                                        }}
+                                      />
+                                    )
+                                  } else {
+                                    return (
+                                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                        {token.symbol.slice(0, 2)}
+                                      </div>
+                                    )
+                                  }
+                                })()}
+                                {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                                {network === 'arbitrum' && (
+                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                    <Image 
+                                      src="/networks/arbitrum.png" 
+                                      alt="Arbitrum One"
+                                      width={14}
+                                      height={14}
+                                      className="rounded-full"
+                                      style={{ width: '14px', height: '14px' }}
                                     />
-                                  )
-                                } else {
-                                  return (
-                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                      {token.symbol.slice(0, 2)}
-                                    </div>
-                                  )
-                                }
-                              })()}
+                                  </div>
+                                )}
+                              </div>
                               <div>
                                 <p className="font-medium text-gray-100">{token.symbol}</p>
                                 <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
@@ -1013,36 +1084,66 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           return (
                                             <div className="flex items-center gap-3 justify-end">
                                               <div className="flex items-center gap-2">
-                                                {fromLogo ? (
-                                                  <Image 
-                                                    src={fromLogo} 
-                                                    alt={swapDetails.fromToken}
-                                                    width={20}
-                                                    height={20}
-                                                    className="rounded-full"
-                                                  />
-                                                ) : (
-                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                                    {swapDetails.fromToken.slice(0, 1)}
-                                                  </div>
-                                                )}
+                                                <div className="relative">
+                                                  {fromLogo ? (
+                                                    <Image 
+                                                      src={fromLogo} 
+                                                      alt={swapDetails.fromToken}
+                                                      width={20}
+                                                      height={20}
+                                                      className="rounded-full"
+                                                    />
+                                                  ) : (
+                                                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                                      {swapDetails.fromToken.slice(0, 1)}
+                                                    </div>
+                                                  )}
+                                                  {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                                                  {network === 'arbitrum' && (
+                                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                      <Image 
+                                                        src="/networks/arbitrum.png" 
+                                                        alt="Arbitrum One"
+                                                        width={10}
+                                                        height={10}
+                                                        className="rounded-full"
+                                                        style={{ width: '10px', height: '10px' }}
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
                                                 <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
                                               </div>
                                               <ArrowRight className="h-4 w-4 text-gray-400" />
                                               <div className="flex items-center gap-2">
-                                                {toLogo ? (
-                                                  <Image 
-                                                    src={toLogo} 
-                                                    alt={swapDetails.toToken}
-                                                    width={20}
-                                                    height={20}
-                                                    className="rounded-full"
-                                                  />
-                                                ) : (
-                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                                    {swapDetails.toToken.slice(0, 1)}
-                                                  </div>
-                                                )}
+                                                <div className="relative">
+                                                  {toLogo ? (
+                                                    <Image 
+                                                      src={toLogo} 
+                                                      alt={swapDetails.toToken}
+                                                      width={20}
+                                                      height={20}
+                                                      className="rounded-full"
+                                                    />
+                                                  ) : (
+                                                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                                      {swapDetails.toToken.slice(0, 1)}
+                                                    </div>
+                                                  )}
+                                                  {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                                                  {network === 'arbitrum' && (
+                                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                      <Image 
+                                                        src="/networks/arbitrum.png" 
+                                                        alt="Arbitrum One"
+                                                        width={10}
+                                                        height={10}
+                                                        className="rounded-full"
+                                                        style={{ width: '10px', height: '10px' }}
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
                                                 <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{swapDetails.toToken}</span>
                                               </div>
                                             </div>
@@ -1383,11 +1484,44 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <span className="text-base text-gray-400">{t('status')}</span>
                     <div className="flex items-center gap-2">
                       {(() => {
+                        // Always show network icon regardless of status
+                        const networkIcon = network === 'ethereum' ? (
+                          <Image 
+                            src="/networks/ethereum.png" 
+                            alt="Ethereum Mainnet"
+                            width={16}
+                            height={16}
+                            className="rounded-full"
+                            style={{ width: '16px', height: '16px' }}
+                          />
+                        ) : network === 'arbitrum' ? (
+                          <Image 
+                            src="/networks/arbitrum.png" 
+                            alt="Arbitrum One"
+                            width={16}
+                            height={16}
+                            className="rounded-full"
+                            style={{ width: '16px', height: '16px' }}
+                          />
+                        ) : (
+                          // Default to Ethereum icon if network is not recognized
+                          <Image 
+                            src="/networks/ethereum.png" 
+                            alt="Ethereum Mainnet"
+                            width={16}
+                            height={16}
+                            className="rounded-full"
+                            style={{ width: '16px', height: '16px' }}
+                          />
+                        );
+
                         // If investor is closed, show as Finished
                         if (investorData?.investor?.isRegistered === true) {
                           return (
                             <>
-                              <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                              <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                                {networkIcon}
+                              </div>
                               <span className="text-xl font-medium text-red-400">{t('finished')}</span>
                             </>
                           )
@@ -1396,7 +1530,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         const isActive = challengeData?.challenge?.isActive
                         return (
                           <>
-                            <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+                            <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                              {networkIcon}
+                            </div>
                             <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-gray-400'}`}>
                               {isActive ? t('active') : 'Inactive'}
                             </span>
@@ -1577,5 +1713,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       </div>
     </div>
+    </>
   )
 } 

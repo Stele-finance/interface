@@ -9,11 +9,12 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  STELE_CONTRACT_ADDRESS
+  getChainId,
+  getChainConfig, 
+  getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
+import { useWallet } from "@/app/hooks/useWallet"
 
 interface ChallengeCardProps {
   id?: string
@@ -37,6 +38,9 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
   
   const [startDate, setStartDate] = useState<string>("Not started yet");
   const [isCreating, setIsCreating] = useState(false);
+  
+  // Use wallet hook to get current wallet info
+  const { walletType, network } = useWallet();
   
   useEffect(() => {
     // Handle display for challenges that haven't started yet
@@ -78,43 +82,69 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
     setIsCreating(true);
     
     try {
-      // Check if Phantom wallet is installed
-      if (typeof window.phantom === 'undefined') {
-        throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-      }
+      let walletProvider;
+      
+      // Get the appropriate wallet provider based on connected wallet type
+      if (walletType === 'metamask') {
+        if (typeof (window as any).ethereum === 'undefined') {
+          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+        }
+        
+        // For MetaMask, find the correct provider
+        if ((window as any).ethereum.providers) {
+          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
+        } else if ((window as any).ethereum.isMetaMask) {
+          walletProvider = (window as any).ethereum;
+        }
+        
+        if (!walletProvider) {
+          throw new Error("MetaMask provider not found");
+        }
+      } else if (walletType === 'phantom') {
+        if (typeof window.phantom === 'undefined') {
+          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
+        }
 
-      // Check if Ethereum provider is available
-      if (!window.phantom?.ethereum) {
-        throw new Error("Ethereum provider not found in Phantom wallet");
+        if (!window.phantom?.ethereum) {
+          throw new Error("Ethereum provider not found in Phantom wallet");
+        }
+        
+        walletProvider = window.phantom.ethereum;
+      } else {
+        throw new Error("No wallet connected. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await window.phantom.ethereum.request({
+      const accounts = await walletProvider.request({
         method: 'eth_requestAccounts'
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect to Phantom wallet first.");
+        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
-      // Check if we are on Base network
-      const chainId = await window.phantom.ethereum.request({
+      // Check if we are on correct network
+      const chainId = await walletProvider.request({
         method: 'eth_chainId'
       });
 
-      if (chainId !== ETHEREUM_CHAIN_ID) { // Ethereum Mainnet Chain ID
-        // Switch to Ethereum network
+      // Filter network to supported types for contracts (exclude 'solana')
+      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      const targetChainId = getChainId(contractNetwork);
+      
+      if (chainId !== targetChainId) {
+        // Switch to target network
         try {
-          await window.phantom.ethereum.request({
+          await walletProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: ETHEREUM_CHAIN_ID }], // Ethereum Mainnet
+            params: [{ chainId: targetChainId }],
           });
         } catch (switchError: any) {
           // This error code indicates that the chain has not been added to the wallet
           if (switchError.code === 4902) {
-            await window.phantom.ethereum.request({
+            await walletProvider.request({
               method: 'wallet_addEthereumChain',
-              params: [ETHEREUM_CHAIN_CONFIG],
+              params: [getChainConfig(contractNetwork)],
             });
           } else {
             throw switchError;
@@ -122,15 +152,15 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
         }
       }
 
-      // Create a Web3Provider using the Phantom ethereum provider
-      const provider = new ethers.BrowserProvider(window.phantom.ethereum);
+      // Create a Web3Provider using the current wallet provider
+      const provider = new ethers.BrowserProvider(walletProvider);
       
       // Get the signer
       const signer = await provider.getSigner();
       
       // Create contract instance
       const steleContract = new ethers.Contract(
-        STELE_CONTRACT_ADDRESS,
+        getSteleContractAddress(contractNetwork),
         SteleABI.abi,
         signer
       );
