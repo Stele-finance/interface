@@ -42,6 +42,40 @@ const QUOTER_ABI = [
   }
 ]
 
+// Multicall3 ABI (standardized across all chains)
+const MULTICALL3_ABI = [
+  {
+    "inputs": [
+      {"internalType": "bool", "name": "requireSuccess", "type": "bool"},
+      {
+        "components": [
+          {"internalType": "address", "name": "target", "type": "address"},
+          {"internalType": "bytes", "name": "callData", "type": "bytes"}
+        ],
+        "internalType": "struct Multicall3.Call[]",
+        "name": "calls",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "tryAggregate",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "bool", "name": "success", "type": "bool"},
+          {"internalType": "bytes", "name": "returnData", "type": "bytes"}
+        ],
+        "internalType": "struct Multicall3.Result[]",
+        "name": "returnData",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]
+
+
+
 // ERC20 ABI for checking token existence
 const ERC20_ABI = [
   {
@@ -99,45 +133,51 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     return new ethers.JsonRpcProvider(getRPCUrl(network))
   }, [network])
 
-  const getTokenPrice = useCallback(async (token: TokenInfo, provider: ethers.JsonRpcProvider): Promise<TokenPrice | null> => {
+    const fetchBatchPricesWithMulticall = useCallback(async (tokens: TokenInfo[], provider: ethers.JsonRpcProvider): Promise<Record<string, TokenPrice>> => {
+    const usdcAddress = getUSDCTokenAddress(network)
+    const wethAddress = getWETHAddress(network)
+    const quoterAddress = getUniswapQuoterAddress(network)
+    const multicallAddress = getMulticallAddress(network)
+    
+    const processedTokens: Record<string, TokenPrice> = {}
+    
+    // Always add USDC first
+    processedTokens.USDC = {
+      symbol: 'USDC',
+      address: usdcAddress,
+      priceUSD: 1.0,
+      decimals: 6,
+      lastUpdated: new Date()
+    }
+
+    // Filter out USDC from processing
+    const tokensToProcess = tokens.filter((token: TokenInfo) => 
+      token.address.toLowerCase() !== usdcAddress.toLowerCase()
+    ) as TokenInfo[]
+
+    if (tokensToProcess.length === 0) {
+      return processedTokens
+    }
+
     try {
-      const usdcAddress = getUSDCTokenAddress(network)
-      
-      // Skip USDC - always $1
-      if (token.address.toLowerCase() === usdcAddress.toLowerCase()) {
-        return {
-          symbol: 'USDC',
-          address: usdcAddress,
-          priceUSD: 1.0,
-          decimals: 6,
-          lastUpdated: new Date()
-        }
-      }
+      // Create QuoterV2 interface for encoding calls
+      const quoterInterface = new ethers.Interface(QUOTER_ABI)
+      const calls: Array<{target: string, callData: string}> = []
+      const callMapping: Array<{
+        tokenIndex: number,
+        feeType: 'usdc' | 'weth',
+        fee: number
+      }> = []
 
-      // Validate token first
-      const tokenContract = new ethers.Contract(token.address, ERC20_ABI, provider)
-      
-      try {
-        await tokenContract.decimals()
-        await tokenContract.symbol()
-      } catch (tokenError) {
-        console.warn(`Token ${token.symbol} (${token.address}) appears to be invalid on ${network}`)
-        return null
-      }
-
-      // Create quoter contract
-      const quoterContract = new ethers.Contract(
-        getUniswapQuoterAddress(network),
-        QUOTER_ABI,
-        provider
-      )
-
-      // Try different fee tiers
+      // Generate all calls for all tokens and fee tiers
       const feeTiers = [3000, 500, 10000] // 0.3%, 0.05%, 1%
-      const amountIn = ethers.parseUnits("1", token.decimals)
-
-      for (const fee of feeTiers) {
-        try {
+      
+      for (let tokenIndex = 0; tokenIndex < tokensToProcess.length; tokenIndex++) {
+        const token = tokensToProcess[tokenIndex]
+        const amountIn = ethers.parseUnits("1", token.decimals)
+        
+        // Try USDC pairs first
+        for (const fee of feeTiers) {
           const params = {
             tokenIn: ethers.getAddress(token.address),
             tokenOut: ethers.getAddress(usdcAddress),
@@ -145,31 +185,22 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
             fee: fee,
             sqrtPriceLimitX96: 0
           }
-
-          const result = await quoterContract.quoteExactInputSingle.staticCall(params)
-          const amountOut = result[0]
-          const priceUSD = parseFloat(ethers.formatUnits(amountOut, 6))
-
-          if (priceUSD > 0) {
-            console.log(`Got price for ${token.symbol} with ${fee/100}% fee: $${priceUSD}`)
-            return {
-              symbol: token.symbol,
-              address: token.address,
-              priceUSD: priceUSD,
-              decimals: token.decimals,
-              lastUpdated: new Date()
-            }
-          }
-        } catch (feeError) {
-          console.warn(`Fee tier ${fee} failed for ${token.symbol}:`, feeError)
-          continue
+          
+          const callData = quoterInterface.encodeFunctionData("quoteExactInputSingle", [params])
+          calls.push({
+            target: quoterAddress,
+            callData: callData
+          })
+          
+          callMapping.push({
+            tokenIndex,
+            feeType: 'usdc',
+            fee
+          })
         }
-      }
 
-      // If USDC quote failed, try WETH
-      const wethAddress = getWETHAddress(network)
-      for (const fee of feeTiers) {
-        try {
+        // Try WETH pairs as fallback
+        for (const fee of feeTiers) {
           const params = {
             tokenIn: ethers.getAddress(token.address),
             tokenOut: ethers.getAddress(wethAddress),
@@ -177,37 +208,106 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
             fee: fee,
             sqrtPriceLimitX96: 0
           }
-
-          const result = await quoterContract.quoteExactInputSingle.staticCall(params)
-          const amountOut = result[0]
-          const ethAmount = parseFloat(ethers.formatUnits(amountOut, 18))
-
-          if (ethAmount > 0) {
-            // Get ETH price in USD (approximate)
-            const ethPriceUSD = network === 'arbitrum' ? 2400 : 2400 // Rough estimate
-            const priceUSD = ethAmount * ethPriceUSD
-
-            console.log(`Got price for ${token.symbol} via WETH with ${fee/100}% fee: $${priceUSD}`)
-            return {
-              symbol: token.symbol,
-              address: token.address,
-              priceUSD: priceUSD,
-              decimals: token.decimals,
-              lastUpdated: new Date()
-            }
-          }
-        } catch (feeError) {
-          console.warn(`WETH fee tier ${fee} failed for ${token.symbol}:`, feeError)
-          continue
+          
+          const callData = quoterInterface.encodeFunctionData("quoteExactInputSingle", [params])
+          calls.push({
+            target: quoterAddress,
+            callData: callData
+          })
+          
+          callMapping.push({
+            tokenIndex,
+            feeType: 'weth',
+            fee
+          })
         }
       }
 
-      console.warn(`No price found for ${token.symbol} on ${network}`)
-      return null
+      // Execute multicall with Multicall3 (standardized across all networks)
+      // Limit batch size to prevent gas issues
+      const MAX_BATCH_SIZE = 50
+      const allResults: Array<{success: boolean, returnData: string}> = []
+      
+      for (let i = 0; i < calls.length; i += MAX_BATCH_SIZE) {
+        const batchCalls = calls.slice(i, i + MAX_BATCH_SIZE)
+        
+        try {
+          const multicallContract = new ethers.Contract(multicallAddress, MULTICALL3_ABI, provider)
+          const response = await multicallContract.tryAggregate.staticCall(false, batchCalls)
+          
+          const batchResults = response.map((result: any) => ({
+            success: result.success,
+            returnData: result.returnData
+          }))
+          
+          allResults.push(...batchResults)
+        } catch (batchError) {
+          console.error(`Batch ${Math.floor(i / MAX_BATCH_SIZE) + 1} failed:`, batchError)
+          // Add failed results for this batch
+          const failedResults = batchCalls.map(() => ({
+            success: false,
+            returnData: '0x'
+          }))
+          allResults.push(...failedResults)
+        }
+      }
+      
+      const results = allResults
+
+      // Process results and find best price for each token
+      for (let tokenIndex = 0; tokenIndex < tokensToProcess.length; tokenIndex++) {
+        const token = tokensToProcess[tokenIndex]
+        let bestPrice: TokenPrice | null = null
+        
+        // Check all results for this token
+        for (let callIndex = 0; callIndex < callMapping.length; callIndex++) {
+          const mapping = callMapping[callIndex]
+          if (mapping.tokenIndex !== tokenIndex) continue
+          
+          const result = results[callIndex]
+          if (!result.success || !result.returnData || result.returnData === '0x') continue
+          
+          try {
+            const decoded = quoterInterface.decodeFunctionResult("quoteExactInputSingle", result.returnData)
+            const amountOut = decoded[0]
+            
+            let priceUSD = 0
+            
+            if (mapping.feeType === 'usdc') {
+              priceUSD = parseFloat(ethers.formatUnits(amountOut, 6))
+            } else if (mapping.feeType === 'weth') {
+              const ethAmount = parseFloat(ethers.formatUnits(amountOut, 18))
+              const ethPriceUSD = 2400 // Rough estimate
+              priceUSD = ethAmount * ethPriceUSD
+            }
+            
+            if (priceUSD > 0 && (!bestPrice || priceUSD > bestPrice.priceUSD)) {
+              bestPrice = {
+                symbol: token.symbol,
+                address: token.address,
+                priceUSD: priceUSD,
+                decimals: token.decimals,
+                lastUpdated: new Date()
+              }
+            }
+          } catch (decodeError) {
+            // Ignore decode errors for individual calls
+          }
+        }
+        
+        if (bestPrice) {
+          processedTokens[bestPrice.symbol] = bestPrice
+        } else {
+          console.warn(`No price found for ${token.symbol} on ${network}`)
+        }
+      }
+
+      return processedTokens
 
     } catch (error) {
-      console.error(`Error getting price for ${token.symbol}:`, error)
-      return null
+      console.error('Multicall failed:', error)
+      // Fallback to empty result
+      return processedTokens
     }
   }, [network])
 
@@ -216,7 +316,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       setPriceData({
         tokens: {},
         timestamp: Date.now(),
-        source: 'Uniswap V3 Individual Calls (No tokens provided)',
+        source: 'Uniswap V3 Multicall (No tokens provided)',
       })
       setIsLoading(false)
       return
@@ -238,46 +338,14 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       }
       setError(null)
       lastFetchTimeRef.current = now
-      
-      console.log(`Fetching prices for ${tokens.length} tokens on ${network}`)
-      
+            
       const provider = await getProvider()
-      const processedTokens: Record<string, TokenPrice> = {}
-
-      // Process tokens individually with concurrency limit
-      const CONCURRENT_LIMIT = 3
-      const batches = []
-      for (let i = 0; i < tokens.length; i += CONCURRENT_LIMIT) {
-        batches.push(tokens.slice(i, i + CONCURRENT_LIMIT))
-      }
-
-      for (const batch of batches) {
-        const promises = batch.map(token => getTokenPrice(token, provider))
-        const results = await Promise.allSettled(promises)
-        
-        results.forEach((result, index) => {
-          if (result.status === 'fulfilled' && result.value) {
-            processedTokens[result.value.symbol] = result.value
-          }
-        })
-      }
-
-      // Always add USDC
-      const usdcAddress = getUSDCTokenAddress(network)
-      processedTokens.USDC = {
-        symbol: 'USDC',
-        address: usdcAddress,
-        priceUSD: 1.0,
-        decimals: 6,
-        lastUpdated: new Date()
-      }
-
-      console.log(`Successfully fetched ${Object.keys(processedTokens).length} prices`)
+      const processedTokens = await fetchBatchPricesWithMulticall(tokens, provider)
 
       setPriceData({
         tokens: processedTokens,
         timestamp: Date.now(),
-        source: 'Uniswap V3 Individual Calls',
+        source: 'Uniswap V3 Multicall',
       })
 
     } catch (fetchError) {
@@ -298,13 +366,13 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
           }
         },
         timestamp: Date.now(),
-        source: 'Fallback (Individual Call Error)',
+        source: 'Fallback (Multicall Error)',
         error: `Price fetch error on ${network}: ${fetchError instanceof Error ? fetchError.message : 'Unknown error'}`
       })
     } finally {
       setIsLoading(false)
     }
-  }, [tokens, getProvider, getTokenPrice])
+  }, [tokens, getProvider, fetchBatchPricesWithMulticall])
 
   // Create stable token key to prevent unnecessary re-renders
   const tokenKey = useMemo(() => {
