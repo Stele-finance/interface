@@ -65,7 +65,7 @@ export function InvestorPortfolio({ challengeId, walletAddress, network }: Inves
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, network)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data
-  const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(userTokens)
+  const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(userTokens, network)
 
   // Format address for display
   const formatAddress = (address: string) => {

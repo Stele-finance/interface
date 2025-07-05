@@ -117,7 +117,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     shouldFetchPrices ? fromToken : null,
     shouldFetchPrices ? toToken : null,
     getTokenAddress,
-    getTokenDecimals
+    getTokenDecimals,
+    subgraphNetwork
   );
 
   // Helper function to format token amounts for display
