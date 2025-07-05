@@ -132,7 +132,6 @@ export const jp = {
   join: "参加",
   joinChallenge: "チャレンジに参加",
   joining: "参加中...",
-  justJoinedWaitingForData: "チャレンジに参加しました。データの更新をお待ちください。",
   language: "言語",
   lastUpdated: "最終更新",
   links: "リンク",

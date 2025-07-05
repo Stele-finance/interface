@@ -132,7 +132,6 @@ export const hu = {
   join: "Csatlakozás",
   joinChallenge: "Csatlakozás a kihíváshoz",
   joining: "Csatlakozás...",
-  justJoinedWaitingForData: "Most csatlakoztál a kihíváshoz. Kérlek várj, amíg az adataid frissülnek.",
   language: "Nyelv",
   lastUpdated: "Utoljára frissítve",
   links: "Linkek",

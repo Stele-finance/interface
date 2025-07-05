@@ -132,7 +132,6 @@ export const zhCn = {
   join: "加入",
   joinChallenge: "加入挑战",
   joining: "正在加入...",
-  justJoinedWaitingForData: "您刚刚加入了挑战。请等待数据更新。",
   language: "语言",
   lastUpdated: "最后更新",
   links: "链接",

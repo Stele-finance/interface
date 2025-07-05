@@ -132,7 +132,6 @@ export const da = {
   join: "Tilslut",
   joinChallenge: "Tilslut Udfordring",
   joining: "Tilslutter...",
-  justJoinedWaitingForData: "Du har lige tilmeldt dig udfordringen. Vent venligst mens dine data opdateres.",
   language: "Sprog",
   lastUpdated: "Sidst Opdateret",
   links: "Links",

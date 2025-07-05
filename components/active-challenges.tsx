@@ -21,6 +21,7 @@ import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
 import { ExternalLink, Users, Clock, Trophy, Loader2 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
@@ -561,7 +562,22 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                   >
                     <TableCell className="font-medium text-gray-100 pl-12 py-6 text-lg">
                       <div className="flex items-center gap-3">
-                        <Trophy className="h-5 w-5 text-yellow-500" />
+                        <div className="relative">
+                          <Trophy className="h-5 w-5 text-yellow-500" />
+                          {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                          {network === 'arbitrum' && (
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                              <Image 
+                                src="/networks/arbitrum.png" 
+                                alt="Arbitrum"
+                                width={12}
+                                height={12}
+                                className="rounded-full"
+                                style={{ width: '12px', height: '12px' }}
+                              />
+                            </div>
+                          )}
+                        </div>
                         {challenge.title}
                       </div>
                     </TableCell>

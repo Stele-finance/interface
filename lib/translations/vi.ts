@@ -132,7 +132,6 @@ export const vi = {
   join: "Tham gia",
   joinChallenge: "Tham gia thử thách",
   joining: "Đang tham gia...",
-  justJoinedWaitingForData: "Bạn vừa tham gia thử thách. Vui lòng đợi trong khi dữ liệu của bạn đang được cập nhật.",
   language: "Ngôn ngữ",
   lastUpdated: "Cập nhật lần cuối",
   links: "Liên kết",

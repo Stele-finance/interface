@@ -132,7 +132,6 @@ export const he = {
   join: "הצטרף",
   joinChallenge: "הצטרף לאתגר",
   joining: "מצטרף...",
-  justJoinedWaitingForData: "זה עתה הצטרפת לאתגר. אנא המתן בעוד הנתונים שלך מתעדכנים.",
   language: "שפה",
   lastUpdated: "עודכן לאחרונה",
   links: "קישורים",

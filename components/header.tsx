@@ -365,7 +365,17 @@ export function Header() {
                 <DropdownMenuLabel>{t('switchNetwork')}</DropdownMenuLabel>
                 {walletNetwork !== 'ethereum' && (
                   <DropdownMenuItem onClick={() => switchWalletNetwork('ethereum')}>
-                    {t('ethereumMainnet')}
+                    <div className="flex items-center gap-2">
+                      <Image 
+                        src="/networks/ethereum.png" 
+                        alt="Ethereum Mainnet"
+                        width={16}
+                        height={16}
+                        className="rounded-full"
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>{t('ethereumMainnet')}</span>
+                    </div>
                   </DropdownMenuItem>
                 )}
                 {walletNetwork !== 'arbitrum' && (
@@ -379,7 +389,17 @@ export function Header() {
                             className={walletType === 'phantom' ? 'opacity-50 cursor-not-allowed' : ''}
                           >
                             <div className="flex items-center justify-between w-full">
-                              <span>Arbitrum</span>
+                              <div className="flex items-center gap-2">
+                                <Image 
+                                  src="/networks/arbitrum.png" 
+                                  alt="Arbitrum One"
+                                  width={16}
+                                  height={16}
+                                  className="rounded-full"
+                                  style={{ width: '16px', height: '16px' }}
+                                />
+                                <span>Arbitrum</span>
+                              </div>
                               {walletType === 'phantom' && (
                                 <span className="text-xs text-muted-foreground ml-2">
                                   🚫

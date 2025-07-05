@@ -132,7 +132,6 @@ export const kr = {
   join: "참가",
   joinChallenge: "챌린지 참가",
   joining: "참가 중...",
-  justJoinedWaitingForData: "방금 챌린지에 참가하셨습니다. 데이터가 업데이트될 때까지 잠시 기다려주세요.",
   language: "언어",
   lastUpdated: "마지막 업데이트",
   links: "링크",

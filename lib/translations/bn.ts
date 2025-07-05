@@ -132,7 +132,6 @@ export const bn = {
   join: "যোগদান",
   joinChallenge: "চ্যালেঞ্জে যোগদান করুন",
   joining: "যোগদান করা হচ্ছে...",
-  justJoinedWaitingForData: "আপনি এইমাত্র চ্যালেঞ্জে যোগদান করেছেন। আপনার ডেটা আপডেট হওয়ার সময় অনুগ্রহ করে অপেক্ষা করুন।",
   language: "ভাষা",
   lastUpdated: "সর্বশেষ আপডেট",
   links: "লিংক",

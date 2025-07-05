@@ -132,7 +132,6 @@ export const ar = {
   join: "انضمام",
   joinChallenge: "انضم للتحدي",
   joining: "جاري الانضمام...",
-  justJoinedWaitingForData: "لقد انضممت للتو إلى التحدي. يرجى الانتظار بينما يتم تحديث بياناتك.",
   language: "اللغة",
   lastUpdated: "آخر تحديث",
   links: "الروابط",

@@ -132,7 +132,6 @@ export const hi = {
   join: "शामिल हों",
   joinChallenge: "चुनौती में शामिल हों",
   joining: "शामिल हो रहे हैं...",
-  justJoinedWaitingForData: "आप अभी-अभी चुनौती में शामिल हुए हैं। कृपया प्रतीक्षा करें जब तक आपका डेटा अपडेट हो रहा है।",
   language: "भाषा",
   lastUpdated: "अंतिम अपडेट",
   links: "लिंक्स",

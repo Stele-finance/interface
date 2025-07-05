@@ -132,7 +132,6 @@ export const id = {
   join: "Bergabung",
   joinChallenge: "Ikuti Tantangan",
   joining: "Bergabung...",
-  justJoinedWaitingForData: "Anda baru saja bergabung dengan tantangan. Harap tunggu sementara data Anda sedang diperbarui.",
   language: "Bahasa",
   lastUpdated: "Terakhir Diperbarui",
   links: "Tautan",

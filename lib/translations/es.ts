@@ -132,7 +132,6 @@ export const es = {
   join: "Unirse",
   joinChallenge: "Unirse al Desafío",
   joining: "Uniéndose...",
-  justJoinedWaitingForData: "Acaba de unirse al desafío. Espere mientras se actualizan sus datos.",
   language: "Idioma",
   lastUpdated: "Última Actualización",
   links: "Enlaces",

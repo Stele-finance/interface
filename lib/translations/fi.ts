@@ -132,7 +132,6 @@ export const fi = {
   join: "Liity",
   joinChallenge: "Liity Haasteeseen",
   joining: "Liitytään...",
-  justJoinedWaitingForData: "Olet juuri liittynyt haasteeseen. Odota hetki kun tietojasi päivitetään.",
   language: "Kieli",
   lastUpdated: "Viimeksi Päivitetty",
   links: "Linkit",

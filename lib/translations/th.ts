@@ -132,7 +132,6 @@ export const th = {
   join: "เข้าร่วม",
   joinChallenge: "เข้าร่วมชาเลนจ์",
   joining: "กำลังเข้าร่วม...",
-  justJoinedWaitingForData: "คุณเพิ่งเข้าร่วมชาเลนจ์ กรุณารอสักครู่ขณะที่ข้อมูลของคุณกำลังอัปเดต",
   language: "ภาษา",
   lastUpdated: "อัปเดตล่าสุด",
   links: "ลิงก์",

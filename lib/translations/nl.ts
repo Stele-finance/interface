@@ -132,7 +132,6 @@ export const nl = {
   join: "Deelnemen",
   joinChallenge: "Doe Mee Met Uitdaging",
   joining: "Deelnemen...",
-  justJoinedWaitingForData: "Je bent zojuist toegetreden tot de uitdaging. Even wachten terwijl je gegevens worden bijgewerkt.",
   language: "Taal",
   lastUpdated: "Laatst Bijgewerkt",
   links: "Links",

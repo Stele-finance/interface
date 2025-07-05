@@ -132,7 +132,6 @@ export const zhTw = {
   join: "加入",
   joinChallenge: "加入挑戰",
   joining: "加入中...",
-  justJoinedWaitingForData: "您剛剛加入了挑戰。請稍等，您的數據正在更新中。",
   language: "語言",
   lastUpdated: "最後更新",
   links: "連結",

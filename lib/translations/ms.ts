@@ -132,7 +132,6 @@ export const ms = {
   join: "Sertai",
   joinChallenge: "Sertai Cabaran",
   joining: "Menyertai...",
-  justJoinedWaitingForData: "Anda baru sahaja menyertai cabaran. Sila tunggu sementara data anda sedang dikemas kini.",
   language: "Bahasa",
   lastUpdated: "Terakhir Dikemas Kini",
   links: "Pautan",
