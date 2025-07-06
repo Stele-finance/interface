@@ -60,9 +60,7 @@ const setupWalletEventListeners = (walletType: 'metamask' | 'phantom') => {
     
     if (provider) {
       // Listen for account changes
-      const handleAccountsChanged = async (accounts: string[]) => {
-        console.log('Accounts changed:', accounts)
-        
+      const handleAccountsChanged = async (accounts: string[]) => {        
         if (accounts.length === 0) {
           // User disconnected their wallet
           localStorage.removeItem('walletAddress')
@@ -117,8 +115,6 @@ const setupWalletEventListeners = (walletType: 'metamask' | 'phantom') => {
 
       // Listen for chain changes
       const handleChainChanged = (chainId: string) => {
-        console.log('Chain changed:', chainId)
-        
         if (globalWalletState.isConnected) {
           let network: 'arbitrum' | 'ethereum' = 'ethereum'
           if (chainId === '0x1') {
@@ -206,7 +202,6 @@ export function useWallet() {
 
           // Only update if there's a genuine network change
           if (detectedNetwork !== globalWalletState.network) {
-            console.log(`Network change detected on ${globalWalletState.walletType}: stored=${globalWalletState.network}, actual=${detectedNetwork}`)
             localStorage.setItem('walletNetwork', detectedNetwork)
             updateGlobalState({
               network: detectedNetwork
@@ -247,7 +242,6 @@ export function useWallet() {
 
           if (currentAccounts.length === 0) {
             // User disconnected their wallet
-            console.log(`${globalWalletState.walletType} wallet disconnected`)
             localStorage.removeItem('walletAddress')
             localStorage.removeItem('walletNetwork')
             localStorage.removeItem('walletType')
@@ -262,7 +256,6 @@ export function useWallet() {
             
             // Check if address has changed
             if (currentAddress !== globalWalletState.address) {
-              console.log(`${globalWalletState.walletType} account changed: ${globalWalletState.address} → ${currentAddress}`)
               localStorage.setItem('walletAddress', currentAddress)
               updateGlobalState({
                 address: currentAddress
@@ -301,9 +294,7 @@ export function useWallet() {
          
          if (!provider || !currentWalletType) return
 
-         const handleChainChanged = (chainId: string) => {
-           console.log(`Chain changed detected by ${currentWalletType}:`, chainId)
-           
+         const handleChainChanged = (chainId: string) => {           
            // Only process if this is still the active wallet
            if (globalWalletState.isConnected && globalWalletState.walletType === currentWalletType) {
              let network: 'arbitrum' | 'ethereum' = 'ethereum'
@@ -320,9 +311,7 @@ export function useWallet() {
            }
          }
 
-         const handleAccountsChanged = (accounts: string[]) => {
-           console.log(`Accounts changed detected by ${currentWalletType}:`, accounts)
-           
+         const handleAccountsChanged = (accounts: string[]) => {           
            // Only process if this is still the active wallet
            if (globalWalletState.walletType === currentWalletType) {
              if (accounts.length === 0) {
