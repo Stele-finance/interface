@@ -39,7 +39,7 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
   // Format profit ratio as percentage
   const formatProfitRatio = (profitRatio: string) => {
     const ratio = parseFloat(profitRatio)
-    return `${ratio.toFixed(2)}%`
+    return `${ratio.toFixed(3)}%`
   }
 
 
@@ -101,7 +101,7 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+                  <TableRow className="bg-gray-900/80 hover:bg-gray-800/50">
                     <TableHead className="text-gray-300 text-base px-6">{t('rank')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6 pl-12">{t('user')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6">{t('challenge')}</TableHead>
@@ -114,7 +114,7 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
                     const isPositive = profitRatio >= 0
                     
                     return (
-                      <TableRow key={ranking.id} className="border-b border-gray-700 hover:bg-gray-800/30">
+                      <TableRow key={ranking.id} className="hover:bg-gray-800/30">
                         <TableCell className="font-medium text-gray-100 text-base px-6">
                           <div className="flex items-center gap-2">
                             <span>#{index + 1}</span>

@@ -128,19 +128,19 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
                     <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
                       <div className="flex items-center gap-3">
                         <div className="relative">
-                          {getTokenLogo(token.symbol) ? (
-                            <Image
-                              src={getTokenLogo(token.symbol)!}
-                              alt={token.symbol}
-                              width={24}
-                              height={24}
-                              className="rounded-full"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                              {token.symbol.slice(0, 2)}
-                            </div>
-                          )}
+                        {getTokenLogo(token.symbol) ? (
+                          <Image
+                            src={getTokenLogo(token.symbol)!}
+                            alt={token.symbol}
+                            width={24}
+                            height={24}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                            {token.symbol.slice(0, 2)}
+                          </div>
+                        )}
                           {/* Show Arbitrum network icon only when connected to Arbitrum */}
                           {network === 'arbitrum' && (
                             <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">

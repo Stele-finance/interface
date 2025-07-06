@@ -563,7 +563,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                     <TableCell className="font-medium text-gray-100 pl-12 py-6 text-lg">
                       <div className="flex items-center gap-3">
                         <div className="relative">
-                          <Trophy className="h-5 w-5 text-yellow-500" />
+                        <Trophy className="h-5 w-5 text-yellow-500" />
                           {/* Show Arbitrum network icon only when connected to Arbitrum */}
                           {network === 'arbitrum' && (
                             <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
