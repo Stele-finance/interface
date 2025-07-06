@@ -220,6 +220,63 @@ export function useWallet() {
     }
   }, [getActiveProvider])
 
+  // Function to check and update current account state (especially for Phantom)
+  const checkAndUpdateAccountState = useCallback(async () => {
+    if (!globalWalletState.isConnected || !globalWalletState.walletType) return
+
+    try {
+      const provider = getActiveProvider()
+
+      if (provider) {
+        // For Ethereum-compatible networks only
+        if (globalWalletState.network !== 'solana') {
+          let currentAccounts: string[] = []
+          
+          try {
+            currentAccounts = await provider.request({ method: 'eth_accounts' })
+          } catch (error) {
+            console.warn('Failed to get accounts:', error)
+            
+            // For Phantom, also try to get selectedAddress directly
+            if (globalWalletState.walletType === 'phantom' && provider.selectedAddress) {
+              currentAccounts = [provider.selectedAddress]
+            } else {
+              return
+            }
+          }
+
+          if (currentAccounts.length === 0) {
+            // User disconnected their wallet
+            console.log(`${globalWalletState.walletType} wallet disconnected`)
+            localStorage.removeItem('walletAddress')
+            localStorage.removeItem('walletNetwork')
+            localStorage.removeItem('walletType')
+            updateGlobalState({
+              address: null,
+              isConnected: false,
+              network: null,
+              walletType: null
+            })
+          } else {
+            const currentAddress = currentAccounts[0]
+            
+            // Check if address has changed
+            if (currentAddress !== globalWalletState.address) {
+              console.log(`${globalWalletState.walletType} account changed: ${globalWalletState.address} → ${currentAddress}`)
+              localStorage.setItem('walletAddress', currentAddress)
+              updateGlobalState({
+                address: currentAddress
+              })
+            }
+          }
+        }
+        // For Solana, skip account checks as it uses different methods
+      }
+    } catch (error) {
+      console.warn('Failed to check account state:', error)
+    }
+  }, [getActiveProvider])
+
   useEffect(() => {
     // Initialize from localStorage on first load
     if (!globalWalletState.address) {
@@ -290,9 +347,39 @@ export function useWallet() {
            }
          }
 
+         // Additional event listeners for Phantom
+         const handleConnect = (connectInfo: any) => {
+           console.log(`Connect event detected by ${currentWalletType}:`, connectInfo)
+           // Force account state check
+           setTimeout(() => {
+             checkAndUpdateAccountState()
+           }, 1000)
+         }
+
+         const handleDisconnect = () => {
+           console.log(`Disconnect event detected by ${currentWalletType}`)
+           if (globalWalletState.walletType === currentWalletType) {
+             localStorage.removeItem('walletAddress')
+             localStorage.removeItem('walletNetwork')
+             localStorage.removeItem('walletType')
+             updateGlobalState({
+               address: null,
+               isConnected: false,
+               network: null,
+               walletType: null
+             })
+           }
+         }
+
          if (provider.on) {
            provider.on('chainChanged', handleChainChanged)
            provider.on('accountsChanged', handleAccountsChanged)
+           
+           // Add additional event listeners for better account detection
+           if (currentWalletType === 'phantom') {
+             provider.on('connect', handleConnect)
+             provider.on('disconnect', handleDisconnect)
+           }
          }
 
          // Return cleanup function
@@ -300,24 +387,33 @@ export function useWallet() {
            if (provider.removeListener) {
              provider.removeListener('chainChanged', handleChainChanged)
              provider.removeListener('accountsChanged', handleAccountsChanged)
+             
+             if (currentWalletType === 'phantom') {
+               provider.removeListener('connect', handleConnect)
+               provider.removeListener('disconnect', handleDisconnect)
+             }
            }
          }
        }
 
-             const cleanupEventListeners = setupEventListeners()
+       const cleanupEventListeners = setupEventListeners()
 
-       // Reduced polling - only check every 30 seconds as backup
-       const networkCheckInterval = setInterval(checkAndUpdateNetworkState, 30000)
+       // Different polling intervals for different wallets
+       const pollingInterval = globalWalletState.walletType === 'phantom' ? 5000 : 30000 // 5 seconds for Phantom, 30 seconds for MetaMask
+       const networkCheckInterval = setInterval(checkAndUpdateNetworkState, pollingInterval)
+       const accountCheckInterval = setInterval(checkAndUpdateAccountState, pollingInterval)
 
        // Check on window focus
        const handleFocus = () => {
          checkAndUpdateNetworkState()
+         checkAndUpdateAccountState()
        }
        window.addEventListener('focus', handleFocus)
 
        return () => {
          unsubscribe()
          clearInterval(networkCheckInterval)
+         clearInterval(accountCheckInterval)
          window.removeEventListener('focus', handleFocus)
          if (cleanupEventListeners) {
            cleanupEventListeners()
@@ -328,7 +424,7 @@ export function useWallet() {
     return () => {
       unsubscribe()
     }
-  }, [])
+  }, [checkAndUpdateAccountState])
 
     // Disconnect wallet function
   const disconnectWallet = useCallback(() => {
