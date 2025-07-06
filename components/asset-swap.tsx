@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowDown, RefreshCw, TrendingUp, TrendingDown, Loader2, XCircle, ChevronDown, Check } from "lucide-react"
 import { HTMLAttributes, useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
+import { cn, getTokenLogo } from "@/lib/utils"
 import { useSwapTokenPrices, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
 import { Badge } from "@/components/ui/badge"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
@@ -48,11 +48,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const params = useParams()
   const challengeId = params?.id || params?.challengeId || "1"
 
-  // Function to get token logo path
-  const getTokenLogo = (symbol: string): string => {
-    const symbolLower = symbol.toLowerCase()
-    return `/tokens/${symbolLower}.png`
-  }
+
 
   // Get token address by symbol - enhanced with investable tokens
   const getTokenAddress = (tokenSymbol: string): string => {
@@ -752,7 +748,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                           {fromToken ? (
                             <>
                               <Image
-                                src={getTokenLogo(fromToken)}
+                                src={getTokenLogo(getTokenAddress(fromToken), subgraphNetwork) || `/tokens/${fromToken.toLowerCase()}.png`}
                                 alt={fromToken}
                                 width={20}
                                 height={20}
@@ -801,7 +797,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                               }}
                             >
                               <Image
-                                src={getTokenLogo(token)}
+                                src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/${token.toLowerCase()}.png`}
                                 alt={token}
                                 width={20}
                                 height={20}
@@ -886,7 +882,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                         {toToken ? (
                           <>
                             <Image
-                              src={getTokenLogo(toToken)}
+                              src={getTokenLogo(getTokenAddress(toToken), subgraphNetwork) || `/tokens/${toToken.toLowerCase()}.png`}
                               alt={toToken}
                               width={20}
                               height={20}
@@ -924,7 +920,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                             }}
                           >
                             <Image
-                              src={getTokenLogo(token)}
+                              src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/${token.toLowerCase()}.png`}
                               alt={token}
                               width={20}
                               height={20}

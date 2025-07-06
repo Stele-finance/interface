@@ -91,6 +91,8 @@ export interface InvestorTransactionData {
   timestamp: number
   transactionHash: string
   // Additional data for swaps
+  fromAsset?: string
+  toAsset?: string
   fromAssetSymbol?: string
   toAssetSymbol?: string
   fromAmount?: string
@@ -193,6 +195,8 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               timestamp: parseInt(swap.blockTimestamp),
               transactionHash: swap.transactionHash,
               // Add swap-specific data
+              fromAsset: swap.fromAsset,
+              toAsset: swap.toAsset,
               fromAssetSymbol: fromSymbol,
               toAssetSymbol: toSymbol,
               fromAmount: swap.fromAmount,
