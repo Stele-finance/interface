@@ -45,9 +45,17 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
     })
   }
 
-  // Handle row click to open Etherscan
+  // Get explorer URL based on network
+  const getTokenExplorerUrl = (tokenAddress: string) => {
+    if (subgraphNetwork === 'arbitrum') {
+      return `https://arbiscan.io/token/${tokenAddress}`
+    }
+    return `https://etherscan.io/token/${tokenAddress}`
+  }
+
+  // Handle row click to open appropriate explorer
   const handleRowClick = (tokenAddress: string) => {
-    window.open(`https://etherscan.io/token/${tokenAddress}`, '_blank')
+    window.open(getTokenExplorerUrl(tokenAddress), '_blank')
   }
 
   if (isLoading) {

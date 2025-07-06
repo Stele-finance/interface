@@ -177,6 +177,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     return null
   }
 
+  // Get token explorer URL based on network
+  const getTokenExplorerUrl = (tokenAddress: string) => {
+    if (subgraphNetwork === 'arbitrum') {
+      return `https://arbiscan.io/token/${tokenAddress}`
+    }
+    return `https://etherscan.io/token/${tokenAddress}`
+  }
+
+  // Handle token row click
+  const handleTokenClick = (tokenAddress: string) => {
+    window.open(getTokenExplorerUrl(tokenAddress), '_blank')
+  }
+
   // Ensure client-side rendering for time calculations
   useEffect(() => {
     setIsClient(true);
@@ -904,7 +917,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
                         
                         return (
-                          <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0">
+                          <div 
+                            key={index} 
+                            className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/30 transition-colors"
+                            onClick={() => handleTokenClick(token.address)}
+                          >
                             <div className="flex items-center gap-3">
                               <div className="relative">
                                 {(() => {
@@ -936,7 +953,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                   }
                                 })()}
                                 {/* Show Arbitrum network icon only when connected to Arbitrum */}
-                                {network === 'arbitrum' && (
+                                {subgraphNetwork === 'arbitrum' && (
                                   <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
                                     <Image 
                                       src="/networks/arbitrum.png" 
