@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect, useCallback, use } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { 
@@ -194,13 +194,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     }
   }, [])
 
-  // Check voting power and voting status when wallet is connected
-  useEffect(() => {
-    if (walletAddress && id) {
-      checkVotingPowerAndStatus()
-      checkProposalState()
-    }
-  }, [walletAddress, id])
+
 
   // Set current time on client side only
   useEffect(() => {
@@ -212,7 +206,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   }, [])
 
   // Get voting power and check if user has already voted
-  const checkVotingPowerAndStatus = async () => {
+  const checkVotingPowerAndStatus = useCallback(async () => {
     if (!walletAddress || !id) return
 
     setIsLoadingVotingPower(true)
@@ -293,10 +287,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     } finally {
       setIsLoadingVotingPower(false)
     }
-  }
+  }, [walletAddress, id, walletType, contractNetwork, blockInfo, isLoadingBlockNumber])
 
   // Check proposal state
-  const checkProposalState = async () => {
+  const checkProposalState = useCallback(async () => {
     if (!id) return
 
     try {
@@ -335,7 +329,15 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     } catch (error) {
       console.error('Error checking proposal state:', error)
     }
-  }
+  }, [id, contractNetwork])
+
+  // Check voting power and voting status when wallet is connected
+  useEffect(() => {
+    if (walletAddress && id) {
+      checkVotingPowerAndStatus()
+      checkProposalState()
+    }
+  }, [walletAddress, id, checkVotingPowerAndStatus, checkProposalState])
 
   // Calculate vote percentage based on total supply (1 billion STELE)
   const calculatePercentage = () => {
