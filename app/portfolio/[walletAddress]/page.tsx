@@ -83,7 +83,9 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
     const totalInvestment = investors.reduce((sum, inv) => sum + safeFormatUSD(inv.seedMoneyUSD), 0)
     const totalCurrentValue = investors.reduce((sum, inv) => sum + safeFormatUSD(inv.currentUSD), 0)
-    const totalProfit = investors.reduce((sum, inv) => sum + safeFormatUSD(inv.profitUSD), 0)
+    // Calculate profit as difference between current value and investment
+    const totalProfit = totalCurrentValue - totalInvestment
+    // Calculate weighted average profit ratio
     const totalProfitRatio = totalInvestment > 0 ? (totalProfit / totalInvestment) * 100 : 0
 
     return {
@@ -146,7 +148,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
   }
 
   const formatPercentage = (value: number) => {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`
+    return `${value >= 0 ? '+' : ''}${value.toFixed(3)}%`
   }
 
   // Challenge Table Row Component
@@ -155,8 +157,8 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     const initialInvestment = safeFormatUSD(investor.seedMoneyUSD)
     const currentValue = safeFormatUSD(investor.currentUSD)
     
-    // Calculate correct profit/loss ratio: ((Current - Initial) / Initial) * 100
-    const profitRatio = initialInvestment > 0 ? ((currentValue - initialInvestment) / initialInvestment) * 100 : 0
+    // Use profit ratio from subgraph data (already calculated as percentage)
+    const profitRatio = parseFloat(investor.profitRatio) || 0
     const isPositive = profitRatio >= 0
 
     // Check if challenge is active based on challenge data

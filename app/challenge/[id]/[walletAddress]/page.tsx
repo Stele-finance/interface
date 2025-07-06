@@ -924,34 +924,34 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           >
                             <div className="flex items-center gap-3">
                               <div className="relative">
-                                {(() => {
-                                  const logoPath = getTokenLogo(token.symbol)
-                                  
-                                  if (logoPath) {
-                                    return (
-                                      <img
-                                        src={logoPath}
-                                        alt={token.symbol}
-                                        className="h-10 w-10 rounded-full object-cover"
-                                        onError={(e: any) => {
-                                          console.error('Failed to load token logo:', logoPath)
-                                          const target = e.target as HTMLImageElement
-                                          target.outerHTML = `
-                                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                              ${token.symbol.slice(0, 2)}
-                                            </div>
-                                          `
-                                        }}
-                                      />
-                                    )
-                                  } else {
-                                    return (
-                                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                        {token.symbol.slice(0, 2)}
-                                      </div>
-                                    )
-                                  }
-                                })()}
+                              {(() => {
+                                const logoPath = getTokenLogo(token.symbol)
+                                
+                                if (logoPath) {
+                                  return (
+                                    <img
+                                      src={logoPath}
+                                      alt={token.symbol}
+                                      className="h-10 w-10 rounded-full object-cover"
+                                      onError={(e: any) => {
+                                        console.error('Failed to load token logo:', logoPath)
+                                        const target = e.target as HTMLImageElement
+                                        target.outerHTML = `
+                                          <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                            ${token.symbol.slice(0, 2)}
+                                          </div>
+                                        `
+                                      }}
+                                    />
+                                  )
+                                } else {
+                                  return (
+                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                      {token.symbol.slice(0, 2)}
+                                    </div>
+                                  )
+                                }
+                              })()}
                                 {/* Show Arbitrum network icon only when connected to Arbitrum */}
                                 {subgraphNetwork === 'arbitrum' && (
                                   <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
@@ -1105,19 +1105,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                             <div className="flex items-center gap-3 justify-end">
                                               <div className="flex items-center gap-2">
                                                 <div className="relative">
-                                                  {fromLogo ? (
-                                                    <Image 
-                                                      src={fromLogo} 
-                                                      alt={swapDetails.fromToken}
-                                                      width={20}
-                                                      height={20}
-                                                      className="rounded-full"
-                                                    />
-                                                  ) : (
-                                                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                                      {swapDetails.fromToken.slice(0, 1)}
-                                                    </div>
-                                                  )}
+                                                {fromLogo ? (
+                                                  <Image 
+                                                    src={fromLogo} 
+                                                    alt={swapDetails.fromToken}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                                    {swapDetails.fromToken.slice(0, 1)}
+                                                  </div>
+                                                )}
                                                   {/* Show Arbitrum network icon only when connected to Arbitrum */}
                                                   {subgraphNetwork === 'arbitrum' && (
                                                     <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
@@ -1137,19 +1137,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                               <ArrowRight className="h-4 w-4 text-gray-400" />
                                               <div className="flex items-center gap-2">
                                                 <div className="relative">
-                                                  {toLogo ? (
-                                                    <Image 
-                                                      src={toLogo} 
-                                                      alt={swapDetails.toToken}
-                                                      width={20}
-                                                      height={20}
-                                                      className="rounded-full"
-                                                    />
-                                                  ) : (
-                                                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                                      {swapDetails.toToken.slice(0, 1)}
-                                                    </div>
-                                                  )}
+                                                {toLogo ? (
+                                                  <Image 
+                                                    src={toLogo} 
+                                                    alt={swapDetails.toToken}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                                    {swapDetails.toToken.slice(0, 1)}
+                                                  </div>
+                                                )}
                                                   {/* Show Arbitrum network icon only when connected to Arbitrum */}
                                                   {subgraphNetwork === 'arbitrum' && (
                                                     <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">

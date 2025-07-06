@@ -398,7 +398,7 @@ export function Header() {
                                   className="rounded-full"
                                   style={{ width: '16px', height: '16px' }}
                                 />
-                                <span>Arbitrum</span>
+                              <span>Arbitrum</span>
                               </div>
                               {walletType === 'phantom' && (
                                 <span className="text-xs text-muted-foreground ml-2">
