@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Home, Trophy, BarChart3, Vote } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Bell, Search, User, Wallet, DollarSign, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
@@ -47,6 +47,7 @@ type WalletType = 'metamask' | 'phantom' | null
 
 export function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const { t, language, setLanguage } = useLanguage()
   const { toast } = useToast()
   
@@ -58,6 +59,10 @@ export function Header() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
+  
+  // Track previous network and wallet address for detecting changes
+  const prevNetworkRef = useRef<string | null>(null)
+  const prevWalletAddressRef = useRef<string | null>(null)
   
   // Get entry fee from context
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee()
@@ -215,6 +220,43 @@ export function Header() {
       fetchBalance();
     }
   }, [walletAddress, walletNetwork]);
+
+  // Navigate to dashboard when network changes
+  useEffect(() => {
+    // Skip on initial load (when prevNetworkRef is null)
+    if (prevNetworkRef.current === null) {
+      prevNetworkRef.current = walletNetwork;
+      return;
+    }
+
+    // Only navigate if network actually changed and not already on dashboard
+    if (prevNetworkRef.current !== walletNetwork && !pathname.includes('/dashboard')) {
+      prevNetworkRef.current = walletNetwork;
+      router.push('/dashboard');
+    } else {
+      prevNetworkRef.current = walletNetwork;
+    }
+  }, [walletNetwork, pathname, router]);
+
+  // Navigate to dashboard when wallet address changes
+  useEffect(() => {
+    // Skip on initial load (when prevWalletAddressRef is null)
+    if (prevWalletAddressRef.current === null) {
+      prevWalletAddressRef.current = walletAddress;
+      return;
+    }
+
+    // Only navigate if wallet address actually changed and not already on dashboard
+    // Also skip if wallet is being disconnected (walletAddress becomes null)
+    if (prevWalletAddressRef.current !== walletAddress && 
+        walletAddress !== null && 
+        !pathname.includes('/dashboard')) {
+      prevWalletAddressRef.current = walletAddress;
+      router.push('/dashboard');
+    } else {
+      prevWalletAddressRef.current = walletAddress;
+    }
+  }, [walletAddress, pathname, router]);
 
   const { symbol, name } = getNetworkInfo();
   const walletIcon = getWalletIcon();
