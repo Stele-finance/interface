@@ -14,7 +14,6 @@ export const hu = {
   backToProposals: "Vissza a javaslatokhoz",
   balance: "Egyenleg",
   baseMainnet: "Base főhálózat",
-  blockNumber: "Blokk",
   browserExtension: "Böngésző Kiterjesztés",
   browseChallenges: "Kihívások böngészése",
   buy: "Vásárlás",

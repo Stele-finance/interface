@@ -14,7 +14,6 @@ export const ru = {
   backToProposals: "Назад к Предложениям",
   balance: "Баланс",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Блок",
   browserExtension: "Расширение Браузера",
   browseChallenges: "Обзор Вызовов",
   buy: "Купить",

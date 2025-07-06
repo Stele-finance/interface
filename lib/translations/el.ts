@@ -14,7 +14,6 @@ export const el = {
   backToProposals: "Πίσω στις Προτάσεις",
   balance: "Υπόλοιπο",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Μπλοκ",
   browserExtension: "Επέκταση Περιηγητή",
   browseChallenges: "Περιήγηση Προκλήσεων",
   buy: "Αγορά",

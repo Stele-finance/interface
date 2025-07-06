@@ -14,7 +14,6 @@ export const nl = {
   backToProposals: "Terug naar Voorstellen",
   balance: "Saldo",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Blok",
   browserExtension: "Browserextensie",
   browseChallenges: "Blader Door Uitdagingen",
   buy: "Kopen",

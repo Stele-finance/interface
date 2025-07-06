@@ -14,7 +14,6 @@ export const da = {
   backToProposals: "Tilbage til Forslag",
   balance: "Saldo",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Blok",
   browserExtension: "Browserudvidelse",
   browseChallenges: "Gennemse Udfordringer",
   buy: "Køb",

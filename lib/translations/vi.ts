@@ -14,7 +14,6 @@ export const vi = {
   backToProposals: "Quay lại đề xuất",
   balance: "Số dư",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Khối",
   browserExtension: "Tiện Ích Trình Duyệt",
   browseChallenges: "Duyệt thử thách",
   buy: "Mua",

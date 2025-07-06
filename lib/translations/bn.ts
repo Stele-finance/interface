@@ -14,7 +14,6 @@ export const bn = {
   backToProposals: "প্রস্তাবে ফিরে যান",
   balance: "ব্যালেন্স",
   baseMainnet: "বেস মেইননেট",
-  blockNumber: "ব্লক",
   browserExtension: "ব্রাউজার এক্সটেনশন",
   browseChallenges: "চ্যালেঞ্জ ব্রাউজ করুন",
   buy: "কিনুন",

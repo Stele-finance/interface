@@ -14,7 +14,6 @@ export const zhCn = {
   backToProposals: "返回提案",
   balance: "余额",
   baseMainnet: "Base主网",
-  blockNumber: "区块",
   browserExtension: "浏览器扩展",
   browseChallenges: "浏览挑战",
   buy: "购买",

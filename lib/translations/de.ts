@@ -14,7 +14,6 @@ export const de = {
   backToProposals: "Zurück zu Vorschlägen",
   balance: "Saldo",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Block",
   browserExtension: "Browser-Erweiterung",
   browseChallenges: "Herausforderungen Durchsuchen",
   buy: "Kaufen",

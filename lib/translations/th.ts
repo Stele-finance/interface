@@ -14,7 +14,6 @@ export const th = {
   backToProposals: "กลับไปยังข้อเสนอ",
   balance: "ยอดคงเหลือ",
   baseMainnet: "Base Mainnet",
-  blockNumber: "บล็อก",
   browserExtension: "ส่วนขยายเบราว์เซอร์",
   browseChallenges: "เรียกดูชาเลนจ์",
   buy: "ซื้อ",

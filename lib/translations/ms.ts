@@ -14,7 +14,6 @@ export const ms = {
   backToProposals: "Kembali ke Cadangan",
   balance: "Baki",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Blok",
   browserExtension: "Sambungan Pelayar",
   browseChallenges: "Semak Cabaran",
   buy: "Beli",

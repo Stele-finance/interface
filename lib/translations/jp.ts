@@ -14,7 +14,6 @@ export const jp = {
   backToProposals: "提案に戻る",
   balance: "残高",
   baseMainnet: "Baseメインネット",
-  blockNumber: "ブロック",
   browserExtension: "ブラウザ拡張機能",
   browseChallenges: "チャレンジを閲覧",
   buy: "購入",

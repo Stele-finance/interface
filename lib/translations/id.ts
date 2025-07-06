@@ -14,7 +14,6 @@ export const id = {
   backToProposals: "Kembali ke Proposal",
   balance: "Saldo",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Blok",
   browserExtension: "Ekstensi Browser",
   browseChallenges: "Jelajahi Tantangan",
   buy: "Beli",

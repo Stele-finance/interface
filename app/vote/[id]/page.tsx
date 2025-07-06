@@ -40,6 +40,38 @@ interface ProposalDetailPageProps {
   }>
 }
 
+// Helper function to get scan site URL based on network
+const getScanSiteUrl = (network: 'ethereum' | 'arbitrum' | 'solana' | null) => {
+  switch (network) {
+    case 'ethereum':
+      return 'https://etherscan.io'
+    case 'arbitrum':
+      return 'https://arbiscan.io'
+    default:
+      return 'https://etherscan.io' // default to ethereum
+  }
+}
+
+// Helper function to open scan site in new tab
+const openScanSite = (network: 'ethereum' | 'arbitrum' | 'solana' | null, type: 'tx' | 'address' | 'block', value: string) => {
+  const baseUrl = getScanSiteUrl(network)
+  let url = ''
+  
+  switch (type) {
+    case 'tx':
+      url = `${baseUrl}/tx/${value}`
+      break
+    case 'address':
+      url = `${baseUrl}/address/${value}`
+      break
+    case 'block':
+      url = `${baseUrl}/block/${value}`
+      break
+  }
+  
+  window.open(url, '_blank')
+}
+
 export default function ProposalDetailPage({ params }: ProposalDetailPageProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -127,7 +159,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     const blockTimestamp = searchParams.get('blockTimestamp') || ''
     const blockNumber = searchParams.get('blockNumber') || ''
     const valuesStr = searchParams.get('values')
-    const transactionHash = searchParams.get('transactionHash') || ''
+    // Use subgraph transaction hash if available, otherwise use URL param
+    const transactionHash = subgraphProposal?.transactionHash || 
+                            searchParams.get('transactionHash') || 
+                            id // fallback to proposal ID if no transaction hash available
     // Get cached token info from URL parameters
     const cachedTokenBalance = searchParams.get('tokenBalance') || '0'
     const cachedDelegatedTo = searchParams.get('delegatedTo') || ''
@@ -193,8 +228,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       setIsConnected(true)
     }
   }, [])
-
-
 
   // Set current time on client side only
   useEffect(() => {
@@ -1029,6 +1062,24 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     }
   }
 
+  // Add click handlers for scan site navigation
+  const handleProposalIdClick = () => {
+    // Use the proposal transaction hash
+    if (proposal.transactionHash) {
+      openScanSite(network, 'tx', proposal.transactionHash)
+    }
+  }
+  
+  const handleProposerClick = () => {
+    openScanSite(network, 'address', proposal.fullProposer)
+  }
+  
+  const handleBlockClick = () => {
+    if (proposal.blockNumber) {
+      openScanSite(network, 'block', proposal.blockNumber)
+    }
+  }
+
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
@@ -1048,7 +1099,15 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-xl text-gray-100">{proposal.title}</CardTitle>
-                  <CardDescription className="mt-2 text-gray-400">Proposal #{id.slice(0, 8)}...{id.slice(-8)}</CardDescription>
+                  <CardDescription className="mt-2 text-gray-400">
+                    <span 
+                      className="cursor-pointer hover:text-blue-400 transition-colors"
+                      onClick={handleProposalIdClick}
+                      title={`View transaction on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+                    >
+                      Proposal #{id.slice(0, 8)}...{id.slice(-8)}
+                    </span>
+                  </CardDescription>
                 </div>
                 <StatusBadge status={proposal.status} />
               </div>
@@ -1057,7 +1116,14 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <div className="text-sm text-gray-400 space-y-1">
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-2 text-gray-400" />
-                  <span>{t('proposer')}: {proposal.fullProposer}</span>
+                  <span>{t('proposer')}: </span>
+                  <span 
+                    className="cursor-pointer hover:text-blue-400 transition-colors ml-1"
+                    onClick={handleProposerClick}
+                    title={`View proposer on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+                  >
+                    {proposal.fullProposer}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-gray-400" />
@@ -1067,12 +1133,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   <Clock className="h-4 w-4 mr-2 text-gray-400" />
                   <span>{t('voteEnd')}: {formatDate(proposal.endTime)}</span>
                 </div>
-                {proposal.blockNumber && (
-                  <div className="flex items-center">
-                    <FileText className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>{t('blockNumber')}: {proposal.blockNumber}</span>
-                  </div>
-                )}
               </div>
               
               <Separator className="bg-gray-700" />
@@ -1139,7 +1199,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                         }</div>
                       )} */}
                       {proposalState !== null && (
-                        <div>{t('proposalState')}: {
+                        <div>{t('status')}: {
                           isReadyForQueue() && proposalState !== 5 ? t('pendingQueue') :
                           proposalState === 0 ? t('pending') :
                           proposalState === 1 ? t('active') :

@@ -14,7 +14,6 @@ export const fr = {
   backToProposals: "Retour aux Propositions",
   balance: "Solde",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Bloc",
   browserExtension: "Extension de Navigateur",
   browseChallenges: "Parcourir les Défis",
   buy: "Acheter",

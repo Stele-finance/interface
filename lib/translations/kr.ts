@@ -14,7 +14,6 @@ export const kr = {
   backToProposals: "제안으로 돌아가기",
   balance: "잔액",
   baseMainnet: "베이스 메인넷",
-  blockNumber: "블록",
   browserExtension: "브라우저 확장 프로그램",
   browseChallenges: "챌린지 둘러보기",
   buy: "구매",

@@ -14,7 +14,6 @@ export const ar = {
   backToProposals: "العودة إلى المقترحات",
   balance: "الرصيد",
   baseMainnet: "شبكة Base الرئيسية",
-  blockNumber: "الكتلة",
   browserExtension: "ملحق المتصفح",
   browseChallenges: "تصفح التحديات",
   buy: "شراء",

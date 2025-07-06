@@ -14,7 +14,6 @@ export const en = {
   backToProposals: "Back to Proposals",
   balance: "Balance",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Block",
   browserExtension: "Browser Extension",
   browseChallenges: "Browse Challenges",
   buy: "Buy",

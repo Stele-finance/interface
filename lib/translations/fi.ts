@@ -14,7 +14,6 @@ export const fi = {
   backToProposals: "Takaisin Ehdotuksiin",
   balance: "Saldo",
   baseMainnet: "Base Mainnet",
-  blockNumber: "Lohko",
   browserExtension: "Selainlaajennus",
   browseChallenges: "Selaa Haasteita",
   buy: "Osta",

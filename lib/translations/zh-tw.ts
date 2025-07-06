@@ -14,7 +14,6 @@ export const zhTw = {
   backToProposals: "返回提案",
   balance: "餘額",
   baseMainnet: "Base 主網",
-  blockNumber: "區塊",
   browserExtension: "瀏覽器擴充功能",
   browseChallenges: "瀏覽挑戰",
   buy: "購買",

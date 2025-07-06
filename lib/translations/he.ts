@@ -14,7 +14,6 @@ export const he = {
   backToProposals: "חזור להצעות",
   balance: "יתרה",
   baseMainnet: "Base Mainnet",
-  blockNumber: "בלוק",
   browserExtension: "הרחבת דפדפן",
   browseChallenges: "עיין באתגרים",
   buy: "קנה",
