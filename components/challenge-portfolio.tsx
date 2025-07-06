@@ -308,6 +308,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     return null
   }
 
+
+
   // Get swap details from transaction data
   const getSwapDetails = (transaction: any) => {
     if (transaction.type !== 'swap') return null
@@ -1187,7 +1189,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                           <div 
                             key={transaction.id} 
                             className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors"
-                            onClick={() => window.open(`https://etherscan.io/tx/${transaction.transactionHash}`, '_blank')}
+                            onClick={() => {
+                              const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+                              window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
+                            }}
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
