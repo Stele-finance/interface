@@ -1213,36 +1213,62 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                     return (
                                       <div className="flex items-center gap-3 justify-end">
                                         <div className="flex items-center gap-2">
-                                          {fromLogo ? (
-                                            <Image 
-                                              src={fromLogo} 
-                                              alt={swapDetails.fromToken}
-                                              width={20}
-                                              height={20}
-                                              className="rounded-full"
-                                            />
-                                          ) : (
-                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.fromToken.slice(0, 1)}
-                                            </div>
-                                          )}
+                                          <div className="relative">
+                                            {fromLogo ? (
+                                              <Image 
+                                                src={fromLogo} 
+                                                alt={swapDetails.fromToken}
+                                                width={20}
+                                                height={20}
+                                                className="rounded-full"
+                                              />
+                                            ) : (
+                                              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                                {swapDetails.fromToken.slice(0, 1)}
+                                              </div>
+                                            )}
+                                            {subgraphNetwork === 'arbitrum' && (
+                                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                                <Image 
+                                                  src="/networks/arbitrum.png" 
+                                                  alt="Arbitrum"
+                                                  width={12}
+                                                  height={12}
+                                                  className="w-full h-full object-contain"
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
                                           <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
                                         </div>
                                         <ArrowRight className="h-4 w-4 text-gray-400" />
                                         <div className="flex items-center gap-2">
-                                          {toLogo ? (
-                                            <Image 
-                                              src={toLogo} 
-                                              alt={swapDetails.toToken}
-                                              width={20}
-                                              height={20}
-                                              className="rounded-full"
-                                            />
-                                          ) : (
-                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.toToken.slice(0, 1)}
-                                            </div>
-                                          )}
+                                          <div className="relative">
+                                            {toLogo ? (
+                                              <Image 
+                                                src={toLogo} 
+                                                alt={swapDetails.toToken}
+                                                width={20}
+                                                height={20}
+                                                className="rounded-full"
+                                              />
+                                            ) : (
+                                              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                                {swapDetails.toToken.slice(0, 1)}
+                                              </div>
+                                            )}
+                                            {subgraphNetwork === 'arbitrum' && (
+                                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                                <Image 
+                                                  src="/networks/arbitrum.png" 
+                                                  alt="Arbitrum"
+                                                  width={12}
+                                                  height={12}
+                                                  className="w-full h-full object-contain"
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
                                           <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toToken}</span>
                                         </div>
                                       </div>
