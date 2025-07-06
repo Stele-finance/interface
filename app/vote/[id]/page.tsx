@@ -1110,63 +1110,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               
               {/* Debug Information */}
               <div className="text-sm bg-gray-800/50 border border-gray-600 p-4 rounded-md space-y-2 text-gray-300">
-                <div className="font-bold text-gray-100">🔍 {t('debugInformation')}:</div>
                 <div className="text-gray-300">⏰ {t('currentTime')}: <span className="font-semibold text-gray-100">{currentTime}</span></div>
                 <div className="text-gray-300">📅 {t('voteEndTime')}: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
-                <div className="text-gray-300">✅ {t('votingEnded')}: <span className={`font-semibold ${currentTime ? (new Date() > proposal.endTime ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
-                  {currentTime ? (new Date() > proposal.endTime ? "Yes" : "No") : "Checking..."}
-                </span></div>
                 <div className="text-gray-300">👍 {t('votesFor')}: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
                 <div className="text-gray-300">👎 {t('votesAgainst')}: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
                 <div className="text-gray-300">🤷 {t('abstainVotes')}: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
                 <div className="text-gray-300">📊 {t('totalVotes')}: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
-                {/* <div className="text-gray-300">🏆 Has Majority (For &gt; Against): <span className={`font-semibold ${proposal.votesFor > proposal.votesAgainst ? "text-green-400" : "text-red-400"}`}>
-                  {proposal.votesFor > proposal.votesAgainst ? "Yes" : "No"}
-                </span></div>
-                <div className="text-gray-300">📈 Has Minimum Participation: <span className={`font-semibold ${(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "text-green-400" : "text-red-400"}`}>
-                  {(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "Yes" : "No"}
-                </span></div> */}
-                <div className="text-gray-300">🏛️ {t('proposalState')}: <span className="font-semibold text-blue-400">{proposalState !== null ? `${proposalState} (${typeof proposalState})` : t('loading')}</span></div>
-                {/* <div className="text-gray-300">✨ Proposal State is Succeeded (4): <span className={`font-semibold ${proposalState === 4 ? "text-green-400" : "text-red-400"}`}>
-                  {proposalState === 4 ? "Yes" : "No"}
-                </span></div> */}
-                {/* <div className="text-gray-300">🔗 Is Connected: <span className={`font-semibold ${isConnected ? "text-green-400" : "text-red-400"}`}>
-                  {isConnected ? "Yes" : "No"}
-                </span></div>
-                <div className="text-gray-300">🚀 Is Ready for Queue: <span className={`font-semibold ${currentTime ? (isReadyForQueue() ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
-                  {currentTime ? (isReadyForQueue() ? "Yes" : "No") : "Checking..."}
-                </span></div>
-                <div className="text-gray-300">🎯 Queue Button Should Show: <span className={`font-semibold ${currentTime ? (isConnected && isReadyForQueue() ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
-                  {currentTime ? (isConnected && isReadyForQueue() ? "Yes" : "No") : "Checking..."}
-                </span></div>
-                <div className="text-gray-300">⚡ Execute Button Should Show: <span className={`font-semibold ${isConnected && proposalState === 5 ? "text-green-400" : "text-red-400"}`}>
-                  {isConnected && proposalState === 5 ? "Yes" : "No"}
-                </span></div> */}
-{/*                 
-                <div className="border-t border-gray-600 pt-2 mt-3">
-                  <div className="font-bold text-gray-100">⚙️ Queue Logic:</div>
-                  <div className="text-gray-300 ml-2">📍 Using Proposal State: <span className={`font-semibold ${proposalState !== null ? "text-green-400" : "text-red-400"}`}>
-                    {proposalState !== null ? "Yes" : "No"}
-                  </span></div>
-                  {proposalState !== null ? (
-                    <div className="text-gray-300 ml-2">🎯 State Check Result: <span className={`font-semibold ${proposalState === 4 ? "text-green-400" : "text-red-400"}`}>
-                      {proposalState === 4 ? "Succeeded (Ready)" : `Not Succeeded (State: ${proposalState})`}
-                    </span></div>
-                  ) : (
-                    <div className="ml-2">
-                      <div className="text-gray-300">🔄 Fallback to Manual Check:</div>
-                      <div className="text-gray-300 ml-4">• Voting Ended: <span className={`font-semibold ${currentTime ? (new Date() > proposal.endTime ? "text-green-400" : "text-red-400") : "text-yellow-400"}`}>
-                        {currentTime ? (new Date() > proposal.endTime ? "✓" : "✗") : "?"}
-                      </span></div>
-                      <div className="text-gray-300 ml-4">• Has Majority: <span className={`font-semibold ${proposal.votesFor > proposal.votesAgainst ? "text-green-400" : "text-red-400"}`}>
-                        {proposal.votesFor > proposal.votesAgainst ? "✓" : "✗"}
-                      </span></div>
-                      <div className="text-gray-300 ml-4">• Has Participation: <span className={`font-semibold ${(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "text-green-400" : "text-red-400"}`}>
-                        {(proposal.votesFor + proposal.votesAgainst + proposal.abstain) > 0 ? "✓" : "✗"}
-                      </span></div>
-                    </div>
-                  )}
-                </div> */}
               </div>
 
               {isConnected && (
@@ -1348,94 +1297,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 </Button>
               )}
             </CardFooter>
-          </Card>
-          
-          <Card className="mt-6 bg-gray-900/50 border-gray-700/50">
-            <CardHeader>
-              <CardTitle className="text-gray-100">{t('currentResults')}</CardTitle>
-              <CardDescription className="text-gray-300">
-                                  {voteResult ? (
-                  <>
-                    {t('totalVotes')}: {parseFloat(ethers.formatUnits(voteResult.totalVotes || "0", STELE_DECIMALS)).toLocaleString()} STELE • 
-                    {t('voters')}: {parseInt(voteResult.voterCount || "0").toLocaleString()}
-                  </>
-                ) : (
-                  <>
-                    {t('totalVotes')}: {(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()} STELE
-                  </>
-                )}
-                <br />
-                <span className="text-xs text-gray-400">
-                  {t('participation')}: {((proposal.votesFor + proposal.votesAgainst + proposal.abstain) / parseFloat(ethers.formatUnits(STELE_TOTAL_SUPPLY, STELE_DECIMALS)) * 100).toFixed(2)}% {t('ofTotalSupply')}
-                </span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingVoteResult ? (
-                <div className="flex items-center justify-center py-8 text-gray-300">
-                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                  {t('loadingVoteResults')}
-                </div>
-              ) : !voteResult ? (
-                <div className="text-center py-8 text-gray-400">
-                  <p>{t('noVoteDataAvailable')}</p>
-                  <p className="text-sm mt-2">{t('noVoteDataDesc')}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* For */}
-                                      <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">{t('voteFor')}</span>
-                      <span className="text-sm text-green-400">{percentages.for}% {t('ofTotalSupply')}</span>
-                    </div>
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-green-500 h-full" 
-                      style={{ width: `${percentages.for}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {proposal.votesFor.toLocaleString()} STELE
-                  </div>
-                </div>
-                
-                {/* Against */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">{t('voteAgainst')}</span>
-                      <span className="text-sm text-red-400">{percentages.against}% {t('ofTotalSupply')}</span>
-                    </div>
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-red-500 h-full" 
-                      style={{ width: `${percentages.against}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {proposal.votesAgainst.toLocaleString()} STELE
-                  </div>
-                </div>
-                
-                {/* Abstain */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-200">{t('abstain')}</span>
-                      <span className="text-sm text-gray-400">{percentages.abstain}% {t('ofTotalSupply')}</span>
-                    </div>
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-gray-500 h-full" 
-                      style={{ width: `${percentages.abstain}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {proposal.abstain.toLocaleString()} STELE
-                  </div>
-                </div>
-              </div>
-              )}
-            </CardContent>
           </Card>
         </div>
       </div>
