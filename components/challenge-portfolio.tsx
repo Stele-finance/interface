@@ -30,6 +30,7 @@ import { useInvestorData } from "@/app/subgraph/Account"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
+import { getTokenLogo } from "@/lib/utils"
 
 interface ChallengePortfolioProps {
   challengeId: string
@@ -296,17 +297,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
 
-  // Get token logo path based on symbol
-  const getTokenLogo = (symbol: string) => {
-    const symbolLower = symbol.toLowerCase()
-    // Check if we have a logo for this token
-    const availableLogos = ['usdc', 'eth', 'weth']
-    if (availableLogos.includes(symbolLower)) {
-      return `/tokens/${symbolLower}.png`
-    }
-    // Return null if no logo exists
-    return null
-  }
+
 
 
 
@@ -318,9 +309,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     if (transaction.fromAssetSymbol && transaction.toAssetSymbol) {
       return {
         fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
-        fromToken: transaction.fromAssetSymbol,
+        fromToken: transaction.fromAsset,
+        fromTokenSymbol: transaction.fromAssetSymbol,
         toAmount: parseFloat(transaction.toAmount).toFixed(4),
-        toToken: transaction.toAssetSymbol
+        toToken: transaction.toAsset,
+        toTokenSymbol: transaction.toAssetSymbol
       }
     }
     
@@ -1213,8 +1206,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                 (() => {
                                   const swapDetails = getSwapDetails(transaction)
                                   if (swapDetails) {
-                                    const fromLogo = getTokenLogo(swapDetails.fromToken)
-                                    const toLogo = getTokenLogo(swapDetails.toToken)
+                                    const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
+                                    const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                     return (
                                       <div className="flex items-center gap-3 justify-end">
                                         <div className="flex items-center gap-2">
@@ -1222,14 +1215,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                           {fromLogo ? (
                                             <Image 
                                               src={fromLogo} 
-                                              alt={swapDetails.fromToken}
+                                              alt={swapDetails.fromTokenSymbol || 'Token'}
                                               width={20}
                                               height={20}
                                               className="rounded-full"
                                             />
                                           ) : (
                                             <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.fromToken.slice(0, 1)}
+                                              {swapDetails.fromTokenSymbol?.slice(0, 1) || '?'}
                                             </div>
                                           )}
                                             {subgraphNetwork === 'arbitrum' && (
@@ -1244,7 +1237,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
                                         </div>
                                         <ArrowRight className="h-4 w-4 text-gray-400" />
                                         <div className="flex items-center gap-2">
@@ -1252,14 +1245,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                           {toLogo ? (
                                             <Image 
                                               src={toLogo} 
-                                              alt={swapDetails.toToken}
+                                              alt={swapDetails.toTokenSymbol || 'Token'}
                                               width={20}
                                               height={20}
                                               className="rounded-full"
                                             />
                                           ) : (
                                             <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.toToken.slice(0, 1)}
+                                              {swapDetails.toTokenSymbol?.slice(0, 1) || '?'}
                                             </div>
                                           )}
                                             {subgraphNetwork === 'arbitrum' && (
@@ -1274,7 +1267,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toToken}</span>
+                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
                                         </div>
                                       </div>
                                     )

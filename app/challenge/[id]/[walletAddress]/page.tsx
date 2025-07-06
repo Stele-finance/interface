@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { cn } from "@/lib/utils"
+import { cn, getTokenLogo } from "@/lib/utils"
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -128,17 +128,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const itemsPerPage = 5
   const maxPages = 5
 
-  // Get token logo path based on symbol
-  const getTokenLogo = (symbol: string) => {
-    const symbolLower = symbol.toLowerCase()
-    // Check if we have a logo for this token
-    const availableLogos = ['usdc', 'eth', 'weth']
-    if (availableLogos.includes(symbolLower)) {
-      return `/tokens/${symbolLower}.png`
-    }
-    // Return null if no logo exists
-    return null
-  }
+
 
   // Get swap details from transaction data
   const getSwapDetails = (transaction: any) => {
@@ -148,9 +138,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     if (transaction.fromAssetSymbol && transaction.toAssetSymbol && transaction.fromAmount && transaction.toAmount) {
       const swapDetails = {
         fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
-        fromToken: transaction.fromAssetSymbol,
+        fromToken: transaction.fromAsset,
+        fromTokenSymbol: transaction.fromAssetSymbol,
         toAmount: parseFloat(transaction.toAmount).toFixed(4),
-        toToken: transaction.toAssetSymbol
+        toToken: transaction.toAsset,
+        toTokenSymbol: transaction.toAssetSymbol
       }
       return swapDetails
     }
@@ -925,7 +917,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <div className="flex items-center gap-3">
                               <div className="relative">
                               {(() => {
-                                const logoPath = getTokenLogo(token.symbol)
+                                const logoPath = getTokenLogo(token.address, subgraphNetwork)
                                 
                                 if (logoPath) {
                                   return (
@@ -1099,8 +1091,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
                                         if (swapDetails) {
-                                          const fromLogo = getTokenLogo(swapDetails.fromToken)
-                                          const toLogo = getTokenLogo(swapDetails.toToken)
+                                          const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
+                                          const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                           return (
                                             <div className="flex items-center gap-3 justify-end">
                                               <div className="flex items-center gap-2">
@@ -1108,14 +1100,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                 {fromLogo ? (
                                                   <Image 
                                                     src={fromLogo} 
-                                                    alt={swapDetails.fromToken}
+                                                    alt={(swapDetails as any).fromTokenSymbol || swapDetails.fromToken || 'Token'}
                                                     width={20}
                                                     height={20}
                                                     className="rounded-full"
                                                   />
                                                 ) : (
                                                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                                    {swapDetails.fromToken.slice(0, 1)}
+                                                    {((swapDetails as any).fromTokenSymbol || swapDetails.fromToken)?.slice(0, 1) || '?'}
                                                   </div>
                                                 )}
                                                   {/* Show Arbitrum network icon only when connected to Arbitrum */}
@@ -1132,7 +1124,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromToken}</span>
+                                                <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {(swapDetails as any).fromTokenSymbol || swapDetails.fromToken}</span>
                                               </div>
                                               <ArrowRight className="h-4 w-4 text-gray-400" />
                                               <div className="flex items-center gap-2">
@@ -1140,14 +1132,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                 {toLogo ? (
                                                   <Image 
                                                     src={toLogo} 
-                                                    alt={swapDetails.toToken}
+                                                    alt={(swapDetails as any).toTokenSymbol || swapDetails.toToken || 'Token'}
                                                     width={20}
                                                     height={20}
                                                     className="rounded-full"
                                                   />
                                                 ) : (
                                                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                                    {swapDetails.toToken.slice(0, 1)}
+                                                    {((swapDetails as any).toTokenSymbol || swapDetails.toToken)?.slice(0, 1) || '?'}
                                                   </div>
                                                 )}
                                                   {/* Show Arbitrum network icon only when connected to Arbitrum */}
@@ -1164,7 +1156,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{swapDetails.toToken}</span>
+                                                <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{(swapDetails as any).toTokenSymbol || swapDetails.toToken}</span>
                                               </div>
                                             </div>
                                           )

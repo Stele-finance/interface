@@ -5,15 +5,6 @@ import { request } from 'graphql-request'
 import { getSubgraphUrl, USDC_DECIMALS } from '@/lib/constants'
 import { ethers } from 'ethers'
 
-// Simple test query to check if subgraph is working
-const TEST_QUERY = `
-  query TestSubgraph {
-    creates(first: 1) {
-      id
-    }
-  }
-`
-
 const GET_TRANSACTIONS_QUERY = `
   query GetTransactions($challengeId: BigInt!) {
     creates(
@@ -171,6 +162,8 @@ export interface TransactionData {
   timestamp: number
   transactionHash: string
   // Additional data for swaps
+  fromAsset?: string
+  toAsset?: string
   fromAssetSymbol?: string
   toAssetSymbol?: string
   fromAmount?: string
@@ -293,6 +286,8 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               timestamp: parseInt(swap.blockTimestamp),
               transactionHash: swap.transactionHash,
               // Add swap-specific data
+              fromAsset: swap.fromAsset,
+              toAsset: swap.toAsset,
               fromAssetSymbol: fromSymbol,
               toAssetSymbol: toSymbol,
               fromAmount: swap.fromAmount,
