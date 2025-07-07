@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { ArrowDown, RefreshCw, TrendingUp, TrendingDown, Loader2, XCircle, ChevronDown, Check } from "lucide-react"
 import { HTMLAttributes, useState, useEffect } from "react"
 import { cn, getTokenLogo } from "@/lib/utils"
-import { useSwapTokenPrices, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
+import { useSwapTokenPrices, useSwapTokenPricesIndependent, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
 import { Badge } from "@/components/ui/badge"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
@@ -106,16 +106,32 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     return tokenDecimals[tokenSymbol] || 18;
   };
 
-  // Use new hook to get prices for selected tokens only
-  // Only fetch prices when both tokens are selected to avoid unnecessary API calls
-  const shouldFetchPrices = fromToken && toToken && fromToken !== toToken;
-  const { data: priceData, isLoading, error, refetch } = useSwapTokenPrices(
-    shouldFetchPrices ? fromToken : null,
-    shouldFetchPrices ? toToken : null,
+  // Use new cached hook to get prices for selected tokens only
+  // This replaces the old useSwapTokenPrices to prevent Too Many Requests errors
+  const {
+    fromTokenPrice,
+    toTokenPrice,
+    isLoading,
+    error,
+    calculateSimpleSwapQuote,
+    refetch
+  } = useSwapTokenPricesIndependent(
+    fromToken,
+    toToken,
     getTokenAddress,
     getTokenDecimals,
     subgraphNetwork
   );
+
+  // Create compatible priceData structure for existing code
+  const priceData = fromTokenPrice && toTokenPrice ? {
+    tokens: {
+      [fromToken]: { priceUSD: fromTokenPrice },
+      [toToken]: { priceUSD: toTokenPrice }
+    },
+    timestamp: Date.now(),
+    source: 'cached'
+  } : null;
 
   // Helper function to format token amounts for display
   const formatTokenAmount = (rawAmount: string, decimals: string): string => {
@@ -243,6 +259,9 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     priceData
   );
 
+  // NEW: Get immediate simple swap quote for instant feedback
+  const simpleSwapQuote = calculateSimpleSwapQuote(parseFloat(fromAmount) || 0);
+
   // Check if selected tokens have price data available
   const hasFromTokenData = fromToken ? priceData?.tokens?.[fromToken] !== undefined : true;
   const hasToTokenData = toToken ? priceData?.tokens?.[toToken] !== undefined : true;
@@ -311,7 +330,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const isBelowMinimumSwapAmount = (): boolean => {
     if (!fromAmount || !fromToken || parseFloat(fromAmount) <= 0) return false;
     
-    const tokenPrice = priceData?.tokens?.[fromToken]?.priceUSD;
+    // Priority: 1. Accurate price data 2. Individual token price 3. Return false to not block
+    const tokenPrice = priceData?.tokens?.[fromToken]?.priceUSD || fromTokenPrice;
     if (!tokenPrice) return false;
     
     const usdValue = parseFloat(fromAmount) * tokenPrice;
@@ -327,7 +347,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const getSwapAmountUSD = (): number => {
     if (!fromAmount || !fromToken || parseFloat(fromAmount) <= 0) return 0;
     
-    const tokenPrice = priceData?.tokens?.[fromToken]?.priceUSD;
+    // Priority: 1. Accurate price data 2. Individual token price 3. Zero
+    const tokenPrice = priceData?.tokens?.[fromToken]?.priceUSD || fromTokenPrice;
     if (!tokenPrice) return 0;
     
     return parseFloat(fromAmount) * tokenPrice;
@@ -657,13 +678,25 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   };
 
   // Calculate actual output amount based on user input
-  const outputAmount = fromAmount && parseFloat(fromAmount) > 0 && swapQuote 
-    ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(6)
+  // Priority: 1. Accurate Uniswap quote 2. Simple estimate 3. Zero
+  const outputAmount = fromAmount && parseFloat(fromAmount) > 0 
+    ? (swapQuote 
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(6)
+        : (simpleSwapQuote 
+            ? simpleSwapQuote.toAmount.toFixed(6)
+            : "0"))
     : "0";
   
-  const minimumReceived = fromAmount && swapQuote
-    ? (parseFloat(fromAmount) * swapQuote.exchangeRate * 0.99).toFixed(4)
-    : swapQuote?.minimumReceived.toFixed(4) || "0";
+  const minimumReceived = fromAmount && parseFloat(fromAmount) > 0
+    ? (swapQuote
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate * 0.99).toFixed(4)
+        : (simpleSwapQuote 
+            ? (simpleSwapQuote.toAmount * 0.99).toFixed(4)
+            : "0"))
+    : "0";
+
+  // Show if using basic estimate
+  const isUsingBasicEstimate = !swapQuote && simpleSwapQuote;
 
   // Remove loading and error states - show swap interface immediately
 
@@ -867,8 +900,11 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                     })()}
                   </div>
                   <div className="text-sm text-gray-400 mt-1">
-                    ${outputAmount && toToken && priceData?.tokens?.[toToken] ? 
-                      (parseFloat(outputAmount) * priceData.tokens[toToken].priceUSD).toFixed(2) : "0.00"}
+                    ${outputAmount && toToken && (priceData?.tokens?.[toToken] || toTokenPrice) ? 
+                      (parseFloat(outputAmount) * (priceData?.tokens?.[toToken]?.priceUSD || toTokenPrice || 0)).toFixed(2) : "0.00"}
+                    {isUsingBasicEstimate && (
+                      <span className="text-orange-400 ml-1">({t('loadingPrice')})</span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 relative">
@@ -950,9 +986,12 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
           </div>
 
           {/* Exchange Rate - Simple Display */}
-          {isDataReady && fromToken && toToken && swapQuote && (
+          {isDataReady && fromToken && toToken && (swapQuote || simpleSwapQuote) && (
             <div className="text-center text-sm text-gray-400">
-              1 {fromToken} = {swapQuote.exchangeRate.toFixed(6)} {toToken}
+              1 {fromToken} = {(swapQuote ? swapQuote.exchangeRate : simpleSwapQuote?.exchangeRate || 0).toFixed(6)} {toToken}
+              {isUsingBasicEstimate && (
+                <span className="text-orange-400 ml-1">({t('loadingPrice')})</span>
+              )}
             </div>
           )}
           <Button 

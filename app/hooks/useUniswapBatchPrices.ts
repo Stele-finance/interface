@@ -458,4 +458,388 @@ export function useSwapTokenPrices(
   }, [fromTokenSymbol, toTokenSymbol, getTokenAddress, getTokenDecimals])
 
   return useUniswapBatchPrices(tokenInfos, network)
+}
+
+// Price cache for preventing too many requests
+interface PriceCacheItem {
+  price: number | null
+  timestamp: number
+  isLoading: boolean
+}
+
+const priceCache = new Map<string, PriceCacheItem>()
+const CACHE_DURATION = 120000 // 2 minutes cache for aggressive caching
+
+// Hook for getting individual token price immediately with caching
+export function useTokenPrice(
+  tokenSymbol: string | null,
+  getTokenAddress: (symbol: string) => string,
+  getTokenDecimals: (symbol: string) => number,
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
+) {
+  const [price, setPrice] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const cacheKey = `${tokenSymbol}-${network}`
+
+  const fetchTokenPrice = useCallback(async () => {
+    if (!tokenSymbol) {
+      setPrice(null)
+      setIsLoading(false)
+      return
+    }
+
+    // USDC는 항상 1달러
+    if (tokenSymbol === 'USDC') {
+      setPrice(1.0)
+      setIsLoading(false)
+      return
+    }
+
+    // Check cache first
+    const cached = priceCache.get(cacheKey)
+    const now = Date.now()
+    
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      setPrice(cached.price)
+      setIsLoading(cached.isLoading)
+      return
+    }
+
+    // If already loading, don't start another request
+    if (cached && cached.isLoading) {
+      setIsLoading(true)
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    // Mark as loading in cache
+    priceCache.set(cacheKey, {
+      price: cached?.price || null,
+      timestamp: now,
+      isLoading: true
+    })
+
+    try {
+      const provider = new ethers.JsonRpcProvider(getRPCUrl(network))
+      const usdcAddress = getUSDCTokenAddress(network)
+      const wethAddress = getWETHAddress(network)
+      const quoterAddress = getUniswapQuoterAddress(network)
+      
+      const tokenAddress = getTokenAddress(tokenSymbol)
+      const tokenDecimals = getTokenDecimals(tokenSymbol)
+      
+      if (!tokenAddress) {
+        throw new Error(`Token address not found for ${tokenSymbol}`)
+      }
+
+      const quoterInterface = new ethers.Interface(QUOTER_ABI)
+      const amountIn = ethers.parseUnits("1", tokenDecimals)
+      
+      // Try to get price via USDC first
+      const feeTiers = [3000, 500, 10000] // 0.3%, 0.05%, 1%
+      let tokenPrice = null
+
+      for (const fee of feeTiers) {
+        try {
+          const params = {
+            tokenIn: ethers.getAddress(tokenAddress),
+            tokenOut: ethers.getAddress(usdcAddress),
+            amountIn: amountIn,
+            fee: fee,
+            sqrtPriceLimitX96: 0
+          }
+          
+          const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+          
+          const result = await quoter.quoteExactInputSingle.staticCall(params)
+          const amountOut = result[0]
+          
+          if (amountOut > 0) {
+            const price = parseFloat(ethers.formatUnits(amountOut, 6)) // USDC has 6 decimals
+            tokenPrice = price
+            break
+          }
+        } catch (err) {
+          continue // Try next fee tier
+        }
+      }
+
+      // If USDC route failed, try WETH route
+      if (!tokenPrice) {
+        for (const fee of feeTiers) {
+          try {
+            const params = {
+              tokenIn: ethers.getAddress(tokenAddress),
+              tokenOut: ethers.getAddress(wethAddress),
+              amountIn: amountIn,
+              fee: fee,
+              sqrtPriceLimitX96: 0
+            }
+            
+            const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+            const result = await quoter.quoteExactInputSingle.staticCall(params)
+            const amountOut = result[0]
+            
+            if (amountOut > 0) {
+              const ethAmount = parseFloat(ethers.formatUnits(amountOut, 18))
+              
+              // Get ETH price in USD (assuming ~$2500 for immediate feedback)
+              const ethPriceUSD = 2500 // This should be more dynamic in production
+              tokenPrice = ethAmount * ethPriceUSD
+              break
+            }
+          } catch (err) {
+            continue
+          }
+        }
+      }
+
+      // Update cache with result
+      priceCache.set(cacheKey, {
+        price: tokenPrice,
+        timestamp: now,
+        isLoading: false
+      })
+
+      setPrice(tokenPrice)
+    } catch (err) {
+      console.error(`Error fetching price for ${tokenSymbol}:`, err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch price')
+      
+      // Update cache to mark as not loading
+      priceCache.set(cacheKey, {
+        price: cached?.price || null,
+        timestamp: now,
+        isLoading: false
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [tokenSymbol, getTokenAddress, getTokenDecimals, network, cacheKey])
+
+  useEffect(() => {
+    fetchTokenPrice()
+  }, [fetchTokenPrice])
+
+  return { price, isLoading, error, refetch: fetchTokenPrice }
+}
+
+// Hook for getting both token prices independently for immediate swap calculation
+export function useSwapTokenPricesIndependent(
+  fromTokenSymbol: string | null,
+  toTokenSymbol: string | null,
+  getTokenAddress: (symbol: string) => string,
+  getTokenDecimals: (symbol: string) => number,
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
+) {
+  const [fromTokenPrice, setFromTokenPrice] = useState<number | null>(null)
+  const [toTokenPrice, setToTokenPrice] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchBothTokenPrices = useCallback(async () => {
+    if (!fromTokenSymbol || !toTokenSymbol) {
+      setFromTokenPrice(null)
+      setToTokenPrice(null)
+      setIsLoading(false)
+      return
+    }
+
+    // Handle USDC cases
+    if (fromTokenSymbol === 'USDC') setFromTokenPrice(1.0)
+    if (toTokenSymbol === 'USDC') setToTokenPrice(1.0)
+
+    const fromKey = `${fromTokenSymbol}-${network}`
+    const toKey = `${toTokenSymbol}-${network}`
+    const now = Date.now()
+
+    // Check cache for both tokens
+    const fromCached = priceCache.get(fromKey)
+    const toCached = priceCache.get(toKey)
+
+    let needsFetch = false
+
+    if (fromTokenSymbol !== 'USDC' && (!fromCached || now - fromCached.timestamp >= CACHE_DURATION)) {
+      if (!fromCached?.isLoading) {
+        needsFetch = true
+      }
+    } else if (fromCached && fromTokenSymbol !== 'USDC') {
+      setFromTokenPrice(fromCached.price)
+    }
+
+    if (toTokenSymbol !== 'USDC' && (!toCached || now - toCached.timestamp >= CACHE_DURATION)) {
+      if (!toCached?.isLoading) {
+        needsFetch = true
+      }
+    } else if (toCached && toTokenSymbol !== 'USDC') {
+      setToTokenPrice(toCached.price)
+    }
+
+    if (!needsFetch) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const provider = new ethers.JsonRpcProvider(getRPCUrl(network))
+      const usdcAddress = getUSDCTokenAddress(network)
+      const quoterAddress = getUniswapQuoterAddress(network)
+      
+      const quoterInterface = new ethers.Interface(QUOTER_ABI)
+      const feeTiers = [3000, 500, 10000] // 0.3%, 0.05%, 1%
+
+      // Fetch from token price if needed
+      if (fromTokenSymbol !== 'USDC' && (!fromCached || now - fromCached.timestamp >= CACHE_DURATION)) {
+        const fromAddress = getTokenAddress(fromTokenSymbol)
+        const fromDecimals = getTokenDecimals(fromTokenSymbol)
+        
+        if (fromAddress) {
+          const amountIn = ethers.parseUnits("1", fromDecimals)
+          let fromPrice = null
+
+          for (const fee of feeTiers) {
+            try {
+              const params = {
+                tokenIn: ethers.getAddress(fromAddress),
+                tokenOut: ethers.getAddress(usdcAddress),
+                amountIn: amountIn,
+                fee: fee,
+                sqrtPriceLimitX96: 0
+              }
+              
+              const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+              const result = await quoter.quoteExactInputSingle.staticCall(params)
+              const amountOut = result[0]
+              
+              if (amountOut > 0) {
+                fromPrice = parseFloat(ethers.formatUnits(amountOut, 6))
+                break
+              }
+            } catch (err) {
+              continue
+            }
+          }
+
+          if (fromPrice) {
+            setFromTokenPrice(fromPrice)
+            priceCache.set(fromKey, {
+              price: fromPrice,
+              timestamp: now,
+              isLoading: false
+            })
+          }
+        }
+      }
+
+      // Fetch to token price if needed
+      if (toTokenSymbol !== 'USDC' && (!toCached || now - toCached.timestamp >= CACHE_DURATION)) {
+        const toAddress = getTokenAddress(toTokenSymbol)
+        const toDecimals = getTokenDecimals(toTokenSymbol)
+        
+        if (toAddress) {
+          const amountIn = ethers.parseUnits("1", toDecimals)
+          let toPrice = null
+
+          for (const fee of feeTiers) {
+            try {
+              const params = {
+                tokenIn: ethers.getAddress(toAddress),
+                tokenOut: ethers.getAddress(usdcAddress),
+                amountIn: amountIn,
+                fee: fee,
+                sqrtPriceLimitX96: 0
+              }
+              
+              const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+              const result = await quoter.quoteExactInputSingle.staticCall(params)
+              const amountOut = result[0]
+              
+              if (amountOut > 0) {
+                toPrice = parseFloat(ethers.formatUnits(amountOut, 6))
+                break
+              }
+            } catch (err) {
+              continue
+            }
+          }
+
+          if (toPrice) {
+            setToTokenPrice(toPrice)
+            priceCache.set(toKey, {
+              price: toPrice,
+              timestamp: now,
+              isLoading: false
+            })
+          }
+        }
+      }
+
+         } catch (err) {
+       console.error('Error fetching token prices:', err)
+       
+       // Handle 429 Too Many Requests error specifically
+       if (err instanceof Error && err.message.includes('Too Many Requests')) {
+         setError('요청 한도 초과. 잠시 후 다시 시도해주세요.')
+         
+         // Cache the error state to prevent immediate retries
+         priceCache.set(fromKey, {
+           price: null,
+           timestamp: now,
+           isLoading: false
+         })
+         priceCache.set(toKey, {
+           price: null,
+           timestamp: now,
+           isLoading: false
+         })
+       } else {
+         setError(err instanceof Error ? err.message : 'Failed to fetch prices')
+       }
+     } finally {
+       setIsLoading(false)
+     }
+  }, [fromTokenSymbol, toTokenSymbol, getTokenAddress, getTokenDecimals, network])
+
+  useEffect(() => {
+    // Debounce the fetch to prevent too many requests when user changes tokens quickly
+    const timeoutId = setTimeout(() => {
+      fetchBothTokenPrices()
+    }, 500) // 500ms delay
+
+    return () => clearTimeout(timeoutId)
+  }, [fetchBothTokenPrices])
+
+  const calculateSimpleSwapQuote = useCallback((fromAmount: number) => {
+    if (!fromTokenPrice || !toTokenPrice || fromAmount <= 0) {
+      return null
+    }
+
+    const fromValueUSD = fromAmount * fromTokenPrice
+    const toAmount = fromValueUSD / toTokenPrice
+    
+    // Apply simple fee estimation (0.3% typical for AMM DEXs)
+    const feeRate = 0.003
+    const toAmountAfterFees = toAmount * (1 - feeRate)
+    
+    return {
+      fromAmount,
+      toAmount: toAmountAfterFees,
+      exchangeRate: toAmountAfterFees / fromAmount,
+      fromValueUSD,
+      isBasicEstimate: true
+    }
+  }, [fromTokenPrice, toTokenPrice])
+
+  return {
+    fromTokenPrice,
+    toTokenPrice,
+    isLoading,
+    error,
+    calculateSimpleSwapQuote,
+    refetch: fetchBothTokenPrices
+  }
 } 
