@@ -358,11 +358,12 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     const value = e.target.value
     // Allow only numbers and decimal point
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      // Limit decimal places to 4
-      if (value.includes('.')) {
+      // Limit decimal places based on token decimals
+      if (value.includes('.') && fromToken) {
         const parts = value.split('.');
-        if (parts[1] && parts[1].length > 4) {
-          return; // Don't update if more than 4 decimal places
+        const maxDecimals = getTokenDecimals(fromToken);
+        if (parts[1] && parts[1].length > maxDecimals) {
+          return; // Don't update if more decimal places than token supports
         }
       }
       setFromAmount(value)
@@ -420,7 +421,11 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
     if (balance <= 0) return;
     
     const amount = balance * (percentage / 100);
-    setFromAmount(amount.toString());
+    const tokenDecimals = getTokenDecimals(fromToken);
+    
+    // Adjust to token decimals
+    const adjustedAmount = parseFloat(amount.toFixed(tokenDecimals));
+    setFromAmount(adjustedAmount.toString());
   }
 
   // Get available tokens
@@ -466,14 +471,14 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       return;
     }
 
-    if (parseFloat(fromAmount) <= 0) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Amount",
-        description: "Please enter a valid amount to swap.",
-      });
-      return;
-    }
+          if (parseFloat(fromAmount) <= 0) {
+        toast({
+          variant: "destructive",
+          title: t('invalidAmount'),
+          description: t('enterValidAmount'),
+        });
+        return;
+      }
 
     // Check if user has sufficient balance - use same logic as isAmountExceedsBalance
     if (isAmountExceedsBalance()) {
@@ -607,8 +612,27 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
 
       // Convert amount to wei format based on token decimals
       const fromTokenDecimals = getTokenDecimals(fromToken);
-      const amountInWei = ethers.parseUnits(fromAmount, fromTokenDecimals);
-
+      
+      // Fix decimal precision to match token decimals to prevent parseUnits error
+      const numericAmount = parseFloat(fromAmount);
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        throw new Error(t('invalidAmountFormat'));
+      }
+      
+      // 사용자 입력값 보존하면서 토큰 decimals 초과 방지
+      let adjustedAmount = fromAmount;
+      const decimalIndex = fromAmount.indexOf('.');
+      
+      if (decimalIndex !== -1) {
+        const decimalPlaces = fromAmount.length - decimalIndex - 1;
+        if (decimalPlaces > fromTokenDecimals) {
+          // 토큰 decimals보다 많은 소수점이 있으면 자르기
+          adjustedAmount = numericAmount.toFixed(fromTokenDecimals);
+        }
+      }
+      
+      const amountInWei = ethers.parseUnits(adjustedAmount, fromTokenDecimals);
+      
       // Call the swap function
       const tx = await steleContract.swap(
         challengeId,
@@ -681,17 +705,17 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   // Priority: 1. Accurate Uniswap quote 2. Simple estimate 3. Zero
   const outputAmount = fromAmount && parseFloat(fromAmount) > 0 
     ? (swapQuote 
-        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(6)
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(Math.min(6, getTokenDecimals(toToken)))
         : (simpleSwapQuote 
-            ? simpleSwapQuote.toAmount.toFixed(6)
+            ? simpleSwapQuote.toAmount.toFixed(Math.min(6, getTokenDecimals(toToken)))
             : "0"))
     : "0";
   
   const minimumReceived = fromAmount && parseFloat(fromAmount) > 0
     ? (swapQuote
-        ? (parseFloat(fromAmount) * swapQuote.exchangeRate * 0.99).toFixed(4)
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate * 0.99).toFixed(Math.min(4, getTokenDecimals(toToken)))
         : (simpleSwapQuote 
-            ? (simpleSwapQuote.toAmount * 0.99).toFixed(4)
+            ? (simpleSwapQuote.toAmount * 0.99).toFixed(Math.min(4, getTokenDecimals(toToken)))
             : "0"))
     : "0";
 
@@ -896,7 +920,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                       if (!outputAmount || outputAmount === "0") return "0";
                       const num = parseFloat(outputAmount);
                       if (num % 1 === 0) return num.toString();
-                      return num.toFixed(4).replace(/\.?0+$/, '');
+                      return num.toFixed(Math.min(4, getTokenDecimals(toToken))).replace(/\.?0+$/, '');
                     })()}
                   </div>
                   <div className="text-sm text-gray-400 mt-1">
@@ -988,7 +1012,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
           {/* Exchange Rate - Simple Display */}
           {isDataReady && fromToken && toToken && (swapQuote || simpleSwapQuote) && (
             <div className="text-center text-sm text-gray-400">
-              1 {fromToken} = {(swapQuote ? swapQuote.exchangeRate : simpleSwapQuote?.exchangeRate || 0).toFixed(6)} {toToken}
+              1 {fromToken} = {(swapQuote ? swapQuote.exchangeRate : simpleSwapQuote?.exchangeRate || 0).toFixed(Math.min(6, getTokenDecimals(toToken)))} {toToken}
               {isUsingBasicEstimate && (
                 <span className="text-orange-400 ml-1">({t('loadingPrice')})</span>
               )}
