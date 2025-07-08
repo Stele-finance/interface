@@ -58,6 +58,7 @@ export const jp = {
   currentTime: "現在時刻",
   customContractInteraction: "カスタムコントラクトインタラクション",
   customProposal: "カスタム提案",
+  daily: "日次",
   dashboard: "ダッシュボード",
   dataRefreshedSuccessfully: "データが正常に更新されました",
   dataUpdateInProgress: "データの更新が進行中です。数分かかる場合があります。",
@@ -341,6 +342,7 @@ export const jp = {
   volume: "ボリューム",
   walletNotConnected: "ウォレットが接続されていません",
   warning: "警告",
+  weekly: "週次",
   youCancelledNetworkSwitch: "ネットワーク切り替えリクエストをキャンセルしました。",
   youHaveAlreadyVoted: "この提案にはすでに投票しています",
   youNeedToDelegate: "ガバナンスに参加するにはトークンを委任する必要があります"

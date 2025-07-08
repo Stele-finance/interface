@@ -58,6 +58,7 @@ export const th = {
   currentTime: "เวลาปัจจุบัน",
   customContractInteraction: "การโต้ตอบสัญญาแบบกำหนดเอง",
   customProposal: "ข้อเสนอแบบกำหนดเอง",
+  daily: "รายวัน",
   dashboard: "แดชบอร์ด",
   dataRefreshedSuccessfully: "รีเฟรชข้อมูลสำเร็จ",
   dataUpdateInProgress: "การอัปเดตข้อมูลกำลังดำเนินการ อาจใช้เวลาสักสองสามนาที",
@@ -341,6 +342,7 @@ export const th = {
   volume: "ปริมาณ",
   walletNotConnected: "วอลเล็ตไม่ได้เชื่อมต่อ",
   warning: "คำเตือน",
+  weekly: "รายสัปดาห์",
   youCancelledNetworkSwitch: "คุณยกเลิกการขอเปลี่ยนเครือข่าย",
   youHaveAlreadyVoted: "คุณได้โหวตในข้อเสนอนี้แล้ว",
   youNeedToDelegate: "คุณต้องมอบหมายโทเค็นของคุณเพื่อเข้าร่วมการบริหาร"

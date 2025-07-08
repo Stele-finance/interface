@@ -58,6 +58,7 @@ export const el = {
   currentTime: "Τρέχων Χρόνος",
   customContractInteraction: "Προσαρμοσμένη Αλληλεπίδραση Συμβολαίου",
   customProposal: "Προσαρμοσμένη Πρόταση",
+  daily: "Καθημερινά",
   dashboard: "Πίνακας Ελέγχου",
   dataRefreshedSuccessfully: "Τα δεδομένα ανανεώθηκαν επιτυχώς",
   dataUpdateInProgress: "Η ενημέρωση δεδομένων βρίσκεται σε εξέλιξη. Μπορεί να χρειαστούν μερικά λεπτά.",
@@ -341,6 +342,7 @@ export const el = {
   volume: "Όγκος",
   walletNotConnected: "Wallet Δεν Είναι Συνδεδεμένο",
   warning: "Προειδοποίηση",
+  weekly: "Εβδομαδιαία",
   youCancelledNetworkSwitch: "Ακυρώσατε το αίτημα αλλαγής δικτύου.",
   youHaveAlreadyVoted: "Έχετε ήδη ψηφίσει σε αυτή την πρόταση",
   youNeedToDelegate: "Πρέπει να εκχωρήσετε τα tokens σας για να συμμετάσχετε στη διακυβέρνηση"

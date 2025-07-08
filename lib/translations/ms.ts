@@ -58,6 +58,7 @@ export const ms = {
   currentTime: "Masa Semasa",
   customContractInteraction: "Interaksi Kontrak Tersuai",
   customProposal: "Cadangan Tersuai",
+  daily: "Harian",
   dashboard: "Papan Pemuka",
   dataRefreshedSuccessfully: "Data berjaya disegarkan",
   dataUpdateInProgress: "Kemas kini data sedang berlangsung. Mungkin mengambil beberapa minit.",
@@ -341,6 +342,7 @@ export const ms = {
   volume: "Isipadu",
   walletNotConnected: "Wallet Tidak Tersambung",
   warning: "Amaran",
+  weekly: "Mingguan",
   youCancelledNetworkSwitch: "Anda membatalkan permintaan pertukaran rangkaian.",
   youHaveAlreadyVoted: "Anda sudah mengundi untuk cadangan ini",
   youNeedToDelegate: "Anda perlu mewakilkan token anda untuk menyertai tadbir urus"

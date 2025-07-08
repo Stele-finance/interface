@@ -58,6 +58,7 @@ export const it = {
   currentTime: "Ora Attuale",
   customContractInteraction: "Interazione Contratto Personalizzato",
   customProposal: "Proposta Personalizzata",
+  daily: "Giornaliero",
   dashboard: "Dashboard",
   dataRefreshedSuccessfully: "Dati aggiornati con successo",
   dataUpdateInProgress: "L'aggiornamento dei dati è in corso. Potrebbe richiedere alcuni minuti.",
@@ -341,6 +342,7 @@ export const it = {
   volume: "Volume",
   walletNotConnected: "Wallet Non Connesso",
   warning: "Avviso",
+  weekly: "Settimanale",
   youCancelledNetworkSwitch: "Hai annullato la richiesta di cambio rete.",
   youHaveAlreadyVoted: "Hai già votato su questa proposta",
   youNeedToDelegate: "Devi delegare i tuoi token per partecipare alla governance"

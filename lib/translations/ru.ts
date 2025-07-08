@@ -58,6 +58,7 @@ export const ru = {
   currentTime: "Текущее Время",
   customContractInteraction: "Взаимодействие с Пользовательским Контрактом",
   customProposal: "Пользовательское Предложение",
+  daily: "Ежедневно",
   dashboard: "Панель",
   dataRefreshedSuccessfully: "Данные успешно обновлены",
   dataUpdateInProgress: "Обновление данных в процессе. Это может занять несколько минут.",
@@ -341,6 +342,7 @@ export const ru = {
   volume: "Объем",
   walletNotConnected: "Кошелек Не Подключен",
   warning: "Предупреждение",
+  weekly: "Еженедельно",
   youCancelledNetworkSwitch: "Вы отменили запрос на переключение сети.",
   youHaveAlreadyVoted: "Вы уже проголосовали по этому предложению",
   youNeedToDelegate: "Вам нужно делегировать ваши токены для участия в управлении"
