@@ -10,7 +10,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Check, Clock, XCircle, Plus, FileText, Vote as VoteIcon, Loader2 } from "lucide-react"
 import { useProposalsData, useActiveProposalsData, useMultipleProposalVoteResults, useProposalsByStatus, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
 import { useQueryClient } from '@tanstack/react-query'
-import { ARBITRUM_BLOCK_TIME_MS, STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
+import { STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"
 import { useGovernanceConfig } from "@/app/hooks/useGovernanceConfig"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
@@ -141,15 +141,17 @@ export default function VotePage() {
     if (tab === "all") setAllProposalsPage(1)
   }
 
-  // Get current block info from RPC (called only once)
+  // Get current Ethereum mainnet block info from RPC (called only once)
+  // Note: Governor contracts use Ethereum block numbers even on L2s for cross-chain governance
   const getCurrentBlockInfo = async () => {
     if (currentBlockInfo || isLoadingBlockInfo) return // Prevent multiple calls
     
     setIsLoadingBlockInfo(true)
     try {
-      const rpcUrl = getRPCUrl(subgraphNetwork)
+      // Always use Ethereum mainnet for block info since voteStart/voteEnd use Ethereum block numbers
+      const ethereumRpcUrl = getRPCUrl('ethereum')
         
-      const provider = new ethers.JsonRpcProvider(rpcUrl)
+      const provider = new ethers.JsonRpcProvider(ethereumRpcUrl)
       const currentBlock = await provider.getBlock('latest')
       
       if (currentBlock) {
@@ -158,27 +160,29 @@ export default function VotePage() {
           timestamp: currentBlock.timestamp
         }
         setCurrentBlockInfo(blockInfo)
+        console.log('Using Ethereum mainnet block info for timestamp calculation:', blockInfo)
       }
     } catch (error) {
-      console.error('Error getting current block info:', error)
+      console.error('Error getting Ethereum mainnet block info:', error)
     } finally {
       setIsLoadingBlockInfo(false)
     }
   }
 
-  // Calculate timestamp for any block number based on current block info
+  // Calculate timestamp for any block number based on Ethereum mainnet block info
+  // Note: voteStart/voteEnd values are Ethereum block numbers even on L2 networks
   const calculateBlockTimestamp = (targetBlockNumber: string): number => {
     if (!currentBlockInfo) {
-      console.warn('No current block info available for timestamp calculation')
+      console.warn('No current Ethereum block info available for timestamp calculation')
       return Date.now() / 1000 // Return current time as fallback
     }
     
     const targetBlock = parseInt(targetBlockNumber)
     const blockDifference = targetBlock - currentBlockInfo.blockNumber
     
-    // Use different block times based on network (default to 12 seconds for Ethereum)
-    const BLOCK_TIME_SECONDS = 12 // Ethereum mainnet average
-    const estimatedTimestamp = currentBlockInfo.timestamp + (blockDifference * BLOCK_TIME_SECONDS)
+    // Always use Ethereum mainnet block time (12 seconds) since Governor uses Ethereum blocks
+    const ETHEREUM_BLOCK_TIME_SECONDS = 12
+    const estimatedTimestamp = currentBlockInfo.timestamp + (blockDifference * ETHEREUM_BLOCK_TIME_SECONDS)
     return estimatedTimestamp
   }
 
@@ -460,12 +464,13 @@ export default function VotePage() {
     } else {
       // Fallback to estimated periods based on status and timestamps
       // Use actual governance config if available, otherwise use default estimates
-      const votingPeriodBlocks = governanceConfig?.votingPeriod || 21600 // Default: ~3 days at 2 sec/block
-      const votingDelayBlocks = governanceConfig?.votingDelay || 7200 // Default: ~1 day at 2 sec/block
+      const votingPeriodBlocks = governanceConfig?.votingPeriod || 21600 // Default: ~3 days at 12 sec/block
+      const votingDelayBlocks = governanceConfig?.votingDelay || 7200 // Default: ~1 day at 12 sec/block
       
-      // Convert blocks to milliseconds (Base mainnet: ~2 seconds per block)
-              const votingPeriodMs = votingPeriodBlocks * ARBITRUM_BLOCK_TIME_MS
-        const votingDelayMs = votingDelayBlocks * ARBITRUM_BLOCK_TIME_MS
+      // Convert blocks to milliseconds using Ethereum block time since Governor uses Ethereum blocks
+      const ETHEREUM_BLOCK_TIME_MS = 12 * 1000 // 12 seconds per block
+      const votingPeriodMs = votingPeriodBlocks * ETHEREUM_BLOCK_TIME_MS
+      const votingDelayMs = votingDelayBlocks * ETHEREUM_BLOCK_TIME_MS
       
       if (proposalData.status === 'PENDING') {
         // For pending proposals, voting hasn't started yet
