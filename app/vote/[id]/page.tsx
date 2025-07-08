@@ -33,6 +33,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
+import { ClientOnly } from "@/components/ClientOnly"
 
 interface ProposalDetailPageProps {
   params: Promise<{
@@ -1188,14 +1189,25 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               </CardDescription>
               
               {/* Debug Information */}
-              <div className="text-sm bg-gray-800/50 border border-gray-600 p-4 rounded-md space-y-2 text-gray-300">
-                <div className="text-gray-300">⏰ {t('currentTime')}: <span className="font-semibold text-gray-100">{currentTime}</span></div>
-                <div className="text-gray-300">📅 {t('voteEndTime')}: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
-                <div className="text-gray-300">👍 {t('votesFor')}: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
-                <div className="text-gray-300">👎 {t('votesAgainst')}: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
-                <div className="text-gray-300">🤷 {t('abstainVotes')}: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
-                <div className="text-gray-300">📊 {t('totalVotes')}: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
-              </div>
+              <ClientOnly fallback={
+                <div className="text-sm bg-gray-800/50 border border-gray-600 p-4 rounded-md space-y-2 text-gray-300">
+                  <div className="text-gray-300">⏰ {t('currentTime')}: <span className="font-semibold text-gray-100">Loading...</span></div>
+                  <div className="text-gray-300">📅 {t('voteEndTime')}: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
+                  <div className="text-gray-300">👍 {t('votesFor')}: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
+                  <div className="text-gray-300">👎 {t('votesAgainst')}: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
+                  <div className="text-gray-300">🤷 {t('abstainVotes')}: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
+                  <div className="text-gray-300">📊 {t('totalVotes')}: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
+                </div>
+              }>
+                <div className="text-sm bg-gray-800/50 border border-gray-600 p-4 rounded-md space-y-2 text-gray-300">
+                  <div className="text-gray-300">⏰ {t('currentTime')}: <span className="font-semibold text-gray-100">{currentTime || 'Loading...'}</span></div>
+                  <div className="text-gray-300">📅 {t('voteEndTime')}: <span className="font-semibold text-gray-100">{proposal.endTime.toLocaleString()}</span></div>
+                  <div className="text-gray-300">👍 {t('votesFor')}: <span className="font-semibold text-green-400">{proposal.votesFor.toLocaleString()}</span></div>
+                  <div className="text-gray-300">👎 {t('votesAgainst')}: <span className="font-semibold text-red-400">{proposal.votesAgainst.toLocaleString()}</span></div>
+                  <div className="text-gray-300">🤷 {t('abstainVotes')}: <span className="font-semibold text-gray-400">{proposal.abstain.toLocaleString()}</span></div>
+                  <div className="text-gray-300">📊 {t('totalVotes')}: <span className="font-semibold text-gray-100">{(proposal.votesFor + proposal.votesAgainst + proposal.abstain).toLocaleString()}</span></div>
+                </div>
+              </ClientOnly>
 
               {isConnected && (
                 <div className="text-sm text-gray-400 space-y-1">
@@ -1323,7 +1335,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               </Button>
 
               {/* Queue Button - Show when proposal is ready for queue (voting ended + majority for) */}
-              {currentTime && isConnected && isReadyForQueue() && (
+              <ClientOnly>
+                {currentTime && isConnected && isReadyForQueue() && (
                 <Button 
                   variant="outline"
                   className="w-full" 
@@ -1348,6 +1361,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   )}
                 </Button>
               )}
+              </ClientOnly>
 
               {/* Execute Button - Show when proposal is queued (state 5) */}
               {isConnected && proposalState === 5 && (
