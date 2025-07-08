@@ -419,14 +419,22 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     return (
       <Card className="bg-transparent border-0">
         <CardHeader className="pb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <div className="flex items-baseline gap-3">
+              <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-medium text-gray-400">0.00%</span>
+              </div>
+            </div>
             {/* Show interval selector even when no data */}
             <div className="flex items-center space-x-2">
               <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                 <button
                   onClick={() => setInterval('daily')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     interval === 'daily' 
                       ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
@@ -436,7 +444,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 </button>
                 <button
                   onClick={() => setInterval('weekly')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     interval === 'weekly' 
                       ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
@@ -445,12 +453,6 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                   {t('weekly')}
                 </button>
               </div>
-            </div>
-          </div>
-          <div className="flex items-baseline gap-3">
-            <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-gray-400">0.00%</span>
             </div>
           </div>
         </CardHeader>
@@ -466,50 +468,50 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   return (
     <Card className="bg-transparent border-0">
       <CardHeader className="pb-6">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-4 mb-2">
           <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
-          <div className="flex items-center gap-4">
-            {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
-              <div className="flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="text-xs text-green-400">{t('live')}</span>
-              </div>
-            )}
-            {/* Interval selector */}
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setInterval('daily')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setInterval('weekly')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
+          {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span className="text-xs text-green-400">{t('live')}</span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-baseline justify-between gap-3">
+          <div className="flex items-baseline gap-3">
+            <CardTitle className="text-4xl font-bold text-gray-100">
+              ${currentPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </CardTitle>
+            <div className="flex items-center gap-1">
+              <span className={`text-sm font-medium ${metrics.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                {metrics.isPositive ? '▲' : '▼'} {Math.abs(metrics.gainLossPercentage).toFixed(2)}%
+              </span>
             </div>
           </div>
-        </div>
-        <div className="flex items-baseline gap-3">
-          <CardTitle className="text-4xl font-bold text-gray-100">
-            ${currentPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </CardTitle>
-          <div className="flex items-center gap-1">
-            <span className={`text-sm font-medium ${metrics.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-              {metrics.isPositive ? '▲' : '▼'} {Math.abs(metrics.gainLossPercentage).toFixed(2)}%
-            </span>
+          {/* Interval selector */}
+          <div className="flex items-center space-x-2">
+            <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+              <button
+                onClick={() => setInterval('daily')}
+                className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  interval === 'daily' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                }`}
+              >
+                {t('daily')}
+              </button>
+              <button
+                onClick={() => setInterval('weekly')}
+                className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  interval === 'weekly' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                }`}
+              >
+                {t('weekly')}
+              </button>
+            </div>
           </div>
         </div>
       </CardHeader>

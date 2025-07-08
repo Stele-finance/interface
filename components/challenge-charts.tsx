@@ -232,34 +232,34 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
           <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
-              <div className="flex items-center space-x-2">
-                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setIntervalType('daily')}
-                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'daily' 
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setIntervalType('weekly')}
-                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'weekly' 
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('weekly')}
-                  </button>
-                </div>
+                      <div className="flex items-center justify-between mb-2">
+            <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setIntervalType('daily')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setIntervalType('weekly')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
               </div>
             </div>
-            <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
+          </div>
+          <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
             <p className="text-sm text-gray-400">{currentDate}</p>
           </CardHeader>
           <CardContent>
@@ -287,13 +287,18 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
       {/* Total Rewards Chart - Takes 2 columns */}
       <Card className="bg-transparent border-0 lg:col-span-2">
         <CardHeader className="pb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <CardTitle className="text-4xl font-bold text-gray-100">
+            ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </CardTitle>
             <div className="flex items-center space-x-2">
               <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                 <button
                   onClick={() => setIntervalType('daily')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     intervalType === 'daily' 
                       ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
@@ -303,7 +308,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
                 </button>
                 <button
                   onClick={() => setIntervalType('weekly')}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     intervalType === 'weekly' 
                       ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
@@ -313,11 +318,6 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
                 </button>
               </div>
             </div>
-          </div>
-          <div className="flex items-baseline gap-3">
-            <CardTitle className="text-4xl font-bold text-gray-100">
-            ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-          </CardTitle>
           </div>
           <p className="text-sm text-gray-400">{currentDate}</p>
         </CardHeader>
