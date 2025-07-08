@@ -237,7 +237,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                       <button
                         onClick={() => setChartType('rewards')}
                         className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out flex items-center ${
-                          chartType === 'rewards' 
+                          (chartType as string) === 'rewards' 
                             ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                             : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                         }`}
@@ -358,7 +358,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                       <button
                         onClick={() => setChartType('participants')}
                         className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out flex items-center ${
-                          chartType === 'participants' 
+                          (chartType as string) === 'participants' 
                             ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
                             : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                         }`}
