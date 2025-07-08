@@ -1,7 +1,6 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useActiveChallengesSnapshots } from '@/app/hooks/useActiveChallengesSnapshots'
 import { useActiveChallengesWeeklySnapshots } from '@/app/hooks/useActiveChallengesWeeklySnapshots'
@@ -37,8 +36,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   const [activeIndexParticipants, setActiveIndexParticipants] = useState<number | null>(null)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
-
-
+  const [chartType, setChartType] = useState<'participants' | 'rewards'>('participants')
 
   const dailyChartData = useMemo(() => {
     if (!dailyData?.activeChallengesSnapshots) return []
@@ -178,59 +176,73 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
 
   return (
     <div className="mb-6">
-      <Tabs defaultValue="participants" className="w-full">
-        <Card className="bg-transparent border-0">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <TabsContent value="participants" className="m-0">
-                  <h3 className="text-3xl text-gray-100">{t('totalParticipants')}</h3>
-                </TabsContent>
-                <TabsContent value="rewards" className="m-0">
-                  <h3 className="text-3xl text-gray-100">{t('totalRewards')}</h3>
-                </TabsContent>
-              </div>
-              <div className="flex items-center space-x-4">
-                {/* Interval selector */}
-                <div className="flex items-center space-x-2">
-                  <div className="grid grid-cols-2 bg-gray-800/50 p-1 rounded-lg">
-                    <button
-                      onClick={() => setIntervalType('daily')}
-                      className={`px-3 py-1 text-sm rounded transition-colors ${
-                        intervalType === 'daily' 
-                          ? 'bg-gray-700 text-white' 
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {t('daily')}
-                    </button>
-                    <button
-                      onClick={() => setIntervalType('weekly')}
-                      className={`px-3 py-1 text-sm rounded transition-colors ${
-                        intervalType === 'weekly' 
-                          ? 'bg-gray-700 text-white' 
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {t('weekly')}
-                    </button>
-                  </div>
+      <Card className="bg-transparent border-0">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-3xl text-gray-100">
+                {chartType === 'participants' ? t('totalParticipants') : t('totalRewards')}
+              </h3>
+            </div>
+            <div className="flex items-center space-x-4">
+              {/* Interval selector */}
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                  <button
+                    onClick={() => setIntervalType('daily')}
+                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'daily' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('daily')}
+                  </button>
+                  <button
+                    onClick={() => setIntervalType('weekly')}
+                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'weekly' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('weekly')}
+                  </button>
                 </div>
-                <TabsList className="grid grid-cols-2 bg-gray-800/50">
-                  <TabsTrigger value="participants" className="data-[state=active]:bg-gray-700">
+              </div>
+              {/* Chart type selector */}
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                  <button
+                    onClick={() => setChartType('participants')}
+                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out flex items-center ${
+                      chartType === 'participants' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
                     <Users className="h-4 w-4 mr-2" />
                     {t('participants')}
-                  </TabsTrigger>
-                  <TabsTrigger value="rewards" className="data-[state=active]:bg-gray-700">
+                  </button>
+                  <button
+                    onClick={() => setChartType('rewards')}
+                    className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out flex items-center ${
+                      chartType === 'rewards' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
                     <DollarSign className="h-4 w-4 mr-2" />
                     {t('rewards')}
-                  </TabsTrigger>
-                </TabsList>
+                  </button>
+                </div>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <TabsContent value="participants" className="mt-0">
+          </div>
+        </CardHeader>
+        <CardContent>
+          {chartType === 'participants' && (
+            <div className="mt-0">
               <div className="mb-2">
                 <CardTitle className="text-4xl text-gray-100">
                   {hasNoData ? "-" : (totalParticipants >= 1000 ? `${(totalParticipants / 1000).toFixed(1)}K` : totalParticipants.toLocaleString())}
@@ -302,9 +314,11 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   </AreaChart>
                 </ResponsiveContainer>
               )}
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="rewards" className="mt-0">
+          {chartType === 'rewards' && (
+            <div className="mt-0">
               <div className="mb-2">
                 <CardTitle className="text-4xl text-gray-100">
                   {hasNoData ? "-" : `$${totalRewards >= 1000000 ? `${(totalRewards / 1000000).toFixed(1)}M` : totalRewards >= 1000 ? `${(totalRewards / 1000).toFixed(1)}K` : totalRewards.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
@@ -376,10 +390,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   </AreaChart>
                 </ResponsiveContainer>
               )}
-            </TabsContent>
-          </CardContent>
-        </Card>
-      </Tabs>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 } 

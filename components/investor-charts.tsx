@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '@/app/hooks/useInvestorSnapshots'
+import { useInvestorWeeklySnapshots } from '@/app/hooks/useInvestorWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
 import { DollarSign, TrendingUp, TrendingDown, User, Trophy } from 'lucide-react'
@@ -41,17 +42,22 @@ interface InvestorChartsProps {
 export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio }: InvestorChartsProps) {
   const { t } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
+  const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 30, network)
   const { data: challengeData } = useChallenge(challengeId, network)
   const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
-
-
+  const [interval, setInterval] = useState<'daily' | 'weekly'>('daily')
 
   const chartData = useMemo(() => {
-    if (!data?.investorSnapshots) return []
+    // Select data source based on interval
+    const selectedData = interval === 'weekly' 
+      ? weeklyData?.investorWeeklySnapshots 
+      : data?.investorSnapshots
+    
+    if (!selectedData) return []
 
     // Convert and sort data by timestamp
-    const processedData = data.investorSnapshots
+    const processedData = selectedData
       .map((snapshot, index) => {
         const date = new Date(Number(snapshot.timestamp) * 1000)
         
@@ -61,31 +67,47 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           currentUSD: parseFloat(snapshot.currentUSD) || 0,
           seedMoneyUSD: Number(snapshot.seedMoneyUSD),
           profitRatio: Number(snapshot.profitRatio),
-          formattedDate: date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric'
-          }),
-          fullDate: date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          }),
-          timeLabel: date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          }),
+          formattedDate: interval === 'weekly' 
+            ? date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+              })
+            : date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+              }),
+          fullDate: interval === 'weekly'
+            ? date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+              })
+            : date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              }),
+          timeLabel: interval === 'weekly'
+            ? date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+              })
+            : date.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              }),
           dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           isRealTime: false
         }
       })
       .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)
 
-    // Add real-time data point if available
-    if (realTimePortfolio && realTimePortfolio.totalValue > 0) {
+    // Add real-time data point if available (only for daily interval)
+    if (interval === 'daily' && realTimePortfolio && realTimePortfolio.totalValue > 0) {
       const currentDate = new Date(realTimePortfolio.timestamp)
       const seedMoney = investorData?.investor ? (parseFloat(investorData.investor.seedMoneyUSD) || 0) : 0
       
@@ -119,9 +141,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       processedData.push(realTimeDataPoint)
     }
 
-
     return processedData
-  }, [data, realTimePortfolio, investorData])
+  }, [data, weeklyData, interval, realTimePortfolio, investorData])
 
   // Calculate current values for headers (prefer real-time data if available)
   const currentPortfolioValue = useMemo(() => {
@@ -375,7 +396,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     )
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingWeekly) {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
@@ -389,12 +410,49 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     )
   }
 
-  if (error || !data?.investorSnapshots || chartData.length === 0) {
+  // Check if there's data for the selected interval
+  const hasData = interval === 'weekly' 
+    ? weeklyData?.investorWeeklySnapshots && weeklyData.investorWeeklySnapshots.length > 0
+    : data?.investorSnapshots && data.investorSnapshots.length > 0
+
+  if (error || weeklyError || !hasData || chartData.length === 0) {
     return (
       <Card className="bg-transparent border-0">
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
-          <p className="text-sm text-gray-400">{currentDate}</p>
+        <CardHeader className="pb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
+            {/* Show interval selector even when no data */}
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setInterval('daily')}
+                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    interval === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setInterval('weekly')}
+                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    interval === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-baseline gap-3">
+            <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium text-gray-400">0.00%</span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="h-80 flex items-center justify-center">
@@ -410,12 +468,39 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       <CardHeader className="pb-6">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
-          {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
-            <div className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-xs text-green-400">{t('live')}</span>
+          <div className="flex items-center gap-4">
+            {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span className="text-xs text-green-400">{t('live')}</span>
+              </div>
+            )}
+            {/* Interval selector */}
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setInterval('daily')}
+                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    interval === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setInterval('weekly')}
+                  className={`px-4 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    interval === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
             </div>
-          )}
+          </div>
         </div>
         <div className="flex items-baseline gap-3">
           <CardTitle className="text-4xl font-bold text-gray-100">
