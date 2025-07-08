@@ -13,7 +13,7 @@ export const zhTw = {
   back: "返回",
   backToProposals: "返回提案",
   balance: "餘額",
-  baseMainnet: "Base 主網",
+
   browserExtension: "瀏覽器擴充功能",
   browseChallenges: "瀏覽挑戰",
   buy: "購買",

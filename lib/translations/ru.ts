@@ -13,7 +13,7 @@ export const ru = {
   back: "Назад",
   backToProposals: "Назад к Предложениям",
   balance: "Баланс",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Расширение Браузера",
   browseChallenges: "Обзор Вызовов",
   buy: "Купить",

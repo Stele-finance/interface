@@ -13,7 +13,7 @@ export const zhCn = {
   back: "返回",
   backToProposals: "返回提案",
   balance: "余额",
-  baseMainnet: "Base主网",
+
   browserExtension: "浏览器扩展",
   browseChallenges: "浏览挑战",
   buy: "购买",

@@ -13,7 +13,7 @@ export const es = {
   back: "Volver",
   backToProposals: "Volver a Propuestas",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Extensión del Navegador",
   browseChallenges: "Explorar Desafíos",
   buy: "Comprar",

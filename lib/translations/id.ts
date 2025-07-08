@@ -13,7 +13,7 @@ export const id = {
   back: "Kembali",
   backToProposals: "Kembali ke Proposal",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Ekstensi Browser",
   browseChallenges: "Jelajahi Tantangan",
   buy: "Beli",

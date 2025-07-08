@@ -13,7 +13,7 @@ export const th = {
   back: "กลับ",
   backToProposals: "กลับไปยังข้อเสนอ",
   balance: "ยอดคงเหลือ",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "ส่วนขยายเบราว์เซอร์",
   browseChallenges: "เรียกดูชาเลนจ์",
   buy: "ซื้อ",

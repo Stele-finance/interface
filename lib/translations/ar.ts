@@ -13,7 +13,7 @@ export const ar = {
   back: "رجوع",
   backToProposals: "العودة إلى المقترحات",
   balance: "الرصيد",
-  baseMainnet: "شبكة Base الرئيسية",
+
   browserExtension: "ملحق المتصفح",
   browseChallenges: "تصفح التحديات",
   buy: "شراء",
