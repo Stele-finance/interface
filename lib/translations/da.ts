@@ -13,7 +13,7 @@ export const da = {
   back: "Tilbage",
   backToProposals: "Tilbage til Forslag",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Browserudvidelse",
   browseChallenges: "Gennemse Udfordringer",
   buy: "Køb",

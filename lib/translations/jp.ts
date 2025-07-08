@@ -13,7 +13,7 @@ export const jp = {
   back: "戻る",
   backToProposals: "提案に戻る",
   balance: "残高",
-  baseMainnet: "Baseメインネット",
+
   browserExtension: "ブラウザ拡張機能",
   browseChallenges: "チャレンジを閲覧",
   buy: "購入",

@@ -13,7 +13,7 @@ export const el = {
   back: "Πίσω",
   backToProposals: "Πίσω στις Προτάσεις",
   balance: "Υπόλοιπο",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Επέκταση Περιηγητή",
   browseChallenges: "Περιήγηση Προκλήσεων",
   buy: "Αγορά",

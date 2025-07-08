@@ -13,7 +13,7 @@ export const en = {
   back: "Back",
   backToProposals: "Back to Proposals",
   balance: "Balance",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Browser Extension",
   browseChallenges: "Browse Challenges",
   buy: "Buy",

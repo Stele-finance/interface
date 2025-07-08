@@ -13,7 +13,7 @@ export const hu = {
   back: "Vissza",
   backToProposals: "Vissza a javaslatokhoz",
   balance: "Egyenleg",
-  baseMainnet: "Base főhálózat",
+
   browserExtension: "Böngésző Kiterjesztés",
   browseChallenges: "Kihívások böngészése",
   buy: "Vásárlás",

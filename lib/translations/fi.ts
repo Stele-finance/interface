@@ -13,7 +13,7 @@ export const fi = {
   back: "Takaisin",
   backToProposals: "Takaisin Ehdotuksiin",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Selainlaajennus",
   browseChallenges: "Selaa Haasteita",
   buy: "Osta",

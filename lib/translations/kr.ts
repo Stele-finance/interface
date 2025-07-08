@@ -13,7 +13,7 @@ export const kr = {
   back: "뒤로",
   backToProposals: "제안으로 돌아가기",
   balance: "잔액",
-  baseMainnet: "베이스 메인넷",
+
   browserExtension: "브라우저 확장 프로그램",
   browseChallenges: "챌린지 둘러보기",
   buy: "구매",

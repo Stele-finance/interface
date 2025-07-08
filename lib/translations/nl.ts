@@ -13,7 +13,7 @@ export const nl = {
   back: "Terug",
   backToProposals: "Terug naar Voorstellen",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Browserextensie",
   browseChallenges: "Blader Door Uitdagingen",
   buy: "Kopen",

@@ -13,7 +13,7 @@ export const ms = {
   back: "Kembali",
   backToProposals: "Kembali ke Cadangan",
   balance: "Baki",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Sambungan Pelayar",
   browseChallenges: "Semak Cabaran",
   buy: "Beli",

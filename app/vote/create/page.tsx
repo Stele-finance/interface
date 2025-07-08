@@ -178,12 +178,6 @@ export default function CreateProposalPage() {
     switch (chainId) {
       case '0x1': // Ethereum Mainnet
         return `https://etherscan.io/tx/${txHash}`;
-      case '0x2105': // Base Mainnet
-        return `https://basescan.org/tx/${txHash}`;
-      case '0x89': // Polygon
-        return `https://polygonscan.com/tx/${txHash}`;
-      case '0xa': // Optimism
-        return `https://optimistic.etherscan.io/tx/${txHash}`;
       case '0xa4b1': // Arbitrum One
         return `https://arbiscan.io/tx/${txHash}`;
       default:
@@ -195,12 +189,6 @@ export default function CreateProposalPage() {
     switch (chainId) {
       case '0x1': // Ethereum Mainnet
         return 'Etherscan';
-      case '0x2105': // Base Mainnet
-        return 'BaseScan';
-      case '0x89': // Polygon
-        return 'PolygonScan';
-      case '0xa': // Optimism
-        return 'Optimistic Etherscan';
       case '0xa4b1': // Arbitrum One
         return 'Arbiscan';
       default:

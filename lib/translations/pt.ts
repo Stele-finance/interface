@@ -13,7 +13,7 @@ export const pt = {
   back: "Voltar",
   backToProposals: "Voltar às Propostas",
   balance: "Saldo",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Extensão do Navegador",
   browseChallenges: "Navegar Desafios",
   buy: "Comprar",

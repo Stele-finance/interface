@@ -13,7 +13,7 @@ export const vi = {
   back: "Quay lại",
   backToProposals: "Quay lại đề xuất",
   balance: "Số dư",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "Tiện Ích Trình Duyệt",
   browseChallenges: "Duyệt thử thách",
   buy: "Mua",

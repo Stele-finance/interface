@@ -13,7 +13,7 @@ export const he = {
   back: "חזור",
   backToProposals: "חזור להצעות",
   balance: "יתרה",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "הרחבת דפדפן",
   browseChallenges: "עיין באתגרים",
   buy: "קנה",

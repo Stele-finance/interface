@@ -13,7 +13,7 @@ export const hi = {
   back: "वापस",
   backToProposals: "प्रस्तावों पर वापस",
   balance: "शेष राशि",
-  baseMainnet: "Base Mainnet",
+
   browserExtension: "ब्राउज़र एक्सटेंशन",
   browseChallenges: "चुनौतियां ब्राउज़ करें",
   buy: "खरीदें",
