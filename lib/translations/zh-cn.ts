@@ -58,6 +58,7 @@ export const zhCn = {
   currentTime: "当前时间",
   customContractInteraction: "自定义合约交互",
   customProposal: "自定义提案",
+  daily: "每日",
   dashboard: "仪表板",
   dataRefreshedSuccessfully: "数据刷新成功",
   dataUpdateInProgress: "数据更新正在进行中，可能需要几分钟时间。",
@@ -341,6 +342,7 @@ export const zhCn = {
   volume: "交易量",
   walletNotConnected: "钱包未连接",
   warning: "警告",
+  weekly: "每周",
   youCancelledNetworkSwitch: "您取消了网络切换请求。",
   youHaveAlreadyVoted: "您已对此提案投票",
   youNeedToDelegate: "您需要委托您的代币以参与治理"

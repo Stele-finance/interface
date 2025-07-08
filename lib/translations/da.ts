@@ -58,6 +58,7 @@ export const da = {
   currentTime: "Nuværende Tid",
   customContractInteraction: "Brugerdefineret Kontrakt Interaktion",
   customProposal: "Brugerdefineret Forslag",
+  daily: "Daglig",
   dashboard: "Dashboard",
   dataRefreshedSuccessfully: "Data opdateret med succes",
   dataUpdateInProgress: "Dataopdatering er i gang. Det kan tage et par minutter.",
@@ -341,6 +342,7 @@ export const da = {
   volume: "Volumen",
   walletNotConnected: "Wallet Ikke Tilsluttet",
   warning: "Advarsel",
+  weekly: "Ugentlig",
   youCancelledNetworkSwitch: "Du annullerede netværksskift anmodningen.",
   youHaveAlreadyVoted: "Du har allerede stemt på dette forslag",
   youNeedToDelegate: "Du skal delegere dine tokens for at deltage i styring"

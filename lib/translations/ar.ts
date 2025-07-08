@@ -58,6 +58,7 @@ export const ar = {
   currentTime: "الوقت الحالي",
   customContractInteraction: "تفاعل العقد المخصص",
   customProposal: "مقترح مخصص",
+  daily: "يوميا",
   dashboard: "لوحة المعلومات",
   dataRefreshedSuccessfully: "تم تحديث البيانات بنجاح",
   dataUpdateInProgress: "تحديث البيانات قيد التقدم. قد يستغرق بضع دقائق.",
@@ -341,6 +342,7 @@ export const ar = {
   volume: "الحجم",
   walletNotConnected: "المحفظة غير متصلة",
   warning: "تحذير",
+  weekly: "أسبوعياً",
   youCancelledNetworkSwitch: "لقد ألغيت طلب تبديل الشبكة.",
   youHaveAlreadyVoted: "لقد صوتت بالفعل على هذا المقترح",
   youNeedToDelegate: "تحتاج إلى تفويض رموزك للمشاركة في الحوكمة"

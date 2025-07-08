@@ -58,6 +58,7 @@ export const hi = {
   currentTime: "वर्तमान समय",
   customContractInteraction: "कस्टम कॉन्ट्रैक्ट इंटरैक्शन",
   customProposal: "कस्टम प्रस्ताव",
+  daily: "दैनिक",
   dashboard: "डैशबोर्ड",
   dataRefreshedSuccessfully: "डेटा सफलतापूर्वक रीफ्रेश हुआ",
   dataUpdateInProgress: "डेटा अपडेट प्रगति में है। इसमें कुछ मिनट लग सकते हैं।",
@@ -341,6 +342,7 @@ export const hi = {
   volume: "वॉल्यूम",
   walletNotConnected: "वॉलेट कनेक्ट नहीं है",
   warning: "चेतावनी",
+  weekly: "साप्ताहिक",
   youCancelledNetworkSwitch: "आपने नेटवर्क स्विच अनुरोध रद्द कर दिया।",
   youHaveAlreadyVoted: "आपने पहले से ही इस प्रस्ताव पर वोट दिया है",
   youNeedToDelegate: "गवर्नेंस में भाग लेने के लिए आपको अपने टोकन प्रतिनिधित्व करने होंगे"

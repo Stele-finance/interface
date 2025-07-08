@@ -58,6 +58,7 @@ export const he = {
   currentTime: "זמן נוכחי",
   customContractInteraction: "אינטראקציה מותאמת של חוזה",
   customProposal: "הצעה מותאמת",
+  daily: "יומי",
   dashboard: "לוח בקרה",
   dataRefreshedSuccessfully: "הנתונים רוענו בהצלחה",
   dataUpdateInProgress: "עדכון הנתונים בתהליך. זה עשוי לקחת כמה דקות.",
@@ -341,6 +342,7 @@ export const he = {
   volume: "נפח",
   walletNotConnected: "ארנק לא מחובר",
   warning: "אזהרה",
+  weekly: "שבועי",
   youCancelledNetworkSwitch: "ביטלת את בקשת החלפת הרשת.",
   youHaveAlreadyVoted: "כבר הצבעת על ההצעה הזו",
   youNeedToDelegate: "עליך להעביר את הטוקנים שלך כדי להשתתף בממשל"

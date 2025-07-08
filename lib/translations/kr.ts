@@ -58,6 +58,7 @@ export const kr = {
   currentTime: "현재 시간",
   customContractInteraction: "사용자 정의 컨트랙트 상호작용",
   customProposal: "사용자 정의 제안",
+  daily: "1일",
   dashboard: "대시보드",
   dataRefreshedSuccessfully: "데이터가 성공적으로 새로고침되었습니다",
   dataUpdateInProgress: "데이터 업데이트가 진행 중입니다. 몇 분 정도 소요될 수 있습니다.",
@@ -341,6 +342,7 @@ export const kr = {
   volume: "거래량",
   walletNotConnected: "지갑이 연결되지 않음",
   warning: "경고",
+  weekly: "1주",
   youCancelledNetworkSwitch: "네트워크 전환 요청을 취소했습니다.",
   youHaveAlreadyVoted: "이미 이 제안에 투표하셨습니다",
   youNeedToDelegate: "거버넌스에 참여하려면 토큰을 위임해야 합니다"

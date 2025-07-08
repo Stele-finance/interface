@@ -58,6 +58,7 @@ export const zhTw = {
   currentTime: "當前時間",
   customContractInteraction: "自定義合約交互",
   customProposal: "自定義提案",
+  daily: "每日",
   dashboard: "儀表板",
   dataRefreshedSuccessfully: "數據刷新成功",
   dataUpdateInProgress: "數據更新正在進行中，可能需要幾分鐘時間。",
@@ -341,6 +342,7 @@ export const zhTw = {
   volume: "成交量",
   walletNotConnected: "錢包未連接",
   warning: "警告",
+  weekly: "每週",
   youCancelledNetworkSwitch: "您取消了網路切換請求。",
   youHaveAlreadyVoted: "您已對此提案投票",
   youNeedToDelegate: "您需要委託您的代幣以參與治理"

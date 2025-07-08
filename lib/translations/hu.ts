@@ -58,6 +58,7 @@ export const hu = {
   currentTime: "Jelenlegi idő",
   customContractInteraction: "Egyéni szerződés interakció",
   customProposal: "Egyéni javaslat",
+  daily: "Napi",
   dashboard: "Irányítópult",
   dataRefreshedSuccessfully: "Adatok sikeresen frissítve",
   dataUpdateInProgress: "Az adatok frissítése folyamatban van. Ez eltarthat néhány percig.",
@@ -341,6 +342,7 @@ export const hu = {
   volume: "Volumen",
   walletNotConnected: "Tárca nincs csatlakoztatva",
   warning: "Figyelmeztetés",
+  weekly: "Heti",
   youCancelledNetworkSwitch: "Törölte a hálózatváltási kérelmet.",
   youHaveAlreadyVoted: "Már szavazott erre a javaslatra",
   youNeedToDelegate: "Delegálnia kell tokeneit az irányításban való részvételhez"

@@ -58,6 +58,7 @@ export const id = {
   currentTime: "Waktu Saat Ini",
   customContractInteraction: "Interaksi Kontrak Kustom",
   customProposal: "Proposal Kustom",
+  daily: "Harian",
   dashboard: "Dashboard",
   dataRefreshedSuccessfully: "Data berhasil diperbarui",
   dataUpdateInProgress: "Pembaruan data sedang berlangsung. Mungkin memerlukan beberapa menit.",
@@ -341,6 +342,7 @@ export const id = {
   volume: "Volume",
   walletNotConnected: "Wallet Tidak Terhubung",
   warning: "Peringatan",
+  weekly: "Mingguan",
   youCancelledNetworkSwitch: "Anda membatalkan permintaan pergantian jaringan.",
   youHaveAlreadyVoted: "Anda sudah memberikan suara pada proposal ini",
   youNeedToDelegate: "Anda perlu mendelegasikan token Anda untuk berpartisipasi dalam tata kelola"

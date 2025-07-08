@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
+import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
 import { Users, DollarSign, Clock, Trophy, Calendar } from 'lucide-react'
@@ -29,7 +30,9 @@ interface ChallengeChartsProps {
 export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) {
   const { t } = useLanguage()
   const { network: walletNetwork } = useWallet()
+  const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
+  const { data: weeklyData, isLoading: weeklyIsLoading, error: weeklyError } = useChallengeWeeklySnapshots(challengeId, 30, network)
   const { data: challengeData } = useChallenge(challengeId, network)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -44,10 +47,11 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
   }, [])
 
   const chartData = useMemo(() => {
-    if (!data?.challengeSnapshots) return []
+    const sourceData = intervalType === 'weekly' ? weeklyData?.challengeWeeklySnapshots : data?.challengeSnapshots
+    if (!sourceData) return []
 
     // Convert and sort data by timestamp
-    const processedData = data.challengeSnapshots
+    const processedData = sourceData
       .map((snapshot) => {
         const date = new Date(Number(snapshot.timestamp) * 1000)
         
@@ -78,7 +82,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
       .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)
 
     return processedData
-  }, [data])
+  }, [data, weeklyData, intervalType])
 
   // Calculate current values for headers (use the most recent snapshot or challenge data)
   const currentRewardAmount = useMemo(() => {
@@ -198,7 +202,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
     )
   }
 
-  if (isLoading) {
+  if (isLoading || weeklyIsLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
@@ -223,12 +227,39 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
     )
   }
 
-  if (error || !data?.challengeSnapshots || chartData.length === 0) {
+  if ((error && intervalType === 'daily') || (weeklyError && intervalType === 'weekly') || (!data?.challengeSnapshots && intervalType === 'daily') || (!weeklyData?.challengeWeeklySnapshots && intervalType === 'weekly') || chartData.length === 0) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
+                      <div className="flex items-center justify-between mb-2">
+            <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setIntervalType('daily')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setIntervalType('weekly')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
+          </div>
+          <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
             <p className="text-sm text-gray-400">{currentDate}</p>
           </CardHeader>
           <CardContent>
@@ -256,13 +287,37 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
       {/* Total Rewards Chart - Takes 2 columns */}
       <Card className="bg-transparent border-0 lg:col-span-2">
         <CardHeader className="pb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
           </div>
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-baseline justify-between gap-3">
             <CardTitle className="text-4xl font-bold text-gray-100">
             ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </CardTitle>
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setIntervalType('daily')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setIntervalType('weekly')}
+                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    intervalType === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
           </div>
           <p className="text-sm text-gray-400">{currentDate}</p>
         </CardHeader>
@@ -374,7 +429,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
 
           {/* Total Prize */}
           <div className="space-y-2">
-                            <span className="text-base text-gray-400">{t('totalPrize')}</span>
+            <span className="text-base text-gray-400">{t('totalPrize')}</span>
             <div className="text-4xl text-yellow-400">
               ${challengeDetails.totalPrize >= 1000000 
                 ? `${(challengeDetails.totalPrize / 1000000).toFixed(1)}M` 

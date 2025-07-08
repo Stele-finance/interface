@@ -58,6 +58,7 @@ export const en = {
   currentTime: "Current Time",
   customContractInteraction: "Custom Contract Interaction",
   customProposal: "Custom Proposal",
+  daily: "Daily",
   dashboard: "Dashboard",
   dataRefreshedSuccessfully: "Data refreshed successfully",
   dataUpdateInProgress: "Data update is in progress. This may take a few minutes.",
@@ -341,6 +342,7 @@ export const en = {
   volume: "Volume",
   walletNotConnected: "Wallet Not Connected",
   warning: "Warning",
+  weekly: "Weekly",
   youCancelledNetworkSwitch: "You cancelled the network switch request.",
   youHaveAlreadyVoted: "You have already voted on this proposal",
   youNeedToDelegate: "You need to delegate your tokens to participate in governance"

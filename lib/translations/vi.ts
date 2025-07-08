@@ -58,6 +58,7 @@ export const vi = {
   currentTime: "Thời gian hiện tại",
   customContractInteraction: "Tương tác hợp đồng tùy chỉnh",
   customProposal: "Đề xuất tùy chỉnh",
+  daily: "Hàng ngày",
   dashboard: "Bảng điều khiển",
   dataRefreshedSuccessfully: "Làm mới dữ liệu thành công",
   dataUpdateInProgress: "Việc cập nhật dữ liệu đang tiến hành. Có thể mất vài phút.",
@@ -341,6 +342,7 @@ export const vi = {
   volume: "Khối lượng",
   walletNotConnected: "Ví chưa được kết nối",
   warning: "Cảnh báo",
+  weekly: "Hàng tuần",
   youCancelledNetworkSwitch: "Bạn đã hủy yêu cầu chuyển đổi mạng.",
   youHaveAlreadyVoted: "Bạn đã bỏ phiếu cho đề xuất này",
   youNeedToDelegate: "Bạn cần ủy quyền token của mình để tham gia quản trị"

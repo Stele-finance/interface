@@ -58,6 +58,7 @@ export const bn = {
   currentTime: "বর্তমান সময়",
   customContractInteraction: "কাস্টম কন্ট্রাক্ট ইন্টারঅ্যাকশন",
   customProposal: "কাস্টম প্রস্তাব",
+  daily: "দৈনিক",
   dashboard: "ড্যাশবোর্ড",
   dataRefreshedSuccessfully: "ডেটা সফলভাবে রিফ্রেশ হয়েছে",
   dataUpdateInProgress: "ডেটা আপডেট চলমান। এটি কয়েক মিনিট সময় নিতে পারে।",
@@ -341,6 +342,7 @@ export const bn = {
   volume: "ভলিউম",
   walletNotConnected: "ওয়ালেট সংযুক্ত নয়",
   warning: "সতর্কতা",
+  weekly: "সাপ্তাহিক",
   youCancelledNetworkSwitch: "আপনি নেটওয়ার্ক পরিবর্তনের অনুরোধ বাতিল করেছেন।",
   youHaveAlreadyVoted: "আপনি ইতিমধ্যে এই প্রস্তাবে ভোট দিয়েছেন",
   youNeedToDelegate: "গভর্নেন্সে অংশগ্রহণের জন্য আপনাকে আপনার টোকেন অর্পণ করতে হবে"

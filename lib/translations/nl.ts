@@ -58,6 +58,7 @@ export const nl = {
   currentTime: "Huidige Tijd",
   customContractInteraction: "Aangepaste Contract Interactie",
   customProposal: "Aangepast Voorstel",
+  daily: "Dagelijks",
   dashboard: "Dashboard",
   dataRefreshedSuccessfully: "Gegevens succesvol ververst",
   dataUpdateInProgress: "Gegevensupdate is bezig. Dit kan enkele minuten duren.",
@@ -341,6 +342,7 @@ export const nl = {
   volume: "Volume",
   walletNotConnected: "Wallet Niet Verbonden",
   warning: "Waarschuwing",
+  weekly: "Wekelijks",
   youCancelledNetworkSwitch: "U heeft het netwerkwisselverzoek geannuleerd.",
   youHaveAlreadyVoted: "U heeft al gestemd op dit voorstel",
   youNeedToDelegate: "U moet uw tokens delegeren om deel te nemen aan governance"

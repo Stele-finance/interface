@@ -23,14 +23,14 @@ import {
   STELE_DECIMALS, 
   STELE_TOTAL_SUPPLY,
   getGovernanceContractAddress,
-  getSteleTokenAddress
+  getSteleTokenAddress,
+  getRPCUrl
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { useProposalVoteResult, useProposalDetails } from "@/app/subgraph/Proposals"
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
-import { RPC_URL } from "@/lib/constants"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 
@@ -41,7 +41,7 @@ interface ProposalDetailPageProps {
 }
 
 // Helper function to get scan site URL based on network
-const getScanSiteUrl = (network: 'ethereum' | 'arbitrum' | 'solana' | null) => {
+const getScanSiteUrl = (network: 'ethereum' | 'arbitrum' | null) => {
   switch (network) {
     case 'ethereum':
       return 'https://etherscan.io'
@@ -53,7 +53,7 @@ const getScanSiteUrl = (network: 'ethereum' | 'arbitrum' | 'solana' | null) => {
 }
 
 // Helper function to open scan site in new tab
-const openScanSite = (network: 'ethereum' | 'arbitrum' | 'solana' | null, type: 'tx' | 'address' | 'block', value: string) => {
+const openScanSite = (network: 'ethereum' | 'arbitrum' | null, type: 'tx' | 'address' | 'block', value: string) => {
   const baseUrl = getScanSiteUrl(network)
   let url = ''
   
@@ -287,36 +287,58 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       const currentConnectedAddress = accounts[0]
       
-      // Connect to provider for read-only operations
-      const rpcUrl = RPC_URL
+      // Connect to provider for read-only operations using network-specific RPC
+      const rpcUrl = getRPCUrl(contractNetwork)
         
       const provider = new ethers.JsonRpcProvider(rpcUrl)
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
-      // Use cached block number from global hook, fallback to RPC call if not available
-      let currentBlock: number
-      if (blockInfo && !isLoadingBlockNumber) {
-        currentBlock = blockInfo.blockNumber
-      } else {
-        currentBlock = await provider.getBlockNumber()
+      // For cross-chain governance, we need to use Ethereum block numbers for voting power queries
+      // even when on Arbitrum network, because Governor uses Ethereum blocks as timepoints
+      let ethereumBlock: number
+      try {
+        // Always get Ethereum block number for voting power queries
+        const ethereumProvider = new ethers.JsonRpcProvider(getRPCUrl('ethereum'))
+        ethereumBlock = await ethereumProvider.getBlockNumber()
+      } catch (ethereumError) {
+        console.warn('Failed to get Ethereum block, falling back to network block:', ethereumError)
+        // Fallback to current network block
+        ethereumBlock = await provider.getBlockNumber()
       }
       
       // Check if user has already voted using the current connected address
       const hasUserVoted = await governanceContract.hasVoted(id, currentConnectedAddress)
       setHasVoted(hasUserVoted)
 
-      // Get voting power at a past block to avoid "future lookup" error
-      // Use currentBlock - 1 to ensure the block is finalized
-      const timepoint = Math.max(1, currentBlock - 1)
+      // Get voting power at a safe past block to avoid "future lookup" error
+      // Use a more conservative offset to ensure block is finalized and avoid timing issues
+      const timepoint = Math.max(1, ethereumBlock - 10)
+      console.log('Querying voting power at Ethereum block:', timepoint, 'current Ethereum block:', ethereumBlock)
+      
       const userVotingPower = await governanceContract.getVotes(currentConnectedAddress, timepoint)
       setVotingPower(ethers.formatUnits(userVotingPower, STELE_DECIMALS))      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error checking voting power and status:', error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to check voting power. Please try again.",
-      })
+      
+      // Handle specific errors
+      let errorMessage = "Failed to check voting power. Please try again."
+      
+      if (error.message?.includes("future lookup")) {
+        errorMessage = "Block synchronization issue. Please wait a moment and try again."
+      } else if (error.message?.includes("invalid proposal id")) {
+        errorMessage = "Invalid proposal ID. Please check the proposal exists."
+      } else if (error.message?.includes("execution reverted")) {
+        errorMessage = "Contract call failed. Please check your connection and try again."
+      }
+      
+      // Only show toast for non-future-lookup errors to avoid spam
+      if (!error.message?.includes("future lookup")) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: errorMessage,
+        })
+      }
     } finally {
       setIsLoadingVotingPower(false)
     }
@@ -327,23 +349,18 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     if (!id) return
 
     try {
-      // Try multiple RPC providers for better reliability
-      let provider
-      try {
-        // Primary: Base public RPC
-        provider = new ethers.JsonRpcProvider(RPC_URL)
-        await provider.getBlockNumber() // Test connection
-      } catch (primaryError) {
-        // Fallback: Infura
-        const infuraUrl = process.env.NEXT_PUBLIC_INFURA_API_KEY 
-          ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
-          : null
-        if (infuraUrl) {
-          provider = new ethers.JsonRpcProvider(infuraUrl)
-        } else {
-          throw new Error('No working RPC provider available')
-        }
+      // Validate proposal ID format (should be a large number)
+      if (!/^\d+$/.test(id)) {
+        console.warn('Invalid proposal ID format:', id)
+        return
       }
+
+      // Use network-specific RPC URL instead of hardcoded Base RPC
+      const rpcUrl = getRPCUrl(contractNetwork)
+      const provider = new ethers.JsonRpcProvider(rpcUrl)
+      
+      // Test connection
+      await provider.getBlockNumber()
       
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
@@ -361,6 +378,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       setProposalState(Number(state))
     } catch (error) {
       console.error('Error checking proposal state:', error)
+      // Don't show user-facing error for state check failures
+      // as this is just for UI enhancement
     }
   }, [id, contractNetwork])
 
@@ -455,10 +474,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         description: `You have successfully delegated your tokens to yourself (${currentConnectedAddress.slice(0, 6)}...${currentConnectedAddress.slice(-4)}). Your voting power should now be available.`,
         action: (
           <ToastAction 
-            altText="View on BaseScan"
-            onClick={() => window.open(`https://basescan.org/tx/${receipt.hash}`, '_blank')}
+            altText={`View on ${contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+            onClick={() => openScanSite(contractNetwork, 'tx', receipt.hash)}
           >
-            View on BaseScan
+            View on {contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}
           </ToastAction>
         ),
       })
@@ -1066,17 +1085,17 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const handleProposalIdClick = () => {
     // Use the proposal transaction hash
     if (proposal.transactionHash) {
-      openScanSite(network, 'tx', proposal.transactionHash)
+      openScanSite(contractNetwork, 'tx', proposal.transactionHash)
     }
   }
   
   const handleProposerClick = () => {
-    openScanSite(network, 'address', proposal.fullProposer)
+    openScanSite(contractNetwork, 'address', proposal.fullProposer)
   }
   
   const handleBlockClick = () => {
     if (proposal.blockNumber) {
-      openScanSite(network, 'block', proposal.blockNumber)
+      openScanSite(contractNetwork, 'block', proposal.blockNumber)
     }
   }
 
@@ -1103,7 +1122,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     <span 
                       className="cursor-pointer hover:text-blue-400 transition-colors"
                       onClick={handleProposalIdClick}
-                      title={`View transaction on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+                      title={`View transaction on ${contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
                     >
                       Proposal #{id.slice(0, 8)}...{id.slice(-8)}
                     </span>
@@ -1120,7 +1139,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   <span 
                     className="cursor-pointer hover:text-blue-400 transition-colors ml-1"
                     onClick={handleProposerClick}
-                    title={`View proposer on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+                    title={`View proposer on ${contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
                   >
                     {proposal.fullProposer}
                   </span>

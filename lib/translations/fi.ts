@@ -58,6 +58,7 @@ export const fi = {
   currentTime: "Nykyinen Aika",
   customContractInteraction: "Mukautettu Sopimus Vuorovaikutus",
   customProposal: "Mukautettu Ehdotus",
+  daily: "Päivittäin",
   dashboard: "Hallintapaneeli",
   dataRefreshedSuccessfully: "Tiedot päivitetty onnistuneesti",
   dataUpdateInProgress: "Tietojen päivitys on käynnissä. Tämä voi kestää muutaman minuutin.",
@@ -341,6 +342,7 @@ export const fi = {
   volume: "Volyymi",
   walletNotConnected: "Lompakko Ei Yhdistetty",
   warning: "Varoitus",
+  weekly: "Viikoittain",
   youCancelledNetworkSwitch: "Peruutit verkon vaihto-pyynnön.",
   youHaveAlreadyVoted: "Olet jo äänestänyt tästä ehdotuksesta",
   youNeedToDelegate: "Sinun täytyy delegoida tokenisi osallistuaksesi hallintoon"
