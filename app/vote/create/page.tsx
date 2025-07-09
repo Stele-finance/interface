@@ -103,7 +103,7 @@ export default function CreateProposalPage() {
       functionSignature: 'setEntryFee(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('entryFeeLabel')],
-      parameterPlaceholders: ['50000000'],
+      parameterPlaceholders: ['10000000'],
       parameterDescriptions: [t('entryFeeParamDesc')]
     },
     {

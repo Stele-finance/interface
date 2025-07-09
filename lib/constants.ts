@@ -154,7 +154,7 @@ export const STELE_DECIMALS = 18;
 
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
-  ethereum: 'https://api.studio.thegraph.com/query/110372/stele/version/latest',
+  ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
   arbitrum: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest'
 } as const
 
