@@ -19,7 +19,6 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
       ethereum: {
         '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': 'usdc',
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': 'weth',
-        '0x0000000000000000000000000000000000000000': 'eth', // ETH native
         '0xdac17f958d2ee523a2206206994597c13d831ec7': 'usdt',
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': 'wbtc',
         '0x1f9840a85d5af5bf1d1762f925bdadc4201f984': 'uni',
@@ -31,10 +30,9 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
       arbitrum: {
         '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc',
         '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth',
-        '0x0000000000000000000000000000000000000000': 'eth',
         '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'usdt',
         '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc',
-        '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0': 'uni',
+        '0xfb3cb973b2a9e2e09746393c59e7fb0d5189d290': 'uni',
         '0xd403d1624daef243fbcbd4a80d8a6f36affe32b2': 'link',
         '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'dai',
         '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
@@ -68,6 +66,11 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
     'USDC': 'usdc',
     'USDT': 'usdt',
     'WBTC': 'wbtc',
+    'UNI': 'uni',
+    'DAI': 'dai',
+    'LINK': 'link',
+    'AAVE': 'aave',
+    'GRT': 'grt',
   }
   
   const symbolLogo = symbolMap[addressOrSymbol.toUpperCase()]
