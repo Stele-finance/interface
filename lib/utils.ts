@@ -40,9 +40,13 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
       }
     }
     
+    const normalizedAddress = addressOrSymbol.toLowerCase()
     const networkMap = tokenAddressMap[network || 'ethereum']
     if (networkMap) {
-      const logoName = networkMap[addressOrSymbol.toLowerCase()]
+      // Find matching address (case-insensitive)
+      const logoName = Object.entries(networkMap).find(([addr, _]) => 
+        addr.toLowerCase() === normalizedAddress
+      )?.[1]
       if (logoName) {
         return `/tokens/${logoName}.png`
       }
@@ -50,7 +54,9 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
     
     // Search all networks if no network info or mapping not found
     for (const net of ['ethereum', 'arbitrum']) {
-      const logoName = tokenAddressMap[net][addressOrSymbol.toLowerCase()]
+      const logoName = Object.entries(tokenAddressMap[net]).find(([addr, _]) => 
+        addr.toLowerCase() === normalizedAddress
+      )?.[1]
       if (logoName) {
         return `/tokens/${logoName}.png`
       }
