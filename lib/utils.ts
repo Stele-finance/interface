@@ -22,13 +22,23 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         '0x0000000000000000000000000000000000000000': 'eth', // ETH native
         '0xdac17f958d2ee523a2206206994597c13d831ec7': 'usdt',
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': 'wbtc',
+        '0x1f9840a85d5af5bf1d1762f925bdadc4201f984': 'uni',
+        '0x514910771af9ca656af840dff83e8264ecf986ca': 'link',
+        '0x6b175474e89094c44da98b954eedeac495271d0f': 'dai',
+        '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9': 'aave',
+        '0xc944E90C64B2c07662A292be6244BDf05Cda44a7': 'grt',
       },
       arbitrum: {
-        '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc', // Arbitrum USDC
-        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth', // Arbitrum WETH
-        '0x0000000000000000000000000000000000000000': 'eth', // ETH native
-        '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'usdt', // Arbitrum USDT
-        '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc', // Arbitrum WBTC
+        '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc',
+        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth',
+        '0x0000000000000000000000000000000000000000': 'eth',
+        '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'usdt',
+        '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc',
+        '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0': 'uni',
+        '0xd403d1624daef243fbcbd4a80d8a6f36affe32b2': 'link',
+        '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'dai',
+        '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
+        '0x9623063377AD1B27544C965cCd7342f7EA7e88C7': 'grt',
       }
     }
     
