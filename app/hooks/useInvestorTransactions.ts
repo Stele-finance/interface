@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, USDC_DECIMALS } from '@/lib/constants'
+import { getSubgraphUrl, USDC_DECIMALS, headers } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 const GET_INVESTOR_TRANSACTIONS_QUERY = `
@@ -151,7 +151,7 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
         const data = await request<GraphQLResponse>(subgraphUrl, GET_INVESTOR_TRANSACTIONS_QUERY, {
           challengeId: challengeId,
           userAddress: walletAddress.toLowerCase() // Ensure lowercase for address matching
-        })
+        }, headers)
 
         // Check if data is valid
         if (!data) {
