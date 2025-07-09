@@ -948,7 +948,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                 {subgraphNetwork === 'arbitrum' && (
                                   <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
                                     <Image 
-                                      src="/networks/arbitrum.png" 
+                                      src="/networks/small/arbitrum.png" 
                                       alt="Arbitrum One"
                                       width={14}
                                       height={14}
@@ -1114,7 +1114,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                   {subgraphNetwork === 'arbitrum' && (
                                                     <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
                                                       <Image 
-                                                        src="/networks/arbitrum.png" 
+                                                        src="/networks/small/arbitrum.png" 
                                                         alt="Arbitrum One"
                                                         width={10}
                                                         height={10}
@@ -1146,7 +1146,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                   {subgraphNetwork === 'arbitrum' && (
                                                     <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
                                                       <Image 
-                                                        src="/networks/arbitrum.png" 
+                                                        src="/networks/small/arbitrum.png" 
                                                         alt="Arbitrum One"
                                                         width={10}
                                                         height={10}
@@ -1499,7 +1499,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         // Always show network icon regardless of status
                         const networkIcon = network === 'ethereum' ? (
                           <Image 
-                            src="/networks/ethereum.png" 
+                            src="/networks/small/ethereum.png" 
                             alt="Ethereum Mainnet"
                             width={16}
                             height={16}
@@ -1508,7 +1508,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           />
                         ) : network === 'arbitrum' ? (
                           <Image 
-                            src="/networks/arbitrum.png" 
+                            src="/networks/small/arbitrum.png" 
                             alt="Arbitrum One"
                             width={16}
                             height={16}
@@ -1518,7 +1518,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         ) : (
                           // Default to Ethereum icon if network is not recognized
                           <Image 
-                            src="/networks/ethereum.png" 
+                            src="/networks/small/ethereum.png" 
                             alt="Ethereum Mainnet"
                             width={16}
                             height={16}

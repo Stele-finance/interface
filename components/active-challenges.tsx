@@ -568,7 +568,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                           {network === 'arbitrum' && (
                             <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
                               <Image 
-                                src="/networks/arbitrum.png" 
+                                src="/networks/small/arbitrum.png" 
                                 alt="Arbitrum"
                                 width={12}
                                 height={12}

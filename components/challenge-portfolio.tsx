@@ -1228,7 +1228,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                             {subgraphNetwork === 'arbitrum' && (
                                               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
                                                 <Image 
-                                                  src="/networks/arbitrum.png" 
+                                                  src="/networks/small/arbitrum.png" 
                                                   alt="Arbitrum"
                                                   width={12}
                                                   height={12}
@@ -1258,7 +1258,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                             {subgraphNetwork === 'arbitrum' && (
                                               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
                                                 <Image 
-                                                  src="/networks/arbitrum.png" 
+                                                  src="/networks/small/arbitrum.png" 
                                                   alt="Arbitrum"
                                                   width={12}
                                                   height={12}

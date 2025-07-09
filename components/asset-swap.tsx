@@ -805,7 +805,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                           {fromToken ? (
                             <>
                               <Image
-                                src={getTokenLogo(getTokenAddress(fromToken), subgraphNetwork) || `/tokens/${fromToken.toLowerCase()}.png`}
+                                src={getTokenLogo(getTokenAddress(fromToken), subgraphNetwork) || `/tokens/small/${fromToken.toLowerCase()}.png`}
                                 alt={fromToken}
                                 width={20}
                                 height={20}
@@ -854,7 +854,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                               }}
                             >
                               <Image
-                                src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/${token.toLowerCase()}.png`}
+                                src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/small/${token.toLowerCase()}.png`}
                                 alt={token}
                                 width={20}
                                 height={20}
@@ -942,7 +942,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                         {toToken ? (
                           <>
                             <Image
-                              src={getTokenLogo(getTokenAddress(toToken), subgraphNetwork) || `/tokens/${toToken.toLowerCase()}.png`}
+                              src={getTokenLogo(getTokenAddress(toToken), subgraphNetwork) || `/tokens/small/${toToken.toLowerCase()}.png`}
                               alt={toToken}
                               width={20}
                               height={20}
@@ -980,7 +980,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                             }}
                           >
                             <Image
-                              src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/${token.toLowerCase()}.png`}
+                              src={getTokenLogo(getTokenAddress(token), subgraphNetwork) || `/tokens/small/${token.toLowerCase()}.png`}
                               alt={token}
                               width={20}
                               height={20}
