@@ -64,7 +64,7 @@ export default function CreateProposalPage() {
       description: t('resetInvestableTokenDesc'),
       icon: <Settings className="h-5 w-5" />,
       targetContract: getSteleContractAddress(contractNetwork),
-      functionSignature: 'removeToken(address)',
+      functionSignature: 'resetToken(address)',
       parameterTypes: ['address'],
       parameterLabels: [t('tokenAddressLabel')],
       parameterPlaceholders: ['0x...'],
