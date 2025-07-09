@@ -32,7 +32,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth',
         '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'usdt',
         '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc',
-        '0xfb3cb973b2a9e2e09746393c59e7fb0d5189d290': 'uni',
+        '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0': 'uni',
         '0xd403d1624daef243fbcbd4a80d8a6f36affe32b2': 'link',
         '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'dai',
         '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
