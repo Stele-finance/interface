@@ -25,7 +25,7 @@ const TokenLogo = ({ symbol }: { symbol: string }) => {
     const availableLogos = ['usdc', 'eth', 'weth']
     
     if (availableLogos.includes(symbolLower)) {
-      return `/tokens/${symbolLower}.png`
+      return `/tokens/small/${symbolLower}.png`
     }
     return null
   }

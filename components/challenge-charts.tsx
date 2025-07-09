@@ -394,7 +394,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
               <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
                 {walletNetwork === 'ethereum' ? (
                   <Image 
-                    src="/networks/ethereum.png" 
+                    src="/networks/small/ethereum.png" 
                     alt="Ethereum Mainnet"
                     width={16}
                     height={16}
@@ -403,7 +403,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
                   />
                 ) : walletNetwork === 'arbitrum' ? (
                   <Image 
-                    src="/networks/arbitrum.png" 
+                    src="/networks/small/arbitrum.png" 
                     alt="Arbitrum One"
                     width={16}
                     height={16}
@@ -412,7 +412,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
                   />
                 ) : (
                   <Image 
-                    src="/networks/ethereum.png" 
+                    src="/networks/small/ethereum.png" 
                     alt="Ethereum Mainnet"
                     width={16}
                     height={16}

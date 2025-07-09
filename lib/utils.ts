@@ -48,7 +48,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         addr.toLowerCase() === normalizedAddress
       )?.[1]
       if (logoName) {
-        return `/tokens/${logoName}.png`
+        return `/tokens/small/${logoName}.png`
       }
     }
     
@@ -58,7 +58,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         addr.toLowerCase() === normalizedAddress
       )?.[1]
       if (logoName) {
-        return `/tokens/${logoName}.png`
+        return `/tokens/small/${logoName}.png`
       }
     }
     
@@ -81,8 +81,18 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
   
   const symbolLogo = symbolMap[addressOrSymbol.toUpperCase()]
   if (symbolLogo) {
-    return `/tokens/${symbolLogo}.png`
+    return `/tokens/small/${symbolLogo}.png`
   }
   
   return null
+}
+
+// Get network logo path (optimized small version)
+export function getNetworkLogo(network: 'ethereum' | 'arbitrum'): string {
+  return `/networks/small/${network}.png`
+}
+
+// Get wallet logo path (optimized small version)
+export function getWalletLogo(wallet: 'metamask' | 'phantom'): string {
+  return `/wallets/small/${wallet}.png`
 }

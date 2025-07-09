@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { Home, Trophy, BarChart3, Vote } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, getNetworkLogo, getWalletLogo } from "@/lib/utils"
 import { Bell, Search, User, Wallet, DollarSign, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
 import {
   DropdownMenu,
@@ -71,9 +71,9 @@ export function Header() {
   const getWalletIcon = () => {
     switch (walletType) {
       case 'metamask':
-        return "/wallets/metamask.png"
+        return getWalletLogo('metamask')
       case 'phantom':
-        return "/wallets/phantom.png"
+        return getWalletLogo('phantom')
       default:
         return null
     }
@@ -83,9 +83,9 @@ export function Header() {
   const getNetworkIcon = () => {
     switch (walletNetwork) {
       case 'ethereum':
-        return "/networks/ethereum.png"
+        return getNetworkLogo('ethereum')
       case 'arbitrum':
-        return "/networks/arbitrum.png"
+        return getNetworkLogo('arbitrum')
       default:
         return null
     }
@@ -409,7 +409,7 @@ export function Header() {
                   <DropdownMenuItem onClick={() => switchWalletNetwork('ethereum')}>
                     <div className="flex items-center gap-2">
                       <Image 
-                        src="/networks/ethereum.png" 
+                        src={getNetworkLogo('ethereum')} 
                         alt="Ethereum Mainnet"
                         width={16}
                         height={16}
@@ -433,7 +433,7 @@ export function Header() {
                             <div className="flex items-center justify-between w-full">
                               <div className="flex items-center gap-2">
                                 <Image 
-                                  src="/networks/arbitrum.png" 
+                                  src={getNetworkLogo('arbitrum')} 
                                   alt="Arbitrum One"
                                   width={16}
                                   height={16}
@@ -497,7 +497,7 @@ export function Header() {
                   disabled={isConnecting}
                 >
                   <Image 
-                    src="/wallets/metamask.png" 
+                    src={getWalletLogo('metamask')} 
                     alt="MetaMask"
                     width={32}
                     height={32}
@@ -517,7 +517,7 @@ export function Header() {
                   disabled={isConnecting}
                 >
                   <Image 
-                    src="/wallets/phantom.png" 
+                    src={getWalletLogo('phantom')} 
                     alt="Phantom"
                     width={32}
                     height={32}
