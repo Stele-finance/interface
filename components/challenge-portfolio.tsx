@@ -705,80 +705,55 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         throw balanceError;
       }
 
-      // Check and handle USDC allowance
+      // Check current allowance
       try {
         const currentAllowance = await usdcContract.allowance(userAddress, getSteleContractAddress(contractNetwork));
-        console.log(`Current allowance: ${ethers.formatUnits(currentAllowance, USDC_DECIMALS)} USDC`);
-        console.log(`Required entry fee: ${entryFee} USDC`);
-        
         if (currentAllowance < discountedEntryFeeAmount) {
-          console.log("❌ Insufficient allowance, requesting approval...");
           
           // Estimate gas for approval
-          const approveGasEstimate = await usdcContract.approve.estimateGas(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount);
-          
-          // Set higher gas price for Arbitrum to prevent pending transactions
-          let gasOptions: any = {
-            gasLimit: approveGasEstimate + BigInt(20000) // Increase gas buffer for Arbitrum
-          };
-          
-          if (contractNetwork === 'arbitrum') {
-            // For Arbitrum, set higher gas price to ensure faster confirmation
-            const feeData = await provider.getFeeData();
-            if (feeData.gasPrice) {
-              gasOptions.gasPrice = feeData.gasPrice * BigInt(120) / BigInt(100); // 20% higher gas price
-            }
-            console.log("🚀 Using higher gas price for Arbitrum:", gasOptions);
+          try {
+            const approveGasEstimate = await usdcContract.approve.estimateGas(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount);
+            const approveTx = await usdcContract.approve(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount, {
+              gasLimit: approveGasEstimate + BigInt(10000) // Add 10k gas buffer
+            });
+                        
+            // Show toast notification for approve transaction submitted
+            const explorerName = getExplorerName(chainId);
+            const explorerUrl = getExplorerUrl(chainId, approveTx.hash);
+            
+            toast({
+              title: "Approval Submitted",
+              description: "Your USDC approval transaction has been sent to the network.",
+              action: (
+                <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+                  View on {explorerName}
+                </ToastAction>
+              ),
+            });
+            
+            // Wait for approve transaction to be mined
+            await approveTx.wait();
+            
+            // Show toast notification for approve transaction confirmed
+            toast({
+              title: "Approval Confirmed",
+              description: `You have successfully approved ${entryFee} USDC for Stele contract.`,
+              action: (
+                <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+                  View on {explorerName}
+                </ToastAction>
+              ),
+            });
+          } catch (approveError: any) {
+            console.error("❌ Approval failed:", approveError);
+            throw new Error(`Failed to approve USDC: ${approveError.message}`);
           }
-          
-          const approveTx = await usdcContract.approve(getSteleContractAddress(contractNetwork), discountedEntryFeeAmount, gasOptions);
-                      
-          // Show toast notification for approve transaction submitted
-          const explorerName = getExplorerName(chainId);
-          const explorerUrl = getExplorerUrl(chainId, approveTx.hash);
-          
-          toast({
-            title: "Approval Submitted",
-            description: "Your USDC approval transaction has been sent to the network.",
-            action: (
-              <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-                View on {explorerName}
-              </ToastAction>
-            ),
-          });
-          
-          // Wait for approve transaction to be mined
-          console.log("⏳ Waiting for approval transaction...");
-          await approveTx.wait();
-          
-          // Verify the allowance has been updated
-          const updatedAllowance = await usdcContract.allowance(userAddress, getSteleContractAddress(contractNetwork));
-          console.log(`Updated allowance: ${ethers.formatUnits(updatedAllowance, USDC_DECIMALS)} USDC`);
-          
-          if (updatedAllowance < discountedEntryFeeAmount) {
-            throw new Error("Approval transaction completed but allowance is still insufficient. Please try again.");
-          }
-          
-          // Show toast notification for approve transaction confirmed
-          toast({
-            title: "Approval Confirmed",
-            description: `You have successfully approved ${entryFee} USDC for Stele contract.`,
-            action: (
-              <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-                View on {explorerName}
-              </ToastAction>
-            ),
-          });
         } else {
-          console.log("✅ Sufficient allowance already exists");
+
         }
       } catch (allowanceError: any) {
-        console.error("❌ Error handling allowance:", allowanceError);
-        if (allowanceError.message?.includes("Failed to approve")) {
-          throw allowanceError; // Re-throw approval-specific errors
-        } else {
-          throw new Error(`Failed to check or set USDC allowance: ${allowanceError.message}`);
-        }
+        console.error("❌ Error checking allowance:", allowanceError);
+        throw allowanceError;
       }
 
       // Now try to join the challenge
@@ -786,21 +761,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         // Estimate gas for joinChallenge
         const joinGasEstimate = await steleContract.joinChallenge.estimateGas(challengeId);
 
-        // Set higher gas price for Arbitrum to prevent pending transactions
-        let joinGasOptions: any = {
-          gasLimit: joinGasEstimate + BigInt(30000) // Increase gas buffer for join
-        };
-        
-        if (contractNetwork === 'arbitrum') {
-          // For Arbitrum, set higher gas price to ensure faster confirmation
-          const feeData = await provider.getFeeData();
-          if (feeData.gasPrice) {
-            joinGasOptions.gasPrice = feeData.gasPrice * BigInt(120) / BigInt(100); // 20% higher gas price
-          }
-          console.log("🚀 Using higher gas price for Arbitrum join:", joinGasOptions);
-        }
-
-        const tx = await steleContract.joinChallenge(challengeId, joinGasOptions);
+        const tx = await steleContract.joinChallenge(challengeId, {
+          gasLimit: joinGasEstimate + BigInt(20000) // Add 20k gas buffer
+        });
                 
         // Show toast notification for transaction submitted
         const joinExplorerName = getExplorerName(chainId);
@@ -870,20 +833,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           throw new Error("Transaction was rejected by user.");
         } else if (joinError.message.includes("already joined") || joinError.message.includes("AlreadyJoined")) {
           throw new Error("You have already joined this challenge.");
-        } else if (joinError.message.includes("NA")) {
-          throw new Error("USDC approval insufficient. Please ensure you have approved enough USDC for the entry fee and try again.");
-        } else if (joinError.message.includes("NEB")) {
-          throw new Error("Insufficient USDC balance. Please add more USDC to your wallet.");
-        } else if (joinError.message.includes("CNE")) {
-          throw new Error("Challenge does not exist or is invalid.");
-        } else if (joinError.message.includes("E")) {
-          throw new Error("Challenge has already ended.");
-        } else if (joinError.message.includes("C")) {
-          throw new Error("You are already registered for this challenge.");
-        } else if (joinError.message.includes("AJ")) {
-          throw new Error("You have already joined this challenge.");
-        } else if (joinError.message.includes("TF")) {
-          throw new Error("USDC transfer failed. Please check your balance and allowance.");
         } else if (joinError.message.includes("missing revert data")) {
           throw new Error(`Contract execution failed. This might be due to:\n- Insufficient USDC balance\n- Challenge not active\n- Already joined\n- Invalid challenge ID\n\nPlease check the console for detailed logs.`);
         } else {
