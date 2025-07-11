@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2 } from "lucide-react"
+import { Loader2, Coins } from "lucide-react"
 import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
@@ -89,7 +89,8 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
-        <Badge variant="secondary" className="bg-gray-700 text-gray-300 text-base px-3 py-1.5">
+        <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
+          <Coins className="h-4 w-4 mr-2" />
           {tokens.length} {t('tokens')}
         </Badge>
       </div>

@@ -39,6 +39,7 @@ interface ChallengePortfolioProps {
 // Ranking Section Component
 function RankingSection({ challengeId, network }: { challengeId: string; network: 'ethereum' | 'arbitrum' | null }) {
   const { t } = useLanguage()
+  const router = useRouter();
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, network);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -82,6 +83,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
               cy="12"
               r="10"
               fill={rank === 4 ? '#4F46E5' : '#10B981'}
+              fillOpacity={rank === 4 ? '1' : '0.6'}
               stroke="#FFD700"
               strokeWidth="2"
             />
@@ -115,7 +117,15 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
   };
 
   const getRankColor = (rank: number) => {
-    return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
+    return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
+  };
+
+  const handleUserClick = (userAddress: string) => {
+    // Check if address is empty or zero address
+    if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+      return;
+    }
+    router.push(`/challenge/${challengeId}/${userAddress}`);
   };
 
   // Calculate pagination
@@ -179,7 +189,10 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
                 return (
                   <div 
                     key={`${user}-${rank}`} 
-                    className={`flex items-center justify-between p-3 rounded-lg border ${getRankColor(rank)}`}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${getRankColor(rank)} ${
+                      isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
+                    }`}
+                    onClick={() => !isEmptySlot && handleUserClick(user)}
                   >
                     <div className="flex items-center gap-6">
                       {getRankIcon(rank)}
@@ -1005,20 +1018,20 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
           {isClient && shouldShowGetRewards() && (
             <Button 
-              variant="default" 
-              size="sm" 
+              variant="outline" 
+              size="lg" 
               onClick={handleGetRewards}
               disabled={isGettingRewards}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white"
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
             >
               {isGettingRewards ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                   Claiming...
                 </>
               ) : (
                 <>
-                  <Trophy className="mr-2 h-4 w-4" />
+                  <Trophy className="mr-3 h-5 w-5" />
                   Get Rewards
                 </>
               )}
@@ -1046,7 +1059,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               variant="outline" 
               size="lg" 
               onClick={handleNavigateToAccount}
-              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
             >
               <User className="mr-3 h-5 w-5" />
               {t('myAccount')}
@@ -1057,7 +1070,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               size="lg" 
               onClick={handleJoinChallenge} 
               disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-              className={`font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
+              className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
                 isInsufficientBalance() 
                   ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
                   : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"

@@ -1326,7 +1326,16 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           
                           // Get rank color
                           const getRankColor = (rank: number) => {
-                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
+                                return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
+                          };
+
+                          // Handle user click
+                          const handleUserClick = (userAddress: string) => {
+                            // Check if address is empty or zero address
+                            if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+                              return;
+                            }
+                            router.push(`/challenge/${challengeId}/${userAddress}`);
                           };
                           
                           const formattedAddress = formatAddress(user);
@@ -1336,7 +1345,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           return (
                             <div 
                               key={`${user}-${rank}`} 
-                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''}`}
+                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
+                                isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
+                              }`}
+                              onClick={() => !isEmptySlot && handleUserClick(user)}
                             >
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center justify-center w-10 h-10">
@@ -1382,6 +1394,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           cy="12"
                                           r="10"
                                           fill="#10B981"
+                                          fillOpacity="0.6"
                                           stroke="#FFD700"
                                           strokeWidth="2"
                                         />

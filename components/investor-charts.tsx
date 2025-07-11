@@ -323,6 +323,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                               cy="12"
                               r="10"
                               fill={ranking.color}
+                              fillOpacity={ranking.rank === 5 ? 0.6 : 1}
                               stroke="#FFD700"
                               strokeWidth="2"
                             />
@@ -614,6 +615,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                           cy={props.cy}
                           r="10"
                           fill={ranking.color}
+                          fillOpacity={ranking.rank === 5 ? 0.6 : 1}
                           stroke="#FFD700"
                           strokeWidth="2"
                         />

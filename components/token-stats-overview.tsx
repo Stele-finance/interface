@@ -3,10 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Trophy, TrendingUp, TrendingDown, Loader2 } from "lucide-react"
+import { Trophy, TrendingUp, TrendingDown, Loader2, Users } from "lucide-react"
 import { useTotalRanking } from "@/app/hooks/useTotalRanking"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
+import { useRouter } from "next/navigation"
 
 interface TokenStatsOverviewProps {
   className?: string
@@ -15,6 +16,7 @@ interface TokenStatsOverviewProps {
 
 export function TokenStatsOverview({ className, network }: TokenStatsOverviewProps) {
   const { t } = useLanguage()
+  const router = useRouter()
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   const { data: rankingData, isLoading, error } = useTotalRanking(subgraphNetwork)
@@ -40,6 +42,11 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
   const formatProfitRatio = (profitRatio: string) => {
     const ratio = parseFloat(profitRatio)
     return `${ratio.toFixed(3)}%`
+  }
+
+  // Handle row click to navigate to investor page
+  const handleRowClick = (challengeId: string, walletAddress: string) => {
+    router.push(`/challenge/${challengeId}/${walletAddress}`)
   }
 
 
@@ -85,7 +92,8 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
       <div className="flex items-center gap-2">
         <Trophy className="h-6 w-6 text-gray-100" />
         <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
-        <Badge variant="secondary" className="ml-2 bg-gray-700 text-gray-300 text-base px-3 py-1.5">
+        <Badge variant="secondary" className="ml-2 bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
+          <Users className="h-4 w-4 mr-2" />
           {rankings.length} {t('users')}
         </Badge>
       </div>
@@ -114,23 +122,27 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
                     const isPositive = profitRatio >= 0
                     
                     return (
-                      <TableRow key={ranking.id} className="hover:bg-gray-800/30">
-                        <TableCell className="font-medium text-gray-100 text-base px-6">
+                      <TableRow 
+                        key={ranking.id} 
+                        className="hover:bg-gray-800/30 border-0 cursor-pointer transition-colors"
+                        onClick={() => handleRowClick(ranking.challengeId, ranking.user)}
+                      >
+                        <TableCell className="font-medium text-gray-100 text-base px-6 py-6">
                           <div className="flex items-center gap-2">
                             <span>#{index + 1}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-6">
+                        <TableCell className="px-6 py-6">
                           <code className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded">
                             {formatAddress(ranking.user)}
                           </code>
                         </TableCell>
-                        <TableCell className="px-6 pl-8">
+                        <TableCell className="px-6 pl-8 py-6">
                           <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
                             {getChallengeType(ranking.challengeId)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="px-6">
+                        <TableCell className="px-6 py-6">
                           <div className={cn(
                             "flex items-center gap-1 font-medium text-base",
                             isPositive ? "text-green-400" : "text-red-400"
