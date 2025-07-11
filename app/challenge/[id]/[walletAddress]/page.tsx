@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn, getTokenLogo } from "@/lib/utils"
 import { 
   TrendingUp, 
@@ -180,6 +181,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Handle token row click
   const handleTokenClick = (tokenAddress: string) => {
     window.open(getTokenExplorerUrl(tokenAddress), '_blank')
+  }
+
+  // Get wallet address explorer URL based on network
+  const getWalletExplorerUrl = (walletAddress: string) => {
+    if (subgraphNetwork === 'arbitrum') {
+      return `https://arbiscan.io/address/${walletAddress}`
+    }
+    return `https://etherscan.io/address/${walletAddress}`
+  }
+
+  // Handle wallet address click
+  const handleWalletClick = () => {
+    window.open(getWalletExplorerUrl(walletAddress), '_blank')
   }
 
   // Ensure client-side rendering for time calculations
@@ -544,7 +558,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Calculate time remaining from real challenge data
   const getTimeRemaining = () => {
     if (!isClient) {
-      return { text: "Loading...", subText: "Calculating time..." };
+      return { text: t('loading'), subText: "Calculating time..." };
     }
     
     if (challengeDetails) {
@@ -552,7 +566,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const diff = endTime.getTime() - currentTime.getTime();
       
       if (diff <= 0) {
-        return { text: "Challenge Ended", subText: `Ended on ${endTime.toLocaleDateString()}` };
+        return { text: t('ended'), subText: `Ended on ${endTime.toLocaleDateString()}` };
       }
       
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -561,14 +575,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
       let timeText: string;
-      if (days > 0) {
-        timeText = `${days} days ${hours} hours`;
+      if (days > 30) {
+        const months = Math.floor(days / 30);
+        const remainingDays = days % 30;
+        timeText = `${months} ${t('months')} ${remainingDays} ${t('days')}`;
+      } else if (days > 0) {
+        timeText = `${days} ${t('days')} ${hours} ${t('hours')}`;
       } else if (hours > 0) {
-        timeText = `${hours} hours ${minutes} minutes`;
+        timeText = `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
       } else if (minutes > 0) {
-        timeText = `${minutes} minutes ${seconds} seconds`;
+        timeText = `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
       } else {
-        timeText = `${seconds} seconds`;
+        timeText = `${seconds} ${t('seconds')}`;
       }
       
       return { 
@@ -578,7 +596,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     }
     
     // Fallback
-    return { text: "Loading...", subText: "Calculating time..." };
+    return { text: t('loading'), subText: "Calculating time..." };
   };
 
   const timeRemaining = getTimeRemaining();
@@ -801,7 +819,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl text-gray-400">{t('investor')}</h1>
-              <p className="text-2xl">
+              <p 
+                className="text-2xl cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                onClick={handleWalletClick}
+                title={`View on ${subgraphNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+              >
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
               </p>
             </div>
@@ -1304,7 +1326,16 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           
                           // Get rank color
                           const getRankColor = (rank: number) => {
-                                return 'bg-gray-800/50 border-gray-700/50 text-gray-100';
+                                return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
+                          };
+
+                          // Handle user click
+                          const handleUserClick = (userAddress: string) => {
+                            // Check if address is empty or zero address
+                            if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+                              return;
+                            }
+                            router.push(`/challenge/${challengeId}/${userAddress}`);
                           };
                           
                           const formattedAddress = formatAddress(user);
@@ -1314,7 +1345,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           return (
                             <div 
                               key={`${user}-${rank}`} 
-                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''}`}
+                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
+                                isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
+                              }`}
+                              onClick={() => !isEmptySlot && handleUserClick(user)}
                             >
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center justify-center w-10 h-10">
@@ -1360,6 +1394,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           cy="12"
                                           r="10"
                                           fill="#10B981"
+                                          fillOpacity="0.6"
                                           stroke="#FFD700"
                                           strokeWidth="2"
                                         />
@@ -1688,29 +1723,38 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="w-full bg-gray-700 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                        style={{ 
-                          width: `${(() => {
-                            if (!challengeDetails || !isClient) return 0;
-                            
-                            const startTime = challengeDetails.startTime.getTime();
-                            const endTime = challengeDetails.endTime.getTime();
-                            const now = currentTime.getTime();
-                            
-                            if (now < startTime) return 0;
-                            if (now >= endTime) return 100;
-                            
-                            const totalDuration = endTime - startTime;
-                            const elapsed = now - startTime;
-                            const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                            
-                            return progress;
-                          })()}%` 
-                        }}
-                      ></div>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-full bg-gray-700 rounded-full h-3">
+                            <div 
+                              className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                              style={{ 
+                                width: `${(() => {
+                                  if (!challengeDetails || !isClient) return 0;
+                                  
+                                  const startTime = challengeDetails.startTime.getTime();
+                                  const endTime = challengeDetails.endTime.getTime();
+                                  const now = currentTime.getTime();
+                                  
+                                  if (now < startTime) return 0;
+                                  if (now >= endTime) return 100;
+                                  
+                                  const totalDuration = endTime - startTime;
+                                  const elapsed = now - startTime;
+                                  const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                                  
+                                  return progress;
+                                })()}%` 
+                              }}
+                            ></div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm font-medium">{timeRemaining.text}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">

@@ -41,19 +41,19 @@ interface ChallengeCardProps {
   challengeId: string
 }
 
-function calculateTimeLeft(startTime: string, endTime: string, currentTime: Date = new Date()): string {
+function calculateTimeLeft(startTime: string, endTime: string, currentTime: Date = new Date(), t: any): string {
   const start = new Date(Number(startTime) * 1000)
   const end = new Date(Number(endTime) * 1000)
   const now = currentTime
   
   // If challenge hasn't started yet
   if (now < start) {
-    return "Not started yet"
+    return t('notStarted')
   }
   
   // If challenge has ended
   if (now >= end) {
-    return "Ended"
+    return t('ended')
   }
   
   const diff = end.getTime() - now.getTime()
@@ -66,22 +66,22 @@ function calculateTimeLeft(startTime: string, endTime: string, currentTime: Date
   if (days > 30) {
     const months = Math.floor(days / 30)
     const remainingDays = days % 30
-    return `${months} months ${remainingDays} days`
+    return `${months} ${t('months')} ${remainingDays} ${t('days')}`
   }
   
   if (days > 0) {
-    return `${days} days ${hours} hours`
+    return `${days} ${t('days')} ${hours} ${t('hours')}`
   }
   
   if (hours > 0) {
-    return `${hours} hours ${minutes} minutes`
+    return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`
   }
   
   if (minutes > 0) {
-    return `${minutes} minutes ${seconds} seconds`
+    return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`
   }
   
-  return `${seconds} seconds`
+  return `${seconds} ${t('seconds')}`
 }
 
 function calculateProgress(startTime: string, endTime: string, isCompleted: boolean, currentTime: Date = new Date()): number {
@@ -377,7 +377,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       title: t('oneWeek'),
       type: `${t('oneWeek')} challenge`,
       participants: Number(data.activeChallenges.one_week_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime)) : t('loading'),
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_week_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, data.activeChallenges.one_week_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_week_isCompleted ? "completed" : 
@@ -393,7 +393,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       title: t('oneMonth'),
       type: `${t('oneMonth')} challenge`,
       participants: Number(data.activeChallenges.one_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime)) : t('loading'),
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, data.activeChallenges.one_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_month_isCompleted ? "completed" : 
@@ -409,7 +409,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       title: t('threeMonths'),
       type: `${t('threeMonths')} challenge`,
       participants: Number(data.activeChallenges.three_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime)) : t('loading'),
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.three_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, data.activeChallenges.three_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.three_month_isCompleted ? "completed" : 
@@ -425,7 +425,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       title: t('sixMonths'),
       type: `${t('sixMonths')} challenge`,
       participants: Number(data.activeChallenges.six_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime)) : t('loading'),
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.six_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, data.activeChallenges.six_month_isCompleted, currentTime) : 0,
       status: data.activeChallenges.six_month_isCompleted ? "completed" : 
@@ -441,7 +441,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       title: t('oneYear'),
       type: `${t('oneYear')} challenge`,
       participants: Number(data.activeChallenges.one_year_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime)) : t('loading'),
+      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_year_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, data.activeChallenges.one_year_isCompleted, currentTime) : 0,
       status: data.activeChallenges.one_year_isCompleted ? "completed" : 
@@ -601,7 +601,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                               <div>
                                 <Progress 
                                   value={challenge.progress} 
-                                  className="w-20 h-3 cursor-help"
+                                  className="w-20 h-3"
                                 />
                               </div>
                             </TooltipTrigger>

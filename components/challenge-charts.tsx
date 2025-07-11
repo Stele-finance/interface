@@ -163,6 +163,41 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
 
   const progressPercentage = getProgressPercentage()
 
+  // Calculate remaining time in a human-readable format
+  const getRemainingTime = () => {
+    const { endTime } = challengeDetails
+    const remainingMs = endTime.getTime() - currentTime.getTime()
+    
+    if (remainingMs <= 0) return t('ended')
+    
+    const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000)
+    
+    if (days > 30) {
+      const months = Math.floor(days / 30)
+      const remainingDays = days % 30
+      return `${months} ${t('months')} ${remainingDays} ${t('days')}`
+    }
+    
+    if (days > 0) {
+      return `${days} ${t('days')} ${hours} ${t('hours')}`
+    }
+    
+    if (hours > 0) {
+      return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`
+    }
+    
+    if (minutes > 0) {
+      return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`
+    }
+    
+    return `${seconds} ${t('seconds')}`
+  }
+
+  const remainingTime = getRemainingTime()
+
   // Get current date for header
   const currentDate = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -454,12 +489,21 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
+            <TooltipProvider>
+              <UITooltip>
+                <TooltipTrigger asChild>
+                  <div className="w-full bg-gray-700 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium">{remainingTime}</p>
+                </TooltipContent>
+              </UITooltip>
+            </TooltipProvider>
             
             {/* Time Info */}
             <div className="flex justify-between text-sm text-gray-500">

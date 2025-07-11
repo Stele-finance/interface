@@ -200,55 +200,52 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
 
   const metrics = getInvestorMetrics()
 
-    // Process real ranking data
+    // Process real ranking data from the same source as Ranking tab
   const rankingData = useMemo(() => {
     const colors = ['#FFD700', '#C0C0C0', '#CD7F32', '#4F46E5', '#10B981']
     const emojis = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣']
 
-    // If no data, return default 5 rankings with score 0
+    // If no data, return empty array
     if (!rankingResponse?.topUsers || !rankingResponse?.scores) {
-      return Array.from({ length: 5 }, (_, index) => ({
-        rank: index + 1,
-        user: `User ${index + 1}`,
-        value: 0,
-        color: colors[index],
-        emoji: emojis[index],
-        bgGradient: `linear-gradient(45deg, ${colors[index]}, ${colors[index]})`
-      }))
+      return []
     }
 
-         // Process real data, fill missing slots with 0 scores
-     const result = []
-     for (let i = 0; i < 5; i++) {
-       const user = rankingResponse.topUsers[i] || `User ${i + 1}`
-       const score = rankingResponse.scores[i]
-       
-       // Check if score is already formatted (contains decimal) or needs conversion
-       let scoreValue = 0
-       if (score) {
-         try {
-           if (score.includes('.')) {
-             // Already formatted as decimal string
-             scoreValue = parseFloat(score)
-           } else {
-             // Raw integer string, needs conversion from USDC units
-             scoreValue = parseFloat(ethers.formatUnits(score, USDC_DECIMALS))
-           }
-         } catch (error) {
-           console.warn('Error parsing score:', score, error)
-           scoreValue = 0
-         }
-       }
-       
-       result.push({
-         rank: i + 1,
-         user: user,
-         value: scoreValue,
-         color: colors[i],
-         emoji: emojis[i],
-         bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
-       })
-     }
+    // Process real data, same logic as Ranking tab
+    const result = []
+    for (let i = 0; i < Math.min(5, rankingResponse.topUsers.length); i++) {
+      const user = rankingResponse.topUsers[i]
+      const score = rankingResponse.scores[i]
+      const profitRatio = rankingResponse.profitRatios[i]
+      
+      // Format address - same logic as Ranking tab
+      const formatAddress = (address: string) => {
+        if (!address || address === '0x0000000000000000000000000000000000000000') {
+          return '';
+        }
+        return `${address.slice(0, 6)}...${address.slice(-4)}`;
+      };
+      
+      // Parse score value - same logic as Ranking tab
+      let scoreValue = 0
+      if (score) {
+        try {
+          scoreValue = parseFloat(score)
+        } catch (error) {
+          console.warn('Error parsing score:', score, error)
+          scoreValue = 0
+        }
+      }
+      
+      result.push({
+        rank: i + 1,
+        user: formatAddress(user),
+        value: scoreValue,
+        profitRatio: profitRatio ? parseFloat(profitRatio) : 0,
+        color: colors[i],
+        emoji: emojis[i],
+        bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
+      })
+    }
 
     return result
   }, [rankingResponse])
@@ -287,6 +284,15 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       const value = payload[0]?.value
       const dataPoint = payload[0]?.payload
       const isRealTime = dataPoint?.isRealTime
+      const isRegistered = investorData?.investor?.isRegistered === true
+      
+      // Check if this is the last data point (most recent)
+      const isLastDataPoint = chartData.length > 0 && dataPoint?.id === chartData[chartData.length - 1]?.id
+      
+      // Show ranking info if:
+      // 1. Real-time data point, OR
+      // 2. Registered user hovering over the last data point
+      const shouldShowRanking = isRealTime || (isRegistered && isLastDataPoint)
       
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-4 py-3 shadow-xl backdrop-blur-sm min-w-[280px]">
@@ -300,13 +306,13 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
             </div>
           )}
           
-          {/* Show ranking information when hovering over real-time data */}
-          {isRealTime && (
+          {/* Show ranking information for real-time data or registered users on last data point */}
+          {shouldShowRanking && rankingData && rankingData.length > 0 && (
             <div className="border-t border-gray-600 pt-2 mt-2">
               <p className="text-gray-300 text-xs font-medium mb-2">Current Rankings:</p>
               <div className="space-y-1">
-                {rankingData.map((ranking) => (
-                  <div key={ranking.rank} className="flex items-center justify-between">
+                                {rankingData.map((ranking) => (
+                  <div key={ranking.rank} className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       {/* Use same icons as chart */}
                       {(ranking.rank === 4 || ranking.rank === 5) ? (
@@ -317,6 +323,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                               cy="12"
                               r="10"
                               fill={ranking.color}
+                              fillOpacity={ranking.rank === 5 ? 0.6 : 1}
                               stroke="#FFD700"
                               strokeWidth="2"
                             />
@@ -347,30 +354,37 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                         </span>
                       )}
                       <span className="text-gray-300 text-xs">
-                        {ranking.rank === 1 ? '1st' : ranking.rank === 2 ? '2nd' : ranking.rank === 3 ? '3rd' : `${ranking.rank}th`}
+                        {ranking.user || `Rank #${ranking.rank}`}
                       </span>
                     </div>
-                    <span className="text-gray-100 text-xs font-medium">
-                      ${ranking.value.toLocaleString()}
-                    </span>
+                    <div className="flex items-center gap-2 ml-auto">
+                      <span className="text-gray-100 text-xs font-medium">
+                        ${ranking.value.toFixed(2)}
+                      </span>
+                      <span className={`text-xs ${ranking.profitRatio >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {ranking.profitRatio >= 0 ? '+' : ''}{ranking.profitRatio.toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
                 ))}
-              </div>
-              
-              {/* Show current user's position relative to rankings */}
-              <div className="border-t border-gray-600 pt-2 mt-2">
-                <div className="flex items-center justify-between">
+            </div>
+            
+            {/* Show current user's position relative to rankings */}
+            <div className="border-t border-gray-600 pt-2 mt-2">
+                              <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-green-400 border border-white flex items-center justify-center">
+                    <div className={`w-3 h-3 rounded-full border border-white flex items-center justify-center ${isRealTime ? 'bg-green-400' : 'bg-blue-400'}`}>
                     </div>
-                    <span className="text-green-400 text-xs font-medium">Your Position</span>
+                    <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : 'text-blue-400'}`}>
+                      {isRealTime ? 'Your Position (Live)' : 'Your Position (Registered)'}
+                    </span>
                   </div>
-                  <span className="text-green-400 text-xs font-medium">
+                  <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : 'text-blue-400'}`}>
                     ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-              </div>
             </div>
+          </div>
           )}
           
           <p className="text-gray-400 text-xs mt-2">
@@ -601,6 +615,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                           cy={props.cy}
                           r="10"
                           fill={ranking.color}
+                          fillOpacity={ranking.rank === 5 ? 0.6 : 1}
                           stroke="#FFD700"
                           strokeWidth="2"
                         />
