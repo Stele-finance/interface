@@ -183,6 +183,19 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     window.open(getTokenExplorerUrl(tokenAddress), '_blank')
   }
 
+  // Get wallet address explorer URL based on network
+  const getWalletExplorerUrl = (walletAddress: string) => {
+    if (subgraphNetwork === 'arbitrum') {
+      return `https://arbiscan.io/address/${walletAddress}`
+    }
+    return `https://etherscan.io/address/${walletAddress}`
+  }
+
+  // Handle wallet address click
+  const handleWalletClick = () => {
+    window.open(getWalletExplorerUrl(walletAddress), '_blank')
+  }
+
   // Ensure client-side rendering for time calculations
   useEffect(() => {
     setIsClient(true);
@@ -806,7 +819,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl text-gray-400">{t('investor')}</h1>
-              <p className="text-2xl">
+              <p 
+                className="text-2xl cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                onClick={handleWalletClick}
+                title={`View on ${subgraphNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+              >
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
               </p>
             </div>
