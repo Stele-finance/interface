@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn, getTokenLogo } from "@/lib/utils"
 import { 
   TrendingUp, 
@@ -544,7 +545,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Calculate time remaining from real challenge data
   const getTimeRemaining = () => {
     if (!isClient) {
-      return { text: "Loading...", subText: "Calculating time..." };
+      return { text: t('loading'), subText: "Calculating time..." };
     }
     
     if (challengeDetails) {
@@ -552,7 +553,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const diff = endTime.getTime() - currentTime.getTime();
       
       if (diff <= 0) {
-        return { text: "Challenge Ended", subText: `Ended on ${endTime.toLocaleDateString()}` };
+        return { text: t('ended'), subText: `Ended on ${endTime.toLocaleDateString()}` };
       }
       
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -561,14 +562,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
       let timeText: string;
-      if (days > 0) {
-        timeText = `${days} days ${hours} hours`;
+      if (days > 30) {
+        const months = Math.floor(days / 30);
+        const remainingDays = days % 30;
+        timeText = `${months} ${t('months')} ${remainingDays} ${t('days')}`;
+      } else if (days > 0) {
+        timeText = `${days} ${t('days')} ${hours} ${t('hours')}`;
       } else if (hours > 0) {
-        timeText = `${hours} hours ${minutes} minutes`;
+        timeText = `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
       } else if (minutes > 0) {
-        timeText = `${minutes} minutes ${seconds} seconds`;
+        timeText = `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
       } else {
-        timeText = `${seconds} seconds`;
+        timeText = `${seconds} ${t('seconds')}`;
       }
       
       return { 
@@ -578,7 +583,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     }
     
     // Fallback
-    return { text: "Loading...", subText: "Calculating time..." };
+    return { text: t('loading'), subText: "Calculating time..." };
   };
 
   const timeRemaining = getTimeRemaining();
@@ -1688,29 +1693,38 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="w-full bg-gray-700 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                        style={{ 
-                          width: `${(() => {
-                            if (!challengeDetails || !isClient) return 0;
-                            
-                            const startTime = challengeDetails.startTime.getTime();
-                            const endTime = challengeDetails.endTime.getTime();
-                            const now = currentTime.getTime();
-                            
-                            if (now < startTime) return 0;
-                            if (now >= endTime) return 100;
-                            
-                            const totalDuration = endTime - startTime;
-                            const elapsed = now - startTime;
-                            const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                            
-                            return progress;
-                          })()}%` 
-                        }}
-                      ></div>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-full bg-gray-700 rounded-full h-3">
+                            <div 
+                              className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                              style={{ 
+                                width: `${(() => {
+                                  if (!challengeDetails || !isClient) return 0;
+                                  
+                                  const startTime = challengeDetails.startTime.getTime();
+                                  const endTime = challengeDetails.endTime.getTime();
+                                  const now = currentTime.getTime();
+                                  
+                                  if (now < startTime) return 0;
+                                  if (now >= endTime) return 100;
+                                  
+                                  const totalDuration = endTime - startTime;
+                                  const elapsed = now - startTime;
+                                  const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                                  
+                                  return progress;
+                                })()}%` 
+                              }}
+                            ></div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm font-medium">{timeRemaining.text}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
