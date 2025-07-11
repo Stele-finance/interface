@@ -211,10 +211,10 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     }
 
     // Process real data, same logic as Ranking tab
-    const result = []
+     const result = []
     for (let i = 0; i < Math.min(5, rankingResponse.topUsers.length); i++) {
       const user = rankingResponse.topUsers[i]
-      const score = rankingResponse.scores[i]
+       const score = rankingResponse.scores[i]
       const profitRatio = rankingResponse.profitRatios[i]
       
       // Format address - same logic as Ranking tab
@@ -226,26 +226,26 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       };
       
       // Parse score value - same logic as Ranking tab
-      let scoreValue = 0
-      if (score) {
-        try {
-          scoreValue = parseFloat(score)
-        } catch (error) {
-          console.warn('Error parsing score:', score, error)
-          scoreValue = 0
-        }
-      }
-      
-      result.push({
-        rank: i + 1,
+       let scoreValue = 0
+       if (score) {
+         try {
+             scoreValue = parseFloat(score)
+         } catch (error) {
+           console.warn('Error parsing score:', score, error)
+           scoreValue = 0
+         }
+       }
+       
+       result.push({
+         rank: i + 1,
         user: formatAddress(user),
-        value: scoreValue,
+         value: scoreValue,
         profitRatio: profitRatio ? parseFloat(profitRatio) : 0,
-        color: colors[i],
-        emoji: emojis[i],
-        bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
-      })
-    }
+         color: colors[i],
+         emoji: emojis[i],
+         bgGradient: `linear-gradient(45deg, ${colors[i]}, ${colors[i]})`
+       })
+     }
 
     return result
   }, [rankingResponse])
@@ -311,7 +311,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
             <div className="border-t border-gray-600 pt-2 mt-2">
               <p className="text-gray-300 text-xs font-medium mb-2">Current Rankings:</p>
               <div className="space-y-1">
-                                {rankingData.map((ranking) => (
+                {rankingData.map((ranking) => (
                   <div key={ranking.rank} className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       {/* Use same icons as chart */}
@@ -358,20 +358,20 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                       </span>
                     </div>
                     <div className="flex items-center gap-2 ml-auto">
-                      <span className="text-gray-100 text-xs font-medium">
+                    <span className="text-gray-100 text-xs font-medium">
                         ${ranking.value.toFixed(2)}
                       </span>
                       <span className={`text-xs ${ranking.profitRatio >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {ranking.profitRatio >= 0 ? '+' : ''}{ranking.profitRatio.toFixed(2)}%
-                      </span>
+                    </span>
                     </div>
                   </div>
                 ))}
-            </div>
-            
-            {/* Show current user's position relative to rankings */}
-            <div className="border-t border-gray-600 pt-2 mt-2">
-                              <div className="flex items-center justify-between">
+              </div>
+              
+              {/* Show current user's position relative to rankings */}
+              <div className="border-t border-gray-600 pt-2 mt-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full border border-white flex items-center justify-center ${isRealTime ? 'bg-green-400' : 'bg-blue-400'}`}>
                     </div>
@@ -383,8 +383,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
+              </div>
             </div>
-          </div>
           )}
           
           <p className="text-gray-400 text-xs mt-2">
@@ -484,12 +484,12 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       <CardHeader className="pb-6">
         <div className="flex items-center gap-4 mb-2">
           <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
-          {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
-            <div className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-xs text-green-400">{t('live')}</span>
-            </div>
-          )}
+            {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span className="text-xs text-green-400">{t('live')}</span>
+              </div>
+            )}
         </div>
         <div className="flex items-baseline justify-between gap-3">
           <div className="flex items-baseline gap-3">
@@ -502,30 +502,30 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               </span>
             </div>
           </div>
-          {/* Interval selector */}
-          <div className="flex items-center space-x-2">
-            <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-              <button
-                onClick={() => setInterval('daily')}
+            {/* Interval selector */}
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setInterval('daily')}
                 className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  interval === 'daily' 
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('daily')}
-              </button>
-              <button
-                onClick={() => setInterval('weekly')}
+                    interval === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setInterval('weekly')}
                 className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  interval === 'weekly' 
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('weekly')}
-              </button>
-            </div>
+                    interval === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
           </div>
         </div>
       </CardHeader>

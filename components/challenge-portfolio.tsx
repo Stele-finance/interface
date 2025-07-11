@@ -1031,7 +1031,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 </>
               ) : (
                 <>
-                  <Trophy className="mr-3 h-5 w-5" />
+                  <DollarSign className="mr-3 h-5 w-5" />
                   Get Rewards
                 </>
               )}
