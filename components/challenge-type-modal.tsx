@@ -95,7 +95,6 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
         >
           <Plus className="mr-3 h-5 w-5" />
           {t('createChallenge')}
-          <Trophy className="ml-3 h-5 w-5" />
         </Button>
       </DialogTrigger>
       
