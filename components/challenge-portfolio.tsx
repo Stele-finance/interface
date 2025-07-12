@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { ArrowRight, BarChart3, LineChart, PieChart, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -258,6 +259,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -618,9 +620,15 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   const challengeDetails = getChallengeDetails();
 
-  // Handle Join Challenge
-  const handleJoinChallenge = async () => {
+  // Handle Join Challenge - Show modal
+  const handleJoinChallenge = () => {
+    setShowJoinModal(true);
+  };
+
+  // Confirm Join Challenge - Actual transaction
+  const confirmJoinChallenge = async () => {
     setIsJoining(true);
+    setShowJoinModal(false);
     
     try {      
       let walletProvider;
@@ -850,13 +858,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       }
       
     } catch (error: any) {
-      console.error("❌ Error joining challenge:", error);
+      console.error("❌ Error in confirmJoinChallenge:", error);
       
-      // Show toast notification for error
+      // Show error toast
       toast({
+        title: "Error",
+        description: `Failed to join challenge: ${error.message}`,
         variant: "destructive",
-        title: "Error Joining Challenge",
-        description: error.message || "An unknown error occurred",
       });
     } finally {
       setIsJoining(false);
@@ -994,113 +1002,205 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      <div className="flex items-center justify-between">
-        {isLoadingChallenge ? (
-          <div className="flex items-center gap-2">
-            <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
-            <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
-          </div>
-        ) : (
-          <h2 className="text-2xl">
-            <span className="text-gray-400">
-              {getChallengeTitle().split(' ( ID: ')[0]}
-            </span>
-            <span className="text-gray-100">
-              {getChallengeTitle().includes('( ID: ') ? ' ( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
-            </span>
-          </h2>
-        )}
-        <div className="flex items-center gap-2">
-          {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
-          {isClient && shouldShowGetRewards() && (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleGetRewards}
-              disabled={isGettingRewards}
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-            >
-              {isGettingRewards ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Claiming...
-                </>
-              ) : (
-                <>
-                  <DollarSign className="mr-3 h-5 w-5" />
-                  Get Rewards
-                </>
-              )}
-            </Button>
-          )}
-          
-          {/* Entry Fee Display - only show when join button is visible */}
-          {!hasJoinedChallenge && !isChallengeEnded() && challengeData?.challenge && entryFee && (
-            <div className={`flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium border ${
-              isInsufficientBalance() 
-                ? "bg-red-500/10 text-red-400 border-red-500/20" 
-                : "bg-primary/10 text-primary border-primary/20"
-            }`}>
-              Entry Fee : {isLoadingEntryFee ? 'Loading...' : `$${entryFee}`}
-              {isInsufficientBalance() && !isLoadingBalance && (
-                <span className="ml-2 text-xs">
-                  (Balance: ${parseFloat(usdcBalance).toFixed(2)})
+      {/* Mobile Responsive Challenge Header */}
+      <div className="space-y-4">
+        {/* Mobile Layout - Stack vertically */}
+        <div className="block md:hidden">
+          {/* First row: Challenge title and Entry Fee */}
+          <div className="flex items-center justify-between mb-2">
+            {isLoadingChallenge ? (
+              <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
+            ) : (
+              <h2 className="text-2xl">
+                <span className="text-gray-400">
+                  {getChallengeTitle().split(' ( ID: ')[0]}
                 </span>
+              </h2>
+            )}
+          </div>
+          
+          {/* Second row: Challenge ID and Join Button */}
+          <div className="flex items-center justify-between">
+            {/* Challenge ID */}
+            {!isLoadingChallenge && getChallengeTitle().includes('( ID: ') && (
+              <span className="text-gray-100 text-lg">
+                {getChallengeTitle().includes('( ID: ') ? '( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
+              </span>
+            )}
+            
+            {/* Buttons */}
+            <div className="flex flex-col space-y-2">
+              {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
+              {isClient && shouldShowGetRewards() && (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={handleGetRewards}
+                  disabled={isGettingRewards}
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                >
+                  {isGettingRewards ? (
+                    <>
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                      Claiming...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="mr-3 h-5 w-5" />
+                      Get Rewards
+                    </>
+                  )}
+                </Button>
+              )}
+              
+              {hasJoinedChallenge ? (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={handleNavigateToAccount}
+                  className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                >
+                  <User className="mr-3 h-5 w-5" />
+                  {t('myAccount')}
+                </Button>
+              ) : !isChallengeEnded() && (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={handleJoinChallenge} 
+                  disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
+                  className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
+                    isInsufficientBalance() 
+                      ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
+                      : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                  }`}
+                >
+                  {isJoining ? (
+                    <>
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                      {t('joining')}
+                    </>
+                  ) : isLoadingChallenge || !challengeData?.challenge ? (
+                    <>
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                      Loading challenge info...
+                    </>
+                  ) : isLoadingEntryFee || isLoadingBalance ? (
+                    <>
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                      {t('loading')}
+                    </>
+                  ) : isInsufficientBalance() ? (
+                    <>
+                      <Plus className="mr-3 h-5 w-5" />
+                      Insufficient USDC
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="mr-2 h-5 w-5" />
+                      {t('join')}
+                      <UserPlus className="ml-2 h-5 w-5" />
+                    </>
+                  )}
+                </Button>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout - Original horizontal layout */}
+        <div className="hidden md:flex items-center justify-between">
+          {isLoadingChallenge ? (
+            <div className="flex items-center gap-2">
+              <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
+              <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
+            </div>
+          ) : (
+            <h2 className="text-2xl">
+              <span className="text-gray-400">
+                {getChallengeTitle().split(' ( ID: ')[0]}
+              </span>
+              <span className="text-gray-100">
+                {getChallengeTitle().includes('( ID: ') ? ' ( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
+              </span>
+            </h2>
           )}
-          
-          {hasJoinedChallenge ? (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleNavigateToAccount}
-              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-            >
-              <User className="mr-3 h-5 w-5" />
-              {t('myAccount')}
-            </Button>
-          ) : !isChallengeEnded() && (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleJoinChallenge} 
-              disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-              className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
-                isInsufficientBalance() 
-                  ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                  : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
-              }`}
-            >
-              {isJoining ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  {t('joining')}
-                </>
-              ) : isLoadingChallenge || !challengeData?.challenge ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Loading challenge info...
-                </>
-              ) : isLoadingEntryFee || isLoadingBalance ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  {t('loading')}
-                </>
-              ) : isInsufficientBalance() ? (
-                <>
-                  <UserPlus className="mr-3 h-5 w-5" />
-                  Insufficient USDC
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-5 w-5" />
-                  {t('join')}
-                  <UserPlus className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
+            {isClient && shouldShowGetRewards() && (
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={handleGetRewards}
+                disabled={isGettingRewards}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+              >
+                {isGettingRewards ? (
+                  <>
+                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                    Claiming...
+                  </>
+                ) : (
+                  <>
+                    <DollarSign className="mr-3 h-5 w-5" />
+                    Get Rewards
+                  </>
+                )}
+              </Button>
+            )}
+            
+            {hasJoinedChallenge ? (
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={handleNavigateToAccount}
+                className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+              >
+                <User className="mr-3 h-5 w-5" />
+                {t('myAccount')}
+              </Button>
+            ) : !isChallengeEnded() && (
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={handleJoinChallenge} 
+                disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
+                className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
+                  isInsufficientBalance() 
+                    ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
+                    : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                }`}
+              >
+                {isJoining ? (
+                  <>
+                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                    {t('joining')}
+                  </>
+                ) : isLoadingChallenge || !challengeData?.challenge ? (
+                  <>
+                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                    Loading challenge info...
+                  </>
+                ) : isLoadingEntryFee || isLoadingBalance ? (
+                  <>
+                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                    {t('loading')}
+                  </>
+                ) : isInsufficientBalance() ? (
+                  <>
+                    <Plus className="mr-3 h-5 w-5" />
+                    Insufficient USDC
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-5 w-5" />
+                    {t('join')}
+                    <UserPlus className="ml-2 h-5 w-5" />
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1341,6 +1441,50 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         {/* Ranking Section */}
         <RankingSection challengeId={challengeId} network={subgraphNetwork} />
       </div>
+
+      {/* Join Challenge Confirmation Modal */}
+      <AlertDialog open={showJoinModal} onOpenChange={setShowJoinModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Join Challenge</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to join this challenge?
+            </AlertDialogDescription>
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-300">Entry Fee:</span>
+                <span className="text-lg font-bold text-white">
+                  ${isLoadingEntryFee ? 'Loading...' : entryFee || '0'} USDC
+                </span>
+              </div>
+              {isInsufficientBalance() && (
+                <div className="mt-2 text-sm text-red-400">
+                  ⚠️ Insufficient USDC balance to join this challenge
+                </div>
+              )}
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowJoinModal(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmJoinChallenge}
+              disabled={isJoining || isLoadingEntryFee || isInsufficientBalance()}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isJoining ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                'Confirm Join'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   )
