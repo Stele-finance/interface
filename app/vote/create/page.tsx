@@ -85,7 +85,7 @@ export default function CreateProposalPage() {
         t('fourthPlaceLabel'),
         t('fifthPlaceLabel')
       ],
-      parameterPlaceholders: ['50', '30', '15', '3', '2'],
+      parameterPlaceholders: ['50', '26', '13', '7', '4'],
       parameterDescriptions: [
         t('firstPlaceDesc'),
         t('secondPlaceDesc'),

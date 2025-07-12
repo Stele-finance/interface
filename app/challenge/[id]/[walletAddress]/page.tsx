@@ -1355,21 +1355,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                   {rank <= 3 ? (
                                     <span className="text-3xl">{getRankIcon(rank)}</span>
                                   ) : rank === 4 ? (
-                                    <div className="relative w-8 h-8 flex items-center justify-center">
-                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                    <div className="relative w-6 h-6 flex items-center justify-center">
+                                      <svg width="24" height="24" viewBox="0 0 24 24">
                                         <circle
                                           cx="12"
                                           cy="12"
                                           r="10"
                                           fill="#4F46E5"
-                                          stroke="#FFD700"
-                                          strokeWidth="2"
-                                        />
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="6"
-                                          fill="none"
                                           stroke="#FFD700"
                                           strokeWidth="1"
                                         />
@@ -1378,7 +1370,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           y="13"
                                           textAnchor="middle"
                                           dominantBaseline="middle"
-                                          fontSize="8"
+                                          fontSize="12"
                                           fill="#FFFFFF"
                                           fontWeight="bold"
                                         >
@@ -1387,22 +1379,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                       </svg>
                                     </div>
                                   ) : rank === 5 ? (
-                                    <div className="relative w-8 h-8 flex items-center justify-center">
-                                      <svg width="32" height="32" viewBox="0 0 24 24">
+                                    <div className="relative w-6 h-6 flex items-center justify-center">
+                                      <svg width="24" height="24" viewBox="0 0 24 24">
                                         <circle
                                           cx="12"
                                           cy="12"
                                           r="10"
                                           fill="#10B981"
                                           fillOpacity="0.6"
-                                          stroke="#FFD700"
-                                          strokeWidth="2"
-                                        />
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="6"
-                                          fill="none"
                                           stroke="#FFD700"
                                           strokeWidth="1"
                                         />
@@ -1411,7 +1395,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           y="13"
                                           textAnchor="middle"
                                           dominantBaseline="middle"
-                                          fontSize="8"
+                                          fontSize="12"
                                           fill="#FFFFFF"
                                           fontWeight="bold"
                                         >

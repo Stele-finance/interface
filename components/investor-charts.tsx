@@ -316,22 +316,14 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     <div className="flex items-center gap-2">
                       {/* Use same icons as chart */}
                       {(ranking.rank === 4 || ranking.rank === 5) ? (
-                        <div className="relative w-4 h-4 flex items-center justify-center">
-                          <svg width="16" height="16" viewBox="0 0 24 24">
+                        <div className="relative w-3 h-3 flex items-center justify-center">
+                          <svg width="12" height="12" viewBox="0 0 24 24">
                             <circle
                               cx="12"
                               cy="12"
                               r="10"
                               fill={ranking.color}
                               fillOpacity={ranking.rank === 5 ? 0.6 : 1}
-                              stroke="#FFD700"
-                              strokeWidth="2"
-                            />
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="6"
-                              fill="none"
                               stroke="#FFD700"
                               strokeWidth="1"
                             />
@@ -340,7 +332,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                               y="13"
                               textAnchor="middle"
                               dominantBaseline="middle"
-                              fontSize="8"
+                              fontSize="10"
                               fill="#FFFFFF"
                               fontWeight="bold"
                             >
@@ -613,18 +605,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                         <circle
                           cx={props.cx}
                           cy={props.cy}
-                          r="10"
+                          r="8"
                           fill={ranking.color}
                           fillOpacity={ranking.rank === 5 ? 0.6 : 1}
-                          stroke="#FFD700"
-                          strokeWidth="2"
-                        />
-                        {/* Inner circle */}
-                        <circle
-                          cx={props.cx}
-                          cy={props.cy}
-                          r="6"
-                          fill="none"
                           stroke="#FFD700"
                           strokeWidth="1"
                         />
@@ -634,7 +617,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                           y={props.cy + 1}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                          fontSize="10"
+                          fontSize="12"
                           fill="#FFFFFF"
                           fontWeight="bold"
                         >
