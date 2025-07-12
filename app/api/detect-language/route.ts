@@ -79,7 +79,100 @@ function getClientIP(request: NextRequest): string {
     'fastly-client-ip',
     'true-client-ip',
     'x-original-forwarded-for',
+    // Additional headers for various CDN providers
+    'x-forwarded-proto',
+    'x-forwarded-port',
+    'x-forwarded-host',
+    'x-vercel-forwarded-for',
+    'x-vercel-ip-country',
+    'x-vercel-ip-city',
+    'x-vercel-ip-region',
+    'x-cloudflare-connecting-ip',
+    'x-appengine-remote-addr',
+    'x-nginx-proxy',
+    'x-remote-addr',
+    'x-remote-ip',
+    'x-originating-ip',
+    'x-client-ip-address',
+    'x-forwarded-client-ip',
+    'x-forwarded-remote-addr',
+    'x-real-client-ip',
+    'x-appengine-user-ip',
+    'x-client-ipaddress',
+    'x-forwarded-ipaddress',
+    'x-user-ip',
+    'x-host',
+    'x-custom-ip-authorization',
+    'x-forwarded-server',
+    'x-connecting-ip',
+    'x-client-address',
+    'x-forwarded-addr',
+    'x-forwarded-ip',
+    'x-client-real-ip',
+    'x-remote-address',
+    'x-original-remote-addr',
+    'x-original-client-ip',
+    'x-forwarded-from',
+    'x-forwarded-by',
+    'x-forwarded-host-ip',
+    'x-forwarded-via',
+    'x-forwarded-source-ip',
+    'x-forwarded-destination-ip',
+    'x-forwarded-peer-ip',
+    'x-peer-ip',
+    'x-source-ip',
+    'x-destination-ip',
+    'x-origin-ip',
+    'x-original-ip',
+    'x-caller-ip',
+    'x-request-ip',
+    'x-request-from',
+    'x-request-source',
+    'x-request-origin',
+    'x-request-peer',
+    'x-request-addr',
+    'x-request-address',
+    'x-request-client-ip',
+    'x-request-real-ip',
+    'x-request-remote-addr',
+    'x-request-remote-ip',
+    'x-request-forwarded-for',
+    'x-request-forwarded-ip',
+    'x-request-user-ip',
+    'x-request-peer-ip',
+    'x-request-caller-ip',
+    'x-request-source-ip',
+    'x-request-origin-ip',
+    'x-request-destination-ip',
+    'x-request-forwarded-from',
+    'x-request-forwarded-by',
+    'x-request-forwarded-via',
+    'x-request-forwarded-host',
+    'x-request-forwarded-proto',
+    'x-request-forwarded-port',
+    'x-request-forwarded-server',
+    'x-request-forwarded-addr',
+    'x-request-forwarded-address',
+    'x-request-forwarded-client-ip',
+    'x-request-forwarded-real-ip',
+    'x-request-forwarded-remote-addr',
+    'x-request-forwarded-remote-ip',
+    'x-request-forwarded-peer-ip',
+    'x-request-forwarded-user-ip',
+    'x-request-forwarded-caller-ip',
+    'x-request-forwarded-source-ip',
+    'x-request-forwarded-origin-ip',
+    'x-request-forwarded-destination-ip'
   ];
+
+  // Debug: Log all headers in production to identify which headers are available
+  if (process.env.NODE_ENV === 'production') {
+    console.log('=== Debug: All Request Headers ===');
+    request.headers.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+    console.log('=== End Headers ===');
+  }
 
   for (const header of headers) {
     const value = request.headers.get(header);
@@ -87,9 +180,27 @@ function getClientIP(request: NextRequest): string {
       // Use the first IP when multiple IPs are present
       const ip = value.split(',')[0].trim();
       if (ip && ip !== 'unknown') {
+        // Debug: Log which header provided the IP
+        if (process.env.NODE_ENV === 'production') {
+          console.log(`IP found in header '${header}': ${ip}`);
+        }
         return ip;
       }
     }
+  }
+
+  // If no IP found, try to get from request URL hostname as fallback
+  const hostname = request.nextUrl.hostname;
+  if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== 'stele.io') {
+    if (process.env.NODE_ENV === 'production') {
+      console.log(`IP found in hostname: ${hostname}`);
+    }
+    return hostname;
+  }
+
+  // Debug: Log when no IP is found
+  if (process.env.NODE_ENV === 'production') {
+    console.log('No IP found in any header, returning default 127.0.0.1');
   }
 
   // Return default value when IP cannot be found in all headers
