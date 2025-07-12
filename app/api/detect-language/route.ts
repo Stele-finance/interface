@@ -66,48 +66,108 @@ const countryToLanguage: { [key: string]: string } = {
   'YE': 'ar',
 };
 
-// Get client IP address
+// Get client IP address - check various headers including mobile environments
 function getClientIP(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const realIP = request.headers.get('x-real-ip');
-  const cfConnectingIP = request.headers.get('cf-connecting-ip');
-  
-  if (forwarded) {
-    return forwarded.split(',')[0].trim();
+  // Headers to get real client IP in various proxy and CDN environments
+  const headers = [
+    'x-forwarded-for',
+    'x-real-ip',
+    'x-client-ip',
+    'x-forwarded',
+    'x-cluster-client-ip',
+    'cf-connecting-ip',
+    'fastly-client-ip',
+    'true-client-ip',
+    'x-original-forwarded-for',
+  ];
+
+  for (const header of headers) {
+    const value = request.headers.get(header);
+    if (value) {
+      // Use the first IP when multiple IPs are present
+      const ip = value.split(',')[0].trim();
+      if (ip && ip !== 'unknown') {
+        return ip;
+      }
+    }
   }
-  
-  if (realIP) {
-    return realIP;
-  }
-  
-  if (cfConnectingIP) {
-    return cfConnectingIP;
-  }
-  
+
+  // Return default value when IP cannot be found in all headers
   return '127.0.0.1';
+}
+
+// IP address validation function
+function isValidIP(ip: string): boolean {
+  // IPv4 address validation
+  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  // IPv6 address validation (simple form)
+  const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  
+  return ipv4Regex.test(ip) || ipv6Regex.test(ip);
+}
+
+// Local IP address check function
+function isLocalIP(ip: string): boolean {
+  return ip === '127.0.0.1' || 
+         ip === '::1' || 
+         ip.startsWith('192.168.') || 
+         ip.startsWith('10.') || 
+         ip.startsWith('172.16.') ||
+         ip.startsWith('172.17.') ||
+         ip.startsWith('172.18.') ||
+         ip.startsWith('172.19.') ||
+         ip.startsWith('172.20.') ||
+         ip.startsWith('172.21.') ||
+         ip.startsWith('172.22.') ||
+         ip.startsWith('172.23.') ||
+         ip.startsWith('172.24.') ||
+         ip.startsWith('172.25.') ||
+         ip.startsWith('172.26.') ||
+         ip.startsWith('172.27.') ||
+         ip.startsWith('172.28.') ||
+         ip.startsWith('172.29.') ||
+         ip.startsWith('172.30.') ||
+         ip.startsWith('172.31.');
 }
 
 // Get geographical location info from IP (using free API)
 async function getCountryFromIP(ip: string): Promise<string> {
   try {
     // Return default value for local IP addresses
-    if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    if (isLocalIP(ip)) {
+      return 'US';
+    }
+    
+    // IP address validation
+    if (!isValidIP(ip)) {
+      console.warn('Invalid IP address:', ip);
       return 'US';
     }
     
     // Use ipapi.co free API (1000 requests per month limit)
     const response = await fetch(`https://ipapi.co/${ip}/country/`, {
+      method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Stele/1.0)'
-      }
+        'User-Agent': 'Mozilla/5.0 (compatible; Stele/1.0)',
+        'Accept': 'text/plain',
+      },
+      // Set timeout (10 seconds)
+      signal: AbortSignal.timeout(10000),
     });
     
     if (!response.ok) {
-      throw new Error('Failed to fetch country');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
     const country = await response.text();
-    return country.trim().toUpperCase();
+    const countryCode = country.trim().toUpperCase();
+    
+    // Country code validation
+    if (countryCode && countryCode.length === 2) {
+      return countryCode;
+    }
+    
+    throw new Error('Invalid country code received');
   } catch (error) {
     console.error('Error fetching country from IP:', error);
     return 'US'; // Default value
@@ -117,13 +177,23 @@ async function getCountryFromIP(ip: string): Promise<string> {
 export async function GET(request: NextRequest) {
   try {
     const ip = getClientIP(request);
-    console.log('Detected IP:', ip);
+    
+    // Only output logs in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Detected IP:', ip);
+    }
     
     const country = await getCountryFromIP(ip);
-    console.log('Detected country:', country);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Detected country:', country);
+    }
     
     const language = countryToLanguage[country] || 'en';
-    console.log('Suggested language:', language);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Suggested language:', language);
+    }
     
     return NextResponse.json({
       ip,
