@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
 import { LanguageProvider } from "@/lib/language-context"
+import { LanguageAutoDetectNotification } from "@/components/language-auto-detect-notification"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <LanguageProvider>
+              <LanguageAutoDetectNotification />
               <EntryFeeProvider>
                 <div className="flex flex-col min-h-screen">
                   <Header />
