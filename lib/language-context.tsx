@@ -76,117 +76,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           console.log(`Language automatically set to ${data.language} (Country: ${data.country})`);
         }
       } else {
-        // If IP detection failed, try browser language fallback
-        const browserLanguage = getBrowserLanguage();
-        if (browserLanguage && Object.keys(translations).includes(browserLanguage)) {
-          setLanguage(browserLanguage as Language);
-          setIsAutoDetected(true);
-          localStorage.setItem('language', browserLanguage);
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`Language automatically set to ${browserLanguage} (Browser fallback)`);
-          }
-        } else {
-          // Set default language when both IP and browser detection fail
-          setLanguage('en');
-          localStorage.setItem('language', 'en');
-        }
-      }
-    } catch (error) {
-      console.error('Auto language detection failed:', error);
-      // Try browser language fallback on network error
-      const browserLanguage = getBrowserLanguage();
-      if (browserLanguage && Object.keys(translations).includes(browserLanguage)) {
-        setLanguage(browserLanguage as Language);
-        setIsAutoDetected(true);
-        localStorage.setItem('language', browserLanguage);
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Language automatically set to ${browserLanguage} (Browser fallback after IP error)`);
-        }
-      } else {
-        // Set default language on network error or other failures
+        // Set default language when auto-detection fails
         setLanguage('en');
         localStorage.setItem('language', 'en');
       }
+    } catch (error) {
+      console.error('Auto language detection failed:', error);
+      // Set default language on network error or other failures
+      setLanguage('en');
+      localStorage.setItem('language', 'en');
     }
-  };
-
-  // Get browser language and map to supported language codes
-  const getBrowserLanguage = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    
-    const browserLang = navigator.language || navigator.languages[0];
-    if (!browserLang) return null;
-    
-    const langCode = browserLang.toLowerCase();
-    
-    // Direct mapping for exact matches
-    const langMap: { [key: string]: string } = {
-      'en': 'en',
-      'en-us': 'en',
-      'en-gb': 'en',
-      'ko': 'kr',
-      'ko-kr': 'kr',
-      'ja': 'jp',
-      'ja-jp': 'jp',
-      'zh': 'zh-cn',
-      'zh-cn': 'zh-cn',
-      'zh-tw': 'zh-tw',
-      'zh-hk': 'zh-tw',
-      'es': 'es',
-      'es-es': 'es',
-      'es-mx': 'es',
-      'pt': 'pt',
-      'pt-br': 'pt',
-      'pt-pt': 'pt',
-      'fr': 'fr',
-      'fr-fr': 'fr',
-      'de': 'de',
-      'de-de': 'de',
-      'it': 'it',
-      'it-it': 'it',
-      'ru': 'ru',
-      'ru-ru': 'ru',
-      'ar': 'ar',
-      'hi': 'hi',
-      'hi-in': 'hi',
-      'bn': 'bn',
-      'bn-bd': 'bn',
-      'id': 'id',
-      'id-id': 'id',
-      'ms': 'ms',
-      'ms-my': 'ms',
-      'th': 'th',
-      'th-th': 'th',
-      'vi': 'vi',
-      'vi-vn': 'vi',
-      'nl': 'nl',
-      'nl-nl': 'nl',
-      'da': 'da',
-      'da-dk': 'da',
-      'fi': 'fi',
-      'fi-fi': 'fi',
-      'el': 'el',
-      'el-gr': 'el',
-      'he': 'he',
-      'he-il': 'he',
-      'hu': 'hu',
-      'hu-hu': 'hu'
-    };
-    
-    // Check exact match first
-    if (langMap[langCode]) {
-      return langMap[langCode];
-    }
-    
-    // Check partial match (e.g., 'en-au' -> 'en')
-    const baseLang = langCode.split('-')[0];
-    if (langMap[baseLang]) {
-      return langMap[baseLang];
-    }
-    
-    return null;
   };
 
   // Save language to localStorage when it changes
