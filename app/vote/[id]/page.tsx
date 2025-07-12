@@ -1104,7 +1104,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     <div className="container mx-auto py-6">
       <div className="mb-6">
         <Link href="/vote">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="border-transparent">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('backToProposals')}
           </Button>
