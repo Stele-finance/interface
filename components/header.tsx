@@ -281,15 +281,73 @@ export function Header() {
           />
         </Link>
         
-        {/* Menu Icon */}
+        {/* Mobile Menu Icon - Hidden on desktop */}
         <Button
           variant="ghost"
           size="lg"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-3"
+          className="p-3 md:hidden"
         >
           <Menu className="h-10 w-10" />
         </Button>
+
+        {/* Desktop Navigation - Hidden on mobile */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link 
+            href="/dashboard"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              pathname === "/" || pathname === "/dashboard"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <BarChart3 className="h-4 w-4" />
+            {t('dashboard')}
+          </Link>
+          
+          <DropdownMenu open={challengesDropdownOpen} onOpenChange={setChallengesDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  pathname.includes("/challenges") || pathname.includes("/challenge/")
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                <Trophy className="h-4 w-4" />
+                {t('challenges')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-36">
+               <DropdownMenuItem asChild>
+                 <Link href="/challenges" className="cursor-pointer">
+                   {t('myPortfolio')}
+                 </Link>
+               </DropdownMenuItem>
+               <DropdownMenuItem asChild>
+                 <Link href="/challenges" className="cursor-pointer">
+                   {t('totalChallenges')}
+                 </Link>
+               </DropdownMenuItem>
+             </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Link 
+            href="/vote"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              pathname.includes("/vote")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <Vote className="h-4 w-4" />
+            {t('vote')}
+          </Link>
+        </nav>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
@@ -489,6 +547,62 @@ export function Header() {
           </Dialog>
         )}
 
+        {/* Language Selector - Hidden on mobile */}
+        <LanguageSelectorSidebar>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-2 hidden md:flex"
+          >
+            <Languages className="h-5 w-5" />
+          </Button>
+        </LanguageSelectorSidebar>
+
+        {/* Desktop Menu Icon - Hidden on mobile */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 hidden md:flex"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link 
+                href="https://github.com/Stele-finance/interface"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer"
+              >
+                <Github className="mr-2 h-4 w-4" />
+                {t('github')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link 
+                href="#"
+                className="cursor-pointer"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                {t('doc')}
+              </Link>
+            </DropdownMenuItem>
+                         <DropdownMenuItem asChild>
+               <Link 
+                 href="https://x.com/stelefinance"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="cursor-pointer"
+               >
+                 <Twitter className="mr-2 h-4 w-4" />
+                 X
+               </Link>
+             </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
       </div>
 
