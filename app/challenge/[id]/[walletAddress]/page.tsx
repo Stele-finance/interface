@@ -1640,19 +1640,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <span className="text-base text-gray-400">{t('challengeType')}</span>
                     <div className="text-3xl text-white">
                       {(() => {
-                        switch (challengeId) {
-                          case '1':
+                        const challengeType = challengeData?.challenge?.challengeType
+                        switch (challengeType) {
+                          case 0:
                             return t('oneWeek');
-                          case '2':
+                          case 1:
                             return t('oneMonth');
-                          case '3':
+                          case 2:
                             return t('threeMonths');
-                          case '4':
+                          case 3:
                             return t('sixMonths');
-                          case '5':
+                          case 4:
                             return t('oneYear');
                           default:
-                            return `Type ${challengeId}`;
+                            return challengeType !== undefined ? `Type ${challengeType}` : `Type ${challengeId}`;
                         }
                       })()}
                     </div>
