@@ -119,17 +119,19 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
                   >
                     <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
                       <div className="flex items-center gap-3">
-                        <div className="relative">
+                        <div className="relative flex-shrink-0">
                         {getTokenLogo(token.tokenAddress, subgraphNetwork) ? (
-                          <Image
-                            src={getTokenLogo(token.tokenAddress, subgraphNetwork)!}
-                            alt={token.symbol}
-                            width={24}
-                            height={24}
-                            className="rounded-full"
-                          />
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex items-center justify-center">
+                            <Image
+                              src={getTokenLogo(token.tokenAddress, subgraphNetwork)!}
+                              alt={token.symbol}
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                             {token.symbol.slice(0, 2)}
                           </div>
                         )}

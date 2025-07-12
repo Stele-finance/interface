@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
 
-interface TokenStatsOverviewProps {
+interface TotalRankingProps {
   className?: string
   network?: 'ethereum' | 'arbitrum' | 'solana' | null
 }
 
-export function TokenStatsOverview({ className, network }: TokenStatsOverviewProps) {
+export function TotalRanking({ className, network }: TotalRankingProps) {
   const { t } = useLanguage()
   const router = useRouter()
   // Filter network for subgraph usage (exclude solana)
@@ -92,10 +92,6 @@ export function TokenStatsOverview({ className, network }: TokenStatsOverviewPro
       <div className="flex items-center gap-2">
         <Trophy className="h-6 w-6 text-gray-100" />
         <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
-        <Badge variant="secondary" className="ml-2 bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
-          <Users className="h-4 w-4 mr-2" />
-          {rankings.length} {t('users')}
-        </Badge>
       </div>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-0">

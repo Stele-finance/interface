@@ -530,8 +530,8 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-14 w-32">{t('type')}</TableHead>
-                  <TableHead className="text-gray-300 w-20">{t('id')}</TableHead>
+                  <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
+                  <TableHead className="text-gray-300 w-20">{t('challenge')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
                   <TableHead className="text-gray-300 w-32">{t('progress')}</TableHead>
@@ -553,7 +553,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                       }
                     }}
                   >
-                    <TableCell className="font-medium text-gray-100 pl-12 py-6 text-lg">
+                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg w-40 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="relative">
                         <Trophy className="h-5 w-5 text-yellow-500" />
@@ -574,8 +574,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                         {challenge.title}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-gray-300 text-base py-6">
-                      {challenge.challengeId}
+                    <TableCell className="py-6">
+                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                        {challenge.challengeId}
+                      </Badge>
                     </TableCell>
                     <TableCell className="py-6">
                       <div className="flex items-center gap-2 text-gray-300 text-base">
