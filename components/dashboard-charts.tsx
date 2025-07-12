@@ -134,7 +134,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
           <p className="text-gray-100 text-sm font-medium">
-            {dataKey === 'totalParticipants' ? `${t('participants')}: ${value?.toLocaleString()}` : `${t('rewards')}: $${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            {dataKey === 'totalParticipants' ? `${t('users')}: ${value?.toLocaleString()}` : `${t('rewards')}: $${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
         </div>
       )
@@ -232,7 +232,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                         }`}
                       >
                         <Users className="h-4 w-4 mr-2" />
-                        {t('participants')}
+                        {t('users')}
                       </button>
                       <button
                         onClick={() => setChartType('rewards')}
@@ -364,7 +364,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                         }`}
                       >
                         <Users className="h-4 w-4 mr-2" />
-                        {t('participants')}
+                        {t('users')}
                       </button>
                       <button
                         onClick={() => setChartType('rewards')}

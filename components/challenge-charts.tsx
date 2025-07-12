@@ -514,7 +514,7 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
 
           {/* Participants */}
           <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('participants')}</span>
+            <span className="text-base text-gray-400">{t('users')}</span>
             <div className="text-4xl text-white">{challengeDetails.participants.toLocaleString()}</div>
           </div>
 
