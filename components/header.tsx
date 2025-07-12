@@ -59,6 +59,7 @@ export function Header() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   // Track previous network and wallet address for detecting changes
   const prevNetworkRef = useRef<string | null>(null)
@@ -264,76 +265,89 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-background">
       <div className="flex items-center">
-        <Link href="/" className="flex items-center gap-2 mr-6">
-          <img 
-            src="/stele_logo.png" 
+        <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
+          <Image 
+            src="/stele_logo_small.png" 
             alt="Stele Logo" 
-            className="h-10 w-auto object-contain"
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+            style={{ 
+              width: 'auto', 
+              height: '40px',
+              maxWidth: '48px'
+            }}
           />
         </Link>
         
-        <div className="flex items-center">
-          <Link href={"/dashboard"} className="mr-6">
-            <div 
-              className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors",
-                pathname === "/" || pathname === "/dashboard"
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <span>{t('dashboard')}</span>
-            </div>
-          </Link>
-          <div 
-            className="mr-6 relative"
-            onMouseEnter={() => setChallengesDropdownOpen(true)}
-            onMouseLeave={() => setChallengesDropdownOpen(false)}
-          >
-            <div 
-              className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors cursor-pointer",
-                pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/portfolio")
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <span>{t('challenges')}</span>
-            </div>
-            {challengesDropdownOpen && (
-              <div className="absolute top-full left-0 -mt-1 w-52 z-50 pt-2">
-                {/* Invisible bridge area */}
-                <div className="h-1 w-full"></div>
-                <div className="space-y-1 p-1 bg-background border border-gray-600 rounded-2xl shadow-xl">
-                  <Link 
-                    href="/portfolio"
-                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
-                  >
-                    {t('myPortfolios')}
-                  </Link>
-                  <Link 
-                    href="/challenges"
-                    className="block px-3 py-2 text-lg text-white bg-transparent hover:bg-gray-700/30 border border-gray-600 rounded-2xl transition-all duration-200 font-medium shadow-lg"
-                  >
-                    {t('totalChallenges')}
-                  </Link>
-                </div>
-              </div>
+        {/* Mobile Menu Icon - Hidden on desktop */}
+        <Button
+          variant="ghost"
+          size="lg"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-3 md:hidden"
+        >
+          <Menu className="h-10 w-10" />
+        </Button>
+
+        {/* Desktop Navigation - Hidden on mobile */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link 
+            href="/dashboard"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              pathname === "/" || pathname === "/dashboard"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
-          </div>
-          <Link href={"/vote"} className="mr-6">
-            <div 
-              className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors",
-                pathname.includes("/vote") 
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <span>{t('vote')}</span>
-            </div>
+          >
+            <BarChart3 className="h-4 w-4" />
+            {t('dashboard')}
           </Link>
-        </div>
+          
+          <DropdownMenu open={challengesDropdownOpen} onOpenChange={setChallengesDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  pathname.includes("/challenges") || pathname.includes("/challenge/")
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                <Trophy className="h-4 w-4" />
+                {t('challenges')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-36">
+               <DropdownMenuItem asChild>
+                 <Link href="/challenges" className="cursor-pointer">
+                   {t('myPortfolio')}
+                 </Link>
+               </DropdownMenuItem>
+               <DropdownMenuItem asChild>
+                 <Link href="/challenges" className="cursor-pointer">
+                   {t('totalChallenges')}
+                 </Link>
+               </DropdownMenuItem>
+             </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Link 
+            href="/vote"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              pathname.includes("/vote")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <Vote className="h-4 w-4" />
+            {t('vote')}
+          </Link>
+        </nav>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
@@ -364,7 +378,7 @@ export function Header() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10 hidden sm:flex font-medium px-4 py-2 h-auto">
+                <Button variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 font-medium px-2 sm:px-4 py-2 h-auto text-xs sm:text-base">
                   {walletIcon ? (
                     <Image 
                       src={walletIcon} 
@@ -472,8 +486,8 @@ export function Header() {
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
-                size="lg" 
-                className="text-primary border-primary hover:bg-primary/10 hidden sm:flex font-medium px-4 py-2 h-auto"
+                size="sm" 
+                className="text-primary border-primary hover:bg-primary/10 font-medium px-2 sm:px-4 py-2 h-auto text-xs sm:text-base"
               >
                 <Wallet className="mr-2 h-5 w-5" />
                 <span className="text-base">
@@ -533,46 +547,187 @@ export function Header() {
           </Dialog>
         )}
 
-        <div className="flex items-center gap-2">
-          {/* Language Selector Sidebar */}
-          <LanguageSelectorSidebar>
-            <Button variant="ghost" size="icon" className="text-muted-foreground">
-              <Languages className="h-6 w-6" />
-            </Button>
-          </LanguageSelectorSidebar>
+        {/* Language Selector - Hidden on mobile */}
+        <LanguageSelectorSidebar>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-2 hidden md:flex"
+          >
+            <Languages className="h-5 w-5" />
+          </Button>
+        </LanguageSelectorSidebar>
 
-          {/* Menu Dropdown for Links */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
-                <Menu className="h-7 w-7" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-base w-48">
-              <DropdownMenuLabel className="text-lg font-semibold">{t('links')}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-base py-2" asChild>
-                <Link href="https://github.com/Stele-finance/interface" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                  <Github className="h-4 w-4" />
+        {/* Desktop Menu Icon - Hidden on mobile */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 hidden md:flex"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link 
+                href="https://github.com/Stele-finance/interface"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer"
+              >
+                <Github className="mr-2 h-4 w-4" />
+                {t('github')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link 
+                href="#"
+                className="cursor-pointer"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                {t('doc')}
+              </Link>
+            </DropdownMenuItem>
+                         <DropdownMenuItem asChild>
+               <Link 
+                 href="https://x.com/stelefinance"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="cursor-pointer"
+               >
+                 <Twitter className="mr-2 h-4 w-4" />
+                 X
+               </Link>
+             </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Menu Panel */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="p-6 pb-8">
+              {/* Handle Bar */}
+              <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-6"></div>
+              
+              {/* Menu Items */}
+              <div className="space-y-1 mb-8">
+                <Link 
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    pathname === "/" || pathname === "/dashboard"
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <BarChart3 className="h-6 w-6 mr-4" />
+                  {t('dashboard')}
+                </Link>
+                
+                <Link 
+                  href="/challenges"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    pathname.includes("/challenges") || pathname.includes("/challenge/")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Trophy className="h-6 w-6 mr-4" />
+                  {t('challenges')}
+                </Link>
+                
+                <Link 
+                  href="/portfolio"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    pathname.includes("/portfolio")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <User className="h-6 w-6 mr-4" />
+                  {t('myPortfolios')}
+                </Link>
+                
+                <Link 
+                  href="/vote"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    pathname.includes("/vote")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Vote className="h-6 w-6 mr-4" />
+                  {t('vote')}
+                </Link>
+              </div>
+               
+              {/* Separator */}
+              <div className="border-t border-border mb-6"></div>
+               
+               {/* Links */}
+              <div className="space-y-1">
+                <Link 
+                  href="https://github.com/Stele-finance/interface"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <Github className="h-5 w-5 mr-4" />
                   {t('github')}
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-base py-2" asChild>
-                <Link href="#" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
+                
+                <Link 
+                  href="#"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <FileText className="h-5 w-5 mr-4" />
                   {t('doc')}
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-base py-2" asChild>
-                <Link href="https://x.com/stelefinance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                  <Twitter className="h-4 w-4" />
-                  X
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+                
+                                 <Link 
+                   href="https://x.com/stelefinance"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   onClick={() => setMobileMenuOpen(false)}
+                   className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                 >
+                   <Twitter className="h-5 w-5 mr-4" />
+                   X
+                 </Link>
+                 
+                 {/* Language Selector */}
+                 <LanguageSelectorSidebar>
+                   <div className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
+                     <Languages className="h-5 w-5 mr-4" />
+                     {t('language')}
+                   </div>
+                 </LanguageSelectorSidebar>
+               </div>
+             </div>
+           </div>
+        </>
+      )}
     </header>
   )
 }

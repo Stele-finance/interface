@@ -39,7 +39,7 @@ export function DashboardClientComponents({ network }: DashboardClientComponents
   return (
     <Suspense fallback={<LoadingSkeleton />}>
       <ActiveChallenges showCreateButton={true} />
-      <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="mt-6 sm:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <InvestableTokens network={network} />
         <TokenStatsOverview network={network} />
       </div>
