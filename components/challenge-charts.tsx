@@ -149,6 +149,43 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
 
   const challengeDetails = getChallengeDetails()
 
+  // Get challenge status based on isActive and endTime
+  const getChallengeStatus = () => {
+    if (!challengeData?.challenge) {
+      return {
+        status: 'finished',
+        color: 'text-red-400',
+        text: t('finished')
+      }
+    }
+
+    const challenge = challengeData.challenge
+    const endTime = new Date(parseInt(challenge.endTime) * 1000)
+    const hasEnded = currentTime >= endTime
+
+    if (challenge.isActive && !hasEnded) {
+      return {
+        status: 'active',
+        color: 'text-green-400',
+        text: t('active')
+      }
+    } else if (challenge.isActive && hasEnded) {
+      return {
+        status: 'pending_reward',
+        color: 'text-orange-400',
+        text: 'Pending reward'
+      }
+    } else {
+      return {
+        status: 'finished',
+        color: 'text-red-400',
+        text: t('finished')
+      }
+    }
+  }
+
+  const challengeStatus = getChallengeStatus()
+
   // Calculate progress percentage
   const getProgressPercentage = () => {
     const { startTime, endTime } = challengeDetails
@@ -456,8 +493,8 @@ export function ChallengeCharts({ challengeId, network }: ChallengeChartsProps) 
                   />
                 )}
               </div>
-              <span className={`text-xl font-medium ${challengeDetails.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                {challengeDetails.isActive ? t('active') : 'Inactive'}
+              <span className={`text-xl font-medium ${challengeStatus.color}`}>
+                {challengeStatus.text}
               </span>
             </div>
           </div>

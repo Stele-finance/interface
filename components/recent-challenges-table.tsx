@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Trophy, Users, Clock } from "lucide-react"
+import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
@@ -61,13 +61,13 @@ export function RecentChallengesTable() {
     }
     
     if (currentTime >= endTime || !challenge.isActive) {
-      return "completed"
+      return "finished"
     }
     
     return "active"
   }
 
-  const getStatusBadge = (status: "active" | "pending" | "completed") => {
+  const getStatusBadge = (status: "active" | "pending" | "finished") => {
     switch (status) {
       case "active":
         return (
@@ -78,8 +78,16 @@ export function RecentChallengesTable() {
         )
       case "pending":
         return <Badge variant="outline" className="border-gray-600 text-gray-300">{t('pending')}</Badge>
-      case "completed":
-        return <Badge className="bg-blue-500 text-white">{t('completed')}</Badge>
+      case "finished":
+        return (
+          <Badge 
+            variant="secondary"
+            className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
+          >
+            <CheckCircle className="h-3 w-3 mr-1" />
+            {t('finished')}
+          </Badge>
+        )
       default:
         return <Badge variant="secondary">{t('unknown')}</Badge>
     }

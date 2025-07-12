@@ -258,7 +258,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                 className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
               >
                 <CheckCircle className="h-3 w-3 mr-1" />
-                {t('completed')}
+                {t('finished')}
               </Badge>
             )}
           </div>
@@ -284,7 +284,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('startDate')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('endDate')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('state')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('status')}</th>
                   </tr>
                 </thead>
                 <tbody>
