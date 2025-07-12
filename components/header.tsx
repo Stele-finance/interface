@@ -616,24 +616,24 @@ export function Header() {
           />
           
           {/* Menu Panel */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300">
-            <div className="p-6 pb-8">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
+            <div className="p-4 pb-6">
               {/* Handle Bar */}
-              <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-6"></div>
+              <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-4"></div>
               
               {/* Menu Items */}
-              <div className="space-y-1 mb-8">
+              <div className="space-y-1 mb-6">
                 <Link 
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname === "/" || pathname === "/dashboard"
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <BarChart3 className="h-6 w-6 mr-4" />
+                  <BarChart3 className="h-5 w-5 mr-3" />
                   {t('dashboard')}
                 </Link>
                 
@@ -641,13 +641,13 @@ export function Header() {
                   href="/challenges"
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/challenges") || pathname.includes("/challenge/")
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <Trophy className="h-6 w-6 mr-4" />
+                  <Trophy className="h-5 w-5 mr-3" />
                   {t('challenges')}
                 </Link>
                 
@@ -655,13 +655,13 @@ export function Header() {
                   href="/portfolio"
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/portfolio")
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <User className="h-6 w-6 mr-4" />
+                  <User className="h-5 w-5 mr-3" />
                   {t('myPortfolios')}
                 </Link>
                 
@@ -669,19 +669,19 @@ export function Header() {
                   href="/vote"
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center px-4 py-4 rounded-2xl text-lg font-medium transition-colors",
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/vote")
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <Vote className="h-6 w-6 mr-4" />
+                  <Vote className="h-5 w-5 mr-3" />
                   {t('vote')}
                 </Link>
               </div>
                
-              {/* Separator */}
-              <div className="border-t border-border mb-6"></div>
+                             {/* Separator */}
+              <div className="border-t border-border mb-4"></div>
                
                {/* Links */}
               <div className="space-y-1">
@@ -690,18 +690,18 @@ export function Header() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <Github className="h-5 w-5 mr-4" />
+                  <Github className="h-4 w-4 mr-3" />
                   {t('github')}
                 </Link>
                 
                 <Link 
                   href="#"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <FileText className="h-5 w-5 mr-4" />
+                  <FileText className="h-4 w-4 mr-3" />
                   {t('doc')}
                 </Link>
                 
@@ -710,16 +710,16 @@ export function Header() {
                    target="_blank"
                    rel="noopener noreferrer"
                    onClick={() => setMobileMenuOpen(false)}
-                   className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                   className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                  >
-                   <Twitter className="h-5 w-5 mr-4" />
+                   <Twitter className="h-4 w-4 mr-3" />
                    X
                  </Link>
                  
                  {/* Language Selector */}
                  <LanguageSelectorSidebar>
-                   <div className="flex items-center px-4 py-3 rounded-2xl text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
-                     <Languages className="h-5 w-5 mr-4" />
+                   <div className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
+                     <Languages className="h-4 w-4 mr-3" />
                      {t('language')}
                    </div>
                  </LanguageSelectorSidebar>

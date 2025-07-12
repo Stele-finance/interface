@@ -297,7 +297,7 @@ export const en = {
   threeMonthsChallenge: "3 Months",
   timeLeft: "Time Left",
   title: "Title",
-  tokenAddress: "Token Address",
+  tokenAddress: "Address",
   tokenAddressDesc: "The contract address of the token to be added as an investable asset",
   tokenAddressLabel: "Token Address",
   tokenAddressRemoveDesc: "The contract address of the token to be removed from investable assets",

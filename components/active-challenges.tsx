@@ -530,7 +530,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300 pl-6 w-40">{t('type')}</TableHead>
+                  <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
                   <TableHead className="text-gray-300 w-20">{t('challenge')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
@@ -553,7 +553,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                       }
                     }}
                   >
-                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg">
+                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg w-40 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="relative">
                         <Trophy className="h-5 w-5 text-yellow-500" />

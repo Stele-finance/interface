@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -17,7 +17,11 @@ export const metadata: Metadata = {
   title: "Stele - Decentralized Investment Challenge Platform",
   description: "A decentralized investment challenge platform for testing cryptocurrency investment strategies",
   generator: 'v0.dev',
-  viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
