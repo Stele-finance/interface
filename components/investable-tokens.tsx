@@ -157,7 +157,7 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
                         {formatAddress(token.tokenAddress)}
                       </code>
                     </TableCell>
-                    <TableCell className="text-gray-400 pr-6 py-6 text-base">
+                    <TableCell className="text-gray-400 pr-6 py-6 text-base whitespace-nowrap">
                       {formatDate(token.updatedTimestamp)}
                     </TableCell>
                   </TableRow>

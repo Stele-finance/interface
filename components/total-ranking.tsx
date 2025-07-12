@@ -54,7 +54,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   if (isLoading) {
     return (
       <div className={cn("space-y-6", className)}>
-        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
+        <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent>
             <div className="flex items-center justify-center py-8">
@@ -70,7 +70,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   if (error) {
     return (
       <div className={cn("space-y-6", className)}>
-        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
+        <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
         <Card className="bg-transparent border border-gray-700/50">
           <CardContent>
             <div className="text-center py-8">
@@ -90,8 +90,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   return (
     <div className={cn("space-y-6", className)}>
       <div className="flex items-center gap-2">
-        <Trophy className="h-6 w-6 text-gray-100" />
-        <h2 className="text-3xl text-gray-100">{t('totalRanking')}</h2>
+        <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
       </div>
       <Card className="bg-transparent border border-gray-700/50">
         <CardContent className="p-0">

@@ -181,16 +181,16 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         className="hover:bg-gray-800/30 transition-colors cursor-pointer" 
         onClick={handleRowClick}
       >
-        <td className="py-6 px-6">
+        <td className="py-6 pl-6 pr-4">
           <div className="flex items-center gap-3">
             <div>
-              <div className="text-sm text-gray-400 pl-8">
+              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
                 {investor.challengeId}
-              </div>
+              </Badge>
             </div>
           </div>
         </td>
-        <td className="py-6 px-4">
+        <td className="py-6 px-4 whitespace-nowrap">
           <span className="font-medium text-gray-100">
             {challengeTitle}
           </span>
@@ -209,7 +209,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             </span>
           </div>
         </td>
-        <td className="py-6 px-4 text-gray-300">
+        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
           <div>
             {challengeData?.challenge?.startTime ? 
               formatDateTime(challengeData.challenge.startTime) : 
@@ -217,7 +217,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             }
           </div>
         </td>
-        <td className="py-6 px-4 text-gray-300">
+        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
           <div>
             {challengeData?.challenge?.endTime ? 
               formatDateTime(challengeData.challenge.endTime) : 
@@ -279,7 +279,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-14">{t('id')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6">{t('challenge')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">{t('type')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('startDate')}</th>
