@@ -111,49 +111,48 @@ export function RecentChallengesTable() {
 
   if (isLoading) {
     return (
-      <Card className="bg-transparent border-0">
-        <CardHeader>
-          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-12 bg-gray-700 rounded animate-pulse"></div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
+        <Card className="bg-transparent border border-gray-700/50">
+          <CardContent className="p-0">
+            <div className="space-y-3 p-6">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-12 bg-gray-700 rounded animate-pulse"></div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   if (error || !data?.challenges) {
     return (
-      <Card className="bg-transparent border-0">
-        <CardHeader>
-          <CardTitle className="text-gray-100">{t('recentChallenges')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
+        <Card className="bg-transparent border border-gray-700/50">
+          <CardContent className="p-0">
+            <div className="text-center py-8 px-6">
+              <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <Card className="bg-transparent border-0">
-      <CardHeader>
-        <h2 className="text-3xl text-gray-100">
-          {t('totalChallenges')}
-        </h2>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border border-gray-700">
-          <Table>
+    <div className="space-y-6">
+      <h2 className="text-3xl text-gray-100">
+        {t('totalChallenges')}
+      </h2>
+      <Card className="bg-transparent border border-gray-700/50">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
-                <TableHead className="text-gray-300 pl-12">{t('id')}</TableHead>
+                <TableHead className="text-gray-300 pl-6">{t('challenge')}</TableHead>
                 <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
                 <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
                 <TableHead className="text-gray-300 pl-8">{t('prize')}</TableHead>
@@ -180,12 +179,12 @@ export function RecentChallengesTable() {
                       className="border-0 hover:bg-gray-800/50 cursor-pointer transition-colors"
                       onClick={() => window.location.href = `/challenge/${challenge.challengeId}`}
                     >
-                      <TableCell className="pl-12 py-6">
-                        <div className="text-sm text-gray-400">
-                          {challenge.challengeId.slice(0, 8)}
-                        </div>
-                      </TableCell>
                       <TableCell className="pl-6 py-6">
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                          {challenge.challengeId}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="pl-6 py-6 whitespace-nowrap">
                         <span className="font-medium text-gray-100 text-base">
                           {getChallengeTypeName(challenge.challengeType)}
                         </span>
@@ -199,12 +198,12 @@ export function RecentChallengesTable() {
                       <TableCell className="font-medium text-yellow-400 pl-8 py-6">
                         {formatUSDAmount(challenge.rewardAmountUSD)}
                       </TableCell>
-                      <TableCell className="pl-10 py-6">
+                      <TableCell className="pl-10 py-6 whitespace-nowrap">
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           {formatDate(challenge.startTime)}
                         </div>
                       </TableCell>
-                      <TableCell className="pl-4 py-6">
+                      <TableCell className="pl-4 py-6 whitespace-nowrap">
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           {formatDate(challenge.endTime)}
                         </div>
@@ -221,5 +220,6 @@ export function RecentChallengesTable() {
         </div>
       </CardContent>
     </Card>
+    </div>
   )
 } 

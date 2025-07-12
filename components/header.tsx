@@ -323,7 +323,7 @@ export function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-36">
                <DropdownMenuItem asChild>
-                 <Link href="/challenges" className="cursor-pointer">
+                 <Link href="/portfolio" className="cursor-pointer">
                    {t('myPortfolio')}
                  </Link>
                </DropdownMenuItem>
