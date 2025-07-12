@@ -1564,8 +1564,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
                               {networkIcon}
                             </div>
-                            <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-gray-400'}`}>
-                              {isActive ? t('active') : 'Inactive'}
+                            <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
+                              {isActive ? t('active') : 'Pending reward'}
                             </span>
                           </>
                         )
