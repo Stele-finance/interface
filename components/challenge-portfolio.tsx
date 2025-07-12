@@ -53,9 +53,12 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
   };
 
   const formatScore = (score: string) => {
-    // Convert BigInt score to a readable format
-    const scoreValue = parseFloat(score) / 1e18; // Assuming 18 decimals
-    return scoreValue.toFixed(2);
+    try {
+      const scoreValue = parseFloat(score);
+      return scoreValue.toFixed(2);
+    } catch {
+      return '0.00';
+    }
   };
 
   const formatProfitRatio = (profitRatio: string, userAddress: string) => {
@@ -174,35 +177,37 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
               currentUsers.map((user, index) => {
                 const rank = startIndex + index + 1;
                 const profitRatio = rankingData.profitRatios[startIndex + index];
+                const score = rankingData.scores[startIndex + index];
                 const formattedAddress = formatAddress(user);
                 const isEmptySlot = !formattedAddress;
 
                 return (
                   <div 
                     key={`${user}-${rank}`} 
-                    className={`flex items-center justify-between p-3 rounded-lg border ${getRankColor(rank)} ${
+                    className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${
                       isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
                     }`}
                     onClick={() => !isEmptySlot && handleUserClick(user)}
                   >
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                       {getRankIcon(rank)}
                       <div>
-                        <div className="font-medium">
+                        <div className="font-medium text-white">
                           {isEmptySlot ? (
                             <span className="text-gray-500 italic">Empty</span>
                           ) : (
                             formattedAddress
                           )}
                         </div>
-                        <div className="text-sm text-gray-400">
-                          {t('rank')} #{rank}
-                        </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-lg">{formatProfitRatio(profitRatio, user)}</div>
-                      <div className="text-xs text-gray-400">{t('profitRatio')}</div>
+                      <div className="font-bold text-lg text-white">${formatScore(score || '0')}</div>
+                      <div className={`text-sm font-medium ${
+                        parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {parseFloat(profitRatio) >= 0 ? '+' : ''}{formatProfitRatio(profitRatio, user)}
+                      </div>
                     </div>
                   </div>
                 );

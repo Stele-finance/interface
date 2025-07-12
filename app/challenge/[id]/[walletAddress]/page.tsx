@@ -1424,9 +1424,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                       </>
                                     )}
                                   </div>
-                                  <div className="text-sm text-gray-400">
-                                    Rank #{rank}
-                                  </div>
                                 </div>
                               </div>
                               <div className="text-right">

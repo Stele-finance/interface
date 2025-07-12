@@ -346,7 +346,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                         </span>
                       )}
                       <span className="text-gray-300 text-xs">
-                        {ranking.user || `Rank #${ranking.rank}`}
+                        {ranking.user}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 ml-auto">
