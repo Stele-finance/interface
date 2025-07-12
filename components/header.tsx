@@ -264,19 +264,27 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-background">
       <div className="flex items-center">
-        <Link href="/" className="flex items-center gap-2 mr-6">
-          <img 
-            src="/stele_logo.png" 
+        <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
+          <Image 
+            src="/stele_logo_small.png" 
             alt="Stele Logo" 
-            className="h-10 w-auto object-contain"
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+            style={{ 
+              width: 'auto', 
+              height: '40px',
+              maxWidth: '48px'
+            }}
           />
         </Link>
         
         <div className="flex items-center">
-          <Link href={"/dashboard"} className="mr-6">
+          <Link href={"/dashboard"} className="mr-3 sm:mr-6">
             <div 
               className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors",
+                "flex flex-row items-center font-medium text-base sm:text-lg transition-colors",
                 pathname === "/" || pathname === "/dashboard"
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -286,13 +294,13 @@ export function Header() {
             </div>
           </Link>
           <div 
-            className="mr-6 relative"
+            className="mr-3 sm:mr-6 relative"
             onMouseEnter={() => setChallengesDropdownOpen(true)}
             onMouseLeave={() => setChallengesDropdownOpen(false)}
           >
             <div 
               className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors cursor-pointer",
+                "flex flex-row items-center font-medium text-base sm:text-lg transition-colors cursor-pointer",
                 pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/portfolio")
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -321,10 +329,10 @@ export function Header() {
               </div>
             )}
           </div>
-          <Link href={"/vote"} className="mr-6">
+          <Link href={"/vote"} className="mr-2 sm:mr-6">
             <div 
               className={cn(
-                "flex flex-row items-center font-medium text-lg transition-colors",
+                "flex flex-row items-center font-medium text-base sm:text-lg transition-colors",
                 pathname.includes("/vote") 
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"

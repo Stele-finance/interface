@@ -175,26 +175,26 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   const hasNoData = error || currentChartData.length === 0
 
   return (
-    <div className="mb-6">
+    <div className="mb-4 sm:mb-6">
       <Card className="bg-transparent border-0">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 px-2 sm:px-6">
           <div className="mb-2">
-            <h3 className="text-3xl text-gray-100">
+            <h3 className="text-xl sm:text-3xl text-gray-100">
               {chartType === 'participants' ? t('totalParticipants') : t('totalRewards')}
             </h3>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           {chartType === 'participants' && (
             <div className="mt-0">
-              <div className="flex items-baseline justify-between gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 mb-2">
                 <div>
-                  <CardTitle className="text-4xl text-gray-100">
+                  <CardTitle className="text-2xl sm:text-4xl text-gray-100">
                     {hasNoData ? "-" : (totalParticipants >= 1000 ? `${(totalParticipants / 1000).toFixed(1)}K` : totalParticipants.toLocaleString())}
                   </CardTitle>
-                  <p className="text-sm text-gray-400">{currentDate}</p>
+                  <p className="text-xs sm:text-sm text-gray-400">{currentDate}</p>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                   {/* Interval selector */}
                   <div className="flex items-center space-x-2">
                     <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
@@ -250,14 +250,14 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </div>
               </div>
               {hasNoData ? (
-                <div className="h-80 flex items-center justify-center">
+                <div className="h-64 sm:h-80 flex items-center justify-center">
                   <p className="text-gray-400">{t('noDataAvailable')}</p>
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="95%" height={280} className="sm:h-80">
                   <AreaChart 
                     data={currentChartData} 
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
                     onMouseMove={(state: any) => {
                       if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                         setActiveIndexParticipants(state.activeTooltipIndex)
@@ -319,14 +319,14 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
 
           {chartType === 'rewards' && (
             <div className="mt-0">
-              <div className="flex items-baseline justify-between gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 mb-2">
                 <div>
-                  <CardTitle className="text-4xl text-gray-100">
+                  <CardTitle className="text-2xl sm:text-4xl text-gray-100">
                     {hasNoData ? "-" : `$${totalRewards >= 1000000 ? `${(totalRewards / 1000000).toFixed(1)}M` : totalRewards >= 1000 ? `${(totalRewards / 1000).toFixed(1)}K` : totalRewards.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
                   </CardTitle>
-                  <p className="text-sm text-gray-400">{currentDate}</p>
+                  <p className="text-xs sm:text-sm text-gray-400">{currentDate}</p>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                   {/* Interval selector */}
                   <div className="flex items-center space-x-2">
                     <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
@@ -382,14 +382,14 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </div>
               </div>
               {hasNoData ? (
-                <div className="h-80 flex items-center justify-center">
+                <div className="h-64 sm:h-80 flex items-center justify-center">
                   <p className="text-gray-400">{t('noDataAvailable')}</p>
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="95%" height={280} className="sm:h-80">
                   <AreaChart 
                     data={currentChartData} 
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
                     onMouseMove={(state: any) => {
                       if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                         setActiveIndexRewards(state.activeTooltipIndex)
