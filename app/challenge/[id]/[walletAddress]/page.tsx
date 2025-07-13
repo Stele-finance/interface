@@ -170,6 +170,76 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     return null
   }
 
+  // Format relative time (1 day, 1 hour, 1 minute, 1 week, etc.)
+  const formatRelativeTime = (timestamp: number) => {
+    const now = new Date().getTime()
+    const transactionTime = timestamp * 1000
+    const diffInSeconds = Math.floor((now - transactionTime) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}${t('secondShort')}`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes}${t('minuteShort')}`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours}${t('hourShort')}`
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days}${t('dayShort')}`
+    } else if (diffInSeconds < 2592000) {
+      const weeks = Math.floor(diffInSeconds / 604800)
+      return `${weeks}${t('weekShort')}`
+    } else {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months}${t('monthShort')}`
+    }
+  }
+
+  // Get transaction type color
+  const getTransactionTypeColor = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'text-purple-400'
+      case 'join':
+        return 'text-blue-400'
+      case 'swap':
+        return 'text-green-400'
+      case 'register':
+        return 'text-orange-400'
+      case 'reward':
+        return 'text-yellow-400'
+      default:
+        return 'text-gray-400'
+    }
+  }
+
+  // Get transaction type display text
+  const getTransactionTypeText = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'Created'
+      case 'join':
+        return 'Joined'
+      case 'swap':
+        return 'Swapped'
+      case 'register':
+        return 'Registered'
+      case 'reward':
+        return 'Rewarded'
+      default:
+        return type
+    }
+  }
+
+  // Format user address
+  const formatUserAddress = (address?: string) => {
+    if (!address || address === '0x0000000000000000000000000000000000000000') {
+      return '';
+    }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
+
   // Get token explorer URL based on network
   const getTokenExplorerUrl = (tokenAddress: string) => {
     if (subgraphNetwork === 'arbitrum') {
@@ -1025,19 +1095,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <CardTitle className="text-gray-100">{t('recentTransactions')}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {isLoadingTransactions ? (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin" />
-                          <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
-                        </div>
-                      ) : transactionsError ? (
-                        <div className="text-center py-8 text-red-400">
-                          <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p className="font-medium">{t('errorLoadingTransactions')}</p>
-                          <p className="text-sm text-gray-400 mt-2">Please try again later</p>
-                        </div>
-                      ) : investorTransactions.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <div className="min-w-full space-y-4">
+                        {isLoadingTransactions ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
+                          </div>
+                        ) : transactionsError ? (
+                          <div className="text-center py-8 text-red-400">
+                            <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                            <p className="font-medium">{t('errorLoadingTransactions')}</p>
+                            <p className="text-sm text-gray-400 mt-2">Please try again later</p>
+                          </div>
+                        ) : investorTransactions.length > 0 ? (
                         (() => {
                           // Calculate pagination
                           const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
@@ -1076,53 +1147,38 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             }
                           }
 
-                                                      const formatTimestamp = (timestamp: number) => {
-                              return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })
-                            }
-
-                            const formatUserAddress = (address?: string) => {
-                              if (!address || address === '0x0000000000000000000000000000000000000000') {
-                                return '';
-                              }
-                              return `${address.slice(0, 6)}...${address.slice(-4)}`;
-                            }
-
                           return (
                             <div className="space-y-4">
                               {paginatedTransactions.map((transaction) => (
                                 <div 
                                   key={transaction.id} 
-                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors"
+                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors whitespace-nowrap"
                                   onClick={() => {
                                     const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                                     window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                                   }}
                                 >
-                                  <div className="flex items-center gap-3">
-                                    <div className={`h-10 w-10 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
-                                      {getTransactionIcon(transaction.type)}
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    {/* Update date */}
+                                    <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                                      {formatRelativeTime(transaction.timestamp)}
                                     </div>
-                                    <div className="flex-1">
-                                      <div className="font-medium text-gray-100">
-                                        {transaction.type === 'swap' ? 'Swapped' : 
-                                         transaction.type === 'join' ? 'Joined' :
-                                         transaction.type === 'register' ? 'Registered' :
-                                         transaction.type === 'reward' ? `Rewarded → ${formatUserAddress(transaction.user)}` :
-                                         transaction.details}
+                                    
+                                    {/* Transaction type text */}
+                                    <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                                      {getTransactionTypeText(transaction.type)}
+                                    </div>
+                                    
+                                    {/* User address (only for reward type) */}
+                                    {transaction.type === 'reward' && (
+                                      <div className="text-gray-300 text-sm flex-shrink-0">
+                                        → {formatUserAddress(transaction.user)}
                                       </div>
-                                      <p className="text-sm text-gray-400">
-                                        {formatTimestamp(transaction.timestamp)}
-                                        {transaction.type !== 'reward'}
-                                      </p>
-                                    </div>
+                                    )}
                                   </div>
-                                  <div className="text-right">
+                                  
+                                  {/* Transaction details */}
+                                  <div className="text-right flex-shrink-0">
                                     {transaction.type === 'swap' ? (
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
@@ -1199,8 +1255,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                         }
                                         return <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
                                       })()
-                                    ) : transaction.type === 'join' ? (
-                                      <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                    ) : transaction.type === 'join' || transaction.type === 'register' ? (
+                                      <p className="text-base font-medium text-gray-100">{formatUserAddress(transaction.user)}</p>
                                     ) : (
                                       <p className="font-medium text-gray-100">{transaction.amount || '-'}</p>
                                     )}
@@ -1252,6 +1308,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           <p className="text-sm mt-2">Transaction history will appear here once you start trading</p>
                         </div>
                       )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
