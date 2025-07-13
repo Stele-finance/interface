@@ -121,6 +121,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
+  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
   
   // Use React Query client for better data management
   const queryClient = useQueryClient()
@@ -170,6 +171,76 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     return null
   }
 
+  // Format relative time (1 day, 1 hour, 1 minute, 1 week, etc.)
+  const formatRelativeTime = (timestamp: number) => {
+    const now = new Date().getTime()
+    const transactionTime = timestamp * 1000
+    const diffInSeconds = Math.floor((now - transactionTime) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}${t('secondShort')}`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes}${t('minuteShort')}`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours}${t('hourShort')}`
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days}${t('dayShort')}`
+    } else if (diffInSeconds < 2592000) {
+      const weeks = Math.floor(diffInSeconds / 604800)
+      return `${weeks}${t('weekShort')}`
+    } else {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months}${t('monthShort')}`
+    }
+  }
+
+  // Get transaction type color
+  const getTransactionTypeColor = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'text-purple-400'
+      case 'join':
+        return 'text-blue-400'
+      case 'swap':
+        return 'text-green-400'
+      case 'register':
+        return 'text-orange-400'
+      case 'reward':
+        return 'text-yellow-400'
+      default:
+        return 'text-gray-400'
+    }
+  }
+
+  // Get transaction type display text
+  const getTransactionTypeText = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'Created'
+      case 'join':
+        return 'Joined'
+      case 'swap':
+        return 'Swapped'
+      case 'register':
+        return 'Registered'
+      case 'reward':
+        return 'Rewarded'
+      default:
+        return type
+    }
+  }
+
+  // Format user address
+  const formatUserAddress = (address?: string) => {
+    if (!address || address === '0x0000000000000000000000000000000000000000') {
+      return '';
+    }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
+
   // Get token explorer URL based on network
   const getTokenExplorerUrl = (tokenAddress: string) => {
     if (subgraphNetwork === 'arbitrum') {
@@ -205,11 +276,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   useEffect(() => {
     if (!isClient) return;
 
-    const interval = setInterval(() => {
+    const timeInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timeInterval);
   }, [isClient]);
 
   // Handle loading and error states
@@ -801,10 +872,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       )}
 
-      <div className="container mx-auto p-6 py-12">
-        <div className="max-w-6xl mx-auto space-y-4">
+      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-12">
+        <div className="max-w-6xl mx-auto space-y-0 sm:space-y-0">
           {/* Go to Challenge Button */}
-          <div className="mb-4">
+          <div className="px-2 sm:px-0">
           <button 
             onClick={() => router.push(`/challenge/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
@@ -815,18 +886,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 sm:px-0">
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl text-gray-400">{t('investor')}</h1>
-              <p 
-                className="text-2xl cursor-pointer hover:text-blue-400 transition-colors duration-200"
-                onClick={handleWalletClick}
-                title={`View on ${subgraphNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
-              >
-                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-              </p>
-            </div>
+            {/* Remove the investor address from here as it's now in the chart header */}
           </div>
           <div className="space-y-4">            
             {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
@@ -874,24 +936,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
             )}
             
-            {/* Show completion message if investor is closed */}
-            {investorData?.investor?.isRegistered === true && (
-              <div className="flex justify-end">
-                <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-green-400 font-medium">{t('registered')}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Show completion message if investor is closed - moved to InvestorCharts component */}
           </div>
         </div>
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-6">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-2 sm:space-y-4">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 
@@ -899,8 +951,36 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               network={subgraphNetwork}
               investorData={investorData}
               realTimePortfolio={realTimePortfolio}
+              interval={chartInterval}
             />
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            
+            {/* Interval selector */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setChartInterval('daily')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setChartInterval('weekly')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
@@ -1025,19 +1105,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     <CardTitle className="text-gray-100">{t('recentTransactions')}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {isLoadingTransactions ? (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin" />
-                          <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
-                        </div>
-                      ) : transactionsError ? (
-                        <div className="text-center py-8 text-red-400">
-                          <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p className="font-medium">{t('errorLoadingTransactions')}</p>
-                          <p className="text-sm text-gray-400 mt-2">Please try again later</p>
-                        </div>
-                      ) : investorTransactions.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <div className="min-w-[500px] space-y-4">
+                        {isLoadingTransactions ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
+                          </div>
+                        ) : transactionsError ? (
+                          <div className="text-center py-8 text-red-400">
+                            <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                            <p className="font-medium">{t('errorLoadingTransactions')}</p>
+                            <p className="text-sm text-gray-400 mt-2">Please try again later</p>
+                          </div>
+                        ) : investorTransactions.length > 0 ? (
                         (() => {
                           // Calculate pagination
                           const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
@@ -1076,39 +1157,38 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             }
                           }
 
-                          const formatTimestamp = (timestamp: number) => {
-                            return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })
-                          }
-
                           return (
                             <div className="space-y-4">
                               {paginatedTransactions.map((transaction) => (
                                 <div 
                                   key={transaction.id} 
-                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors"
+                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors gap-4 min-w-0"
                                   onClick={() => {
                                     const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                                     window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                                   }}
                                 >
-                                  <div className="flex items-center gap-3">
-                                    <div className={`h-10 w-10 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
-                                      {getTransactionIcon(transaction.type)}
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    {/* Update date */}
+                                    <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                                      {formatRelativeTime(transaction.timestamp)}
                                     </div>
-                                    <div className="flex-1">
-                                      <div className="font-medium text-gray-100">
-                                        {transaction.type === 'swap' ? 'Swapped' : transaction.details}
+                                    
+                                    {/* Transaction type text */}
+                                    <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                                      {getTransactionTypeText(transaction.type)}
+                                    </div>
+                                    
+                                    {/* User address (only for reward type) */}
+                                    {transaction.type === 'reward' && (
+                                      <div className="text-gray-300 text-sm flex-shrink-0">
+                                        → {formatUserAddress(transaction.user)}
                                       </div>
-                                      <p className="text-sm text-gray-400">{formatTimestamp(transaction.timestamp)}</p>
-                                    </div>
+                                    )}
                                   </div>
-                                  <div className="text-right">
+                                  
+                                  {/* Transaction details */}
+                                  <div className="text-right flex-shrink-0 min-w-0">
                                     {transaction.type === 'swap' ? (
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
@@ -1116,9 +1196,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
                                           const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                           return (
-                                            <div className="flex items-center gap-3 justify-end">
-                                              <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                            <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <div className="relative flex-shrink-0">
                                                 {fromLogo ? (
                                                   <Image 
                                                     src={fromLogo} 
@@ -1146,11 +1226,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {(swapDetails as any).fromTokenSymbol || swapDetails.fromToken}</span>
+                                                <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {(swapDetails as any).fromTokenSymbol || swapDetails.fromToken}</span>
                                               </div>
-                                              <ArrowRight className="h-4 w-4 text-gray-400" />
-                                              <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                              <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <div className="relative flex-shrink-0">
                                                 {toLogo ? (
                                                   <Image 
                                                     src={toLogo} 
@@ -1178,17 +1258,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{(swapDetails as any).toTokenSymbol || swapDetails.toToken}</span>
+                                                <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{(swapDetails as any).toTokenSymbol || swapDetails.toToken}</span>
                                               </div>
                                             </div>
                                           )
                                         }
-                                        return <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                        return <p className="text-sm md:text-base font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                       })()
-                                    ) : transaction.type === 'join' ? (
-                                      <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                    ) : transaction.type === 'join' || transaction.type === 'register' ? (
+                                      <p className="text-sm md:text-base font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</p>
                                     ) : (
-                                      <p className="font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                      <p className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                     )}
                                   </div>
                                 </div>
@@ -1238,6 +1318,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           <p className="text-sm mt-2">Transaction history will appear here once you start trading</p>
                         </div>
                       )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

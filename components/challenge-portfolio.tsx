@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { ArrowRight, BarChart3, LineChart, PieChart, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -258,12 +259,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { walletType, network } = useWallet();
+  const { address: connectedAddress, isConnected, walletType, network } = useWallet();
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
@@ -328,27 +330,98 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     
     return null
   }
-  
+
+  // Format relative time (1 day, 1 hour, 1 minute, 1 week, etc.)
+  const formatRelativeTime = (timestamp: number) => {
+    const now = new Date().getTime()
+    const transactionTime = timestamp * 1000
+    const diffInSeconds = Math.floor((now - transactionTime) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}${t('secondShort')}`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes}${t('minuteShort')}`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours}${t('hourShort')}`
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days}${t('dayShort')}`
+    } else if (diffInSeconds < 2592000) {
+      const weeks = Math.floor(diffInSeconds / 604800)
+      return `${weeks}${t('weekShort')}`
+    } else {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months}${t('monthShort')}`
+    }
+  }
+
+  // Get transaction type color
+  const getTransactionTypeColor = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'text-purple-400'
+      case 'join':
+        return 'text-blue-400'
+      case 'swap':
+        return 'text-green-400'
+      case 'register':
+        return 'text-orange-400'
+      case 'reward':
+        return 'text-yellow-400'
+      default:
+        return 'text-gray-400'
+    }
+  }
+
+  // Get transaction type display text
+  const getTransactionTypeText = (type: string) => {
+    switch (type) {
+      case 'create':
+        return 'Created'
+      case 'join':
+        return 'Joined'
+      case 'swap':
+        return 'Swapped'
+      case 'register':
+        return 'Registered'
+      case 'reward':
+        return 'Rewarded'
+      default:
+        return type
+    }
+  }
+
+  // Format user address
+  const formatUserAddress = (address?: string) => {
+    if (!address) return ''
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
+  // Use connected address for checking if user has joined the challenge
+  const currentWalletAddress = connectedAddress || walletAddress;
+
   // Check if current user has joined this challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
     challengeId, 
-    walletAddress || "",
+    currentWalletAddress || "",
     subgraphNetwork
   );
 
   // Check if user has joined the challenge (combining local state with subgraph data)
   const hasJoinedFromSubgraph = investorData?.investor !== undefined && investorData?.investor !== null;
-  const hasJoinedChallenge = hasJoinedLocally || hasJoinedFromSubgraph;
+  const hasJoinedChallenge = (hasJoinedLocally || hasJoinedFromSubgraph) && isConnected;
 
   // Check if current wallet is in top 5 ranking
   const isInTop5Ranking = () => {
-    if (!walletAddress || !rankingData?.topUsers || rankingData.topUsers.length === 0) {
+    if (!currentWalletAddress || !rankingData?.topUsers || rankingData.topUsers.length === 0) {
       return false;
     }
     
     // Check if current wallet address is in the top 5 users
     const top5Users = rankingData.topUsers.slice(0, 5);
-    const isInTop5 = top5Users.some(user => user.toLowerCase() === walletAddress.toLowerCase());  
+    const isInTop5 = top5Users.some(user => user.toLowerCase() === currentWalletAddress.toLowerCase());  
     return isInTop5;
   };
 
@@ -456,10 +529,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check USDC balance when wallet address changes
   useEffect(() => {
-    if (walletAddress && isClient) {
-      checkUSDCBalance(walletAddress);
+    if (currentWalletAddress && isClient) {
+      checkUSDCBalance(currentWalletAddress);
     }
-  }, [walletAddress, isClient]);
+  }, [currentWalletAddress, isClient]);
 
   // Update time every second for accurate countdown
   useEffect(() => {
@@ -475,8 +548,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
     try {
-      // If wallet address is not in state, try to get it from current wallet
-      if (!walletAddress) {
+      // Use connected address first, fallback to stored wallet address
+      if (!currentWalletAddress) {
         let walletProvider;
         
         // Get the appropriate wallet provider based on connected wallet type
@@ -526,7 +599,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         router.push(`/challenge/${challengeId}/${address}`);
       } else {
         // Use the existing wallet address
-        router.push(`/challenge/${challengeId}/${walletAddress}`);
+        router.push(`/challenge/${challengeId}/${currentWalletAddress}`);
       }
     } catch (error: any) {
       console.error("Error connecting wallet:", error);
@@ -562,7 +635,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         default:
           baseTitle = `Challenge Type ${challengeType}`;
       }
-      return `${baseTitle} ( ID: ${challengeId} )`;
+      return `${baseTitle} ID : ${challengeId}`;
     }
     
     // Fallback to old logic if no data
@@ -618,9 +691,15 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   const challengeDetails = getChallengeDetails();
 
-  // Handle Join Challenge
-  const handleJoinChallenge = async () => {
+  // Handle Join Challenge - Show modal
+  const handleJoinChallenge = () => {
+    setShowJoinModal(true);
+  };
+
+  // Confirm Join Challenge - Actual transaction
+  const confirmJoinChallenge = async () => {
     setIsJoining(true);
+    setShowJoinModal(false);
     
     try {      
       let walletProvider;
@@ -826,7 +905,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
-          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, walletAddress, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, currentWalletAddress, subgraphNetwork] });
           
           // Hide spinner
           setIsRefreshing(false);
@@ -850,13 +929,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       }
       
     } catch (error: any) {
-      console.error("❌ Error joining challenge:", error);
+      console.error("❌ Error in confirmJoinChallenge:", error);
       
-      // Show toast notification for error
+      // Show error toast
       toast({
+        title: "Error",
+        description: `Failed to join challenge: ${error.message}`,
         variant: "destructive",
-        title: "Error Joining Challenge",
-        description: error.message || "An unknown error occurred",
       });
     } finally {
       setIsJoining(false);
@@ -994,118 +1073,30 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      <div className="flex items-center justify-between">
-        {isLoadingChallenge ? (
-          <div className="flex items-center gap-2">
-            <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
-            <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
-          </div>
-        ) : (
-          <h2 className="text-2xl">
-            <span className="text-gray-400">
-              {getChallengeTitle().split(' ( ID: ')[0]}
-            </span>
-            <span className="text-gray-100">
-              {getChallengeTitle().includes('( ID: ') ? ' ( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
-            </span>
-          </h2>
-        )}
-        <div className="flex items-center gap-2">
-          {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
-          {isClient && shouldShowGetRewards() && (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleGetRewards}
-              disabled={isGettingRewards}
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-            >
-              {isGettingRewards ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Claiming...
-                </>
-              ) : (
-                <>
-                  <DollarSign className="mr-3 h-5 w-5" />
-                  Get Rewards
-                </>
-              )}
-            </Button>
-          )}
-          
-          {/* Entry Fee Display - only show when join button is visible */}
-          {!hasJoinedChallenge && !isChallengeEnded() && challengeData?.challenge && entryFee && (
-            <div className={`flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium border ${
-              isInsufficientBalance() 
-                ? "bg-red-500/10 text-red-400 border-red-500/20" 
-                : "bg-primary/10 text-primary border-primary/20"
-            }`}>
-              Entry Fee : {isLoadingEntryFee ? 'Loading...' : `$${entryFee}`}
-              {isInsufficientBalance() && !isLoadingBalance && (
-                <span className="ml-2 text-xs">
-                  (Balance: ${parseFloat(usdcBalance).toFixed(2)})
-                </span>
-              )}
-            </div>
-          )}
-          
-          {hasJoinedChallenge ? (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleNavigateToAccount}
-              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-            >
-              <User className="mr-3 h-5 w-5" />
-              {t('myAccount')}
-            </Button>
-          ) : !isChallengeEnded() && (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={handleJoinChallenge} 
-              disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-              className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
-                isInsufficientBalance() 
-                  ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                  : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
-              }`}
-            >
-              {isJoining ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  {t('joining')}
-                </>
-              ) : isLoadingChallenge || !challengeData?.challenge ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  Loading challenge info...
-                </>
-              ) : isLoadingEntryFee || isLoadingBalance ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  {t('loading')}
-                </>
-              ) : isInsufficientBalance() ? (
-                <>
-                  <UserPlus className="mr-3 h-5 w-5" />
-                  Insufficient USDC
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-5 w-5" />
-                  {t('join')}
-                  <UserPlus className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </Button>
-          )}
-        </div>
-      </div>
+      
 
       {/* Challenge Charts */}
-                      <ChallengeCharts challengeId={challengeId} network={subgraphNetwork} />
+                      <ChallengeCharts 
+                        challengeId={challengeId} 
+                        network={subgraphNetwork} 
+                        joinButton={{
+                          isClient,
+                          shouldShowGetRewards: shouldShowGetRewards(),
+                          hasJoinedChallenge,
+                          isChallengeEnded: isChallengeEnded(),
+                          isJoining,
+                          isLoadingChallenge,
+                          challengeData,
+                          isLoadingEntryFee,
+                          isLoadingBalance,
+                          isInsufficientBalance: isInsufficientBalance(),
+                          isGettingRewards,
+                          handleJoinChallenge,
+                          handleNavigateToAccount,
+                          handleGetRewards,
+                          t
+                        }}
+                      />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1114,20 +1105,21 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           <h2 className="text-3xl text-gray-100 mb-6">{t('recentTransactions')}</h2>
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-6">
-              <div className="space-y-4">
-                {isLoadingTransactions ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                    <span className="ml-2 text-gray-400">Loading transactions...</span>
-                  </div>
-                ) : transactionsError ? (
-                  <div className="text-center py-8 text-red-400">
-                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="font-medium">Error loading transactions</p>
-                    <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
-                  </div>
-                ) : transactions.length > 0 ? (
+              <div className="overflow-x-auto">
+                <div className="min-w-[500px] space-y-4">
+                  {isLoadingTransactions ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                      <span className="ml-2 text-gray-400">Loading transactions...</span>
+                    </div>
+                  ) : transactionsError ? (
+                    <div className="text-center py-8 text-red-400">
+                      <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-medium">Error loading transactions</p>
+                      <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
+                    </div>
+                  ) : transactions.length > 0 ? (
                   (() => {
                     // Calculate pagination
                     const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
@@ -1170,47 +1162,38 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                       }
                     }
 
-                    const formatTimestamp = (timestamp: number) => {
-                      return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })
-                    }
-
-                    const formatUserAddress = (address?: string) => {
-                      if (!address) return ''
-                      return `${address.slice(0, 6)}...${address.slice(-4)}`
-                    }
-
                     return (
                       <div className="space-y-4">
                         {paginatedTransactions.map((transaction) => (
                           <div 
                             key={transaction.id} 
-                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors"
+                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
                             onClick={() => {
                               const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                               window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                             }}
                           >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full ${getIconColor(transaction.type)} flex items-center justify-center`}>
-                                {getTransactionIcon(transaction.type)}
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              {/* Update date */}
+                              <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                                {formatRelativeTime(transaction.timestamp)}
                               </div>
-                              <div className="flex-1">
-                                <div className="font-medium text-gray-100">
-                                  {transaction.type === 'swap' ? 'Swapped' : transaction.details}
-                                </div>
-                                <div className="text-sm text-gray-400">
-                                  {formatTimestamp(transaction.timestamp)}
-                                  {transaction.user && ` • ${formatUserAddress(transaction.user)}`}
-                                </div>
+                              
+                              {/* Transaction type text */}
+                              <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                                {getTransactionTypeText(transaction.type)}
                               </div>
+                              
+                              {/* User address (only for reward type) */}
+                              {transaction.type === 'reward' && (
+                                <div className="text-gray-300 text-sm flex-shrink-0">
+                                  → {formatUserAddress(transaction.user)}
+                                </div>
+                              )}
                             </div>
-                            <div className="text-right">
+                            
+                            {/* Transaction details */}
+                            <div className="text-right flex-shrink-0 min-w-0">
                               {transaction.type === 'swap' ? (
                                 (() => {
                                   const swapDetails = getSwapDetails(transaction)
@@ -1218,9 +1201,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                     const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
                                     const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                     return (
-                                      <div className="flex items-center gap-3 justify-end">
-                                        <div className="flex items-center gap-2">
-                                          <div className="relative">
+                                      <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <div className="relative flex-shrink-0">
                                           {fromLogo ? (
                                             <Image 
                                               src={fromLogo} 
@@ -1246,11 +1229,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
                                         </div>
-                                        <ArrowRight className="h-4 w-4 text-gray-400" />
-                                        <div className="flex items-center gap-2">
-                                          <div className="relative">
+                                        <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <div className="relative flex-shrink-0">
                                           {toLogo ? (
                                             <Image 
                                               src={toLogo} 
@@ -1276,15 +1259,17 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
                                         </div>
                                       </div>
                                     )
                                   }
                                   return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                 })()
+                              ) : transaction.type === 'join' || transaction.type === 'register' ? (
+                                <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
                               ) : (
-                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
                               )}
                             </div>
                           </div>
@@ -1333,6 +1318,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     <p>No transactions found for this challenge</p>
                   </div>
                 )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1341,6 +1327,50 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         {/* Ranking Section */}
         <RankingSection challengeId={challengeId} network={subgraphNetwork} />
       </div>
+
+      {/* Join Challenge Confirmation Modal */}
+      <AlertDialog open={showJoinModal} onOpenChange={setShowJoinModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Join Challenge</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to join this challenge?
+            </AlertDialogDescription>
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-300">Entry Fee:</span>
+                <span className="text-lg font-bold text-white">
+                  ${isLoadingEntryFee ? 'Loading...' : entryFee || '0'} USDC
+                </span>
+              </div>
+              {isInsufficientBalance() && (
+                <div className="mt-2 text-sm text-red-400">
+                  ⚠️ Insufficient USDC balance to join this challenge
+                </div>
+              )}
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowJoinModal(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmJoinChallenge}
+              disabled={isJoining || isLoadingEntryFee || isInsufficientBalance()}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isJoining ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                'Confirm Join'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   )

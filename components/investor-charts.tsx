@@ -37,16 +37,16 @@ interface InvestorChartsProps {
   network: 'ethereum' | 'arbitrum' | null
   investorData?: any // Add investor data prop for calculations
   realTimePortfolio?: RealTimePortfolio | null
+  interval?: 'daily' | 'weekly'
 }
 
-export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio }: InvestorChartsProps) {
+export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily' }: InvestorChartsProps) {
   const { t } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
   const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 30, network)
   const { data: challengeData } = useChallenge(challengeId, network)
   const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
-  const [interval, setInterval] = useState<'daily' | 'weekly'>('daily')
 
   const chartData = useMemo(() => {
     // Select data source based on interval
@@ -424,45 +424,50 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   if (error || weeklyError || !hasData || chartData.length === 0) {
     return (
       <Card className="bg-transparent border-0">
-        <CardHeader className="pb-6">
-          <div className="mb-2">
-            <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
+        <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">
+          {/* First row: Address and Registered status */}
+          <div className="flex items-center justify-between gap-4 mb-1">
+            <div className="flex items-center gap-4">
+              <h3 
+                className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                onClick={() => {
+                  const explorerUrl = network === 'arbitrum' 
+                    ? `https://arbiscan.io/address/${investor}`
+                    : `https://etherscan.io/address/${investor}`
+                  window.open(explorerUrl, '_blank')
+                }}
+                title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+              >
+                {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
+              </h3>
+            </div>
+            
+            {/* Registered status */}
+            {investorData?.investor?.isRegistered === true && (
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+                <div className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex items-baseline justify-between gap-3">
-            <div className="flex items-baseline gap-3">
+          
+          {/* Second row: Portfolio value and interval selector */}
+          <div className="flex items-baseline justify-between gap-2 sm:gap-3">
+            <div className="flex items-baseline gap-2 sm:gap-3">
               <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
               <div className="flex items-center gap-1">
                 <span className="text-sm font-medium text-gray-400">0.00%</span>
               </div>
             </div>
-            {/* Show interval selector even when no data */}
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setInterval('daily')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setInterval('weekly')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
-            </div>
+              
+
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6 pt-0 pb-2 sm:pb-4">
           <div className="h-80 flex items-center justify-center">
             <p className="text-gray-400">{t('noPortfolioData')}</p>
           </div>
@@ -473,18 +478,46 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
 
   return (
     <Card className="bg-transparent border-0">
-      <CardHeader className="pb-6">
-        <div className="flex items-center gap-4 mb-2">
-          <h3 className="text-3xl text-gray-100">{t('portfolioValue')}</h3>
+      <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">
+                  {/* First row: Address and Registered status */}
+          <div className="flex items-center justify-between gap-4 mb-1">
+          <div className="flex items-center gap-4">
+            <h3 
+              className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
+              onClick={() => {
+                const explorerUrl = network === 'arbitrum' 
+                  ? `https://arbiscan.io/address/${investor}`
+                  : `https://etherscan.io/address/${investor}`
+                window.open(explorerUrl, '_blank')
+              }}
+              title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+            >
+              {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
+            </h3>
             {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
               <div className="flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                 <span className="text-xs text-green-400">{t('live')}</span>
               </div>
             )}
+          </div>
+          
+          {/* Registered status */}
+          {investorData?.investor?.isRegistered === true && (
+            <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+              <div className="flex items-center gap-2">
+                <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex items-baseline justify-between gap-3">
-          <div className="flex items-baseline gap-3">
+        
+        {/* Second row: Portfolio value and interval selector */}
+        <div className="flex items-baseline justify-between gap-2 sm:gap-3">
+          <div className="flex items-baseline gap-2 sm:gap-3">
             <CardTitle className="text-4xl font-bold text-gray-100">
               ${currentPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </CardTitle>
@@ -494,38 +527,14 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               </span>
             </div>
           </div>
-            {/* Interval selector */}
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setInterval('daily')}
-                className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setInterval('weekly')}
-                className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    interval === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
-          </div>
+          
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-2 sm:px-6 pt-0 pb-2 sm:pb-4">
                 <ResponsiveContainer width="100%" height={320}>
           <AreaChart 
             data={chartData} 
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            margin={{ top: 20, right: 10, left: 0, bottom: 0 }}
             onMouseMove={(state: any) => {
               if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                 setActiveIndexPortfolio(state.activeTooltipIndex)
