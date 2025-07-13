@@ -1103,7 +1103,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-6">
               <div className="overflow-x-auto">
-                <div className="min-w-full space-y-4">
+                <div className="min-w-[500px] space-y-4">
                   {isLoadingTransactions ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -1164,7 +1164,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         {paginatedTransactions.map((transaction) => (
                           <div 
                             key={transaction.id} 
-                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors whitespace-nowrap"
+                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
                             onClick={() => {
                               const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                               window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
@@ -1190,7 +1190,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                             </div>
                             
                             {/* Transaction details */}
-                            <div className="text-right flex-shrink-0">
+                            <div className="text-right flex-shrink-0 min-w-0">
                               {transaction.type === 'swap' ? (
                                 (() => {
                                   const swapDetails = getSwapDetails(transaction)
@@ -1198,9 +1198,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                     const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
                                     const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                     return (
-                                      <div className="flex items-center gap-3 justify-end">
-                                        <div className="flex items-center gap-2">
-                                          <div className="relative">
+                                      <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <div className="relative flex-shrink-0">
                                           {fromLogo ? (
                                             <Image 
                                               src={fromLogo} 
@@ -1226,11 +1226,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
                                         </div>
-                                        <ArrowRight className="h-4 w-4 text-gray-400" />
-                                        <div className="flex items-center gap-2">
-                                          <div className="relative">
+                                        <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <div className="relative flex-shrink-0">
                                           {toLogo ? (
                                             <Image 
                                               src={toLogo} 
@@ -1256,7 +1256,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-base font-medium text-gray-100">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
                                         </div>
                                       </div>
                                     )
@@ -1264,9 +1264,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                   return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                 })()
                               ) : transaction.type === 'join' || transaction.type === 'register' ? (
-                                <div className="font-medium text-gray-100">{formatUserAddress(transaction.user)}</div>
+                                <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
                               ) : (
-                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
                               )}
                             </div>
                           </div>

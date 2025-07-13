@@ -1096,7 +1096,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
-                      <div className="min-w-full space-y-4">
+                      <div className="min-w-[500px] space-y-4">
                         {isLoadingTransactions ? (
                           <div className="flex items-center justify-center py-8">
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -1152,7 +1152,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               {paginatedTransactions.map((transaction) => (
                                 <div 
                                   key={transaction.id} 
-                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors whitespace-nowrap"
+                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors gap-4 min-w-0"
                                   onClick={() => {
                                     const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                                     window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
@@ -1178,7 +1178,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                   </div>
                                   
                                   {/* Transaction details */}
-                                  <div className="text-right flex-shrink-0">
+                                  <div className="text-right flex-shrink-0 min-w-0">
                                     {transaction.type === 'swap' ? (
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
@@ -1186,9 +1186,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
                                           const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
                                           return (
-                                            <div className="flex items-center gap-3 justify-end">
-                                              <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                            <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <div className="relative flex-shrink-0">
                                                 {fromLogo ? (
                                                   <Image 
                                                     src={fromLogo} 
@@ -1216,11 +1216,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.fromAmount} {(swapDetails as any).fromTokenSymbol || swapDetails.fromToken}</span>
+                                                <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {(swapDetails as any).fromTokenSymbol || swapDetails.fromToken}</span>
                                               </div>
-                                              <ArrowRight className="h-4 w-4 text-gray-400" />
-                                              <div className="flex items-center gap-2">
-                                                <div className="relative">
+                                              <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <div className="relative flex-shrink-0">
                                                 {toLogo ? (
                                                   <Image 
                                                     src={toLogo} 
@@ -1248,17 +1248,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <span className="text-base font-medium text-gray-100">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{(swapDetails as any).toTokenSymbol || swapDetails.toToken}</span>
+                                                <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount && swapDetails.toAmount !== '0' ? `${swapDetails.toAmount} ` : ''}{(swapDetails as any).toTokenSymbol || swapDetails.toToken}</span>
                                               </div>
                                             </div>
                                           )
                                         }
-                                        return <p className="text-base font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                        return <p className="text-sm md:text-base font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                       })()
                                     ) : transaction.type === 'join' || transaction.type === 'register' ? (
-                                      <p className="text-base font-medium text-gray-100">{formatUserAddress(transaction.user)}</p>
+                                      <p className="text-sm md:text-base font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</p>
                                     ) : (
-                                      <p className="font-medium text-gray-100">{transaction.amount || '-'}</p>
+                                      <p className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                     )}
                                   </div>
                                 </div>
