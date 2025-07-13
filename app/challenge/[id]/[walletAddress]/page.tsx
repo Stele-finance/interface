@@ -121,6 +121,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
+  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
   
   // Use React Query client for better data management
   const queryClient = useQueryClient()
@@ -275,11 +276,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   useEffect(() => {
     if (!isClient) return;
 
-    const interval = setInterval(() => {
+    const timeInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timeInterval);
   }, [isClient]);
 
   // Handle loading and error states
@@ -871,10 +872,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       )}
 
-      <div className="container mx-auto p-6 py-12">
-        <div className="max-w-6xl mx-auto space-y-4">
+      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-12">
+        <div className="max-w-6xl mx-auto space-y-0 sm:space-y-0">
           {/* Go to Challenge Button */}
-          <div className="mb-4">
+          <div className="px-2 sm:px-0">
           <button 
             onClick={() => router.push(`/challenge/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
@@ -885,18 +886,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 sm:px-0">
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl text-gray-400">{t('investor')}</h1>
-              <p 
-                className="text-2xl cursor-pointer hover:text-blue-400 transition-colors duration-200"
-                onClick={handleWalletClick}
-                title={`View on ${subgraphNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
-              >
-                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-              </p>
-            </div>
+            {/* Remove the investor address from here as it's now in the chart header */}
           </div>
           <div className="space-y-4">            
             {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
@@ -944,24 +936,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
             )}
             
-            {/* Show completion message if investor is closed */}
-            {investorData?.investor?.isRegistered === true && (
-              <div className="flex justify-end">
-                <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-green-400 font-medium">{t('registered')}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Show completion message if investor is closed - moved to InvestorCharts component */}
           </div>
         </div>
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-6">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-2 sm:space-y-4">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 
@@ -969,8 +951,36 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               network={subgraphNetwork}
               investorData={investorData}
               realTimePortfolio={realTimePortfolio}
+              interval={chartInterval}
             />
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            
+            {/* Interval selector */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setChartInterval('daily')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'daily' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setChartInterval('weekly')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'weekly' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />

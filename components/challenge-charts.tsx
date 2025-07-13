@@ -322,42 +322,126 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
           <CardHeader>
-                      <div className="flex items-center justify-between mb-2">
-            <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setIntervalType('daily')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setIntervalType('weekly')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
+            <div className="mb-2">
+              <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
             </div>
-          </div>
-          <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
+            
+                      <div className="flex items-center justify-between mb-2">
+              <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
+              {/* My Account button position - Show even in error state */}
+              {joinButton && (
+            <div className="flex items-center space-x-2">
+                  {joinButton.isClient && joinButton.shouldShowGetRewards && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleGetRewards}
+                      disabled={joinButton.isGettingRewards}
+                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    >
+                      {joinButton.isGettingRewards ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Claiming...
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          Get Rewards
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  
+                  {joinButton.hasJoinedChallenge ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleNavigateToAccount}
+                      className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      {joinButton.t('myAccount')}
+                    </Button>
+                  ) : !joinButton.isChallengeEnded && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleJoinChallenge} 
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
+                      className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
+                        joinButton.isInsufficientBalance
+                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
+                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                      }`}
+                    >
+                      {joinButton.isJoining ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {joinButton.t('joining')}
+                        </>
+                      ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {joinButton.t('loading')}
+                        </>
+                      ) : joinButton.isInsufficientBalance ? (
+                        <>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Insufficient USDC
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mr-1 h-4 w-4" />
+                          {joinButton.t('join')}
+                          <UserPlus className="ml-1 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
             <p className="text-sm text-gray-400">{currentDate}</p>
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
               <p className="text-gray-400">{t('noDataAvailable')}</p>
             </div>
-          </CardContent>
+                    </CardContent>
+          
+          {/* Interval selector - Below chart like investor page */}
+          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+            <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+              <button
+                onClick={() => setIntervalType('daily')}
+                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  intervalType === 'daily' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                }`}
+              >
+                {t('daily')}
+              </button>
+              <button
+                onClick={() => setIntervalType('weekly')}
+                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                  intervalType === 'weekly' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                }`}
+              >
+                {t('weekly')}
+              </button>
+            </div>
+          </div>
         </Card>
+        
         <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-1">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-100">Challenge Info</CardTitle>
@@ -379,9 +463,16 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         <CardHeader className="pb-2 px-1 sm:px-6">
           {/* Mobile layout */}
           <div className="block md:hidden">
-            {/* First row: Challenge title + Join Button */}
-            <div className="flex items-center justify-between mb-4">
+            {/* First row: Challenge title only */}
+            <div className="mb-4">
               <h3 className="text-3xl text-gray-100">Challenge {challengeId}</h3>
+            </div>
+            
+            {/* Second row: $3 amount + Join Button */}
+            <div className="flex items-baseline justify-between gap-3 mt-2">
+              <CardTitle className="text-4xl font-bold text-gray-100">
+                ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </CardTitle>
               
               {/* Join Button for Mobile */}
               {joinButton && (
@@ -463,38 +554,6 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 </div>
               )}
             </div>
-            
-            {/* Second row: $3 amount + Daily/Weekly badges */}
-            <div className="flex items-baseline justify-between gap-3 mt-2">
-              <CardTitle className="text-4xl font-bold text-gray-100">
-                ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </CardTitle>
-              
-              <div className="flex items-center space-x-2">
-                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setIntervalType('daily')}
-                    className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'daily' 
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setIntervalType('weekly')}
-                    className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'weekly' 
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('weekly')}
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
           
           {/* Desktop layout */}
@@ -502,34 +561,91 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           <div className="mb-4">
             <h3 className="text-3xl text-gray-100">Challenge {challengeId}</h3>
           </div>
+            
           <div className="flex items-baseline justify-between gap-3 mt-2">
             <CardTitle className="text-4xl font-bold text-gray-100">
             ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </CardTitle>
+              
+              {/* Join Button for Desktop */}
+              {joinButton && (
             <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setIntervalType('daily')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setIntervalType('weekly')}
-                  className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
+                  {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
+                  {joinButton.isClient && joinButton.shouldShowGetRewards && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleGetRewards}
+                      disabled={joinButton.isGettingRewards}
+                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    >
+                      {joinButton.isGettingRewards ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Claiming...
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          Get Rewards
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  
+                  {joinButton.hasJoinedChallenge ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleNavigateToAccount}
+                      className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      {joinButton.t('myAccount')}
+                    </Button>
+                  ) : !joinButton.isChallengeEnded && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={joinButton.handleJoinChallenge} 
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
+                      className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
+                        joinButton.isInsufficientBalance
+                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
+                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                      }`}
+                    >
+                      {joinButton.isJoining ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {joinButton.t('joining')}
+                        </>
+                      ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {joinButton.t('loading')}
+                        </>
+                      ) : joinButton.isInsufficientBalance ? (
+                        <>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Insufficient USDC
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mr-1 h-4 w-4" />
+                          {joinButton.t('join')}
+                          <UserPlus className="ml-1 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  )}
               </div>
-            </div>
+              )}
           </div>
           </div>
         </CardHeader>
@@ -595,6 +711,32 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
+        
+        {/* Interval selector - Below chart like investor page */}
+        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+          <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+            <button
+              onClick={() => setIntervalType('daily')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                intervalType === 'daily' 
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+              }`}
+            >
+              {t('daily')}
+            </button>
+            <button
+              onClick={() => setIntervalType('weekly')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                intervalType === 'weekly' 
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+              }`}
+            >
+              {t('weekly')}
+            </button>
+          </div>
+        </div>
       </Card>
 
       {/* Challenge Info Card */}

@@ -265,7 +265,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { walletType, network } = useWallet();
+  const { address: connectedAddress, isConnected, walletType, network } = useWallet();
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
@@ -399,26 +399,29 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
+  // Use connected address for checking if user has joined the challenge
+  const currentWalletAddress = connectedAddress || walletAddress;
+
   // Check if current user has joined this challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
     challengeId, 
-    walletAddress || "",
+    currentWalletAddress || "",
     subgraphNetwork
   );
 
   // Check if user has joined the challenge (combining local state with subgraph data)
   const hasJoinedFromSubgraph = investorData?.investor !== undefined && investorData?.investor !== null;
-  const hasJoinedChallenge = hasJoinedLocally || hasJoinedFromSubgraph;
+  const hasJoinedChallenge = (hasJoinedLocally || hasJoinedFromSubgraph) && isConnected;
 
   // Check if current wallet is in top 5 ranking
   const isInTop5Ranking = () => {
-    if (!walletAddress || !rankingData?.topUsers || rankingData.topUsers.length === 0) {
+    if (!currentWalletAddress || !rankingData?.topUsers || rankingData.topUsers.length === 0) {
       return false;
     }
     
     // Check if current wallet address is in the top 5 users
     const top5Users = rankingData.topUsers.slice(0, 5);
-    const isInTop5 = top5Users.some(user => user.toLowerCase() === walletAddress.toLowerCase());  
+    const isInTop5 = top5Users.some(user => user.toLowerCase() === currentWalletAddress.toLowerCase());  
     return isInTop5;
   };
 
@@ -526,10 +529,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check USDC balance when wallet address changes
   useEffect(() => {
-    if (walletAddress && isClient) {
-      checkUSDCBalance(walletAddress);
+    if (currentWalletAddress && isClient) {
+      checkUSDCBalance(currentWalletAddress);
     }
-  }, [walletAddress, isClient]);
+  }, [currentWalletAddress, isClient]);
 
   // Update time every second for accurate countdown
   useEffect(() => {
@@ -545,8 +548,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
     try {
-      // If wallet address is not in state, try to get it from current wallet
-      if (!walletAddress) {
+      // Use connected address first, fallback to stored wallet address
+      if (!currentWalletAddress) {
         let walletProvider;
         
         // Get the appropriate wallet provider based on connected wallet type
@@ -596,7 +599,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         router.push(`/challenge/${challengeId}/${address}`);
       } else {
         // Use the existing wallet address
-        router.push(`/challenge/${challengeId}/${walletAddress}`);
+        router.push(`/challenge/${challengeId}/${currentWalletAddress}`);
       }
     } catch (error: any) {
       console.error("Error connecting wallet:", error);
@@ -902,7 +905,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
-          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, walletAddress, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['investor', challengeId, currentWalletAddress, subgraphNetwork] });
           
           // Hide spinner
           setIsRefreshing(false);
