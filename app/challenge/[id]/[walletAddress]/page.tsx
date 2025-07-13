@@ -1076,15 +1076,22 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             }
                           }
 
-                          const formatTimestamp = (timestamp: number) => {
-                            return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })
-                          }
+                                                      const formatTimestamp = (timestamp: number) => {
+                              return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            }
+
+                            const formatUserAddress = (address?: string) => {
+                              if (!address || address === '0x0000000000000000000000000000000000000000') {
+                                return '';
+                              }
+                              return `${address.slice(0, 6)}...${address.slice(-4)}`;
+                            }
 
                           return (
                             <div className="space-y-4">
@@ -1103,9 +1110,16 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     </div>
                                     <div className="flex-1">
                                       <div className="font-medium text-gray-100">
-                                        {transaction.type === 'swap' ? 'Swapped' : transaction.details}
+                                        {transaction.type === 'swap' ? 'Swapped' : 
+                                         transaction.type === 'join' ? 'Joined' :
+                                         transaction.type === 'register' ? 'Registered' :
+                                         transaction.type === 'reward' ? `Rewarded → ${formatUserAddress(transaction.user)}` :
+                                         transaction.details}
                                       </div>
-                                      <p className="text-sm text-gray-400">{formatTimestamp(transaction.timestamp)}</p>
+                                      <p className="text-sm text-gray-400">
+                                        {formatTimestamp(transaction.timestamp)}
+                                        {transaction.type !== 'reward'}
+                                      </p>
                                     </div>
                                   </div>
                                   <div className="text-right">

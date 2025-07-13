@@ -171,7 +171,7 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               challengeId: join.challengeId,
               user: join.user,
               amount: `$${(parseInt(join.seedMoney) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-              details: 'Challenge Joined',
+              details: `${join.user} Joined`,
               timestamp: parseInt(join.blockTimestamp),
               transactionHash: join.transactionHash,
             })
@@ -217,7 +217,7 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               challengeId: register.challengeId,
               user: register.user,
               amount: performanceValue.toFixed(6), // Show as score value with 6 decimal places
-              details: 'Performance Registered',
+              details: `${register.user} Registered`,
               timestamp: parseInt(register.blockTimestamp),
               transactionHash: register.transactionHash,
             })
@@ -236,7 +236,7 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               challengeId: reward.challengeId,
               user: reward.user,
               amount: `$${rewardValue.toFixed(2)}`, // USDC has 6 decimals
-              details: `Reward Claimed → ${userAddress}`,
+              details: `Rewarded → ${userAddress}`,
               timestamp: parseInt(reward.blockTimestamp),
               transactionHash: reward.transactionHash,
             })

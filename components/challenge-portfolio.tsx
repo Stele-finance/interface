@@ -564,7 +564,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         default:
           baseTitle = `Challenge Type ${challengeType}`;
       }
-      return `${baseTitle} ( ID: ${challengeId} )`;
+      return `${baseTitle} ID : ${challengeId}`;
     }
     
     // Fallback to old logic if no data
@@ -1002,210 +1002,30 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      {/* Mobile Responsive Challenge Header */}
-      <div className="space-y-4">
-        {/* Mobile Layout - Stack vertically */}
-        <div className="block md:hidden">
-          {/* First row: Challenge title and Entry Fee */}
-          <div className="flex items-center justify-between mb-2">
-            {isLoadingChallenge ? (
-              <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
-            ) : (
-              <h2 className="text-2xl">
-                <span className="text-gray-400">
-                  {getChallengeTitle().split(' ( ID: ')[0]}
-                </span>
-              </h2>
-            )}
-          </div>
-          
-          {/* Second row: Challenge ID and Join Button */}
-          <div className="flex items-center justify-between">
-            {/* Challenge ID */}
-            {!isLoadingChallenge && getChallengeTitle().includes('( ID: ') && (
-              <span className="text-gray-100 text-lg">
-                {getChallengeTitle().includes('( ID: ') ? '( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
-              </span>
-            )}
-            
-            {/* Buttons */}
-            <div className="flex flex-col space-y-2">
-              {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
-              {isClient && shouldShowGetRewards() && (
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  onClick={handleGetRewards}
-                  disabled={isGettingRewards}
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                >
-                  {isGettingRewards ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      Claiming...
-                    </>
-                  ) : (
-                    <>
-                      <DollarSign className="mr-3 h-5 w-5" />
-                      Get Rewards
-                    </>
-                  )}
-                </Button>
-              )}
-              
-              {hasJoinedChallenge ? (
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  onClick={handleNavigateToAccount}
-                  className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                >
-                  <User className="mr-3 h-5 w-5" />
-                  {t('myAccount')}
-                </Button>
-              ) : !isChallengeEnded() && (
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  onClick={handleJoinChallenge} 
-                  disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-                  className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
-                    isInsufficientBalance() 
-                      ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                      : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
-                  }`}
-                >
-                  {isJoining ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      {t('joining')}
-                    </>
-                  ) : isLoadingChallenge || !challengeData?.challenge ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      Loading challenge info...
-                    </>
-                  ) : isLoadingEntryFee || isLoadingBalance ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      {t('loading')}
-                    </>
-                  ) : isInsufficientBalance() ? (
-                    <>
-                      <Plus className="mr-3 h-5 w-5" />
-                      Insufficient USDC
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="mr-2 h-5 w-5" />
-                      {t('join')}
-                      <UserPlus className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Layout - Original horizontal layout */}
-        <div className="hidden md:flex items-center justify-between">
-          {isLoadingChallenge ? (
-            <div className="flex items-center gap-2">
-              <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
-              <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
-            </div>
-          ) : (
-            <h2 className="text-2xl">
-              <span className="text-gray-400">
-                {getChallengeTitle().split(' ( ID: ')[0]}
-              </span>
-              <span className="text-gray-100">
-                {getChallengeTitle().includes('( ID: ') ? ' ( ID: ' + getChallengeTitle().split('( ID: ')[1] : ''}
-              </span>
-            </h2>
-          )}
-          <div className="flex items-center gap-2">
-            {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
-            {isClient && shouldShowGetRewards() && (
-              <Button 
-                variant="outline" 
-                size="lg" 
-                onClick={handleGetRewards}
-                disabled={isGettingRewards}
-                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-              >
-                {isGettingRewards ? (
-                  <>
-                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    Claiming...
-                  </>
-                ) : (
-                  <>
-                    <DollarSign className="mr-3 h-5 w-5" />
-                    Get Rewards
-                  </>
-                )}
-              </Button>
-            )}
-            
-            {hasJoinedChallenge ? (
-              <Button 
-                variant="outline" 
-                size="lg" 
-                onClick={handleNavigateToAccount}
-                className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-              >
-                <User className="mr-3 h-5 w-5" />
-                {t('myAccount')}
-              </Button>
-            ) : !isChallengeEnded() && (
-              <Button 
-                variant="outline" 
-                size="lg" 
-                onClick={handleJoinChallenge} 
-                disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-                className={`font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg ${
-                  isInsufficientBalance() 
-                    ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                    : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
-                }`}
-              >
-                {isJoining ? (
-                  <>
-                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    {t('joining')}
-                  </>
-                ) : isLoadingChallenge || !challengeData?.challenge ? (
-                  <>
-                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    Loading challenge info...
-                  </>
-                ) : isLoadingEntryFee || isLoadingBalance ? (
-                  <>
-                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    {t('loading')}
-                  </>
-                ) : isInsufficientBalance() ? (
-                  <>
-                    <Plus className="mr-3 h-5 w-5" />
-                    Insufficient USDC
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-5 w-5" />
-                    {t('join')}
-                    <UserPlus className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      
 
       {/* Challenge Charts */}
-                      <ChallengeCharts challengeId={challengeId} network={subgraphNetwork} />
+                      <ChallengeCharts 
+                        challengeId={challengeId} 
+                        network={subgraphNetwork} 
+                        joinButton={{
+                          isClient,
+                          shouldShowGetRewards: shouldShowGetRewards(),
+                          hasJoinedChallenge,
+                          isChallengeEnded: isChallengeEnded(),
+                          isJoining,
+                          isLoadingChallenge,
+                          challengeData,
+                          isLoadingEntryFee,
+                          isLoadingBalance,
+                          isInsufficientBalance: isInsufficientBalance(),
+                          isGettingRewards,
+                          handleJoinChallenge,
+                          handleNavigateToAccount,
+                          handleGetRewards,
+                          t
+                        }}
+                      />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1302,11 +1122,15 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               </div>
                               <div className="flex-1">
                                 <div className="font-medium text-gray-100">
-                                  {transaction.type === 'swap' ? 'Swapped' : transaction.details}
+                                  {transaction.type === 'swap' ? 'Swapped' : 
+                                   transaction.type === 'join' ? 'Joined' :
+                                   transaction.type === 'register' ? 'Registered' :
+                                   transaction.type === 'reward' ? `Rewarded → ${formatUserAddress(transaction.user)}` :
+                                   transaction.details}
                                 </div>
                                 <div className="text-sm text-gray-400">
                                   {formatTimestamp(transaction.timestamp)}
-                                  {transaction.user && ` • ${formatUserAddress(transaction.user)}`}
+                                  {transaction.type !== 'reward'}
                                 </div>
                               </div>
                             </div>
@@ -1383,8 +1207,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                   }
                                   return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                 })()
+                              ) : transaction.type === 'join' || transaction.type === 'register' ? (
+                                <div className="font-medium text-gray-100"></div>
                               ) : (
-                              <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                               )}
                             </div>
                           </div>

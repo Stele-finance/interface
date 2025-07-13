@@ -246,7 +246,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               type: 'create',
               id: create.id,
               challengeId: create.challengeId,
-              details: `Challenge Created (Type ${create.challengeType})`,
+              details: `Challenge Created`,
               timestamp: parseInt(create.blockTimestamp),
               transactionHash: create.transactionHash,
             })
@@ -256,13 +256,14 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
         // Process joins
         if (data.joins && Array.isArray(data.joins)) {
           data.joins.forEach((join) => {
+            const userAddress = `${join.user.slice(0, 6)}...${join.user.slice(-4)}`;
             allTransactions.push({
               type: 'join',
               id: join.id,
               challengeId: join.challengeId,
               user: join.user,
               amount: `$${(parseInt(join.seedMoney) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-              details: 'Challenge Joined',
+              details: `${userAddress} Joined`,
               timestamp: parseInt(join.blockTimestamp),
               transactionHash: join.transactionHash,
             })
@@ -299,7 +300,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
         // Process registers
         if (data.registers && Array.isArray(data.registers)) {
           data.registers.forEach((register) => {
-            
+            const userAddress = `${register.user.slice(0, 6)}...${register.user.slice(-4)}`;
             const performanceValue = parseFloat(ethers.formatUnits(register.performance, USDC_DECIMALS));
             
             allTransactions.push({
@@ -308,7 +309,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               challengeId: register.challengeId,
               user: register.user,
               amount: performanceValue.toFixed(6), // Show as score value with 6 decimal places
-              details: 'Performance Registered',
+              details: `${userAddress} Registered`,
               timestamp: parseInt(register.blockTimestamp),
               transactionHash: register.transactionHash,
             })
@@ -327,7 +328,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               challengeId: reward.challengeId,
               user: reward.user,
               amount: `$${rewardValue.toFixed(2)}`, // USDC has 6 decimals
-              details: `Reward Claimed → ${userAddress}`,
+              details: `Rewarded → ${userAddress}`,
               timestamp: parseInt(reward.blockTimestamp),
               transactionHash: reward.transactionHash,
             })

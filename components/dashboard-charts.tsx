@@ -178,10 +178,47 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
     <div className="mb-4 sm:mb-6">
       <Card className="bg-transparent border-0">
         <CardHeader className="pb-2 px-2 sm:px-6">
-          <div className="mb-2">
-            <h3 className="text-3xl text-gray-100">
-              {chartType === 'participants' ? t('totalParticipants') : t('totalRewards')}
-            </h3>
+          {/* Mobile layout */}
+          <div className="block sm:hidden">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-3xl text-gray-100">
+                {chartType === 'participants' ? t('users') : t('rewards')}
+              </h3>
+              {/* Daily/Weekly badges on mobile */}
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                  <button
+                    onClick={() => setIntervalType('daily')}
+                    className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'daily' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('daily')}
+                  </button>
+                  <button
+                    onClick={() => setIntervalType('weekly')}
+                    className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'weekly' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('weekly')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Desktop layout */}
+          <div className="hidden sm:block">
+            <div className="mb-2">
+              <h3 className="text-3xl text-gray-100">
+                {chartType === 'participants' ? t('totalParticipants') : t('totalRewards')}
+              </h3>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="px-1 sm:px-6">
@@ -191,38 +228,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 {/* Mobile layout */}
                 <div className="sm:hidden">
                   <div className="flex items-center justify-between gap-3 mb-3">
-                    <CardTitle className="text-2xl text-gray-100">
+                    <CardTitle className="text-4xl text-gray-100">
                       {hasNoData ? "-" : (totalParticipants >= 1000 ? `${(totalParticipants / 1000).toFixed(1)}K` : totalParticipants.toLocaleString())}
                     </CardTitle>
-                    {/* Interval selector - same row as number on mobile */}
-                    <div className="flex items-center space-x-2">
-                      <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                        <button
-                          onClick={() => setIntervalType('daily')}
-                          className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                            intervalType === 'daily' 
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                              : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                          }`}
-                        >
-                          {t('daily')}
-                        </button>
-                        <button
-                          onClick={() => setIntervalType('weekly')}
-                          className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                            intervalType === 'weekly' 
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                              : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                          }`}
-                        >
-                          {t('weekly')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs text-gray-400">{currentDate}</p>
-                    {/* Chart type selector - same row as date on mobile */}
+                    {/* Chart type selector - same row as number on mobile */}
                     <div className="flex items-center space-x-2">
                       <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                         <button
@@ -254,11 +263,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 
                 {/* Desktop layout */}
                 <div className="hidden sm:block">
-                  <CardTitle className="text-4xl text-gray-100 mb-2">
-                    {hasNoData ? "-" : (totalParticipants >= 1000 ? `${(totalParticipants / 1000).toFixed(1)}K` : totalParticipants.toLocaleString())}
-                  </CardTitle>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-400">{currentDate}</p>
+                    <CardTitle className="text-5xl text-gray-100">
+                      {hasNoData ? "-" : (totalParticipants >= 1000 ? `${(totalParticipants / 1000).toFixed(1)}K` : totalParticipants.toLocaleString())}
+                    </CardTitle>
                     <div className="flex items-center gap-4">
                       {/* Interval selector */}
                       <div className="flex items-center space-x-2">
@@ -394,35 +402,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     <CardTitle className="text-2xl text-gray-100">
                       {hasNoData ? "-" : `$${totalRewards >= 1000000 ? `${(totalRewards / 1000000).toFixed(1)}M` : totalRewards >= 1000 ? `${(totalRewards / 1000).toFixed(1)}K` : totalRewards.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
                     </CardTitle>
-                    {/* Interval selector - same row as number on mobile */}
-                    <div className="flex items-center space-x-2">
-                      <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                        <button
-                          onClick={() => setIntervalType('daily')}
-                          className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                            intervalType === 'daily' 
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                              : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                          }`}
-                        >
-                          {t('daily')}
-                        </button>
-                        <button
-                          onClick={() => setIntervalType('weekly')}
-                          className={`px-2 py-1 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                            intervalType === 'weekly' 
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
-                              : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                          }`}
-                        >
-                          {t('weekly')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs text-gray-400">{currentDate}</p>
-                    {/* Chart type selector - same row as date on mobile */}
+                    {/* Chart type selector - same row as number on mobile */}
                     <div className="flex items-center space-x-2">
                       <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                         <button
@@ -454,11 +434,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 
                 {/* Desktop layout */}
                 <div className="hidden sm:block">
-                  <CardTitle className="text-4xl text-gray-100 mb-2">
-                    {hasNoData ? "-" : `$${totalRewards >= 1000000 ? `${(totalRewards / 1000000).toFixed(1)}M` : totalRewards >= 1000 ? `${(totalRewards / 1000).toFixed(1)}K` : totalRewards.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-                  </CardTitle>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-400">{currentDate}</p>
+                    <CardTitle className="text-4xl text-gray-100">
+                      {hasNoData ? "-" : `$${totalRewards >= 1000000 ? `${(totalRewards / 1000000).toFixed(1)}M` : totalRewards >= 1000 ? `${(totalRewards / 1000).toFixed(1)}K` : totalRewards.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+                    </CardTitle>
                     <div className="flex items-center gap-4">
                       {/* Interval selector */}
                       <div className="flex items-center space-x-2">
