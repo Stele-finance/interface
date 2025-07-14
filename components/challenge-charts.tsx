@@ -10,9 +10,10 @@ import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
-import { Users, DollarSign, Clock, Trophy, Calendar, Plus, UserPlus, User, Loader2 } from 'lucide-react'
+import { Users, DollarSign, Clock, Trophy, Calendar, Plus, UserPlus, User, Loader2, Wallet } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface ChartDataPoint {
   id: string
@@ -43,6 +44,12 @@ interface ChallengeChartsProps {
     handleNavigateToAccount: () => void
     handleGetRewards: () => void
     t: (key: any) => string
+    // Wallet connection props
+    isConnected: boolean
+    walletSelectOpen: boolean
+    setWalletSelectOpen: (open: boolean) => void
+    isConnecting: boolean
+    handleConnectWallet: (walletType: 'metamask' | 'phantom') => Promise<void>
   }
 }
 
@@ -891,6 +898,75 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             <div className="p-4">
               {(() => {
                 const buttons = [];
+                
+                // Connect Button (when wallet is not connected)
+                if (!joinButton.isConnected) {
+                  buttons.push(
+                    <Dialog key="connect-dialog" open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="lg" 
+                          className="w-full text-primary border-primary hover:bg-primary/10 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                        >
+                          <Wallet className="mr-2 h-5 w-5" />
+                          {joinButton.t('connectWallet')}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
+                          <DialogDescription>
+                            {joinButton.t('chooseWalletToConnect')}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/metamask.png" 
+                                alt="MetaMask"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            MetaMask
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/phantom.png" 
+                                alt="Phantom"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            Phantom
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  );
+                  
+                  // Return early if wallet is not connected
+                  return buttons[0];
+                }
                 
                 // Get Rewards Button
                 if (joinButton.isClient && joinButton.shouldShowGetRewards) {
