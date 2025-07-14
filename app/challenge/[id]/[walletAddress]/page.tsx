@@ -1,7 +1,7 @@
 "use client"
 
 
-import { useState, useMemo, use, useEffect, useCallback } from "react"
+import React, { useState, useMemo, use, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -1531,11 +1531,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <div className="flex items-center justify-between gap-4 mb-4">
                                  {/* Action Buttons and Registered status */}
                  <div className="w-full">
-                   {/* Action buttons (Swap, Register) */}
+                   {/* Action buttons (Swap, Register) - Hidden on mobile, shown on desktop */}
                    {connectedAddress && walletAddress && 
                     connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
                     investorData?.investor?.isRegistered !== true && (
-                     <div className="flex gap-3 w-full">
+                     <div className="hidden md:flex gap-3 w-full">
                        <Button 
                          variant="outline" 
                          size="lg" 
@@ -1840,6 +1840,83 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             </div>
           </div>
         </div>
+
+        {/* Mobile Float Buttons - Only visible on mobile */}
+        {connectedAddress && walletAddress && 
+          connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
+          investorData?.investor?.isRegistered !== true && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+            <div className="p-4">
+              {(() => {
+                const buttons = [];
+                
+                // Swap Button
+                buttons.push(
+                  <Button 
+                    key="swap"
+                    variant="outline" 
+                    size="lg" 
+                    onClick={() => setIsSwapMode(!isSwapMode)}
+                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    {isSwapMode ? (
+                      <>
+                        <X className="mr-2 h-5 w-5" />
+                        {t('close')}
+                      </>
+                    ) : (
+                      <>
+                        <Repeat className="mr-2 h-5 w-5" />
+                        {t('swap')}
+                      </>
+                    )}
+                  </Button>
+                );
+                
+                // Register Button
+                buttons.push(
+                  <Button 
+                    key="register"
+                    variant="default" 
+                    size="lg" 
+                    onClick={handleRegister}
+                    disabled={isRegistering}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    {isRegistering ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        {t('registering')}
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="mr-2 h-5 w-5" />
+                        {t('register')}
+                      </>
+                    )}
+                  </Button>
+                );
+                
+                // Return the buttons with appropriate layout
+                if (buttons.length === 1) {
+                  return buttons[0];
+                } else if (buttons.length === 2) {
+                  return (
+                    <div className="grid grid-cols-2 gap-3">
+                      {buttons.map(button => 
+                        React.cloneElement(button, {
+                          className: button.props.className.replace('w-full ', '')
+                        })
+                      )}
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })()}
+            </div>
+          </div>
+        )}
       </div>
     </div>
     </>
