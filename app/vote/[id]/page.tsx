@@ -1142,7 +1142,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     onClick={handleProposerClick}
                     title={`View proposer on ${contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
                   >
-                    {proposal.fullProposer}
+                    {proposal.proposer}
                   </span>
                 </div>
                 <ClientOnly fallback={
@@ -1299,8 +1299,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               {/* Delegate Button - Show when user has tokens but no voting power */}
               {isConnected && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
                 <Button 
-                  variant="outline"
-                  className="w-full" 
+                  className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleDelegate}
                   disabled={isDelegating}
                 >
@@ -1320,7 +1319,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               
               {/* Vote Button */}
               <Button 
-                className="w-full" 
+                className="w-full bg-orange-500 hover:bg-orange-600" 
                 onClick={handleVote}
                 disabled={proposal.hasVoted || !voteOption || isVoting || !isConnected || Number(votingPower) === 0 || isLoadingVotingPower}
               >
@@ -1352,8 +1351,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <ClientOnly>
                 {currentTime && isConnected && isReadyForQueue() && (
                 <Button 
-                  variant="outline"
-                  className="w-full" 
+                  className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleQueue}
                   disabled={isQueuing || isLoadingProposalDetails}
                 >
@@ -1380,8 +1378,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               {/* Execute Button - Show when proposal is queued (state 5) */}
               {isConnected && proposalState === 5 && (
                 <Button 
-                  variant="default"
-                  className="w-full bg-green-600 hover:bg-green-700" 
+                  className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleExecute}
                   disabled={isExecuting || isLoadingProposalDetails}
                 >
