@@ -1258,8 +1258,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1344,8 +1344,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1430,8 +1430,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
