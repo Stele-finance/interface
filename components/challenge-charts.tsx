@@ -10,9 +10,10 @@ import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
-import { Users, DollarSign, Clock, Trophy, Calendar, Plus, UserPlus, User, Loader2 } from 'lucide-react'
+import { Users, DollarSign, Clock, Trophy, Calendar, Plus, UserPlus, User, Loader2, Wallet } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface ChartDataPoint {
   id: string
@@ -43,6 +44,12 @@ interface ChallengeChartsProps {
     handleNavigateToAccount: () => void
     handleGetRewards: () => void
     t: (key: any) => string
+    // Wallet connection props
+    isConnected: boolean
+    walletSelectOpen: boolean
+    setWalletSelectOpen: (open: boolean) => void
+    isConnecting: boolean
+    handleConnectWallet: (walletType: 'metamask' | 'phantom') => Promise<void>
   }
 }
 
@@ -338,7 +345,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="sm" 
                       onClick={joinButton.handleGetRewards}
                       disabled={joinButton.isGettingRewards}
-                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                     >
                       {joinButton.isGettingRewards ? (
                         <>
@@ -354,12 +361,73 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                     </Button>
                   )}
                   
-                  {joinButton.hasJoinedChallenge ? (
+                  {!joinButton.isConnected ? (
+                    <Dialog open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                        >
+                          <Wallet className="mr-2 h-4 w-4" />
+                          {joinButton.t('connectWallet')}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
+                          <DialogDescription>
+                            {joinButton.t('chooseWalletToConnect')}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/metamask.png" 
+                                alt="MetaMask"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            MetaMask
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/phantom.png" 
+                                alt="Phantom"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            Phantom
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : joinButton.hasJoinedChallenge ? (
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={joinButton.handleNavigateToAccount}
-                      className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                     >
                       <User className="mr-2 h-4 w-4" />
                       {joinButton.t('myAccount')}
@@ -372,8 +440,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
                       className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
                         joinButton.isInsufficientBalance
-                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
+                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                       }`}
                     >
                       {joinButton.isJoining ? (
@@ -470,7 +538,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="lg" 
                       onClick={joinButton.handleGetRewards}
                       disabled={joinButton.isGettingRewards}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       {joinButton.isGettingRewards ? (
                         <>
@@ -495,7 +563,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="lg" 
                       onClick={joinButton.handleNavigateToAccount}
-                      className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       <User className="mr-2 h-5 w-5" />
                       {joinButton.t('myAccount')}
@@ -514,8 +582,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
                       className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
                         joinButton.isInsufficientBalance
-                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
+                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                       }`}
                     >
                       {joinButton.isJoining ? (
@@ -616,7 +684,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="sm" 
                       onClick={joinButton.handleGetRewards}
                       disabled={joinButton.isGettingRewards}
-                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                     >
                       {joinButton.isGettingRewards ? (
                         <>
@@ -632,12 +700,73 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                     </Button>
                   )}
                   
-                  {joinButton.hasJoinedChallenge ? (
+                  {!joinButton.isConnected ? (
+                    <Dialog open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                        >
+                          <Wallet className="mr-2 h-4 w-4" />
+                          {joinButton.t('connectWallet')}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
+                          <DialogDescription>
+                            {joinButton.t('chooseWalletToConnect')}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/metamask.png" 
+                                alt="MetaMask"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            MetaMask
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/phantom.png" 
+                                alt="Phantom"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            Phantom
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : joinButton.hasJoinedChallenge ? (
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={joinButton.handleNavigateToAccount}
-                      className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                     >
                       <User className="mr-2 h-4 w-4" />
                       {joinButton.t('myAccount')}
@@ -650,8 +779,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
                       className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
                         joinButton.isInsufficientBalance
-                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
+                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                       }`}
                     >
                       {joinButton.isJoining ? (
@@ -892,6 +1021,75 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               {(() => {
                 const buttons = [];
                 
+                // Connect Button (when wallet is not connected)
+                if (!joinButton.isConnected) {
+                  buttons.push(
+                    <Dialog key="connect-dialog" open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="lg" 
+                          className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                        >
+                          <Wallet className="mr-2 h-5 w-5" />
+                          {joinButton.t('connectWallet')}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
+                          <DialogDescription>
+                            {joinButton.t('chooseWalletToConnect')}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/metamask.png" 
+                                alt="MetaMask"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            MetaMask
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            disabled={joinButton.isConnecting}
+                            className="w-full justify-start"
+                          >
+                            {joinButton.isConnecting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Image 
+                                src="/wallets/small/phantom.png" 
+                                alt="Phantom"
+                                width={20}
+                                height={20}
+                                className="mr-2"
+                              />
+                            )}
+                            Phantom
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  );
+                  
+                  // Return early if wallet is not connected
+                  return buttons[0];
+                }
+                
                 // Get Rewards Button
                 if (joinButton.isClient && joinButton.shouldShowGetRewards) {
                   buttons.push(
@@ -901,7 +1099,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="lg" 
                       onClick={joinButton.handleGetRewards}
                       disabled={joinButton.isGettingRewards}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       {joinButton.isGettingRewards ? (
                         <>
@@ -926,7 +1124,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="lg" 
                       onClick={joinButton.handleNavigateToAccount}
-                      className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       <User className="mr-2 h-5 w-5" />
                       {joinButton.t('myAccount')}
@@ -945,8 +1143,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
                       className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
                         joinButton.isInsufficientBalance
-                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
+                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                       }`}
                     >
                       {joinButton.isJoining ? (

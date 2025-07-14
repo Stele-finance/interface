@@ -32,6 +32,8 @@ import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
 import { getTokenLogo } from "@/lib/utils"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Wallet } from "lucide-react"
 
 interface ChallengePortfolioProps {
   challengeId: string
@@ -265,10 +267,29 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { address: connectedAddress, isConnected, walletType, network } = useWallet();
+  const { address: connectedAddress, isConnected, walletType, network, connectWallet } = useWallet();
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+
+  // Wallet connection modal state
+  const [walletSelectOpen, setWalletSelectOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  // Handle wallet connection
+  const handleConnectWallet = async (selectedWalletType: 'metamask' | 'phantom') => {
+    if (!selectedWalletType) return
+    
+    try {
+      setIsConnecting(true)
+      await connectWallet(selectedWalletType)
+      setWalletSelectOpen(false)
+    } catch (error) {
+      console.error("Wallet connection error:", error)
+    } finally {
+      setIsConnecting(false)
+    }
+  }
 
   // Get appropriate explorer URL based on chain ID
   const getExplorerUrl = (chainId: string, txHash: string) => {
@@ -1094,7 +1115,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                           handleJoinChallenge,
                           handleNavigateToAccount,
                           handleGetRewards,
-                          t
+                          t,
+                          // Wallet connection props
+                          isConnected,
+                          walletSelectOpen,
+                          setWalletSelectOpen,
+                          isConnecting,
+                          handleConnectWallet
                         }}
                       />
 
@@ -1357,7 +1384,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             <AlertDialogAction 
               onClick={confirmJoinChallenge}
               disabled={isJoining || isLoadingEntryFee || isInsufficientBalance()}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-orange-500 hover:bg-orange-600"
             >
               {isJoining ? (
                 <>

@@ -1540,7 +1540,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                          variant="outline" 
                          size="lg" 
                          onClick={() => setIsSwapMode(!isSwapMode)}
-                         className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                        >
                          {isSwapMode ? (
                            <>
@@ -1559,7 +1559,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                          size="lg" 
                          onClick={handleRegister}
                          disabled={isRegistering}
-                         className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                        >
                          {isRegistering ? (
                            <>
@@ -1874,7 +1874,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     variant="outline" 
                     size="lg" 
                     onClick={() => setIsSwapMode(!isSwapMode)}
-                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                   >
                     {isSwapMode ? (
                       <>
@@ -1898,7 +1898,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     size="lg" 
                     onClick={handleRegister}
                     disabled={isRegistering}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                   >
                     {isRegistering ? (
                       <>

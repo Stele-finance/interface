@@ -378,18 +378,18 @@ export function Header() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 font-medium px-2 sm:px-4 py-2 h-auto text-xs sm:text-base">
+                <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
                   {walletIcon ? (
                     <Image 
                       src={walletIcon} 
                       alt={`${walletType} wallet`}
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mr-2"
-                      style={{ width: 'auto', height: '20px' }}
+                      style={{ width: 'auto', height: '16px' }}
                     />
                   ) : (
-                    <Wallet className="mr-2 h-5 w-5" />
+                    <Wallet className="mr-2 h-4 w-4" />
                   )}
                   <span className="text-base">
                     {walletNetwork === 'solana'
@@ -486,8 +486,8 @@ export function Header() {
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
-                size="sm" 
-                className="text-primary border-primary hover:bg-primary/10 font-medium px-2 sm:px-4 py-2 h-auto text-xs sm:text-base"
+                size="lg" 
+                className="bg-orange-500 hover:bg-orange-600 border-orange-500 hover:border-orange-600 text-white font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
               >
                 <Wallet className="mr-2 h-5 w-5" />
                 <span className="text-base">
@@ -513,9 +513,9 @@ export function Header() {
                   <Image 
                     src={getWalletLogo('metamask')} 
                     alt="MetaMask"
-                    width={32}
-                    height={32}
-                    style={{ width: 'auto', height: '32px' }}
+                    width={24}
+                    height={24}
+                    style={{ width: 'auto', height: '24px' }}
                   />
                   <div className="text-left">
                     <div className="font-semibold">MetaMask</div>
@@ -533,9 +533,9 @@ export function Header() {
                   <Image 
                     src={getWalletLogo('phantom')} 
                     alt="Phantom"
-                    width={32}
-                    height={32}
-                    style={{ width: 'auto', height: '32px' }}
+                    width={24}
+                    height={24}
+                    style={{ width: 'auto', height: '24px' }}
                   />
                   <div className="text-left">
                     <div className="font-semibold">Phantom</div>
