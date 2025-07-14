@@ -1101,10 +1101,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6">
+    <div className="container mx-auto px-2 py-6">
+      <div className="mb-4">
         <Link href="/vote">
-          <Button variant="outline" size="sm">
+          <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('backToProposals')}
           </Button>

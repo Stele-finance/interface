@@ -549,9 +549,9 @@ export default function CreateProposalPage() {
   }
   
   return (
-    <div className="container mx-auto p-6 py-20">
+    <div className="container mx-auto px-2 py-4">
       <div className="max-w-4xl mx-auto space-y-4">
-        <div className="mb-6">
+        <div className="mb-2">
           <button 
             onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
