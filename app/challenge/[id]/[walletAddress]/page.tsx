@@ -1,7 +1,7 @@
 "use client"
 
 
-import { useState, useMemo, use, useEffect, useCallback } from "react"
+import React, { useState, useMemo, use, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -872,8 +872,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       )}
 
-      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-12">
-        <div className="max-w-6xl mx-auto space-y-0 sm:space-y-0">
+      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-4">
+        <div className="max-w-6xl mx-auto space-y-2 sm:space-y-0">
           {/* Go to Challenge Button */}
           <div className="px-2 sm:px-0">
           <button 
@@ -885,65 +885,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           </button>
         </div>
         
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 sm:px-0">
-          <div>
-            {/* Remove the investor address from here as it's now in the chart header */}
-          </div>
-          <div className="space-y-4">            
-            {/* Swap and Register Buttons - Only show if connected wallet matches investor address and not closed */}
-            {connectedAddress && walletAddress && 
-             connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
-             investorData?.investor?.isRegistered !== true && (
-              <div className="flex justify-end gap-4">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  onClick={() => setIsSwapMode(!isSwapMode)}
-                  className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                >
-                  {isSwapMode ? (
-                    <>
-                      <X className="mr-3 h-5 w-5" />
-                      {t('close')}
-                    </>
-                  ) : (
-                    <>
-                      <Repeat className="mr-3 h-5 w-5" />
-                      {t('swap')}
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="lg" 
-                  onClick={handleRegister}
-                  disabled={isRegistering}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                >
-                  {isRegistering ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      {t('registering')}
-                    </>
-                  ) : (
-                    <>
-                      <FileText className="mr-3 h-5 w-5" />
-                      {t('register')}
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-            
-            {/* Show completion message if investor is closed - moved to InvestorCharts component */}
-          </div>
-        </div>
+        {/* Header - Removed buttons as they are now in InvestorCharts */}
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-2 sm:space-y-4">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 
@@ -1579,10 +1526,90 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           
           {/* Right Side - Portfolio Summary / Swap Assets */}
           <div className="lg:col-span-1">
-            <div className="space-y-4">
+            <div className="space-y-4 lg:mt-18">
+              {/* Investor Info Section */}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                                 {/* Action Buttons and Registered status */}
+                 <div className="w-full">
+                   {/* Action buttons (Swap, Register) - Hidden on mobile, shown on desktop */}
+                   {connectedAddress && walletAddress && 
+                    connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
+                    investorData?.investor?.isRegistered !== true && (
+                     <div className="hidden md:flex gap-3 w-full">
+                       <Button 
+                         variant="outline" 
+                         size="lg" 
+                         onClick={() => setIsSwapMode(!isSwapMode)}
+                         className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                       >
+                         {isSwapMode ? (
+                           <>
+                             <X className="mr-2 h-5 w-5" />
+                             {t('close')}
+                           </>
+                         ) : (
+                           <>
+                             <Repeat className="mr-2 h-5 w-5" />
+                             {t('swap')}
+                           </>
+                         )}
+                       </Button>
+                       <Button 
+                         variant="default" 
+                         size="lg" 
+                         onClick={handleRegister}
+                         disabled={isRegistering}
+                         className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                       >
+                         {isRegistering ? (
+                           <>
+                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                             {t('registering')}
+                           </>
+                         ) : (
+                           <>
+                             <FileText className="mr-2 h-5 w-5" />
+                             {t('register')}
+                           </>
+                         )}
+                       </Button>
+                     </div>
+                                      )}
+                   
+                   {/* Registered status */}
+                   {investorData?.investor?.isRegistered === true && (
+                     <div className="w-full bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-3">
+                       <div className="flex items-center justify-center gap-2">
+                         <svg className="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                         </svg>
+                         <span className="text-green-400 font-medium text-base">{t('registered')}</span>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+              </div>
+              
               {/* Swap Assets (when swap mode is active) */}
+              {/* Desktop version - static position */}
               {isSwapMode && (
-                <AssetSwap userTokens={userTokens} />
+                <div className="hidden md:block">
+                  <AssetSwap userTokens={userTokens} />
+                </div>
+              )}
+              
+              {/* Mobile version - floating */}
+              {isSwapMode && (
+                <div className="fixed inset-0 z-50 md:hidden">
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
+                  <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
+                    <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                      <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl">
+                        <AssetSwap userTokens={userTokens} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
               
               {/* Portfolio Summary (always visible) */}
@@ -1830,6 +1857,83 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             </div>
           </div>
         </div>
+
+        {/* Mobile Float Buttons - Only visible on mobile */}
+        {connectedAddress && walletAddress && 
+          connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
+          investorData?.investor?.isRegistered !== true && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+            <div className="p-4">
+              {(() => {
+                const buttons = [];
+                
+                // Swap Button
+                buttons.push(
+                  <Button 
+                    key="swap"
+                    variant="outline" 
+                    size="lg" 
+                    onClick={() => setIsSwapMode(!isSwapMode)}
+                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white border-0 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    {isSwapMode ? (
+                      <>
+                        <X className="mr-2 h-5 w-5" />
+                        {t('close')}
+                      </>
+                    ) : (
+                      <>
+                        <Repeat className="mr-2 h-5 w-5" />
+                        {t('swap')}
+                      </>
+                    )}
+                  </Button>
+                );
+                
+                // Register Button
+                buttons.push(
+                  <Button 
+                    key="register"
+                    variant="default" 
+                    size="lg" 
+                    onClick={handleRegister}
+                    disabled={isRegistering}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    {isRegistering ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        {t('registering')}
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="mr-2 h-5 w-5" />
+                        {t('register')}
+                      </>
+                    )}
+                  </Button>
+                );
+                
+                // Return the buttons with appropriate layout
+                if (buttons.length === 1) {
+                  return buttons[0];
+                } else if (buttons.length === 2) {
+                  return (
+                    <div className="grid grid-cols-2 gap-3">
+                      {buttons.map(button => 
+                        React.cloneElement(button, {
+                          className: button.props.className.replace('w-full ', '')
+                        })
+                      )}
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })()}
+            </div>
+          </div>
+        )}
       </div>
     </div>
     </>

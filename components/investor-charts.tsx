@@ -38,9 +38,10 @@ interface InvestorChartsProps {
   investorData?: any // Add investor data prop for calculations
   realTimePortfolio?: RealTimePortfolio | null
   interval?: 'daily' | 'weekly'
+  actionButtons?: React.ReactNode // Add prop for action buttons (Swap, Register)
 }
 
-export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily' }: InvestorChartsProps) {
+export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily', actionButtons }: InvestorChartsProps) {
   const { t } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
   const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 30, network)
@@ -425,7 +426,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     return (
       <Card className="bg-transparent border-0">
         <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">
-          {/* First row: Address and Registered status */}
+          {/* First row: Address, Action Buttons, and Registered status */}
           <div className="flex items-center justify-between gap-4 mb-1">
             <div className="flex items-center gap-4">
               <h3 
@@ -442,17 +443,23 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               </h3>
             </div>
             
-            {/* Registered status */}
-            {investorData?.investor?.isRegistered === true && (
-              <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
-                <div className="flex items-center gap-2">
-                  <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
+            {/* Action Buttons and Registered status */}
+            <div className="flex items-center gap-4">
+              {/* Action buttons (Swap, Register) */}
+              {actionButtons}
+              
+              {/* Registered status */}
+              {investorData?.investor?.isRegistered === true && (
+                <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           
           {/* Second row: Portfolio value and interval selector */}
@@ -479,7 +486,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   return (
     <Card className="bg-transparent border-0">
       <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">
-                  {/* First row: Address and Registered status */}
+                  {/* First row: Address, Action Buttons, and Registered status */}
           <div className="flex items-center justify-between gap-4 mb-1">
           <div className="flex items-center gap-4">
             <h3 
@@ -494,25 +501,25 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
             >
               {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
             </h3>
-            {realTimePortfolio && realTimePortfolio.totalValue > 0 && (
-              <div className="flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="text-xs text-green-400">{t('live')}</span>
+          </div>
+          
+          {/* Action Buttons and Registered status */}
+          <div className="flex items-center gap-4">
+            {/* Action buttons (Swap, Register) */}
+            {actionButtons}
+            
+            {/* Registered status */}
+            {investorData?.investor?.isRegistered === true && (
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+                <div className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
+                </div>
               </div>
             )}
           </div>
-          
-          {/* Registered status */}
-          {investorData?.investor?.isRegistered === true && (
-            <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
-              <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-green-400 font-medium text-sm">{t('registered')}</span>
-              </div>
-            </div>
-          )}
         </div>
         
         {/* Second row: Portfolio value and interval selector */}
