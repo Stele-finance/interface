@@ -563,7 +563,7 @@ export default function CreateProposalPage() {
         
         <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-100">{t('createProposal')}</h1>
+            <h1 className="text-3xl font-bold text-gray-100">{t('createProposalPage')}</h1>
             <p className="text-gray-400 mt-1">{t('submitNewGovernanceProposal')}</p>
           </div>
         </div>
