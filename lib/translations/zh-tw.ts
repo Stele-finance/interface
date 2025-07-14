@@ -51,7 +51,7 @@ export const zhTw = {
   create: "創建",
   createChallenge: "新建",
   createNewChallenge: "創建新挑戰",
-  createProposal: "創建提案",
+  createProposal: "創建",
   createProposalPage: "創建提案",
   creating: "創建中",
   currentTime: "當前時間",

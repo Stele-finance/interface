@@ -51,7 +51,7 @@ export const ar = {
   create: "إنشاء",
   createChallenge: "جديد",
   createNewChallenge: "إنشاء تحدي جديد",
-  createProposal: "إنشاء مقترح",
+  createProposal: "إنشاء",
   createProposalPage: "إنشاء مقترح",
   creating: "جاري الإنشاء",
   currentTime: "الوقت الحالي",

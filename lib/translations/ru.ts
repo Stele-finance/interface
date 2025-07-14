@@ -51,7 +51,7 @@ export const ru = {
   create: "Создать",
   createChallenge: "Новый",
   createNewChallenge: "Создать Новый Вызов",
-  createProposal: "Создать Предложение",
+  createProposal: "Создать",
   createProposalPage: "Создать Предложение",
   creating: "Создание...",
   currentTime: "Текущее Время",

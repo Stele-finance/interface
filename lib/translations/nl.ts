@@ -51,7 +51,7 @@ export const nl = {
   create: "Creëren",
   createChallenge: "Nieuw",
   createNewChallenge: "Creëer Nieuwe Uitdaging",
-  createProposal: "Creëer Voorstel",
+  createProposal: "Creëren",
   createProposalPage: "Creëer Voorstel",
   creating: "Creëren",
   currentTime: "Huidige Tijd",

@@ -51,7 +51,7 @@ export const fr = {
   create: "Créer",
   createChallenge: "Nouveau",
   createNewChallenge: "Créer un Nouveau Défi",
-  createProposal: "Créer une Proposition",
+  createProposal: "Créer",
   createProposalPage: "Créer une Proposition",
   creating: "Création...",
   currentTime: "Heure Actuelle",

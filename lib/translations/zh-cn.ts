@@ -51,7 +51,7 @@ export const zhCn = {
   create: "创建",
   createChallenge: "新建",
   createNewChallenge: "创建新挑战",
-  createProposal: "创建提案",
+  createProposal: "创建",
   createProposalPage: "创建提案",
   creating: "创建中",
   currentTime: "当前时间",

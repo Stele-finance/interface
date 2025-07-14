@@ -51,7 +51,7 @@ export const hu = {
   create: "Létrehozás",
   createChallenge: "Új",
   createNewChallenge: "Új kihívás létrehozása",
-  createProposal: "Javaslat létrehozása",
+  createProposal: "Létrehozás",
   createProposalPage: "Javaslat létrehozása",
   creating: "Létrehozás...",
   currentTime: "Jelenlegi idő",

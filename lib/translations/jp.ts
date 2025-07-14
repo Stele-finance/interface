@@ -51,7 +51,7 @@ export const jp = {
   create: "作成",
   createChallenge: "新規",
   createNewChallenge: "新しいチャレンジを作成",
-  createProposal: "提案を作成",
+  createProposal: "作成",
   createProposalPage: "提案を作成",
   creating: "作成中",
   currentTime: "現在時刻",

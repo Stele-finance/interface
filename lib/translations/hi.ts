@@ -51,7 +51,7 @@ export const hi = {
   create: "बनाएं",
   createChallenge: "नया",
   createNewChallenge: "नई चुनौती बनाएं",
-  createProposal: "प्रस्ताव बनाएं",
+  createProposal: "बनाएं",
   createProposalPage: "प्रस्ताव बनाएं",
   creating: "बना रहे हैं",
   currentTime: "वर्तमान समय",

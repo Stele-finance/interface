@@ -51,7 +51,7 @@ export const el = {
   create: "Δημιουργία",
   createChallenge: "Νέα",
   createNewChallenge: "Δημιουργία Νέας Πρόκλησης",
-  createProposal: "Δημιουργία Πρότασης",
+  createProposal: "Δημιουργία",
   createProposalPage: "Δημιουργία Πρότασης",
   creating: "Δημιουργία",
   currentTime: "Τρέχων Χρόνος",
