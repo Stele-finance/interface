@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
@@ -456,7 +457,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         {/* Mobile Float Buttons - Only visible on mobile (Error State) */}
         {joinButton && (
           <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-            <div className="bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 p-4 shadow-2xl">
+            <div className="p-4">
               {(() => {
                 const buttons = [];
                 
@@ -469,7 +470,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="lg" 
                       onClick={joinButton.handleGetRewards}
                       disabled={joinButton.isGettingRewards}
-                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       {joinButton.isGettingRewards ? (
                         <>
@@ -494,7 +495,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="lg" 
                       onClick={joinButton.handleNavigateToAccount}
-                      className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                      className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       <User className="mr-2 h-5 w-5" />
                       {joinButton.t('myAccount')}
@@ -511,7 +512,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       size="lg" 
                       onClick={joinButton.handleJoinChallenge} 
                       disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                      className={`font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
+                      className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
                         joinButton.isInsufficientBalance
                           ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
                           : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
@@ -550,15 +551,15 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 
                 // Return the buttons with appropriate layout
                 if (buttons.length === 1) {
-                  return (
-                    <div className="w-full">
-                      {buttons[0]}
-                    </div>
-                  );
+                  return buttons[0];
                 } else if (buttons.length === 2) {
                   return (
                     <div className="grid grid-cols-2 gap-3">
-                      {buttons}
+                      {buttons.map(button => 
+                        React.cloneElement(button, {
+                          className: button.props.className.replace('w-full ', '')
+                        })
+                      )}
                     </div>
                   );
                 } else {
@@ -884,121 +885,121 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </CardContent>
       </Card>
 
-      {/* Mobile Float Buttons - Only visible on mobile */}
-      {joinButton && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-          <div className="bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 p-4 shadow-2xl">
-            {(() => {
-              const buttons = [];
-              
-              // Get Rewards Button
-              if (joinButton.isClient && joinButton.shouldShowGetRewards) {
-                buttons.push(
-                  <Button 
-                    key="get-rewards"
-                    variant="outline" 
-                    size="lg" 
-                    onClick={joinButton.handleGetRewards}
-                    disabled={joinButton.isGettingRewards}
-                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-                  >
-                    {joinButton.isGettingRewards ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Claiming...
-                      </>
-                    ) : (
-                      <>
-                        <DollarSign className="mr-2 h-5 w-5" />
-                        Get Rewards
-                      </>
-                    )}
-                  </Button>
-                );
-              }
-              
-              // My Account Button
-              if (joinButton.hasJoinedChallenge) {
-                buttons.push(
-                  <Button 
-                    key="my-account"
-                    variant="outline" 
-                    size="lg" 
-                    onClick={joinButton.handleNavigateToAccount}
-                    className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-                  >
-                    <User className="mr-2 h-5 w-5" />
-                    {joinButton.t('myAccount')}
-                  </Button>
-                );
-              }
-              
-              // Join Button
-              if (!joinButton.hasJoinedChallenge && !joinButton.isChallengeEnded) {
-                buttons.push(
-                  <Button 
-                    key="join"
-                    variant="outline" 
-                    size="lg" 
-                    onClick={joinButton.handleJoinChallenge} 
-                    disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                    className={`font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
-                      joinButton.isInsufficientBalance
-                        ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
-                        : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
-                    }`}
-                  >
-                    {joinButton.isJoining ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        {joinButton.t('joining')}
-                      </>
-                    ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Loading...
-                      </>
-                    ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        {joinButton.t('loading')}
-                      </>
-                    ) : joinButton.isInsufficientBalance ? (
-                      <>
-                        <Plus className="mr-2 h-5 w-5" />
-                        Insufficient USDC
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="mr-2 h-5 w-5" />
-                        {joinButton.t('join')}
-                        <UserPlus className="ml-2 h-5 w-5" />
-                      </>
-                    )}
-                  </Button>
-                );
-              }
-              
-              // Return the buttons with appropriate layout
-              if (buttons.length === 1) {
-                return (
-                  <div className="w-full">
-                    {buttons[0]}
-                  </div>
-                );
-              } else if (buttons.length === 2) {
-                return (
-                  <div className="grid grid-cols-2 gap-3">
-                    {buttons}
-                  </div>
-                );
-              } else {
-                return null;
-              }
-            })()}
+              {/* Mobile Float Buttons - Only visible on mobile */}
+        {joinButton && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+            <div className="p-4">
+              {(() => {
+                const buttons = [];
+                
+                // Get Rewards Button
+                if (joinButton.isClient && joinButton.shouldShowGetRewards) {
+                  buttons.push(
+                    <Button 
+                      key="get-rewards"
+                      variant="outline" 
+                      size="lg" 
+                      onClick={joinButton.handleGetRewards}
+                      disabled={joinButton.isGettingRewards}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-yellow-500 hover:border-yellow-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    >
+                      {joinButton.isGettingRewards ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Claiming...
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="mr-2 h-5 w-5" />
+                          Get Rewards
+                        </>
+                      )}
+                    </Button>
+                  );
+                }
+                
+                // My Account Button
+                if (joinButton.hasJoinedChallenge) {
+                  buttons.push(
+                    <Button 
+                      key="my-account"
+                      variant="outline" 
+                      size="lg" 
+                      onClick={joinButton.handleNavigateToAccount}
+                      className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white border-gray-500 hover:border-gray-400 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    >
+                      <User className="mr-2 h-5 w-5" />
+                      {joinButton.t('myAccount')}
+                    </Button>
+                  );
+                }
+                
+                // Join Button
+                if (!joinButton.hasJoinedChallenge && !joinButton.isChallengeEnded) {
+                  buttons.push(
+                    <Button 
+                      key="join"
+                      variant="outline" 
+                      size="lg" 
+                      onClick={joinButton.handleJoinChallenge} 
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
+                      className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
+                        joinButton.isInsufficientBalance
+                          ? "bg-gray-600 hover:bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed" 
+                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                      }`}
+                    >
+                      {joinButton.isJoining ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          {joinButton.t('joining')}
+                        </>
+                      ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Loading...
+                        </>
+                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          {joinButton.t('loading')}
+                        </>
+                      ) : joinButton.isInsufficientBalance ? (
+                        <>
+                          <Plus className="mr-2 h-5 w-5" />
+                          Insufficient USDC
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mr-2 h-5 w-5" />
+                          {joinButton.t('join')}
+                          <UserPlus className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                  );
+                }
+                
+                // Return the buttons with appropriate layout
+                if (buttons.length === 1) {
+                  return buttons[0];
+                } else if (buttons.length === 2) {
+                  return (
+                    <div className="grid grid-cols-2 gap-3">
+                      {buttons.map(button => 
+                        React.cloneElement(button, {
+                          className: button.props.className.replace('w-full ', '')
+                        })
+                      )}
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })()}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   )
 } 
