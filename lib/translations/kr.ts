@@ -51,7 +51,7 @@ export const kr = {
   create: "생성",
   createChallenge: "신규",
   createNewChallenge: "새 챌린지 생성",
-  createProposal: "제안 생성",
+  createProposal: "생성",
   createProposalPage: "제안 생성",
   creating: "생성 중",
   currentTime: "현재 시간",

@@ -51,7 +51,7 @@ export const id = {
   create: "Buat",
   createChallenge: "Baru",
   createNewChallenge: "Buat Tantangan Baru",
-  createProposal: "Buat Proposal",
+  createProposal: "Buat",
   createProposalPage: "Buat Proposal",
   creating: "Membuat",
   currentTime: "Waktu Saat Ini",

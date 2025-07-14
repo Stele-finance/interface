@@ -1096,39 +1096,42 @@ export default function VotePage() {
   }
 
   return (
-    <div className="container mx-auto px-20 py-16">
+    <div className="container mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl text-gray-100">{t('governance')}</h1>
         <div className="flex items-center gap-4">
-          <Button 
-            variant="default" 
-            size="lg"
-            onClick={handleRefresh}
-            disabled={isInitialLoading || isCurrentTabLoading} 
-            className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
-          >
-            {isInitialLoading ? (
-              <>
-                <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                {t('loading')}
-              </>
-            ) : (
-              <>
-                <Clock className="mr-3 h-5 w-5" />
-                {t('refresh')}
-              </>
-            )}
-          </Button>
-          <Link href="/vote/create">
+          {/* Desktop buttons - hidden on mobile */}
+          <div className="hidden md:flex items-center gap-4">
             <Button 
               variant="default" 
               size="lg"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg border-orange-500 hover:border-orange-600"
+              onClick={handleRefresh}
+              disabled={isInitialLoading || isCurrentTabLoading} 
+              className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
             >
-              <Plus className="mr-3 h-5 w-5" />
-              {t('createProposal')}
+              {isInitialLoading ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  {t('loading')}
+                </>
+              ) : (
+                <>
+                  <Clock className="mr-3 h-5 w-5" />
+                  {t('refresh')}
+                </>
+              )}
             </Button>
-          </Link>
+            <Link href="/vote/create">
+              <Button 
+                variant="default" 
+                size="lg"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg border-orange-500 hover:border-orange-600"
+              >
+                <Plus className="mr-3 h-5 w-5" />
+                {t('createProposal')}
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -1143,7 +1146,7 @@ export default function VotePage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <h3 className="text-sm font-medium text-orange-400">{t('delegateRequiredToVote')}</h3>
-                  <p className="text-xs text-gray-400">{t('youNeedToDelegate')}</p>
+                  <p className="text-xs text-gray-400 hidden md:block">{t('youNeedToDelegate')}</p>
                 </div>
                 <Button 
                   variant="outline"
@@ -1170,47 +1173,32 @@ export default function VotePage() {
           
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h3 className="text-base font-medium text-gray-400">{t('connectedWallet')}</h3>
-                <p className="text-base font-mono text-gray-100">{walletAddress}</p>
-              </div>
-              
               {isLoadingWalletTokenInfo ? (
                 <div className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                   <span className="text-base text-gray-400">{t('loadingTokenInfo')}</span>
                 </div>
               ) : walletTokenInfo ? (
-                <div className="text-right space-y-1">
+                <>
                   <div className="text-base">
                     <span className="font-medium text-gray-300">{t('balance')}: </span>
                     <span className="font-mono text-gray-100">{Number(walletTokenInfo.formattedBalance).toLocaleString()} STELE</span>
                   </div>
-                  <div className="text-sm text-gray-400">
-                    <span>{t('delegatedTo')}: </span>
-                    {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
-                      <span className="text-orange-400">{t('notDelegated')}</span>
-                    ) : walletTokenInfo.delegatedTo === walletAddress ? (
-                      <span className="text-green-400">Self</span>
-                    ) : (
-                      <span className="font-mono">{walletTokenInfo.delegatedTo.slice(0, 6)}...{walletTokenInfo.delegatedTo.slice(-4)}</span>
-                    )}
+                  <div className="text-right">
+                    <div className="text-sm text-gray-400">
+                      <span>{t('delegatedTo')}: </span>
+                      {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
+                        <span className="text-orange-400">{t('notDelegated')}</span>
+                      ) : walletTokenInfo.delegatedTo === walletAddress ? (
+                        <span className="text-green-400">Self</span>
+                      ) : (
+                        <span className="font-mono">{walletTokenInfo.delegatedTo.slice(0, 6)}...{walletTokenInfo.delegatedTo.slice(-4)}</span>
+                      )}
+                    </div>
                   </div>
-                  {/* Voting Power Status */}
-                  <div className="text-sm">
-                    {walletTokenInfo.delegatedTo === "0x0000000000000000000000000000000000000000" ? (
-                      <span className="text-orange-400">{t('delegateTokensToVote')}</span>
-                    ) : Number(walletTokenInfo.formattedBalance) > 0 ? (
-                      <span className="text-green-400">✅ {t('readyToVote')}</span>
-                    ) : (
-                      <span className="text-gray-500">{t('noSTELETokens')}</span>
-                    )}
-                  </div>
-                </div>
+                </>
               ) : (
-                <div className="text-right">
-                  <div className="text-base text-gray-400">{t('tokenInfoUnavailable')}</div>
-                </div>
+                <div className="text-base text-gray-400">{t('tokenInfoUnavailable')}</div>
               )}
             </div>
           </CardContent>
@@ -1270,8 +1258,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1356,8 +1344,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1442,8 +1430,8 @@ export default function VotePage() {
                         <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteStart')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('voteEnd')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
                           <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1512,6 +1500,43 @@ export default function VotePage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Mobile Float Buttons - Only visible on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+        <div className="p-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              variant="default" 
+              size="lg"
+              onClick={handleRefresh}
+              disabled={isInitialLoading || isCurrentTabLoading} 
+              className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
+            >
+              {isInitialLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {t('loading')}
+                </>
+              ) : (
+                <>
+                  <Clock className="mr-2 h-5 w-5" />
+                  {t('refresh')}
+                </>
+              )}
+            </Button>
+            <Link href="/vote/create">
+              <Button 
+                variant="default" 
+                size="lg"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base border-orange-500 hover:border-orange-600"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                {t('createProposal')}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   )
 } 

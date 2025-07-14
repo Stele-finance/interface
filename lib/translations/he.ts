@@ -51,7 +51,7 @@ export const he = {
   create: "יצירה",
   createChallenge: "חדש",
   createNewChallenge: "צור אתגר חדש",
-  createProposal: "צור הצעה",
+  createProposal: "יצירה",
   createProposalPage: "צור הצעה",
   creating: "יוצר",
   currentTime: "שעה נוכחית",

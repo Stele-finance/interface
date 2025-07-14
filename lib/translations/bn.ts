@@ -51,7 +51,7 @@ export const bn = {
   create: "তৈরি",
   createChallenge: "নতুন",
   createNewChallenge: "নতুন চ্যালেঞ্জ তৈরি করুন",
-  createProposal: "প্রস্তাব তৈরি করুন",
+  createProposal: "তৈরি",
   createProposalPage: "প্রস্তাব তৈরি করুন",
   creating: "তৈরি করা হচ্ছে",
   currentTime: "বর্তমান সময়",

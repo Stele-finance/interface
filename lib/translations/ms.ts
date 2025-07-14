@@ -51,7 +51,7 @@ export const ms = {
   create: "Cipta",
   createChallenge: "Baru",
   createNewChallenge: "Cipta Cabaran Baru",
-  createProposal: "Cipta Cadangan",
+  createProposal: "Cipta",
   createProposalPage: "Cipta Cadangan",
   creating: "Mencipta",
   currentTime: "Masa Semasa",

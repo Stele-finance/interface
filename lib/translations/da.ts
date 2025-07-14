@@ -51,7 +51,7 @@ export const da = {
   create: "Opret",
   createChallenge: "Ny",
   createNewChallenge: "Opret Ny Udfordring",
-  createProposal: "Opret Forslag",
+  createProposal: "Opret",
   createProposalPage: "Opret Forslag",
   creating: "Opretter",
   currentTime: "Nuværende Tid",

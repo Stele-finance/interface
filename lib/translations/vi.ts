@@ -51,7 +51,7 @@ export const vi = {
   create: "Tạo",
   createChallenge: "Mới",
   createNewChallenge: "Tạo thử thách mới",
-  createProposal: "Tạo đề xuất",
+  createProposal: "Tạo",
   createProposalPage: "Tạo đề xuất",
   creating: "Đang tạo",
   currentTime: "Thời gian hiện tại",

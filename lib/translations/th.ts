@@ -51,7 +51,7 @@ export const th = {
   create: "สร้าง",
   createChallenge: "ใหม่",
   createNewChallenge: "สร้างชาเลนจ์ใหม่",
-  createProposal: "สร้างข้อเสนอ",
+  createProposal: "สร้าง",
   createProposalPage: "สร้างข้อเสนอ",
   creating: "กำลังสร้าง",
   currentTime: "เวลาปัจจุบัน",

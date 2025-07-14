@@ -51,7 +51,7 @@ export const fi = {
   create: "Luo",
   createChallenge: "Uusi",
   createNewChallenge: "Luo Uusi Haaste",
-  createProposal: "Luo Ehdotus",
+  createProposal: "Luo",
   createProposalPage: "Luo Ehdotus",
   creating: "Luodaan",
   currentTime: "Nykyinen Aika",
