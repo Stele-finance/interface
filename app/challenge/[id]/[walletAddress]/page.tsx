@@ -872,8 +872,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         </div>
       )}
 
-      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-12">
-        <div className="max-w-6xl mx-auto space-y-0 sm:space-y-0">
+      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-4">
+        <div className="max-w-6xl mx-auto space-y-2 sm:space-y-0">
           {/* Go to Challenge Button */}
           <div className="px-2 sm:px-0">
           <button 
@@ -888,9 +888,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         {/* Header - Removed buttons as they are now in InvestorCharts */}
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-2 sm:space-y-4">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 

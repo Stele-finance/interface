@@ -61,7 +61,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const { id } = use(params)
   
   return (
-    <div className="container mx-auto p-6 py-20">
+    <div className="container mx-auto p-2 py-12">
       <div className="max-w-6xl mx-auto space-y-4">
         <ChallengeContent challengeId={id} />
       </div>
