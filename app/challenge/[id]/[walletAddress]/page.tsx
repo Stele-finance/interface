@@ -1591,8 +1591,23 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
               
               {/* Swap Assets (when swap mode is active) */}
+              {/* Desktop version - static position */}
               {isSwapMode && (
-                <AssetSwap userTokens={userTokens} />
+                <div className="hidden md:block">
+                  <AssetSwap userTokens={userTokens} />
+                </div>
+              )}
+              
+              {/* Mobile version - floating */}
+              {isSwapMode && (
+                <div className="fixed inset-0 z-50 md:hidden">
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
+                  <div className="fixed bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto">
+                    <div className="bg-gray-900 rounded-t-2xl p-6 shadow-2xl">
+                      <AssetSwap userTokens={userTokens} />
+                    </div>
+                  </div>
+                </div>
               )}
               
               {/* Portfolio Summary (always visible) */}
