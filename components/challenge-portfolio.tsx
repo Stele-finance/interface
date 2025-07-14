@@ -1384,7 +1384,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             <AlertDialogAction 
               onClick={confirmJoinChallenge}
               disabled={isJoining || isLoadingEntryFee || isInsufficientBalance()}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-orange-500 hover:bg-orange-600"
             >
               {isJoining ? (
                 <>

@@ -1019,7 +1019,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
             </div>
           )}
           <Button 
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold h-14 rounded-2xl mt-4" 
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold h-14 rounded-2xl mt-4 border-orange-500 hover:border-orange-600 disabled:border-orange-500/50" 
             size="lg"
             onClick={handleSwapTransaction}
             disabled={(() => {

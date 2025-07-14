@@ -91,7 +91,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
         <Button 
           variant="default" 
           size="lg"
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
         >
           <Plus className="mr-3 h-5 w-5" />
           {t('createChallenge')}

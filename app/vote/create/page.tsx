@@ -740,7 +740,7 @@ export default function CreateProposalPage() {
                 size="lg"
                 onClick={handleCreateProposal}
                 disabled={isSubmitting || !title || !description || (!isCustomProposal && !selectedTemplate)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-12 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg min-w-[200px]"
+                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-12 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg min-w-[200px] border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
               >
                 {isSubmitting ? (
                   <>

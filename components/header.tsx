@@ -487,7 +487,7 @@ export function Header() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="text-primary border-primary hover:bg-primary/10 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                className="bg-orange-500 hover:bg-orange-600 border-orange-500 hover:border-orange-600 text-white font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
               >
                 <Wallet className="mr-2 h-5 w-5" />
                 <span className="text-base">
