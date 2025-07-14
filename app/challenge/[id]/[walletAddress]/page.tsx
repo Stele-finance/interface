@@ -1602,8 +1602,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               {isSwapMode && (
                 <div className="fixed inset-0 z-50 md:hidden">
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
-                  <div className="fixed inset-0 flex items-center justify-center p-4">
-                    <div className="w-full max-w-md max-h-[80vh] overflow-y-auto">
+                  <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
+                    <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                       <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl">
                         <AssetSwap userTokens={userTokens} />
                       </div>
