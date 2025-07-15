@@ -164,8 +164,8 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
         )}
       </div>
       <Card className="bg-transparent border border-gray-700/50">
-        <CardContent className="p-6">
-          <div className="space-y-3">
+        <CardContent className="p-0">
+          <div className="space-y-0">
             {isLoadingRanking ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -225,7 +225,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             )}
           </div>
           {rankingData && totalPages > 1 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="pb-2">
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500">
                   Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
@@ -234,7 +234,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             </div>
           )}
           {rankingData && totalPages <= 1 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="pb-2">
               <div className="text-xs text-gray-500 text-center">
                 Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
               </div>
@@ -1129,11 +1129,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Transactions */}
+        {/* Transactions */}
         <div className="lg:col-span-2">
-          <h2 className="text-3xl text-gray-100 mb-6">{t('recentTransactions')}</h2>
+          <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
           <Card className="bg-transparent border border-gray-700/50">
-            <CardContent className="p-6">
+            <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <div className="min-w-[500px] space-y-4">
                   {isLoadingTransactions ? (
@@ -1196,7 +1196,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         {paginatedTransactions.map((transaction) => (
                           <div 
                             key={transaction.id} 
-                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
+                            className="flex items-center justify-between py-6 px-8 last:border-b-0 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
                             onClick={() => {
                               const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                               window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');

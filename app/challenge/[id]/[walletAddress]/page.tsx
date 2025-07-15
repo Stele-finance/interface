@@ -400,8 +400,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
                       <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
                     </div>
-
-
                   </CardContent>
                 </Card>
 
@@ -1107,36 +1105,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const paginatedTransactions = investorTransactions.slice(startIndex, endIndex);
                           const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                          const getTransactionIcon = (type: string) => {
-                            switch (type) {
-                              case 'join':
-                                return <User className="h-4 w-4 text-white" />
-                              case 'swap':
-                                return <Repeat className="h-4 w-4 text-white" />
-                              case 'register':
-                                return <BarChart3 className="h-4 w-4 text-white" />
-                              case 'reward':
-                                return <Trophy className="h-4 w-4 text-white" />
-                              default:
-                                return <Activity className="h-4 w-4 text-white" />
-                            }
-                          }
-
-                          const getIconColor = (type: string) => {
-                            switch (type) {
-                              case 'join':
-                                return 'bg-blue-500'
-                              case 'swap':
-                                return 'bg-green-500'
-                              case 'register':
-                                return 'bg-orange-500'
-                              case 'reward':
-                                return 'bg-yellow-500'
-                              default:
-                                return 'bg-gray-500'
-                            }
-                          }
-
                           return (
                             <div className="space-y-4">
                               {paginatedTransactions.map((transaction) => (
@@ -1550,7 +1518,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   </CardContent>
                 </Card>
               </TabsContent>
-
             </Tabs>
           </div>
           
