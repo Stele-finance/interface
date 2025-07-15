@@ -1048,7 +1048,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Transactions */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 md:mr-10">
           <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-0">

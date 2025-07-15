@@ -336,7 +336,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
             </div>
             
-                      <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2">
               <CardTitle className="text-4xl text-gray-100">$0</CardTitle>
               {/* Desktop buttons - Show only on desktop */}
               {joinButton && (
@@ -652,7 +652,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           <div className="block md:hidden">
             {/* First row: Challenge title only */}
             <div className="mb-4">
-              <h3 className="text-3xl text-gray-100">Challenge {challengeId}</h3>
+              <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
             </div>
             
             {/* Second row: $3 amount + Hidden buttons for mobile (will be shown in float) */}
@@ -666,160 +666,160 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </div>
           
           {/* Desktop layout */}
-          <div className="hidden md:block">
-          <div className="mb-4">
-            <h3 className="text-3xl text-gray-100">Challenge {challengeId}</h3>
-          </div>
-            
-          <div className="flex items-baseline justify-between gap-3 mt-2">
-            <CardTitle className="text-4xl font-bold text-gray-100">
-            ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-          </CardTitle>
+          <div className="hidden md:block md:mr-6">
+            <div className="mb-4">
+              <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
+            </div>
               
+            <div className="flex items-baseline justify-between gap-3 mt-2">
+              <CardTitle className="text-4xl font-bold text-gray-100">
+              ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </CardTitle>
+                
               {/* Join Button for Desktop */}
               {joinButton && (
-            <div className="flex items-center space-x-2">
-                  {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
-                  {joinButton.isClient && joinButton.shouldShowGetRewards && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={joinButton.handleGetRewards}
-                      disabled={joinButton.isGettingRewards}
-                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                    >
-                      {joinButton.isGettingRewards ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Claiming...
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="mr-2 h-4 w-4" />
-                          Get Rewards
-                        </>
-                      )}
-                    </Button>
-                  )}
-                  
-                  {!joinButton.isConnected ? (
-                    <Dialog open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                        >
-                          <Wallet className="mr-2 h-4 w-4" />
-                          {joinButton.t('connectWallet')}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
-                          <DialogDescription>
-                            {joinButton.t('chooseWalletToConnect')}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <Button
-                            variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('metamask')}
-                            disabled={joinButton.isConnecting}
-                            className="w-full justify-start"
+              <div className="flex items-center space-x-2">
+                    {/* Get Rewards Button - Show when challenge is ended AND current wallet is in top 5 */}
+                    {joinButton.isClient && joinButton.shouldShowGetRewards && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={joinButton.handleGetRewards}
+                        disabled={joinButton.isGettingRewards}
+                        className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      >
+                        {joinButton.isGettingRewards ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Claiming...
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Get Rewards
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    
+                    {!joinButton.isConnected ? (
+                      <Dialog open={joinButton.walletSelectOpen} onOpenChange={joinButton.setWalletSelectOpen}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                           >
-                            {joinButton.isConnecting ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                              <Image 
-                                src="/wallets/small/metamask.png" 
-                                alt="MetaMask"
-                                width={20}
-                                height={20}
-                                className="mr-2"
-                              />
-                            )}
-                            MetaMask
+                            <Wallet className="mr-2 h-4 w-4" />
+                            {joinButton.t('connectWallet')}
                           </Button>
-                          <Button
-                            variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('phantom')}
-                            disabled={joinButton.isConnecting}
-                            className="w-full justify-start"
-                          >
-                            {joinButton.isConnecting ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                              <Image 
-                                src="/wallets/small/phantom.png" 
-                                alt="Phantom"
-                                width={20}
-                                height={20}
-                                className="mr-2"
-                              />
-                            )}
-                            Phantom
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  ) : joinButton.hasJoinedChallenge ? (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={joinButton.handleNavigateToAccount}
-                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      {joinButton.t('myAccount')}
-                    </Button>
-                  ) : !joinButton.isChallengeEnded && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={joinButton.handleJoinChallenge} 
-                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                      className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
-                        joinButton.isInsufficientBalance
-                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
-                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
-                      }`}
-                    >
-                      {joinButton.isJoining ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {joinButton.t('joining')}
-                        </>
-                      ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Loading...
-                        </>
-                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {joinButton.t('loading')}
-                        </>
-                      ) : joinButton.isInsufficientBalance ? (
-                        <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          Insufficient USDC
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="mr-1 h-4 w-4" />
-                          {joinButton.t('join')}
-                          <UserPlus className="ml-1 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-                  )}
-              </div>
-              )}
-          </div>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>{joinButton.t('connectWallet')}</DialogTitle>
+                            <DialogDescription>
+                              {joinButton.t('chooseWalletToConnect')}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <Button
+                              variant="outline"
+                              onClick={() => joinButton.handleConnectWallet('metamask')}
+                              disabled={joinButton.isConnecting}
+                              className="w-full justify-start"
+                            >
+                              {joinButton.isConnecting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Image 
+                                  src="/wallets/small/metamask.png" 
+                                  alt="MetaMask"
+                                  width={20}
+                                  height={20}
+                                  className="mr-2"
+                                />
+                              )}
+                              MetaMask
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => joinButton.handleConnectWallet('phantom')}
+                              disabled={joinButton.isConnecting}
+                              className="w-full justify-start"
+                            >
+                              {joinButton.isConnecting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Image 
+                                  src="/wallets/small/phantom.png" 
+                                  alt="Phantom"
+                                  width={20}
+                                  height={20}
+                                  className="mr-2"
+                                />
+                              )}
+                              Phantom
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : joinButton.hasJoinedChallenge ? (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={joinButton.handleNavigateToAccount}
+                        className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        {joinButton.t('myAccount')}
+                      </Button>
+                    ) : !joinButton.isChallengeEnded && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={joinButton.handleJoinChallenge} 
+                        disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
+                        className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
+                          joinButton.isInsufficientBalance
+                            ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
+                            : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
+                        }`}
+                      >
+                        {joinButton.isJoining ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            {joinButton.t('joining')}
+                          </>
+                        ) : joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            {joinButton.t('loading')}
+                          </>
+                        ) : joinButton.isInsufficientBalance ? (
+                          <>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Insufficient USDC
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="mr-1 h-4 w-4" />
+                            {joinButton.t('join')}
+                            <UserPlus className="ml-1 h-4 w-4" />
+                          </>
+                        )}
+                      </Button>
+                    )}
+                </div>
+                )}
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="px-1 sm:px-6">
+        <CardContent className="px-1 sm:px-6 md:mr-6">
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart 
               data={chartData} 
@@ -883,7 +883,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </CardContent>
         
         {/* Interval selector - Below chart like investor page */}
-        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-12">
           <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
             <button
               onClick={() => setIntervalType('daily')}
@@ -1016,7 +1016,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </CardContent>
       </Card>
 
-              {/* Mobile Float Buttons - Only visible on mobile */}
+        {/* Mobile Float Buttons - Only visible on mobile */}
         {joinButton && !isMobileMenuOpen && (
           <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
             <div className="p-4">

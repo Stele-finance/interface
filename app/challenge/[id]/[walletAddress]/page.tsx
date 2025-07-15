@@ -927,7 +927,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-4">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 
@@ -939,7 +939,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             />
             
             {/* Interval selector */}
-            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8">
               <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                 <button
                   onClick={() => setChartInterval('daily')}
@@ -964,7 +964,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
             </div>
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
@@ -1523,7 +1523,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           
           {/* Right Side - Portfolio Summary / Swap Assets */}
           <div className="lg:col-span-1">
-            <div className="space-y-6 lg:mt-18">
+            <div className="space-y-8 lg:mt-10 md:space-y-4">
               {/* Investor Info Section */}
               <div className="flex items-center justify-between gap-4 mb-4">
                                  {/* Action Buttons and Registered status */}

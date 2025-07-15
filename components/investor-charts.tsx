@@ -486,8 +486,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   return (
     <Card className="bg-transparent border-0">
       <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">
-                  {/* First row: Address, Action Buttons, and Registered status */}
-          <div className="flex items-center justify-between gap-4 mb-1">
+        {/* First row: Address, Action Buttons, and Registered status */}
+        <div className="flex items-center justify-between gap-4 mb-1">
           <div className="flex items-center gap-4">
             <h3 
               className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
@@ -534,14 +534,13 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               </span>
             </div>
           </div>
-          
         </div>
       </CardHeader>
-      <CardContent className="px-2 sm:px-6 pt-0 pb-2 sm:pb-4">
-                <ResponsiveContainer width="100%" height={320}>
+      <CardContent className="px-0 sm:px-0 md:mr-6 pt-0 pb-0 sm:pb-0 -ml-4">
+        <ResponsiveContainer width="100%" height={320}>
           <AreaChart 
             data={chartData} 
-            margin={{ top: 20, right: 10, left: 0, bottom: 0 }}
+            margin={{ top: 20, right: 12, left: 0, bottom: 0 }}
             onMouseMove={(state: any) => {
               if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                 setActiveIndexPortfolio(state.activeTooltipIndex)
