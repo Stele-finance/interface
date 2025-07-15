@@ -21,6 +21,7 @@ import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 
 import { useLanguage } from "@/lib/language-context"
+import { useMobileMenu } from "@/lib/mobile-menu-context"
 
 // Interface for proposal data
 interface Proposal {
@@ -44,6 +45,7 @@ interface Proposal {
 
 export default function VotePage() {
   const { t } = useLanguage()
+  const { isMobileMenuOpen } = useMobileMenu()
   // Use global wallet hook instead of local state
   const { address: walletAddress, isConnected, walletType, network } = useWallet()
   const queryClient = useQueryClient()
@@ -1502,7 +1504,8 @@ export default function VotePage() {
       </Tabs>
 
       {/* Mobile Float Buttons - Only visible on mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+      {!isMobileMenuOpen && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
         <div className="p-4">
           <div className="grid grid-cols-2 gap-3">
             <Button 
@@ -1537,6 +1540,7 @@ export default function VotePage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 } 
