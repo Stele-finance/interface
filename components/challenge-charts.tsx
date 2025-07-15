@@ -484,7 +484,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             <div className="h-80 flex items-center justify-center">
               <p className="text-gray-400">{t('noDataAvailable')}</p>
             </div>
-                    </CardContent>
+          </CardContent>
           
           {/* Interval selector - Below chart like investor page */}
           <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-0">

@@ -634,86 +634,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     }
   };
 
-  // Get challenge title and info from real data
-  const getChallengeTitle = () => {
-    if (challengeData?.challenge) {
-      const challengeType = challengeData.challenge.challengeType;
-      let baseTitle = '';
-      switch(challengeType) {
-        case 0:
-          baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-          break;
-        case 1:
-          baseTitle = `${t('oneMonth')} ${t('challenge')}`;
-          break;
-        case 2:
-          baseTitle = `${t('threeMonths')} ${t('challenge')}`;
-          break;
-        case 3:
-          baseTitle = `${t('sixMonths')} ${t('challenge')}`;
-          break;
-        case 4:
-          baseTitle = `${t('oneYear')} ${t('challenge')}`;
-          break;
-        default:
-          baseTitle = `Challenge Type ${challengeType}`;
-      }
-      return `${baseTitle} ID : ${challengeId}`;
-    }
-    
-    // Fallback to old logic if no data
-    let baseTitle = '';
-    switch(challengeId) {
-      case 'one-week-challenge':
-        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-        break;
-      case 'one-month-challenge':
-        baseTitle = `${t('oneMonth')} ${t('challenge')}`;
-        break;
-      case 'three-month-challenge':
-        baseTitle = `${t('threeMonths')} ${t('challenge')}`;
-        break;
-      case 'six-month-challenge':
-        baseTitle = `${t('sixMonths')} ${t('challenge')}`;
-        break;
-      case 'one-year-challenge':
-        baseTitle = `${t('oneYear')} ${t('challenge')}`;
-        break;
-      default:
-        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-    }
-    return `${baseTitle} (ID: ${challengeId})`;
-  };
-
-  // Get challenge details from real data
-  const getChallengeDetails = () => {
-    if (!isClient || !challengeData?.challenge) {
-      // Return fallback values for SSR and when data is not available
-      return {
-        participants: 0,
-        prize: '$0.00',
-        entryFee: '$10.00',
-        seedMoney: '$1000.00',
-        isActive: false,
-        startTime: new Date(),
-        endTime: new Date(),
-      };
-    }
-    
-    const challenge = challengeData.challenge;
-    return {
-      participants: parseInt(challenge.investorCounter),
-      prize: `$${(parseInt(challenge.rewardAmountUSD) / 1e18).toFixed(2)}`, // Convert from wei to USD
-      entryFee: `$${(parseInt(challenge.entryFee) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-      seedMoney: `$${(parseInt(challenge.seedMoney) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-      isActive: challenge.isActive,
-      startTime: new Date(parseInt(challenge.startTime) * 1000),
-      endTime: new Date(parseInt(challenge.endTime) * 1000),
-    };
-  };
-
-  const challengeDetails = getChallengeDetails();
-
   // Handle Join Challenge - Show modal
   const handleJoinChallenge = () => {
     setShowJoinModal(true);
@@ -1096,36 +1016,34 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      
-
       {/* Challenge Charts */}
-                      <ChallengeCharts 
-                        challengeId={challengeId} 
-                        network={subgraphNetwork} 
-                        joinButton={{
-                          isClient,
-                          shouldShowGetRewards: shouldShowGetRewards(),
-                          hasJoinedChallenge,
-                          isChallengeEnded: isChallengeEnded(),
-                          isJoining,
-                          isLoadingChallenge,
-                          challengeData,
-                          isLoadingEntryFee,
-                          isLoadingBalance,
-                          isInsufficientBalance: isInsufficientBalance(),
-                          isGettingRewards,
-                          handleJoinChallenge,
-                          handleNavigateToAccount,
-                          handleGetRewards,
-                          t,
-                          // Wallet connection props
-                          isConnected,
-                          walletSelectOpen,
-                          setWalletSelectOpen,
-                          isConnecting,
-                          handleConnectWallet
-                        }}
-                      />
+      <ChallengeCharts 
+        challengeId={challengeId} 
+        network={subgraphNetwork} 
+        joinButton={{
+          isClient,
+          shouldShowGetRewards: shouldShowGetRewards(),
+          hasJoinedChallenge,
+          isChallengeEnded: isChallengeEnded(),
+          isJoining,
+          isLoadingChallenge,
+          challengeData,
+          isLoadingEntryFee,
+          isLoadingBalance,
+          isInsufficientBalance: isInsufficientBalance(),
+          isGettingRewards,
+          handleJoinChallenge,
+          handleNavigateToAccount,
+          handleGetRewards,
+          t,
+          // Wallet connection props
+          isConnected,
+          walletSelectOpen,
+          setWalletSelectOpen,
+          isConnecting,
+          handleConnectWallet
+        }}
+      />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1135,7 +1053,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           <Card className="bg-transparent border border-gray-700/50">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <div className="min-w-[500px] space-y-4">
+                <div className="min-w-[500px] space-y-0">
                   {isLoadingTransactions ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -1157,42 +1075,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     const paginatedTransactions = transactions.slice(startIndex, endIndex);
                     const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                    const getTransactionIcon = (type: string) => {
-                      switch (type) {
-                        case 'create':
-                          return <Trophy className="h-4 w-4 text-white" />
-                        case 'join':
-                          return <User className="h-4 w-4 text-white" />
-                        case 'swap':
-                          return <ArrowLeftRight className="h-4 w-4 text-white" />
-                        case 'register':
-                          return <BarChart3 className="h-4 w-4 text-white" />
-                        case 'reward':
-                          return <Trophy className="h-4 w-4 text-white" />
-                        default:
-                          return <Receipt className="h-4 w-4 text-white" />
-                      }
-                    }
-
-                    const getIconColor = (type: string) => {
-                      switch (type) {
-                        case 'create':
-                          return 'bg-purple-500'
-                        case 'join':
-                          return 'bg-blue-500'
-                        case 'swap':
-                          return 'bg-green-500'
-                        case 'register':
-                          return 'bg-orange-500'
-                        case 'reward':
-                          return 'bg-yellow-500'
-                        default:
-                          return 'bg-gray-500'
-                      }
-                    }
-
                     return (
-                      <div className="space-y-4">
+                      <div className="space-y-0">
                         {paginatedTransactions.map((transaction) => (
                           <div 
                             key={transaction.id} 

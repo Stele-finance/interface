@@ -981,8 +981,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-0">
+                    <div className="space-y-0">
                       {userTokens.map((token, index) => {
                         // Get price from Uniswap data
                         const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
@@ -1082,9 +1082,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
               <TabsContent value="transactions" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardContent>
+                  <CardContent className="p-0">
                     <div className="overflow-x-auto">
-                      <div className="min-w-[500px] space-y-4">
+                      <div className="min-w-[500px] space-y-0">
                         {isLoadingTransactions ? (
                           <div className="flex items-center justify-center py-8">
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -1106,7 +1106,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
                           return (
-                            <div className="space-y-4">
+                            <div className="space-y-0">
                               {paginatedTransactions.map((transaction) => (
                                 <div 
                                   key={transaction.id} 
@@ -1274,8 +1274,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
               <TabsContent value="ranking" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-0">
+                    <div className="space-y-0">
                       {isLoadingRanking ? (
                         <div className="flex items-center justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin" />
@@ -1297,7 +1297,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const rankingTotalPages = Math.min(Math.ceil(totalRankingUsers / itemsPerPage), maxPages);
 
                           return (
-                            <div className="space-y-4">
+                            <div className="space-y-0">
                               {paginatedUsers.map((user, paginatedIndex) => {
                                 const actualIndex = rankingStartIndex + paginatedIndex;
                                 const rank = actualIndex + 1;
