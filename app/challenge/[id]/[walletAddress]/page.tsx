@@ -377,6 +377,52 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 {/* Portfolio Summary Loading */}
                 <Card className="bg-gray-900 border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Type and Status Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Type Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Status Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
+                          <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Portfolio Value Loading */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                      <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
+                    </div>
+
+
+                  </CardContent>
+                </Card>
+
+                {/* Challenge Info Loading */}
+                <Card className="bg-gray-900 border-0 rounded-2xl">
+                  <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Challenge and Seed Money Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Challenge Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
+                      </div>
+
+                      {/* Seed Money Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
+                      </div>
+                    </div>
+
                     {/* Progress Loading */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -388,51 +434,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         <div className="h-3 bg-gray-700 rounded w-36 animate-pulse"></div>
                         <div className="h-3 bg-gray-700 rounded w-32 animate-pulse"></div>
                       </div>
-                    </div>
-
-                    {/* Portfolio Value Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
-                    </div>
-
-                    {/* Gain/Loss Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-44 animate-pulse"></div>
-                      <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
-                    </div>
-
-                    {/* Status Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
-                        <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Challenge Info Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
-                  <CardContent className="p-8 space-y-8">
-                    {/* Challenge Type Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-32 animate-pulse"></div>
-                    </div>
-
-                    {/* Challenge ID Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
-                    </div>
-
-                    {/* Seed Money Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -524,27 +525,63 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 {/* Portfolio Summary Loading */}
                 <Card className="bg-gray-900 border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Type and Status Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Type Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Status Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
+                          <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Portfolio Value Loading */}
                     <div className="space-y-2">
                       <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
                       <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
                     </div>
 
-                    {/* Gain/Loss Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-44 animate-pulse"></div>
-                    </div>
+
                   </CardContent>
                 </Card>
 
                 {/* Challenge Info Loading */}
                 <Card className="bg-gray-900 border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
-                    {/* Challenge Type Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-32 animate-pulse"></div>
+                    {/* Row 1: Challenge and Seed Money Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Challenge Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
+                      </div>
+
+                      {/* Seed Money Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
+                      </div>
+                    </div>
+
+                    {/* Progress Loading */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        <div className="h-4 bg-gray-700 rounded w-8 animate-pulse"></div>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2 animate-pulse"></div>
+                      <div className="flex justify-between">
+                        <div className="h-3 bg-gray-700 rounded w-36 animate-pulse"></div>
+                        <div className="h-3 bg-gray-700 rounded w-32 animate-pulse"></div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -910,7 +947,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   onClick={() => setChartInterval('daily')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     chartInterval === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                   }`}
                 >
@@ -920,7 +957,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   onClick={() => setChartInterval('weekly')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     chartInterval === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                   }`}
                 >
@@ -946,9 +983,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">{t('tokenHoldings')}</CardTitle>
-                  </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {userTokens.map((token, index) => {
@@ -1050,9 +1084,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
               <TabsContent value="transactions" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">{t('recentTransactions')}</CardTitle>
-                  </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
                       <div className="min-w-[500px] space-y-4">
@@ -1275,9 +1306,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
               <TabsContent value="ranking" className="space-y-4">
                 <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">Ranking</CardTitle>
-                  </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {isLoadingRanking ? (
@@ -1528,7 +1556,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           
           {/* Right Side - Portfolio Summary / Swap Assets */}
           <div className="lg:col-span-1">
-            <div className="space-y-4 lg:mt-18">
+            <div className="space-y-6 lg:mt-18">
               {/* Investor Info Section */}
               <div className="flex items-center justify-between gap-4 mb-4">
                                  {/* Action Buttons and Registered status */}
@@ -1617,104 +1645,108 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               {/* Portfolio Summary (always visible) */}
               <Card className="bg-gray-900 border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
-                  {/* Status */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('status')}</span>
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        // Always show network icon regardless of status
-                        const networkIcon = network === 'ethereum' ? (
-                          <Image 
-                            src="/networks/small/ethereum.png" 
-                            alt="Ethereum Mainnet"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        ) : network === 'arbitrum' ? (
-                          <Image 
-                            src="/networks/small/arbitrum.png" 
-                            alt="Arbitrum One"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        ) : (
-                          // Default to Ethereum icon if network is not recognized
-                          <Image 
-                            src="/networks/small/ethereum.png" 
-                            alt="Ethereum Mainnet"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        );
+                  {/* Row 1: Type and Status */}
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Type */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('type')}</span>
+                      <div className="text-3xl text-white">
+                        {(() => {
+                          const challengeType = challengeData?.challenge?.challengeType
+                          switch (challengeType) {
+                            case 0:
+                              return t('oneWeek');
+                            case 1:
+                              return t('oneMonth');
+                            case 2:
+                              return t('threeMonths');
+                            case 3:
+                              return t('sixMonths');
+                            case 4:
+                              return t('oneYear');
+                            default:
+                              return challengeType !== undefined ? `Type ${challengeType}` : `Type ${challengeId}`;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {/* Status */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('status')}</span>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          // Always show network icon regardless of status
+                          const networkIcon = network === 'ethereum' ? (
+                            <Image 
+                              src="/networks/small/ethereum.png" 
+                              alt="Ethereum Mainnet"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          ) : network === 'arbitrum' ? (
+                            <Image 
+                              src="/networks/small/arbitrum.png" 
+                              alt="Arbitrum One"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          ) : (
+                            // Default to Ethereum icon if network is not recognized
+                            <Image 
+                              src="/networks/small/ethereum.png" 
+                              alt="Ethereum Mainnet"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          );
 
-                        // If investor is closed, show as Finished
-                        if (investorData?.investor?.isRegistered === true) {
+                          // If investor is closed, show as Finished
+                          if (investorData?.investor?.isRegistered === true) {
+                            return (
+                              <>
+                                <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                                  {networkIcon}
+                                </div>
+                                <span className="text-3xl text-red-400">{t('finished')}</span>
+                              </>
+                            )
+                          }
+                          // Otherwise show challenge active status
+                          const isActive = challengeData?.challenge?.isActive
                           return (
                             <>
                               <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
                                 {networkIcon}
                               </div>
-                              <span className="text-xl font-medium text-red-400">{t('finished')}</span>
+                              <span className={`text-3xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
+                                {isActive ? t('active') : 'Pending reward'}
+                              </span>
                             </>
                           )
-                        }
-                        // Otherwise show challenge active status
-                        const isActive = challengeData?.challenge?.isActive
-                        return (
-                          <>
-                            <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
-                              {networkIcon}
-                            </div>
-                            <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
-                              {isActive ? t('active') : 'Pending reward'}
-                            </span>
-                          </>
-                        )
-                      })()}
+                        })()}
+                      </div>
                     </div>
                   </div>
 
                   {/* Portfolio Value */}
                   <div className="space-y-2">
                     <span className="text-base text-gray-400">{t('onChainValue')}</span>
-                    <div className="text-4xl text-white">
-                      ${currentValue.toFixed(2)}
-                    </div>
-                    {/* Real-time portfolio value */}
-                    {realTimePortfolio && (
-                      <div className="space-y-1">
-                        <div className="text-base text-green-400 flex items-center gap-2">
-                          <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-{t('live')}: ${realTimePortfolio.totalValue.toFixed(2)}
-                        </div>
-                      </div>
-                    )}
-                    {isLoadingUniswap && (
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-{t('loadingLivePrices')}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Gain/Loss */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('gainLoss')}</span>
-                    <div className="flex items-baseline gap-3">
-                      <div className={`text-4xl ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
+                    <div className="flex items-baseline gap-1">
+                      <div className="text-4xl text-white">
+                        ${currentValue.toFixed(2)}
                       </div>
                       <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                         ({isPositive ? '+' : ''}{gainLossPercentage.toFixed(2)}%)
                       </div>
                     </div>
-                    {/* Real-time gain/loss */}
+                    {/* Real-time portfolio value */}
                     {realTimePortfolio && (
                       <div className="space-y-1">
                         {(() => {
@@ -1723,17 +1755,23 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const isRealTimePositive = realTimeGainLoss >= 0
                           
                           return (
-                            <div>
-                              <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
-                                <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-{t('live')}: {isRealTimePositive ? '+' : ''}${realTimeGainLoss.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
-                              </div>
+                            <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
+                              <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
+                              {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
                             </div>
                           )
                         })()}
                       </div>
                     )}
+                    {isLoadingUniswap && (
+                      <div className="text-sm text-gray-500 flex items-center gap-1">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+                        {t('loadingLivePrices')}
+                      </div>
+                    )}
                   </div>
+
+
 
 
                 </CardContent>
@@ -1742,51 +1780,30 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               {/* Challenge Info */}
               <Card className="bg-gray-900 border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
-                  {/* Challenge Type */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('challengeType')}</span>
-                    <div className="text-3xl text-white">
-                      {(() => {
-                        const challengeType = challengeData?.challenge?.challengeType
-                        switch (challengeType) {
-                          case 0:
-                            return t('oneWeek');
-                          case 1:
-                            return t('oneMonth');
-                          case 2:
-                            return t('threeMonths');
-                          case 3:
-                            return t('sixMonths');
-                          case 4:
-                            return t('oneYear');
-                          default:
-                            return challengeType !== undefined ? `Type ${challengeType}` : `Type ${challengeId}`;
-                        }
-                      })()}
+                  {/* Row 1: Challenge ID and Seed Money */}
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Challenge ID */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('challenge')}</span>
+                      <div className="text-3xl text-white">
+                        {challengeId}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Challenge ID */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('challengeId')}</span>
-                    <div className="text-3xl text-white">
-                      {challengeId}
-                    </div>
-                  </div>
-
-                  {/* Seed Money */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('seedMoney')}</span>
-                    <div className="text-3xl text-white">
-                      {(() => {
-                        // If we have challenge data and seedMoney is available
-                        if (challengeData?.challenge?.seedMoney) {
-                          const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                          return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
-                        }
-                        // Default fallback
-                        return '$0';
-                      })()}
+                    {/* Seed Money */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('seedMoney')}</span>
+                      <div className="text-3xl text-white">
+                        {(() => {
+                          // If we have challenge data and seedMoney is available
+                          if (challengeData?.challenge?.seedMoney) {
+                            const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
+                            return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
+                          }
+                          // Default fallback
+                          return '$0';
+                        })()}
+                      </div>
                     </div>
                   </div>
 
@@ -1850,8 +1867,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
-                      <span>{t('voteStart')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
-                      <span>{t('voteEnd')}: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('start')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>End: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
                     </div>
                   </div>
                 </CardContent>
