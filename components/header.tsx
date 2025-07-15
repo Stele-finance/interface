@@ -618,12 +618,12 @@ export function Header() {
           
           {/* Menu Panel */}
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
-            <div className="p-4 pb-6">
+            <div className="p-4 pb-4">
               {/* Handle Bar */}
               <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-4"></div>
               
               {/* Menu Items */}
-              <div className="space-y-1 mb-6">
+              <div className="space-y-1 mb-4">
                 <Link 
                   href="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -685,7 +685,7 @@ export function Header() {
               <div className="border-t border-border mb-4"></div>
                
                {/* Icon Links - displayed horizontally */}
-              <div className="flex items-center justify-center gap-8 px-4 py-2">
+              <div className="flex items-center justify-center gap-8 px-4 py-0">
                 <Link 
                   href="https://github.com/Stele-finance/interface"
                   target="_blank"
@@ -722,8 +722,8 @@ export function Header() {
                 </LanguageSelectorSidebar>
                </div>
                
-               {/* Empty space where language used to be */}
-               <div className="h-8"></div>
+               {/* Reduced empty space */}
+               <div className="h-6"></div>
              </div>
            </div>
         </>
