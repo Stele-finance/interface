@@ -487,13 +487,13 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                     </CardContent>
           
           {/* Interval selector - Below chart like investor page */}
-          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-0">
             <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
               <button
                 onClick={() => setIntervalType('daily')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                   intervalType === 'daily' 
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                 }`}
               >
@@ -503,7 +503,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 onClick={() => setIntervalType('weekly')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                   intervalType === 'weekly' 
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                 }`}
               >
@@ -889,7 +889,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               onClick={() => setIntervalType('daily')}
               className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                 intervalType === 'daily' 
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
               }`}
             >
@@ -899,7 +899,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               onClick={() => setIntervalType('weekly')}
               className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                 intervalType === 'weekly' 
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
               }`}
             >
@@ -966,7 +966,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             {/* Total Prize */}
             <div className="space-y-2">
               <span className="text-base text-gray-400">{t('totalPrize')}</span>
-              <div className="text-4xl text-yellow-400">
+              <div className="text-4xl text-white">
                 ${challengeDetails.totalPrize >= 1000000 
                   ? `${(challengeDetails.totalPrize / 1000000).toFixed(1)}M` 
                   : challengeDetails.totalPrize >= 1000 

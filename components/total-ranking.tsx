@@ -88,7 +88,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   const rankings = rankingData || []
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn("space-y-4 mt-6", className)}>
       <div className="flex items-center gap-2">
         <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
       </div>

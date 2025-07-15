@@ -86,7 +86,7 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
   const tokens = tokensData?.investableTokens || []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 mt-6">
       <div className="flex items-center gap-3">
         <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
         <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
