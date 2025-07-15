@@ -41,6 +41,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSelectorSidebar } from "./language-selector-sidebar"
 import { useToast } from "@/components/ui/use-toast"
+import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 
 type WalletType = 'metamask' | 'phantom' | null
@@ -50,6 +51,7 @@ export function Header() {
   const router = useRouter()
   const { t, language, setLanguage } = useLanguage()
   const { toast } = useToast()
+  const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   
   // Use global wallet hook
   const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType } = useWallet()
@@ -59,7 +61,6 @@ export function Header() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   // Track previous network and wallet address for detecting changes
   const prevNetworkRef = useRef<string | null>(null)
@@ -285,7 +286,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="lg"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-3 md:hidden"
         >
           <Menu className="h-10 w-10" />
@@ -607,12 +608,12 @@ export function Header() {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
+      {isMobileMenuOpen && (
         <>
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={() => setIsMobileMenuOpen(false)}
           />
           
           {/* Menu Panel */}
@@ -625,7 +626,7 @@ export function Header() {
               <div className="space-y-1 mb-6">
                 <Link 
                   href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname === "/" || pathname === "/dashboard"
@@ -639,7 +640,7 @@ export function Header() {
                 
                 <Link 
                   href="/challenges"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/challenges") || pathname.includes("/challenge/")
@@ -653,7 +654,7 @@ export function Header() {
                 
                 <Link 
                   href="/portfolio"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/portfolio")
@@ -667,7 +668,7 @@ export function Header() {
                 
                 <Link 
                   href="/vote"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
                     pathname.includes("/vote")
@@ -683,47 +684,46 @@ export function Header() {
                              {/* Separator */}
               <div className="border-t border-border mb-4"></div>
                
-               {/* Links */}
-              <div className="space-y-1">
+               {/* Icon Links - displayed horizontally */}
+              <div className="flex items-center justify-center gap-8 px-4 py-2">
                 <Link 
                   href="https://github.com/Stele-finance/interface"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <Github className="h-4 w-4 mr-3" />
-                  {t('github')}
+                  <Github className="h-5 w-5" />
                 </Link>
                 
                 <Link 
                   href="#"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <FileText className="h-4 w-4 mr-3" />
-                  {t('doc')}
+                  <FileText className="h-5 w-5" />
                 </Link>
                 
-                                 <Link 
-                   href="https://x.com/stelefinance"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   onClick={() => setMobileMenuOpen(false)}
-                   className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                 >
-                   <Twitter className="h-4 w-4 mr-3" />
-                   X
-                 </Link>
+                <Link 
+                  href="https://x.com/stelefinance"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <Twitter className="h-5 w-5" />
+                </Link>
                  
-                 {/* Language Selector */}
-                 <LanguageSelectorSidebar>
-                   <div className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
-                     <Languages className="h-4 w-4 mr-3" />
-                     {t('language')}
-                   </div>
-                 </LanguageSelectorSidebar>
+                {/* Language Selector */}
+                <LanguageSelectorSidebar>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
+                    <Languages className="h-5 w-5" />
+                  </div>
+                </LanguageSelectorSidebar>
                </div>
+               
+               {/* Empty space where language used to be */}
+               <div className="h-8"></div>
              </div>
            </div>
         </>

@@ -4,6 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
+import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
@@ -55,6 +56,7 @@ interface ChallengeChartsProps {
 
 export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeChartsProps) {
   const { t } = useLanguage()
+  const { isMobileMenuOpen } = useMobileMenu()
   const { network: walletNetwork } = useWallet()
   const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
@@ -523,7 +525,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </Card>
 
         {/* Mobile Float Buttons - Only visible on mobile (Error State) */}
-        {joinButton && (
+        {joinButton && !isMobileMenuOpen && (
           <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
             <div className="p-4">
               {(() => {
@@ -1015,7 +1017,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
       </Card>
 
               {/* Mobile Float Buttons - Only visible on mobile */}
-        {joinButton && (
+        {joinButton && !isMobileMenuOpen && (
           <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
             <div className="p-4">
               {(() => {

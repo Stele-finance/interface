@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
 import { LanguageProvider } from "@/lib/language-context"
+import { MobileMenuProvider } from "@/lib/mobile-menu-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -35,13 +36,15 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <LanguageProvider>
               <EntryFeeProvider>
-                <div className="flex flex-col min-h-screen">
-                  <Header />
+                <MobileMenuProvider>
+                  <div className="flex flex-col min-h-screen">
+                    <Header />
 
-                  <main className="flex-1 p-4 md:p-6">
-                    {children}
-                  </main>
-                </div>
+                    <main className="flex-1 p-4 md:p-6">
+                      {children}
+                    </main>
+                  </div>
+                </MobileMenuProvider>
               </EntryFeeProvider>
             </LanguageProvider>
           </ThemeProvider>

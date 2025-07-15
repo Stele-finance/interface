@@ -35,6 +35,7 @@ import {
 import { AssetSwap } from "@/components/asset-swap"
 import { InvestorCharts } from "@/components/investor-charts"
 import { useLanguage } from "@/lib/language-context"
+import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/subgraph/Account"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
@@ -66,6 +67,7 @@ interface InvestorPageProps {
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
+  const { isMobileMenuOpen } = useMobileMenu()
   const { id: challengeId, walletAddress } = use(params)
   const router = useRouter()
   
@@ -1861,7 +1863,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         {/* Mobile Float Buttons - Only visible on mobile */}
         {connectedAddress && walletAddress && 
           connectedAddress.toLowerCase() === walletAddress.toLowerCase() && 
-          investorData?.investor?.isRegistered !== true && (
+          investorData?.investor?.isRegistered !== true && 
+          !isMobileMenuOpen && (
           <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
             <div className="p-4">
               {(() => {

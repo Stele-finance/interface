@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
+import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
@@ -247,6 +248,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
 
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { t } = useLanguage()
+  const { isMobileMenuOpen } = useMobileMenu()
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
