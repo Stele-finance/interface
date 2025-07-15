@@ -684,47 +684,46 @@ export function Header() {
                              {/* Separator */}
               <div className="border-t border-border mb-4"></div>
                
-               {/* Links */}
-              <div className="space-y-1">
+               {/* Icon Links - displayed horizontally */}
+              <div className="flex items-center justify-center gap-8 px-4 py-2">
                 <Link 
                   href="https://github.com/Stele-finance/interface"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <Github className="h-4 w-4 mr-3" />
-                  {t('github')}
+                  <Github className="h-5 w-5" />
                 </Link>
                 
                 <Link 
                   href="#"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <FileText className="h-4 w-4 mr-3" />
-                  {t('doc')}
+                  <FileText className="h-5 w-5" />
                 </Link>
                 
-                                 <Link 
-                   href="https://x.com/stelefinance"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   onClick={() => setIsMobileMenuOpen(false)}
-                   className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                 >
-                   <Twitter className="h-4 w-4 mr-3" />
-                   X
-                 </Link>
+                <Link 
+                  href="https://x.com/stelefinance"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <Twitter className="h-5 w-5" />
+                </Link>
                  
-                 {/* Language Selector */}
-                 <LanguageSelectorSidebar>
-                   <div className="flex items-center px-4 py-2 rounded-2xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
-                     <Languages className="h-4 w-4 mr-3" />
-                     {t('language')}
-                   </div>
-                 </LanguageSelectorSidebar>
+                {/* Language Selector */}
+                <LanguageSelectorSidebar>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer">
+                    <Languages className="h-5 w-5" />
+                  </div>
+                </LanguageSelectorSidebar>
                </div>
+               
+               {/* Empty space where language used to be */}
+               <div className="h-8"></div>
              </div>
            </div>
         </>
