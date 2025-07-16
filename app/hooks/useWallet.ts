@@ -83,11 +83,13 @@ const detectWalletFromProvider = (provider: any): 'metamask' | 'phantom' | null 
 
 // Main useWallet hook
 export const useWallet = () => {
-  // Always call hooks in the same order
+  // Local loading state for this hook instance
   const [isLoading, setIsLoading] = useState(false)
+  const [localState, setLocalState] = useState(globalWalletState)
   
   // Safely handle AppKit hooks with individual try-catch
   let appKitOpen: (() => void) | null = null
+  let appKitDisconnect: (() => Promise<void>) | null = null
   let appKitAddress: string | undefined = undefined
   let appKitIsConnected: boolean = false
   let appKitChainId: number | undefined = undefined
@@ -122,6 +124,12 @@ export const useWallet = () => {
     // console.warn('useAppKitProvider not available:', error)
   }
 
+  // Subscribe to global state changes
+  useEffect(() => {
+    const unsubscribe = subscribe(setLocalState)
+    return unsubscribe
+  }, [])
+
   // Initialize from storage on mount
   useEffect(() => {
     initializeFromStorage()
@@ -145,6 +153,7 @@ export const useWallet = () => {
 
     const walletType = appKitIsConnected ? 'walletconnect' : null
     
+    // Update global state immediately when AppKit state changes
     updateGlobalState({
       address: appKitAddress,
       isConnected: appKitIsConnected,
@@ -154,80 +163,91 @@ export const useWallet = () => {
     })
   }, [appKitAddress, appKitIsConnected, appKitChainId, appKitWalletProvider])
 
+
+
   // Connect wallet function
   const connectWallet = useCallback(async (selectedWalletType: 'metamask' | 'phantom' | 'walletconnect') => {
     if (selectedWalletType === 'walletconnect') {
-      setIsLoading(true)
       try {
         if (appKitOpen) {
           appKitOpen()
+          return { success: true }
         } else {
           throw new Error('AppKit not initialized')
         }
-        return { success: true }
       } catch (error) {
         console.error('Failed to open AppKit modal:', error)
         throw error
-      } finally {
-        setIsLoading(false)
       }
-         } else if (selectedWalletType === 'metamask') {
-       // Direct MetaMask connection
-       if (typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask) {
-         try {
-           setIsLoading(true)
-           const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' })
-           if (accounts && accounts.length > 0) {
-             updateGlobalState({
-               address: accounts[0],
-               isConnected: true,
-               walletType: 'metamask',
-               connectedWallet: 'metamask',
-               network: 'ethereum'
-             })
-             return { address: accounts[0], network: 'ethereum' }
-           }
-         } catch (error) {
-           console.error('MetaMask connection failed:', error)
-           throw error
-         } finally {
-           setIsLoading(false)
-         }
-       } else {
-         throw new Error('MetaMask is not installed')
-       }
-     } else if (selectedWalletType === 'phantom') {
-       // Direct Phantom connection
-       if (typeof window !== 'undefined' && (window as any).phantom?.ethereum) {
-         try {
-           setIsLoading(true)
-           const phantomProvider = (window as any).phantom.ethereum
-           const accounts = await phantomProvider.request({ method: 'eth_requestAccounts' })
-           if (accounts && accounts.length > 0) {
-             updateGlobalState({
-               address: accounts[0],
-               isConnected: true,
-               walletType: 'phantom',
-               connectedWallet: 'phantom',
-               network: 'ethereum'
-             })
-             return { address: accounts[0], network: 'ethereum' }
-           }
-         } catch (error) {
-           console.error('Phantom connection failed:', error)
-           throw error
-         } finally {
-           setIsLoading(false)
-         }
-       } else {
-         throw new Error('Phantom is not installed')
-       }
+    } else if (selectedWalletType === 'metamask') {
+      // Direct MetaMask connection
+      if (typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask) {
+        try {
+          setIsLoading(true)
+          const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+          if (accounts && accounts.length > 0) {
+            updateGlobalState({
+              address: accounts[0],
+              isConnected: true,
+              walletType: 'metamask',
+              connectedWallet: 'metamask',
+              network: 'ethereum'
+            })
+            return { address: accounts[0], network: 'ethereum' }
+          }
+        } catch (error) {
+          console.error('MetaMask connection failed:', error)
+          throw error
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        throw new Error('MetaMask is not installed')
+      }
+    } else if (selectedWalletType === 'phantom') {
+      // Direct Phantom connection
+      if (typeof window !== 'undefined' && (window as any).phantom?.ethereum) {
+        try {
+          setIsLoading(true)
+          const phantomProvider = (window as any).phantom.ethereum
+          const accounts = await phantomProvider.request({ method: 'eth_requestAccounts' })
+          if (accounts && accounts.length > 0) {
+            updateGlobalState({
+              address: accounts[0],
+              isConnected: true,
+              walletType: 'phantom',
+              connectedWallet: 'phantom',
+              network: 'ethereum'
+            })
+            return { address: accounts[0], network: 'ethereum' }
+          }
+        } catch (error) {
+          console.error('Phantom connection failed:', error)
+          throw error
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        throw new Error('Phantom is not installed')
+      }
     }
-     }, [appKitOpen])
+  }, [appKitOpen])
 
   // Disconnect wallet function
   const disconnectWallet = useCallback(async () => {
     try {
+      // For WalletConnect, trigger AppKit disconnect if connected
+      if (globalWalletState.walletType === 'walletconnect' && appKitIsConnected) {
+        try {
+          // Try to disconnect from AppKit
+          if (typeof window !== 'undefined' && (window as any).appKit) {
+            await (window as any).appKit.disconnect()
+          }
+        } catch (appKitError) {
+          console.warn('Failed to disconnect from AppKit:', appKitError)
+        }
+      }
+      
       // Clear global state
       updateGlobalState({
         address: null,
@@ -244,9 +264,9 @@ export const useWallet = () => {
     } catch (error) {
       console.error('Failed to disconnect:', error)
     }
-  }, [])
+  }, [appKitIsConnected])
 
-    // Switch network function
+  // Switch network function
   const switchNetwork = useCallback(async (targetNetwork: 'ethereum' | 'arbitrum') => {
     if (!appKitWalletProvider) {
       throw new Error('No wallet connected')
@@ -283,7 +303,7 @@ export const useWallet = () => {
     }
   }, [appKitWalletProvider])
 
-       // Get provider function
+  // Get provider function
   const getProvider = useCallback(() => {
     if (appKitWalletProvider) {
       return new BrowserProvider(appKitWalletProvider as any)
@@ -292,12 +312,12 @@ export const useWallet = () => {
   }, [appKitWalletProvider])
 
   return {
-    // State
-    address: globalWalletState.address,
-    isConnected: globalWalletState.isConnected,
-    network: globalWalletState.network,
-    walletType: globalWalletState.walletType,
-    connectedWallet: globalWalletState.connectedWallet,
+    // State from local state (subscribed to global)
+    address: localState.address,
+    isConnected: localState.isConnected,
+    network: localState.network,
+    walletType: localState.walletType,
+    connectedWallet: localState.connectedWallet,
     isLoading,
     
     // Functions
