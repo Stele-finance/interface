@@ -1,17 +1,31 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Wallet, Loader2 } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
+import { getWalletLogo } from "@/lib/utils"
+import Image from "next/image"
+
+type WalletType = 'metamask' | 'phantom' | 'walletconnect' | null
 
 export default function PortfolioPage() {
   const { t } = useLanguage()
   const router = useRouter()
   const { address, isConnected, connectWallet } = useWallet()
+  const [walletSelectOpen, setWalletSelectOpen] = useState(false)
+  const [isConnecting, setIsConnecting] = useState(false)
 
   useEffect(() => {
     // If wallet is already connected, redirect to portfolio page
@@ -20,12 +34,18 @@ export default function PortfolioPage() {
     }
   }, [isConnected, address, router])
 
-  const handleConnectWallet = async () => {
+  const handleConnectWallet = async (selectedWalletType: WalletType) => {
+    if (!selectedWalletType) return
+    
     try {
-      await connectWallet()
+      setIsConnecting(true)
+      await connectWallet(selectedWalletType)
+      setWalletSelectOpen(false)
     } catch (error: any) {
       console.error("Error connecting wallet:", error)
       alert(error.message || "Failed to connect wallet")
+    } finally {
+      setIsConnecting(false)
     }
   }
 
@@ -63,13 +83,83 @@ export default function PortfolioPage() {
                     {t('connectToAccess')}
                   </p>
                   
-                  <Button 
-                    onClick={handleConnectWallet}
-                    className="bg-blue-500 hover:bg-blue-600 text-white"
-                  >
-                    <Wallet className="mr-2 h-4 w-4" />
-                    {t('connectPhantomWallet')}
-                  </Button>
+                  <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        {t('connectWallet')}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+                      <DialogHeader>
+                        <DialogTitle>{t('connectWallet')}</DialogTitle>
+                        <DialogDescription>
+                          {t('selectWalletToConnect')}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid grid-cols-1 gap-4 py-4">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                          onClick={() => handleConnectWallet('metamask')}
+                          disabled={isConnecting}
+                        >
+                          <Image 
+                            src={getWalletLogo('metamask')} 
+                            alt="MetaMask"
+                            width={24}
+                            height={24}
+                            style={{ width: 'auto', height: '24px' }}
+                          />
+                          <div className="text-left">
+                            <div className="font-semibold">MetaMask</div>
+                            <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
+                          </div>
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                          onClick={() => handleConnectWallet('phantom')}
+                          disabled={isConnecting}
+                        >
+                          <Image 
+                            src={getWalletLogo('phantom')} 
+                            alt="Phantom"
+                            width={24}
+                            height={24}
+                            style={{ width: 'auto', height: '24px' }}
+                          />
+                          <div className="text-left">
+                            <div className="font-semibold">Phantom</div>
+                            <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
+                          </div>
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                          onClick={() => handleConnectWallet('walletconnect')}
+                          disabled={isConnecting}
+                        >
+                          <Image 
+                            src={getWalletLogo('walletconnect')} 
+                            alt="WalletConnect"
+                            width={24}
+                            height={24}
+                            style={{ width: 'auto', height: '24px' }}
+                          />
+                          <div className="text-left">
+                            <div className="font-semibold">WalletConnect</div>
+                            <div className="text-sm text-muted-foreground">Mobile Wallets</div>
+                          </div>
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               )}
             </CardContent>

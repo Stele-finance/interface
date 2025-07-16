@@ -593,6 +593,7 @@ export function useWallet() {
         // WalletConnect connection
         try {
           // Check if WalletConnect project ID is configured
+          console.log('WalletConnect Project ID:', WALLETCONNECT_PROJECT_ID ? 'Configured' : 'Not configured')
           if (!WALLETCONNECT_PROJECT_ID) {
             throw new Error('WalletConnect project ID is not configured. Please refer to WALLETCONNECT_SETUP.md file to set up environment variables.')
           }
