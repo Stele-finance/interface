@@ -305,7 +305,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
   if (isLoading || weeklyIsLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
+        <Card className="bg-muted border-gray-700/50 lg:col-span-2">
           <CardHeader>
             <div className="h-8 bg-gray-700 rounded animate-pulse"></div>
             <div className="h-4 bg-gray-700 rounded animate-pulse mt-2 w-2/3"></div>
@@ -314,7 +314,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             <div className="h-80 bg-gray-700 rounded animate-pulse"></div>
           </CardContent>
         </Card>
-        <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-1">
+        <Card className="bg-muted border-gray-700/50 lg:col-span-1">
           <CardHeader>
             <div className="h-8 bg-gray-700 rounded animate-pulse"></div>
             <div className="h-4 bg-gray-700 rounded animate-pulse mt-2 w-2/3"></div>
@@ -330,7 +330,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
   if ((error && intervalType === 'daily') || (weeklyError && intervalType === 'weekly') || (!data?.challengeSnapshots && intervalType === 'daily') || (!weeklyData?.challengeWeeklySnapshots && intervalType === 'weekly') || chartData.length === 0) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-2">
+        <Card className="bg-muted border-gray-700/50 lg:col-span-2">
           <CardHeader>
             <div className="mb-2">
               <h3 className="text-3xl text-gray-100">{t('totalPrize')}</h3>
@@ -513,7 +513,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </div>
         </Card>
         
-        <Card className="bg-gray-900/50 border-gray-700/50 lg:col-span-1">
+        <Card className="bg-muted border-gray-700/50 lg:col-span-1">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-100">Challenge Info</CardTitle>
           </CardHeader>
@@ -910,7 +910,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
       </Card>
 
       {/* Challenge Info Card */}
-      <Card className="bg-gray-900 border-0 lg:col-span-1 rounded-2xl h-fit lg:mt-8">
+      <Card className="bg-muted border-0 lg:col-span-1 rounded-2xl h-fit lg:mt-8">
         <CardContent className="p-8 space-y-10">
           {/* Row 1: Type and Status */}
           <div className="grid grid-cols-2 gap-6">

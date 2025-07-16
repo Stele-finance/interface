@@ -524,12 +524,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
           />
         </div>
 
-      <Card className="bg-transparent border border-gray-700/50">
+      <Card className="rounded-2xl overflow-hidden bg-muted/40">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+                <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80">
                   <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
                   <TableHead className="text-gray-300 w-20">{t('challenge')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>

@@ -1139,7 +1139,7 @@ export default function VotePage() {
 
       {/* Wallet Token Info Card */}
       {isConnected && (
-        <Card className="mb-6 bg-gray-900/50 border-0">
+        <Card className="mb-6 bg-muted/80 border-0">
           {/* Delegate Button - Show prominently when user has tokens but is not delegated */}
           {!isLoadingWalletTokenInfo && walletTokenInfo && 
            Number(walletTokenInfo.formattedBalance) > 0 && 
@@ -1209,7 +1209,7 @@ export default function VotePage() {
 
       {/* Wallet Connection Prompt */}
       {!isConnected && (
-        <Card className="mb-6 border-dashed bg-gray-900/50 border-gray-700/50">
+        <Card className="mb-6 border-dashed bg-muted hover:bg-muted/80">
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
@@ -1238,10 +1238,10 @@ export default function VotePage() {
       )}
 
       <Tabs defaultValue="active" value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-800/50">
-          <TabsTrigger value="active" className="text-base font-medium data-[state=active]:bg-gray-700">{t('active')}</TabsTrigger>
-          <TabsTrigger value="completed" className="text-base font-medium data-[state=active]:bg-gray-700">{t('completed')}</TabsTrigger>
-          <TabsTrigger value="all" className="text-base font-medium data-[state=active]:bg-gray-700">{t('allProposals')}</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-muted/30">
+          <TabsTrigger value="active" className="text-base font-medium data-[state=active]:bg-muted/90">{t('active')}</TabsTrigger>
+          <TabsTrigger value="completed" className="text-base font-medium data-[state=active]:bg-muted/90">{t('completed')}</TabsTrigger>
+          <TabsTrigger value="all" className="text-base font-medium data-[state=active]:bg-muted/90">{t('allProposals')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
@@ -1254,10 +1254,10 @@ export default function VotePage() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                  <div className="rounded-2xl border border-gray-600 bg-transparent overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                        <TableRow className="bg-muted hover:bg-muted/80">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
@@ -1343,7 +1343,7 @@ export default function VotePage() {
                   <div className="rounded-lg border border-gray-700/50 bg-transparent">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                        <TableRow className="bg-muted hover:bg-muted/80">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
@@ -1429,7 +1429,7 @@ export default function VotePage() {
                   <div className="rounded-lg border border-gray-700/50 bg-transparent">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-gray-800/50 hover:bg-gray-800/50">
+                        <TableRow className="bg-muted hover:bg-muted/80">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>

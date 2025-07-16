@@ -375,7 +375,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="lg:col-span-1">
               <div className="space-y-4">
                 {/* Portfolio Summary Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
                     {/* Row 1: Type and Status Loading */}
                     <div className="grid grid-cols-2 gap-6">
@@ -404,7 +404,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </Card>
 
                 {/* Challenge Info Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
                     {/* Row 1: Challenge and Seed Money Loading */}
                     <div className="grid grid-cols-2 gap-6">
@@ -521,7 +521,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="lg:col-span-1">
               <div className="space-y-4">
                 {/* Portfolio Summary Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
                     {/* Row 1: Type and Status Loading */}
                     <div className="grid grid-cols-2 gap-6">
@@ -552,7 +552,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </Card>
 
                 {/* Challenge Info Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
                     {/* Row 1: Challenge and Seed Money Loading */}
                     <div className="grid grid-cols-2 gap-6">
@@ -1601,7 +1601,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
                   <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
                     <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                      <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl">
+                      <div className="bg-muted rounded-2xl p-6 shadow-2xl">
                         <AssetSwap userTokens={userTokens} />
                       </div>
                     </div>
@@ -1610,7 +1610,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               )}
               
               {/* Portfolio Summary (always visible) */}
-              <Card className="bg-gray-900 border-0 rounded-2xl">
+              <Card className="bg-muted border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
                   {/* Row 1: Type and Status */}
                   <div className="grid grid-cols-2 gap-6">
@@ -1745,7 +1745,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </Card>
 
               {/* Challenge Info */}
-              <Card className="bg-gray-900 border-0 rounded-2xl">
+              <Card className="bg-muted border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
                   {/* Row 1: Challenge ID and Seed Money */}
                   <div className="grid grid-cols-2 gap-6">

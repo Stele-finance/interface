@@ -151,7 +151,7 @@ export function RecentChallengesTable() {
           <div className="overflow-x-auto">
             <Table>
             <TableHeader>
-              <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+              <TableRow className="border-b border-gray-700 bg-muted hover:bg-muted/80">
                 <TableHead className="text-gray-300 pl-6">{t('challenge')}</TableHead>
                 <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
                 <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
