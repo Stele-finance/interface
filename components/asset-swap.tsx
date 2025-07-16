@@ -619,14 +619,14 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
         throw new Error(t('invalidAmountFormat'));
       }
       
-      // 사용자 입력값 보존하면서 토큰 decimals 초과 방지
+              // Preserve user input while preventing token decimals overflow
       let adjustedAmount = fromAmount;
       const decimalIndex = fromAmount.indexOf('.');
       
       if (decimalIndex !== -1) {
         const decimalPlaces = fromAmount.length - decimalIndex - 1;
         if (decimalPlaces > fromTokenDecimals) {
-          // 토큰 decimals보다 많은 소수점이 있으면 자르기
+          // Trim if more decimal places than token decimals
           adjustedAmount = numericAmount.toFixed(fromTokenDecimals);
         }
       }

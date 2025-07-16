@@ -325,6 +325,7 @@ export const useWallet = () => {
     disconnectWallet,
     switchNetwork,
     getProvider,
+    openWalletModal: appKitOpen, // Add AppKit modal open function
     
     // Subscribe to state changes
     subscribe

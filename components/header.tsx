@@ -54,7 +54,7 @@ export function Header() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   
   // Use global wallet hook
-  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType, connectedWallet } = useWallet()
+  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType, connectedWallet, openWalletModal } = useWallet()
   
 
   
@@ -388,38 +388,52 @@ export function Header() {
                 )}
               </span>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
-                  {walletType === 'walletconnect' ? (
-                    <Image 
-                      src={getWalletLogo('walletconnect')} 
-                      alt="WalletConnect"
-                      width={16}
-                      height={16}
-                      className="mr-2"
-                      style={{ width: 'auto', height: '16px' }}
-                    />
-                  ) : walletIcon ? (
-                    <Image 
-                      src={walletIcon} 
-                      alt={`${walletType} wallet`}
-                      width={16}
-                      height={16}
-                      className="mr-2"
-                      style={{ width: 'auto', height: '16px' }}
-                    />
-                  ) : (
-                    <Wallet className="mr-2 h-4 w-4" />
-                  )}
-                  <span className="text-base">
-                    {walletNetwork === 'solana'
-                      ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
-                      : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                    }
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
+            {walletType === 'walletconnect' ? (
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                onClick={() => openWalletModal && openWalletModal()}
+              >
+                <Image 
+                  src={getWalletLogo('walletconnect')} 
+                  alt="WalletConnect"
+                  width={16}
+                  height={16}
+                  className="mr-2"
+                  style={{ width: 'auto', height: '16px' }}
+                />
+                <span className="text-base">
+                  {walletNetwork === 'solana'
+                    ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
+                    : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                  }
+                </span>
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
+                    {walletIcon ? (
+                      <Image 
+                        src={walletIcon} 
+                        alt={`${walletType} wallet`}
+                        width={16}
+                        height={16}
+                        className="mr-2"
+                        style={{ width: 'auto', height: '16px' }}
+                      />
+                    ) : (
+                      <Wallet className="mr-2 h-4 w-4" />
+                    )}
+                    <span className="text-base">
+                      {walletNetwork === 'solana'
+                        ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
+                        : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                      }
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-muted border-gray-600">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
@@ -501,6 +515,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            )}
           </div>
         ) : (
           <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
