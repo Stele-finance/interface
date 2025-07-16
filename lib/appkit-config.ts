@@ -66,10 +66,10 @@ createAppKit({
   ],
 
   // Featured wallets (shown at top) - WalletConnect is always shown by default
-  featuredWalletIds: [
-    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-    'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393'  // Phantom
-  ],
+  // featuredWalletIds: [
+  //   'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+  //   'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393'  // Phantom
+  // ],
   // // Exclude unwanted wallets but keep WalletConnect, MetaMask, Phantom
   // excludeWalletIds: [
   //   'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Brave Wallet

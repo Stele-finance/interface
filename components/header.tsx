@@ -56,7 +56,13 @@ export function Header() {
   // Use global wallet hook
   const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType, connectedWallet } = useWallet()
   
-  const [isConnecting, setIsConnecting] = useState(false)
+
+  
+
+
+
+
+
   const [balance, setBalance] = useState<string>('0')
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
@@ -148,13 +154,18 @@ export function Header() {
     setWalletSelectOpen(false)
     
     try {
-      setIsConnecting(true)
       await connectWallet(selectedWalletType)
       setWalletSelectOpen(false)
     } catch (error) {
       console.error("Wallet connection error:", error)
-    } finally {
-      setIsConnecting(false)
+      
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: "🚫 Connection Failed",
+        description: error instanceof Error ? error.message : "Failed to connect wallet",
+        duration: 5000,
+      })
     }
   }
 
@@ -177,8 +188,6 @@ export function Header() {
     }
     
     try {
-      setIsConnecting(true)
-      
       await switchNetwork(targetNetwork)
       
       // Success feedback
@@ -215,8 +224,6 @@ export function Header() {
         title,
         description,
       })
-    } finally {
-      setIsConnecting(false)
     }
   }
 
@@ -385,25 +392,14 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
                   {walletType === 'walletconnect' ? (
-                    <div className="relative mr-2">
-                      <Image 
-                        src={getWalletLogo('walletconnect')} 
-                        alt="WalletConnect"
-                        width={16}
-                        height={16}
-                        style={{ width: 'auto', height: '16px' }}
-                      />
-                      {connectedWallet && (
-                        <Image 
-                          src={getWalletLogo(connectedWallet)} 
-                          alt={`${connectedWallet} wallet`}
-                          width={6}
-                          height={6}
-                          className="absolute -bottom-0.5 -right-0.5 rounded-full"
-                          style={{ width: 'auto', height: '6px' }}
-                        />
-                      )}
-                    </div>
+                    <Image 
+                      src={getWalletLogo('walletconnect')} 
+                      alt="WalletConnect"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                      style={{ width: 'auto', height: '16px' }}
+                    />
                   ) : walletIcon ? (
                     <Image 
                       src={walletIcon} 
@@ -533,7 +529,6 @@ export function Header() {
                   size="lg"
                   className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet('metamask')}
-                  disabled={isConnecting}
                 >
                   <Image 
                     src={getWalletLogo('metamask')} 
@@ -553,7 +548,6 @@ export function Header() {
                   size="lg"
                   className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet('phantom')}
-                  disabled={isConnecting}
                 >
                   <Image 
                     src={getWalletLogo('phantom')} 
@@ -573,7 +567,6 @@ export function Header() {
                   size="lg"
                   className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet('walletconnect')}
-                  disabled={isConnecting}
                 >
                   <Wallet className="h-6 w-6 text-blue-500" />
                   <div className="text-left">
