@@ -98,7 +98,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-muted/80 border-gray-600">
         <DialogHeader>
           <DialogTitle className="text-xl">{t('createNewChallenge')}</DialogTitle>
           <DialogDescription className="text-base">
@@ -119,10 +119,10 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
                   key={type.id}
                   className={`flex items-start space-x-2 rounded-md border p-3 ${
                     selectedType === type.id 
-                      ? "border-primary bg-primary/5" 
+                      ? "border-orange-500 bg-orange-500/10" 
                       : typeIsActive 
-                      ? "border-muted bg-muted/20 opacity-50" 
-                      : "border-border"
+                      ? "border-gray-600 bg-muted/20 opacity-50" 
+                      : "border-gray-600 bg-muted/30"
                   }`}
                 >
                   <RadioGroupItem 
@@ -148,7 +148,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
                           </span>
                         )}
                       </div>
-                      <span className="text-sm font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                      <span className="text-sm font-normal text-muted-foreground bg-gray-700 px-2 py-1 rounded-full">
                         {type.duration}
                       </span>
                     </Label>
@@ -160,7 +160,7 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} className="text-base">
+          <Button variant="outline" onClick={() => setOpen(false)} className="text-base bg-muted/40 border-gray-600 hover:bg-muted/60">
             {t('cancel')}
           </Button>
           <Button 

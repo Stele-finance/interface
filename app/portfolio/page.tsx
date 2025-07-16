@@ -40,7 +40,7 @@ export default function PortfolioPage() {
             </p>
           </div>
 
-          <Card className="bg-gray-900/50 border-gray-700/50">
+          <Card className="bg-muted border-gray-700/50">
             <CardHeader>
               <CardTitle className="text-center text-gray-100">{t('connectWallet')}</CardTitle>
             </CardHeader>

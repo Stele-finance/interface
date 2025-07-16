@@ -514,7 +514,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4 mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
           <ChallengeTypeModal 
@@ -524,12 +524,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
           />
         </div>
 
-      <Card className="bg-transparent border border-gray-700/50">
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+                <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                   <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
                   <TableHead className="text-gray-300 w-20">{t('challenge')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>

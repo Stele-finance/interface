@@ -264,7 +264,7 @@ export function Header() {
   const walletIcon = getWalletIcon();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-background">
+    <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
       <div className="flex items-center">
         <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
           <Image 
@@ -322,7 +322,7 @@ export function Header() {
                 {t('challenges')}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-36">
+            <DropdownMenuContent align="start" className="w-36 bg-muted/80 border-gray-600">
                <DropdownMenuItem asChild>
                  <Link href="/portfolio" className="cursor-pointer">
                    {t('myPortfolio')}
@@ -379,7 +379,7 @@ export function Header() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
+                <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
                   {walletIcon ? (
                     <Image 
                       src={walletIcon} 
@@ -400,7 +400,7 @@ export function Header() {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuContent align="end" className="w-64 bg-muted/80 border-gray-600">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <span className="text-base font-semibold">{name}</span>
@@ -496,7 +496,7 @@ export function Header() {
                 </span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
               <DialogHeader>
                 <DialogTitle>{t('connectWallet')}</DialogTitle>
                 <DialogDescription>
@@ -507,7 +507,7 @@ export function Header() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4"
+                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet('metamask')}
                   disabled={isConnecting}
                 >
@@ -527,7 +527,7 @@ export function Header() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4"
+                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet('phantom')}
                   disabled={isConnecting}
                 >
@@ -570,7 +570,7 @@ export function Header() {
               <Menu className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600">
             <DropdownMenuItem asChild>
               <Link 
                 href="https://github.com/Stele-finance/interface"
@@ -617,13 +617,13 @@ export function Header() {
           />
           
           {/* Menu Panel */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
-            <div className="p-4 pb-6">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-muted/40 border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
+            <div className="p-4 pb-4">
               {/* Handle Bar */}
               <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-4"></div>
               
               {/* Menu Items */}
-              <div className="space-y-1 mb-6">
+              <div className="space-y-1 mb-4">
                 <Link 
                   href="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -685,7 +685,7 @@ export function Header() {
               <div className="border-t border-border mb-4"></div>
                
                {/* Icon Links - displayed horizontally */}
-              <div className="flex items-center justify-center gap-8 px-4 py-2">
+              <div className="flex items-center justify-center gap-8 px-4 py-0">
                 <Link 
                   href="https://github.com/Stele-finance/interface"
                   target="_blank"
@@ -722,8 +722,8 @@ export function Header() {
                 </LanguageSelectorSidebar>
                </div>
                
-               {/* Empty space where language used to be */}
-               <div className="h-8"></div>
+               {/* Reduced empty space */}
+               <div className="h-6"></div>
              </div>
            </div>
         </>

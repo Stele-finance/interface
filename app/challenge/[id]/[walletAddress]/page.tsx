@@ -375,8 +375,52 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="lg:col-span-1">
               <div className="space-y-4">
                 {/* Portfolio Summary Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Type and Status Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Type Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Status Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
+                          <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Portfolio Value Loading */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                      <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Challenge Info Loading */}
+                <Card className="bg-muted border-0 rounded-2xl">
+                  <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Challenge and Seed Money Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Challenge Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
+                      </div>
+
+                      {/* Seed Money Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
+                      </div>
+                    </div>
+
                     {/* Progress Loading */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -388,51 +432,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         <div className="h-3 bg-gray-700 rounded w-36 animate-pulse"></div>
                         <div className="h-3 bg-gray-700 rounded w-32 animate-pulse"></div>
                       </div>
-                    </div>
-
-                    {/* Portfolio Value Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
-                    </div>
-
-                    {/* Gain/Loss Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-44 animate-pulse"></div>
-                      <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
-                    </div>
-
-                    {/* Status Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
-                        <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Challenge Info Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
-                  <CardContent className="p-8 space-y-8">
-                    {/* Challenge Type Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-32 animate-pulse"></div>
-                    </div>
-
-                    {/* Challenge ID Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
-                    </div>
-
-                    {/* Seed Money Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -522,29 +521,65 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="lg:col-span-1">
               <div className="space-y-4">
                 {/* Portfolio Summary Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
+                    {/* Row 1: Type and Status Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Type Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Status Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></div>
+                          <div className="h-6 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Portfolio Value Loading */}
                     <div className="space-y-2">
                       <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
                       <div className="h-10 bg-gray-700 rounded w-48 animate-pulse"></div>
                     </div>
 
-                    {/* Gain/Loss Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                      <div className="h-10 bg-gray-700 rounded w-44 animate-pulse"></div>
-                    </div>
+
                   </CardContent>
                 </Card>
 
                 {/* Challenge Info Loading */}
-                <Card className="bg-gray-900 border-0 rounded-2xl">
+                <Card className="bg-muted border-0 rounded-2xl">
                   <CardContent className="p-8 space-y-8">
-                    {/* Challenge Type Loading */}
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
-                      <div className="h-8 bg-gray-700 rounded w-32 animate-pulse"></div>
+                    {/* Row 1: Challenge and Seed Money Loading */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Challenge Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-24 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-4 animate-pulse"></div>
+                      </div>
+
+                      {/* Seed Money Loading */}
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                        <div className="h-8 bg-gray-700 rounded w-16 animate-pulse"></div>
+                      </div>
+                    </div>
+
+                    {/* Progress Loading */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
+                        <div className="h-4 bg-gray-700 rounded w-8 animate-pulse"></div>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2 animate-pulse"></div>
+                      <div className="flex justify-between">
+                        <div className="h-3 bg-gray-700 rounded w-36 animate-pulse"></div>
+                        <div className="h-3 bg-gray-700 rounded w-32 animate-pulse"></div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -892,7 +927,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
           {/* Left Side - Charts + Tabs */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-4">
             {/* Investor Charts */}
             <InvestorCharts 
               challengeId={challengeId} 
@@ -904,13 +939,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             />
             
             {/* Interval selector */}
-            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8">
               <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                 <button
                   onClick={() => setChartInterval('daily')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     chartInterval === 'daily' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                   }`}
                 >
@@ -920,7 +955,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   onClick={() => setChartInterval('weekly')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
                     chartInterval === 'weekly' 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/25' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                   }`}
                 >
@@ -929,7 +964,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
             </div>
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="portfolio" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
@@ -945,99 +980,110 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">{t('tokenHoldings')}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {userTokens.map((token, index) => {
-                        // Get price from Uniswap data
-                        const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
-                        const isLoadingPrice = isLoadingUniswap
-                        const hasValidPrice = tokenPrice > 0
-                        const tokenAmount = parseFloat(token.amount) || 0
-                        const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
-                        
-                        return (
-                          <div 
-                            key={index} 
-                            className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/30 transition-colors"
-                            onClick={() => handleTokenClick(token.address)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="relative">
-                              {(() => {
-                                const logoPath = getTokenLogo(token.address, subgraphNetwork)
-                                
-                                if (logoPath) {
-                                  return (
-                                    <img
-                                      src={logoPath}
-                                      alt={token.symbol}
-                                      className="h-10 w-10 rounded-full object-cover"
-                                      onError={(e: any) => {
-                                        console.error('Failed to load token logo:', logoPath)
-                                        const target = e.target as HTMLImageElement
-                                        target.outerHTML = `
-                                          <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                            ${token.symbol.slice(0, 2)}
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      {userTokens.length > 0 ? (
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                              <th className="text-left py-3 pl-20 sm:pl-24 pr-14 text-sm font-medium text-gray-400">Token</th>
+                              <th className="text-right py-3 px-6 sm:px-20 sm:pr-50 mr-10 text-sm font-medium text-gray-400">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {userTokens.map((token, index) => {
+                              // Get price from Uniswap data
+                              const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
+                              const isLoadingPrice = isLoadingUniswap
+                              const hasValidPrice = tokenPrice > 0
+                              const tokenAmount = parseFloat(token.amount) || 0
+                              const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
+                              
+                              return (
+                                <tr 
+                                  key={index} 
+                                  className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                                  onClick={() => handleTokenClick(token.address)}
+                                >
+                                  <td className="py-6 pl-10 sm:pl-14 pr-10">
+                                    <div className="flex items-center gap-3">
+                                      <div className="relative">
+                                      {(() => {
+                                        const logoPath = getTokenLogo(token.address, subgraphNetwork)
+                                        
+                                        if (logoPath) {
+                                          return (
+                                            <img
+                                              src={logoPath}
+                                              alt={token.symbol}
+                                              className="h-10 w-10 rounded-full object-cover"
+                                              onError={(e: any) => {
+                                                console.error('Failed to load token logo:', logoPath)
+                                                const target = e.target as HTMLImageElement
+                                                target.outerHTML = `
+                                                  <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                                    ${token.symbol.slice(0, 2)}
+                                                  </div>
+                                                `
+                                              }}
+                                            />
+                                          )
+                                        } else {
+                                          return (
+                                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                              {token.symbol.slice(0, 2)}
+                                            </div>
+                                          )
+                                        }
+                                      })()}
+                                        {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                                        {subgraphNetwork === 'arbitrum' && (
+                                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                            <Image 
+                                              src="/networks/small/arbitrum.png" 
+                                              alt="Arbitrum One"
+                                              width={14}
+                                              height={14}
+                                              className="rounded-full"
+                                              style={{ width: '14px', height: '14px' }}
+                                            />
                                           </div>
-                                        `
-                                      }}
-                                    />
-                                  )
-                                } else {
-                                  return (
-                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                      {token.symbol.slice(0, 2)}
+                                        )}
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-gray-100">{token.symbol}</p>
+                                        <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
+                                        {/* Show real-time price */}
+                                        {isLoadingPrice ? (
+                                          <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
+                                        ) : tokenPrice > 0 ? (
+                                          <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
+                                        ) : (
+                                          <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
+                                        )}
+                                      </div>
                                     </div>
-                                  )
-                                }
-                              })()}
-                                {/* Show Arbitrum network icon only when connected to Arbitrum */}
-                                {subgraphNetwork === 'arbitrum' && (
-                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                                    <Image 
-                                      src="/networks/small/arbitrum.png" 
-                                      alt="Arbitrum One"
-                                      width={14}
-                                      height={14}
-                                      className="rounded-full"
-                                      style={{ width: '14px', height: '14px' }}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-100">{token.symbol}</p>
-                                <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
-                                {/* Show real-time price */}
-                                {isLoadingPrice ? (
-                                  <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
-                                ) : tokenPrice > 0 ? (
-                                  <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
-                                ) : (
-                                  <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-medium text-gray-100">{token.amount}</p>
-                              {/* Show USD value */}
-                              {isLoadingPrice ? (
-                                <p className="text-sm text-gray-500">{t('loading')}</p>
-                              ) : tokenValue > 0 ? (
-                                <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
-                              ) : (
-                                <p className="text-sm text-gray-500">$0.00</p>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                      
-                      {userTokens.length === 0 && (
+                                  </td>
+                                  <td className="py-6 px-6 sm:px-6">
+                                    <div className="text-right">
+                                      <p className="font-medium text-gray-100">{token.amount}</p>
+                                      {/* Show USD value */}
+                                      {isLoadingPrice ? (
+                                        <p className="text-sm text-gray-500">{t('loading')}</p>
+                                      ) : tokenValue > 0 ? (
+                                        <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
+                                      ) : (
+                                        <p className="text-sm text-gray-500">$0.00</p>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>{t('noTokensFound')}</p>
@@ -1049,13 +1095,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsContent>
 
               <TabsContent value="transactions" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">{t('recentTransactions')}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+                  <CardContent className="p-0">
                     <div className="overflow-x-auto">
-                      <div className="min-w-[500px] space-y-4">
+                      <div className="min-w-[500px] space-y-0">
                         {isLoadingTransactions ? (
                           <div className="flex items-center justify-center py-8">
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -1068,76 +1111,52 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <p className="text-sm text-gray-400 mt-2">Please try again later</p>
                           </div>
                         ) : investorTransactions.length > 0 ? (
-                        (() => {
-                          // Calculate pagination
-                          const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
-                          const startIndex = (currentPage - 1) * itemsPerPage;
-                          const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                          const paginatedTransactions = investorTransactions.slice(startIndex, endIndex);
-                          const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                                <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
+                                <th className="text-right py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                              </tr>
+                            </thead>
+                              <tbody>
+                               {(() => {
+                                // Calculate pagination
+                                const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
+                                const startIndex = (currentPage - 1) * itemsPerPage;
+                                const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                                const paginatedTransactions = investorTransactions.slice(startIndex, endIndex);
+                                const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                          const getTransactionIcon = (type: string) => {
-                            switch (type) {
-                              case 'join':
-                                return <User className="h-4 w-4 text-white" />
-                              case 'swap':
-                                return <Repeat className="h-4 w-4 text-white" />
-                              case 'register':
-                                return <BarChart3 className="h-4 w-4 text-white" />
-                              case 'reward':
-                                return <Trophy className="h-4 w-4 text-white" />
-                              default:
-                                return <Activity className="h-4 w-4 text-white" />
-                            }
-                          }
-
-                          const getIconColor = (type: string) => {
-                            switch (type) {
-                              case 'join':
-                                return 'bg-blue-500'
-                              case 'swap':
-                                return 'bg-green-500'
-                              case 'register':
-                                return 'bg-orange-500'
-                              case 'reward':
-                                return 'bg-yellow-500'
-                              default:
-                                return 'bg-gray-500'
-                            }
-                          }
-
-                          return (
-                            <div className="space-y-4">
-                              {paginatedTransactions.map((transaction) => (
-                                <div 
+                                return (
+                                  <>
+                                    {paginatedTransactions.map((transaction) => (
+                                <tr 
                                   key={transaction.id} 
-                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors gap-4 min-w-0"
+                                  className="hover:bg-gray-800/30 transition-colors cursor-pointer"
                                   onClick={() => {
                                     const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                                     window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                                   }}
                                 >
-                                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                                    {/* Update date */}
-                                    <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                                  <td className="py-6 pl-6 pr-4">
+                                    <div className="text-sm text-gray-400">
                                       {formatRelativeTime(transaction.timestamp)}
                                     </div>
-                                    
-                                    {/* Transaction type text */}
-                                    <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
                                       {getTransactionTypeText(transaction.type)}
                                     </div>
-                                    
-                                    {/* User address (only for reward type) */}
-                                    {transaction.type === 'reward' && (
-                                      <div className="text-gray-300 text-sm flex-shrink-0">
-                                        → {formatUserAddress(transaction.user)}
-                                      </div>
-                                    )}
-                                  </div>
-                                  
-                                  {/* Transaction details */}
-                                  <div className="text-right flex-shrink-0 min-w-0">
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className="text-gray-300 text-sm">
+                                      {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(walletAddress)}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-6">
+                                    <div className="text-right">
                                     {transaction.type === 'swap' ? (
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
@@ -1219,48 +1238,55 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     ) : (
                                       <p className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                     )}
-                                  </div>
-                                </div>
+                                    </div>
+                                  </td>
+                                </tr>
                               ))}
                               
-                              {/* Pagination */}
+                              {/* Pagination Row */}
                               {totalPages > 1 && (
-                                <div className="flex justify-center mt-6">
-                                  <Pagination>
-                                    <PaginationContent>
-                                      <PaginationItem>
-                                        <PaginationPrevious 
-                                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                        />
-                                      </PaginationItem>
-                                      
-                                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                        <PaginationItem key={page}>
-                                          <PaginationLink
-                                            onClick={() => setCurrentPage(page)}
-                                            isActive={currentPage === page}
-                                            className="cursor-pointer"
-                                          >
-                                            {page}
-                                          </PaginationLink>
-                                        </PaginationItem>
-                                      ))}
-                                      
-                                      <PaginationItem>
-                                        <PaginationNext 
-                                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                        />
-                                      </PaginationItem>
-                                    </PaginationContent>
-                                  </Pagination>
-                                </div>
+                                <tr>
+                                  <td colSpan={4} className="py-6">
+                                    <div className="flex justify-center">
+                                      <Pagination>
+                                        <PaginationContent>
+                                          <PaginationItem>
+                                            <PaginationPrevious 
+                                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                          </PaginationItem>
+                                          
+                                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <PaginationItem key={page}>
+                                              <PaginationLink
+                                                onClick={() => setCurrentPage(page)}
+                                                isActive={currentPage === page}
+                                                className="cursor-pointer"
+                                              >
+                                                {page}
+                                              </PaginationLink>
+                                            </PaginationItem>
+                                          ))}
+                                          
+                                          <PaginationItem>
+                                            <PaginationNext 
+                                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                          </PaginationItem>
+                                        </PaginationContent>
+                                      </Pagination>
+                                    </div>
+                                  </td>
+                                </tr>
                               )}
-                            </div>
+                            </>
                           )
-                        })()
-                      ) : (
+                        })()}
+                      </tbody>
+                    </table>
+                  ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No transactions found for this investor</p>
@@ -1274,12 +1300,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsContent>
 
               <TabsContent value="ranking" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-gray-100">Ranking</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
                       {isLoadingRanking ? (
                         <div className="flex items-center justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin" />
@@ -1301,209 +1324,217 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const rankingTotalPages = Math.min(Math.ceil(totalRankingUsers / itemsPerPage), maxPages);
 
                           return (
-                            <div className="space-y-4">
-                              {paginatedUsers.map((user, paginatedIndex) => {
-                                const actualIndex = rankingStartIndex + paginatedIndex;
-                                const rank = actualIndex + 1;
-                                const score = rankingData.scores[actualIndex];
-                                const profitRatio = rankingData.profitRatios[actualIndex];
-                          
-                          // Format address
-                          const formatAddress = (address: string) => {
-                            if (!address || address === '0x0000000000000000000000000000000000000000') {
-                              return '';
-                            }
-                            return `${address.slice(0, 6)}...${address.slice(-4)}`;
-                          };
-                          
-                          // Format score (USDC value)
-                          const formatScore = (score: string) => {
-                            try {
-                              const scoreValue = parseFloat(score);
-                              return `$${scoreValue.toFixed(2)}`;
-                            } catch {
-                              return '$0.00';
-                            }
-                          };
-                          
-                          // Format profit ratio
-                          const formatProfitRatio = (profitRatio: string) => {
-                            try {
-                              const ratioValue = parseFloat(profitRatio);
-                              return `${ratioValue >= 0 ? '+' : ''}${ratioValue.toFixed(2)}%`;
-                            } catch {
-                              return '0.00%';
-                            }
-                          };
-                          
-                          // Get rank icon
-                          const getRankIcon = (rank: number) => {
-                            switch (rank) {
-                              case 1:
-                                return '🥇';
-                              case 2:
-                                return '🥈';
-                              case 3:
-                                return '🥉';
-                              case 4:
-                                return '4️⃣';
-                              case 5:
-                                return '5️⃣';
-                              default:
-                                return rank.toString();
-                            }
-                          };
-                          
-                          // Get rank color
-                          const getRankColor = (rank: number) => {
-                                return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
-                          };
+                            <>
+                              <table className="w-full">
+                                <thead>
+                                  <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Rank</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">User</th>
+                                    <th className="text-right py-3 px-10 sm:px-10 text-sm font-medium text-gray-400">Profit Ratio</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {paginatedUsers.map((user, paginatedIndex) => {
+                                    const actualIndex = rankingStartIndex + paginatedIndex;
+                                    const rank = actualIndex + 1;
+                                    const score = rankingData.scores[actualIndex];
+                                    const profitRatio = rankingData.profitRatios[actualIndex];
+                              
+                              // Format address
+                              const formatAddress = (address: string) => {
+                                if (!address || address === '0x0000000000000000000000000000000000000000') {
+                                  return '';
+                                }
+                                return `${address.slice(0, 6)}...${address.slice(-4)}`;
+                              };
+                              
+                              // Format score (USDC value)
+                              const formatScore = (score: string) => {
+                                try {
+                                  const scoreValue = parseFloat(score);
+                                  return `$${scoreValue.toFixed(2)}`;
+                                } catch {
+                                  return '$0.00';
+                                }
+                              };
+                              
+                              // Format profit ratio
+                              const formatProfitRatio = (profitRatio: string) => {
+                                try {
+                                  const ratioValue = parseFloat(profitRatio);
+                                  return `${ratioValue >= 0 ? '+' : ''}${ratioValue.toFixed(2)}%`;
+                                } catch {
+                                  return '0.00%';
+                                }
+                              };
+                              
+                              // Get rank icon
+                              const getRankIcon = (rank: number) => {
+                                switch (rank) {
+                                  case 1:
+                                    return '🥇';
+                                  case 2:
+                                    return '🥈';
+                                  case 3:
+                                    return '🥉';
+                                  case 4:
+                                    return '4️⃣';
+                                  case 5:
+                                    return '5️⃣';
+                                  default:
+                                    return rank.toString();
+                                }
+                              };
 
-                          // Handle user click
-                          const handleUserClick = (userAddress: string) => {
-                            // Check if address is empty or zero address
-                            if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
-                              return;
-                            }
-                            router.push(`/challenge/${challengeId}/${userAddress}`);
-                          };
-                          
-                          const formattedAddress = formatAddress(user);
-                          const isEmptySlot = !formattedAddress;
-                          const isCurrentUser = walletAddress && user.toLowerCase() === walletAddress.toLowerCase();
+                              // Handle user click
+                              const handleUserClick = (userAddress: string) => {
+                                // Check if address is empty or zero address
+                                if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+                                  return;
+                                }
+                                router.push(`/challenge/${challengeId}/${userAddress}`);
+                              };
+                              
+                              const formattedAddress = formatAddress(user);
+                              const isEmptySlot = !formattedAddress;
+                              const isCurrentUser = walletAddress && user.toLowerCase() === walletAddress.toLowerCase();
 
-                          return (
-                            <div 
-                              key={`${user}-${rank}`} 
-                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
-                                isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
-                              }`}
-                              onClick={() => !isEmptySlot && handleUserClick(user)}
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center justify-center w-10 h-10">
-                                  {rank <= 3 ? (
-                                    <span className="text-3xl">{getRankIcon(rank)}</span>
-                                  ) : rank === 4 ? (
-                                    <div className="relative w-6 h-6 flex items-center justify-center">
-                                      <svg width="24" height="24" viewBox="0 0 24 24">
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          fill="#4F46E5"
-                                          stroke="#FFD700"
-                                          strokeWidth="1"
+                              return (
+                                <tr 
+                                  key={`${user}-${rank}`} 
+                                  className={`hover:bg-gray-800/30 transition-colors ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
+                                    isEmptySlot ? 'cursor-default' : 'cursor-pointer'
+                                  }`}
+                                  onClick={() => !isEmptySlot && handleUserClick(user)}
+                                >
+                                  <td className="py-6 pl-6 pr-4">
+                                    <div className="flex items-center justify-center w-10 h-10">
+                                      {rank <= 3 ? (
+                                        <span className="text-3xl">{getRankIcon(rank)}</span>
+                                      ) : rank === 4 ? (
+                                        <div className="relative w-6 h-6 flex items-center justify-center">
+                                          <svg width="24" height="24" viewBox="0 0 24 24">
+                                            <circle
+                                              cx="12"
+                                              cy="12"
+                                              r="10"
+                                              fill="#4F46E5"
+                                              stroke="#FFD700"
+                                              strokeWidth="1"
+                                            />
+                                            <text
+                                              x="12"
+                                              y="13"
+                                              textAnchor="middle"
+                                              dominantBaseline="middle"
+                                              fontSize="12"
+                                              fill="#FFFFFF"
+                                              fontWeight="bold"
+                                            >
+                                              4
+                                            </text>
+                                          </svg>
+                                        </div>
+                                      ) : rank === 5 ? (
+                                        <div className="relative w-6 h-6 flex items-center justify-center">
+                                          <svg width="24" height="24" viewBox="0 0 24 24">
+                                            <circle
+                                              cx="12"
+                                              cy="12"
+                                              r="10"
+                                              fill="#10B981"
+                                              fillOpacity="0.6"
+                                              stroke="#FFD700"
+                                              strokeWidth="1"
+                                            />
+                                            <text
+                                              x="12"
+                                              y="13"
+                                              textAnchor="middle"
+                                              dominantBaseline="middle"
+                                              fontSize="12"
+                                              fill="#FFFFFF"
+                                              fontWeight="bold"
+                                            >
+                                              5
+                                            </text>
+                                          </svg>
+                                        </div>
+                                      ) : (
+                                        <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                          <span className="text-sm font-bold text-white">{rank}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className="font-medium flex items-center gap-2">
+                                      {isEmptySlot ? (
+                                        <span className="text-gray-500 italic">Empty Slot</span>
+                                      ) : (
+                                        <>
+                                          <span className="text-gray-300">{formattedAddress}</span>
+                                          {isCurrentUser && (
+                                            <Badge variant="outline" className="text-xs border-blue-500 text-blue-400">
+                                              You
+                                            </Badge>
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-6">
+                                    <div className="text-right">
+                                      <div className="font-bold text-lg text-white">{formatScore(score)}</div>
+                                      <div className={`text-sm ${parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                        {formatProfitRatio(profitRatio)}
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                                </tbody>
+                              </table>
+                              
+                              {/* Pagination for Ranking */}
+                              {rankingTotalPages > 1 && (
+                                <div className="flex justify-center mt-6 mb-4">
+                                  <Pagination>
+                                    <PaginationContent>
+                                      <PaginationItem>
+                                        <PaginationPrevious 
+                                          onClick={() => setRankingCurrentPage(Math.max(1, rankingCurrentPage - 1))}
+                                          className={rankingCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                         />
-                                        <text
-                                          x="12"
-                                          y="13"
-                                          textAnchor="middle"
-                                          dominantBaseline="middle"
-                                          fontSize="12"
-                                          fill="#FFFFFF"
-                                          fontWeight="bold"
-                                        >
-                                          4
-                                        </text>
-                                      </svg>
-                                    </div>
-                                  ) : rank === 5 ? (
-                                    <div className="relative w-6 h-6 flex items-center justify-center">
-                                      <svg width="24" height="24" viewBox="0 0 24 24">
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          fill="#10B981"
-                                          fillOpacity="0.6"
-                                          stroke="#FFD700"
-                                          strokeWidth="1"
+                                      </PaginationItem>
+                                      
+                                      {Array.from({ length: rankingTotalPages }, (_, i) => i + 1).map((page) => (
+                                        <PaginationItem key={page}>
+                                          <PaginationLink
+                                            onClick={() => setRankingCurrentPage(page)}
+                                            isActive={rankingCurrentPage === page}
+                                            className="cursor-pointer"
+                                          >
+                                            {page}
+                                          </PaginationLink>
+                                        </PaginationItem>
+                                      ))}
+                                      
+                                      <PaginationItem>
+                                        <PaginationNext 
+                                          onClick={() => setRankingCurrentPage(Math.min(rankingTotalPages, rankingCurrentPage + 1))}
+                                          className={rankingCurrentPage === rankingTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                         />
-                                        <text
-                                          x="12"
-                                          y="13"
-                                          textAnchor="middle"
-                                          dominantBaseline="middle"
-                                          fontSize="12"
-                                          fill="#FFFFFF"
-                                          fontWeight="bold"
-                                        >
-                                          5
-                                        </text>
-                                      </svg>
-                                    </div>
-                                  ) : (
-                                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                                      <span className="text-sm font-bold text-white">{rank}</span>
-                                    </div>
-                                  )}
+                                      </PaginationItem>
+                                    </PaginationContent>
+                                  </Pagination>
                                 </div>
-                                <div>
-                                  <div className="font-medium flex items-center gap-2">
-                                    {isEmptySlot ? (
-                                      <span className="text-gray-500 italic">Empty Slot</span>
-                                    ) : (
-                                      <>
-                                        <span>{formattedAddress}</span>
-                                        {isCurrentUser && (
-                                          <Badge variant="outline" className="text-xs border-blue-500 text-blue-400">
-                                            You
-                                          </Badge>
-                                        )}
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-bold text-lg">{formatScore(score)}</div>
-                                <div className={`text-sm ${parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                  {formatProfitRatio(profitRatio)}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        
-                        {/* Pagination for Ranking */}
-                        {rankingTotalPages > 1 && (
-                          <div className="flex justify-center mt-6">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    onClick={() => setRankingCurrentPage(Math.max(1, rankingCurrentPage - 1))}
-                                    className={rankingCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                                
-                                {Array.from({ length: rankingTotalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      onClick={() => setRankingCurrentPage(page)}
-                                      isActive={rankingCurrentPage === page}
-                                      className="cursor-pointer"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    onClick={() => setRankingCurrentPage(Math.min(rankingTotalPages, rankingCurrentPage + 1))}
-                                    className={rankingCurrentPage === rankingTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })()
-                ) : (
+                              )}
+                            </>
+                          )
+                        })()
+                      ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No ranking data found</p>
@@ -1522,13 +1553,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   </CardContent>
                 </Card>
               </TabsContent>
-
             </Tabs>
           </div>
           
           {/* Right Side - Portfolio Summary / Swap Assets */}
           <div className="lg:col-span-1">
-            <div className="space-y-4 lg:mt-18">
+            <div className="space-y-8 lg:mt-10 md:space-y-4">
               {/* Investor Info Section */}
               <div className="flex items-center justify-between gap-4 mb-4">
                                  {/* Action Buttons and Registered status */}
@@ -1606,7 +1636,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
                   <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
                     <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                      <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl">
+                      <div className="bg-muted rounded-2xl p-6 shadow-2xl">
                         <AssetSwap userTokens={userTokens} />
                       </div>
                     </div>
@@ -1615,106 +1645,110 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               )}
               
               {/* Portfolio Summary (always visible) */}
-              <Card className="bg-gray-900 border-0 rounded-2xl">
+              <Card className="bg-muted border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
-                  {/* Status */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('status')}</span>
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        // Always show network icon regardless of status
-                        const networkIcon = network === 'ethereum' ? (
-                          <Image 
-                            src="/networks/small/ethereum.png" 
-                            alt="Ethereum Mainnet"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        ) : network === 'arbitrum' ? (
-                          <Image 
-                            src="/networks/small/arbitrum.png" 
-                            alt="Arbitrum One"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        ) : (
-                          // Default to Ethereum icon if network is not recognized
-                          <Image 
-                            src="/networks/small/ethereum.png" 
-                            alt="Ethereum Mainnet"
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                            style={{ width: '16px', height: '16px' }}
-                          />
-                        );
+                  {/* Row 1: Type and Status */}
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Type */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('type')}</span>
+                      <div className="text-3xl text-white">
+                        {(() => {
+                          const challengeType = challengeData?.challenge?.challengeType
+                          switch (challengeType) {
+                            case 0:
+                              return t('oneWeek');
+                            case 1:
+                              return t('oneMonth');
+                            case 2:
+                              return t('threeMonths');
+                            case 3:
+                              return t('sixMonths');
+                            case 4:
+                              return t('oneYear');
+                            default:
+                              return challengeType !== undefined ? `Type ${challengeType}` : `Type ${challengeId}`;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {/* Status */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('status')}</span>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          // Always show network icon regardless of status
+                          const networkIcon = network === 'ethereum' ? (
+                            <Image 
+                              src="/networks/small/ethereum.png" 
+                              alt="Ethereum Mainnet"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          ) : network === 'arbitrum' ? (
+                            <Image 
+                              src="/networks/small/arbitrum.png" 
+                              alt="Arbitrum One"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          ) : (
+                            // Default to Ethereum icon if network is not recognized
+                            <Image 
+                              src="/networks/small/ethereum.png" 
+                              alt="Ethereum Mainnet"
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                          );
 
-                        // If investor is closed, show as Finished
-                        if (investorData?.investor?.isRegistered === true) {
+                          // If investor is closed, show as Finished
+                          if (investorData?.investor?.isRegistered === true) {
+                            return (
+                              <>
+                                <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                                  {networkIcon}
+                                </div>
+                                <span className="text-3xl text-red-400">{t('finished')}</span>
+                              </>
+                            )
+                          }
+                          // Otherwise show challenge active status
+                          const isActive = challengeData?.challenge?.isActive
                           return (
                             <>
                               <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
                                 {networkIcon}
                               </div>
-                              <span className="text-xl font-medium text-red-400">{t('finished')}</span>
+                              <span className={`text-3xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
+                                {isActive ? t('active') : 'Pending reward'}
+                              </span>
                             </>
                           )
-                        }
-                        // Otherwise show challenge active status
-                        const isActive = challengeData?.challenge?.isActive
-                        return (
-                          <>
-                            <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
-                              {networkIcon}
-                            </div>
-                            <span className={`text-xl font-medium ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
-                              {isActive ? t('active') : 'Pending reward'}
-                            </span>
-                          </>
-                        )
-                      })()}
+                        })()}
+                      </div>
                     </div>
                   </div>
 
                   {/* Portfolio Value */}
                   <div className="space-y-2">
                     <span className="text-base text-gray-400">{t('onChainValue')}</span>
-                    <div className="text-4xl text-white">
-                      ${currentValue.toFixed(2)}
-                    </div>
-                    {/* Real-time portfolio value */}
-                    {realTimePortfolio && (
-                      <div className="space-y-1">
-                        <div className="text-base text-green-400 flex items-center gap-2">
-                          <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-{t('live')}: ${realTimePortfolio.totalValue.toFixed(2)}
-                        </div>
-                      </div>
-                    )}
-                    {isLoadingUniswap && (
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-{t('loadingLivePrices')}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Gain/Loss */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('gainLoss')}</span>
-                    <div className="flex items-baseline gap-3">
-                      <div className={`text-4xl ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
+                    <div className="flex items-baseline gap-1">
+                      <div className="text-4xl text-white">
+                        ${currentValue.toFixed(2)}
                       </div>
                       <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                         ({isPositive ? '+' : ''}{gainLossPercentage.toFixed(2)}%)
                       </div>
                     </div>
-                    {/* Real-time gain/loss */}
+                    {/* Real-time portfolio value */}
                     {realTimePortfolio && (
                       <div className="space-y-1">
                         {(() => {
@@ -1723,70 +1757,55 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const isRealTimePositive = realTimeGainLoss >= 0
                           
                           return (
-                            <div>
-                              <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
-                                <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-{t('live')}: {isRealTimePositive ? '+' : ''}${realTimeGainLoss.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
-                              </div>
+                            <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
+                              <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
+                              {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
                             </div>
                           )
                         })()}
                       </div>
                     )}
+                    {isLoadingUniswap && (
+                      <div className="text-sm text-gray-500 flex items-center gap-1">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+                        {t('loadingLivePrices')}
+                      </div>
+                    )}
                   </div>
+
+
 
 
                 </CardContent>
               </Card>
 
               {/* Challenge Info */}
-              <Card className="bg-gray-900 border-0 rounded-2xl">
+              <Card className="bg-muted border-0 rounded-2xl">
                 <CardContent className="p-8 space-y-8">
-                  {/* Challenge Type */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('challengeType')}</span>
-                    <div className="text-3xl text-white">
-                      {(() => {
-                        const challengeType = challengeData?.challenge?.challengeType
-                        switch (challengeType) {
-                          case 0:
-                            return t('oneWeek');
-                          case 1:
-                            return t('oneMonth');
-                          case 2:
-                            return t('threeMonths');
-                          case 3:
-                            return t('sixMonths');
-                          case 4:
-                            return t('oneYear');
-                          default:
-                            return challengeType !== undefined ? `Type ${challengeType}` : `Type ${challengeId}`;
-                        }
-                      })()}
+                  {/* Row 1: Challenge ID and Seed Money */}
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Challenge ID */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('challenge')}</span>
+                      <div className="text-3xl text-white">
+                        {challengeId}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Challenge ID */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('challengeId')}</span>
-                    <div className="text-3xl text-white">
-                      {challengeId}
-                    </div>
-                  </div>
-
-                  {/* Seed Money */}
-                  <div className="space-y-2">
-                    <span className="text-base text-gray-400">{t('seedMoney')}</span>
-                    <div className="text-3xl text-white">
-                      {(() => {
-                        // If we have challenge data and seedMoney is available
-                        if (challengeData?.challenge?.seedMoney) {
-                          const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                          return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
-                        }
-                        // Default fallback
-                        return '$0';
-                      })()}
+                    {/* Seed Money */}
+                    <div className="space-y-2">
+                      <span className="text-base text-gray-400">{t('seedMoney')}</span>
+                      <div className="text-3xl text-white">
+                        {(() => {
+                          // If we have challenge data and seedMoney is available
+                          if (challengeData?.challenge?.seedMoney) {
+                            const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
+                            return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
+                          }
+                          // Default fallback
+                          return '$0';
+                        })()}
+                      </div>
                     </div>
                   </div>
 
@@ -1850,8 +1869,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
-                      <span>{t('voteStart')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
-                      <span>{t('voteEnd')}: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>{t('start')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
+                      <span>End: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
                     </div>
                   </div>
                 </CardContent>

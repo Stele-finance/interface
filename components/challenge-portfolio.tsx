@@ -164,8 +164,8 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
         )}
       </div>
       <Card className="bg-transparent border border-gray-700/50">
-        <CardContent className="p-6">
-          <div className="space-y-3">
+        <CardContent className="p-0">
+          <div className="space-y-0">
             {isLoadingRanking ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -225,7 +225,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             )}
           </div>
           {rankingData && totalPages > 1 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="pb-2">
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500">
                   Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
@@ -234,7 +234,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             </div>
           )}
           {rankingData && totalPages <= 1 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="pb-2">
               <div className="text-xs text-gray-500 text-center">
                 Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
               </div>
@@ -634,86 +634,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     }
   };
 
-  // Get challenge title and info from real data
-  const getChallengeTitle = () => {
-    if (challengeData?.challenge) {
-      const challengeType = challengeData.challenge.challengeType;
-      let baseTitle = '';
-      switch(challengeType) {
-        case 0:
-          baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-          break;
-        case 1:
-          baseTitle = `${t('oneMonth')} ${t('challenge')}`;
-          break;
-        case 2:
-          baseTitle = `${t('threeMonths')} ${t('challenge')}`;
-          break;
-        case 3:
-          baseTitle = `${t('sixMonths')} ${t('challenge')}`;
-          break;
-        case 4:
-          baseTitle = `${t('oneYear')} ${t('challenge')}`;
-          break;
-        default:
-          baseTitle = `Challenge Type ${challengeType}`;
-      }
-      return `${baseTitle} ID : ${challengeId}`;
-    }
-    
-    // Fallback to old logic if no data
-    let baseTitle = '';
-    switch(challengeId) {
-      case 'one-week-challenge':
-        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-        break;
-      case 'one-month-challenge':
-        baseTitle = `${t('oneMonth')} ${t('challenge')}`;
-        break;
-      case 'three-month-challenge':
-        baseTitle = `${t('threeMonths')} ${t('challenge')}`;
-        break;
-      case 'six-month-challenge':
-        baseTitle = `${t('sixMonths')} ${t('challenge')}`;
-        break;
-      case 'one-year-challenge':
-        baseTitle = `${t('oneYear')} ${t('challenge')}`;
-        break;
-      default:
-        baseTitle = `${t('oneWeek')} ${t('challenge')}`;
-    }
-    return `${baseTitle} (ID: ${challengeId})`;
-  };
-
-  // Get challenge details from real data
-  const getChallengeDetails = () => {
-    if (!isClient || !challengeData?.challenge) {
-      // Return fallback values for SSR and when data is not available
-      return {
-        participants: 0,
-        prize: '$0.00',
-        entryFee: '$10.00',
-        seedMoney: '$1000.00',
-        isActive: false,
-        startTime: new Date(),
-        endTime: new Date(),
-      };
-    }
-    
-    const challenge = challengeData.challenge;
-    return {
-      participants: parseInt(challenge.investorCounter),
-      prize: `$${(parseInt(challenge.rewardAmountUSD) / 1e18).toFixed(2)}`, // Convert from wei to USD
-      entryFee: `$${(parseInt(challenge.entryFee) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-      seedMoney: `$${(parseInt(challenge.seedMoney) / 1e6).toFixed(2)}`, // USDC has 6 decimals
-      isActive: challenge.isActive,
-      startTime: new Date(parseInt(challenge.startTime) * 1000),
-      endTime: new Date(parseInt(challenge.endTime) * 1000),
-    };
-  };
-
-  const challengeDetails = getChallengeDetails();
-
   // Handle Join Challenge - Show modal
   const handleJoinChallenge = () => {
     setShowJoinModal(true);
@@ -1096,133 +1016,102 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      
-
       {/* Challenge Charts */}
-                      <ChallengeCharts 
-                        challengeId={challengeId} 
-                        network={subgraphNetwork} 
-                        joinButton={{
-                          isClient,
-                          shouldShowGetRewards: shouldShowGetRewards(),
-                          hasJoinedChallenge,
-                          isChallengeEnded: isChallengeEnded(),
-                          isJoining,
-                          isLoadingChallenge,
-                          challengeData,
-                          isLoadingEntryFee,
-                          isLoadingBalance,
-                          isInsufficientBalance: isInsufficientBalance(),
-                          isGettingRewards,
-                          handleJoinChallenge,
-                          handleNavigateToAccount,
-                          handleGetRewards,
-                          t,
-                          // Wallet connection props
-                          isConnected,
-                          walletSelectOpen,
-                          setWalletSelectOpen,
-                          isConnecting,
-                          handleConnectWallet
-                        }}
-                      />
+      <ChallengeCharts 
+        challengeId={challengeId} 
+        network={subgraphNetwork} 
+        joinButton={{
+          isClient,
+          shouldShowGetRewards: shouldShowGetRewards(),
+          hasJoinedChallenge,
+          isChallengeEnded: isChallengeEnded(),
+          isJoining,
+          isLoadingChallenge,
+          challengeData,
+          isLoadingEntryFee,
+          isLoadingBalance,
+          isInsufficientBalance: isInsufficientBalance(),
+          isGettingRewards,
+          handleJoinChallenge,
+          handleNavigateToAccount,
+          handleGetRewards,
+          t,
+          // Wallet connection props
+          isConnected,
+          walletSelectOpen,
+          setWalletSelectOpen,
+          isConnecting,
+          handleConnectWallet
+        }}
+      />
 
       {/* Transactions and Ranking Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Transactions */}
-        <div className="lg:col-span-2">
-          <h2 className="text-3xl text-gray-100 mb-6">{t('recentTransactions')}</h2>
-          <Card className="bg-transparent border border-gray-700/50">
-            <CardContent className="p-6">
+        {/* Transactions */}
+        <div className="lg:col-span-2 md:mr-10">
+          <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
+          <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+            <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <div className="min-w-[500px] space-y-4">
-                  {isLoadingTransactions ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                      <span className="ml-2 text-gray-400">Loading transactions...</span>
-                    </div>
-                  ) : transactionsError ? (
-                    <div className="text-center py-8 text-red-400">
-                      <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="font-medium">Error loading transactions</p>
-                      <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
-                    </div>
-                  ) : transactions.length > 0 ? (
-                  (() => {
-                    // Calculate pagination
-                    const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
-                    const startIndex = (currentPage - 1) * itemsPerPage;
-                    const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                    const paginatedTransactions = transactions.slice(startIndex, endIndex);
-                    const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                {isLoadingTransactions ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <span className="ml-2 text-gray-400">Loading transactions...</span>
+                  </div>
+                ) : transactionsError ? (
+                  <div className="text-center py-8 text-red-400">
+                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="font-medium">Error loading transactions</p>
+                    <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
+                  </div>
+                ) : transactions.length > 0 ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                        <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
+                        <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        // Calculate pagination
+                        const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                        const paginatedTransactions = transactions.slice(startIndex, endIndex);
+                        const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                    const getTransactionIcon = (type: string) => {
-                      switch (type) {
-                        case 'create':
-                          return <Trophy className="h-4 w-4 text-white" />
-                        case 'join':
-                          return <User className="h-4 w-4 text-white" />
-                        case 'swap':
-                          return <ArrowLeftRight className="h-4 w-4 text-white" />
-                        case 'register':
-                          return <BarChart3 className="h-4 w-4 text-white" />
-                        case 'reward':
-                          return <Trophy className="h-4 w-4 text-white" />
-                        default:
-                          return <Receipt className="h-4 w-4 text-white" />
-                      }
-                    }
-
-                    const getIconColor = (type: string) => {
-                      switch (type) {
-                        case 'create':
-                          return 'bg-purple-500'
-                        case 'join':
-                          return 'bg-blue-500'
-                        case 'swap':
-                          return 'bg-green-500'
-                        case 'register':
-                          return 'bg-orange-500'
-                        case 'reward':
-                          return 'bg-yellow-500'
-                        default:
-                          return 'bg-gray-500'
-                      }
-                    }
-
-                    return (
-                      <div className="space-y-4">
-                        {paginatedTransactions.map((transaction) => (
-                          <div 
+                        return (
+                          <>
+                            {paginatedTransactions.map((transaction) => (
+                          <tr 
                             key={transaction.id} 
-                            className="flex items-center justify-between py-3 px-3 last:border-b-0 mb-2 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
+                            className="hover:bg-gray-800/30 transition-colors cursor-pointer"
                             onClick={() => {
                               const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                               window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                             }}
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              {/* Update date */}
-                              <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                            <td className="py-6 pl-6 pr-4">
+                              <div className="text-sm text-gray-400">
                                 {formatRelativeTime(transaction.timestamp)}
                               </div>
-                              
-                              {/* Transaction type text */}
-                              <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
                                 {getTransactionTypeText(transaction.type)}
                               </div>
-                              
-                              {/* User address (only for reward type) */}
-                              {transaction.type === 'reward' && (
-                                <div className="text-gray-300 text-sm flex-shrink-0">
-                                  → {formatUserAddress(transaction.user)}
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Transaction details */}
-                            <div className="text-right flex-shrink-0 min-w-0">
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="text-gray-300 text-sm">
+                                {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(transaction.user)}
+                              </div>
+                            </td>
+                            <td className="py-6 px-6">
+                              <div className="text-right">
                               {transaction.type === 'swap' ? (
                                 (() => {
                                   const swapDetails = getSwapDetails(transaction)
@@ -1300,54 +1189,60 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               ) : (
                                 <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
                               )}
-                            </div>
-                          </div>
+                                </div>
+                              </td>
+                            </tr>
                         ))}
                         
-                        {/* Pagination */}
+                        {/* Pagination Row */}
                         {totalPages > 1 && (
-                          <div className="flex justify-center mt-6">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                                
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      onClick={() => setCurrentPage(page)}
-                                      isActive={currentPage === page}
-                                      className="cursor-pointer"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
+                          <tr>
+                            <td colSpan={4} className="py-6">
+                              <div className="flex justify-center">
+                                <Pagination>
+                                  <PaginationContent>
+                                    <PaginationItem>
+                                      <PaginationPrevious 
+                                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                      />
+                                    </PaginationItem>
+                                    
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                      <PaginationItem key={page}>
+                                        <PaginationLink
+                                          onClick={() => setCurrentPage(page)}
+                                          isActive={currentPage === page}
+                                          className="cursor-pointer"
+                                        >
+                                          {page}
+                                        </PaginationLink>
+                                      </PaginationItem>
+                                    ))}
+                                    
+                                    <PaginationItem>
+                                      <PaginationNext 
+                                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                      />
+                                    </PaginationItem>
+                                  </PaginationContent>
+                                </Pagination>
+                              </div>
+                            </td>
+                          </tr>
                         )}
-                      </div>
-                    )
-                  })()
-                ) : (
-                  <div className="text-center py-8 text-gray-400">
-                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No transactions found for this challenge</p>
-                  </div>
-                )}
+                          </>
+                        );
+                      })()}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No transactions found for this challenge</p>
                 </div>
+              )}
               </div>
             </CardContent>
           </Card>

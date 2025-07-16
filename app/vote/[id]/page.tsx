@@ -1114,7 +1114,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Proposal details */}
         <div className="lg:col-span-2">
-          <Card className="bg-gray-900/50 border-gray-700/50">
+          <Card className="bg-muted border-gray-700/50">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -1192,7 +1192,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         
         {/* Voting component */}
         <div>
-          <Card className="bg-gray-900/50 border-gray-700/50">
+          <Card className="bg-muted border-gray-700/50">
             <CardHeader>
               <CardTitle className="text-gray-100">{t('castYourVote')}</CardTitle>
               <CardDescription className="text-gray-300">

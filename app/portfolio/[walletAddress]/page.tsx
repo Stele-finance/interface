@@ -273,12 +273,12 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
     return (
       <div>
-        <Card className="bg-transparent border border-gray-700/50">
+        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-700 bg-gray-900/80 hover:bg-gray-800/50">
+                  <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6">{t('challenge')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">{t('type')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
@@ -322,7 +322,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <div className="h-6 bg-gray-700 rounded w-20 animate-pulse"></div>
             </div>
             
-            <Card className="bg-transparent border border-gray-700/50">
+            <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -411,7 +411,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
         {/* Challenge Sections */}
         {investors.length === 0 ? (
-          <Card className="bg-gray-900/50 border-gray-700/50">
+          <Card className="bg-muted border-gray-700/50">
             <CardContent className="text-center py-12">
               <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
               <h3 className="text-lg font-medium text-gray-100 mb-2">{t('noChallengesFoundPortfolio')}</h3>

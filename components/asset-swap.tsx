@@ -766,28 +766,28 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                     <div className="absolute -top-10 right-0 flex gap-1 z-10">
                       <Button
                         onClick={() => handlePercentageClick(25)}
-                        className="bg-transparent border border-gray-600 hover:bg-gray-600/20 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
+                        className="bg-transparent border border-gray-600 hover:bg-muted/60 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
                         size="sm"
                       >
                         25%
                       </Button>
                       <Button
                         onClick={() => handlePercentageClick(50)}
-                        className="bg-transparent border border-gray-600 hover:bg-gray-600/20 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
+                        className="bg-transparent border border-gray-600 hover:bg-muted/60 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
                         size="sm"
                       >
                         50%
                       </Button>
                       <Button
                         onClick={() => handlePercentageClick(75)}
-                        className="bg-transparent border border-gray-600 hover:bg-gray-600/20 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
+                        className="bg-transparent border border-gray-600 hover:bg-muted/60 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
                         size="sm"
                       >
                         75%
                       </Button>
                       <Button
                         onClick={() => handlePercentageClick(100)}
-                        className="bg-transparent border border-gray-600 hover:bg-gray-600/20 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
+                        className="bg-transparent border border-gray-600 hover:bg-muted/60 text-white text-xs px-2 py-1 h-6 rounded-full transition-all duration-200"
                         size="sm"
                       >
                         Max
@@ -799,7 +799,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                       <Button
                         variant="ghost"
                         onClick={() => setIsFromDropdownOpen(!isFromDropdownOpen)}
-                        className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
+                        className="bg-transparent hover:bg-muted/60 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
                       >
                         <div className="flex items-center gap-2">
                           {fromToken ? (
@@ -832,10 +832,10 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                       </Button>
                       
                       {isFromDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-muted/80 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                           {!fromToken && (
                             <div
-                              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-gray-400 text-sm"
+                              className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-gray-400 text-sm"
                               onClick={() => {
                                 setFromToken("")
                                 setIsFromDropdownOpen(false)
@@ -847,7 +847,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                       {availableFromTokens.map((token) => (
                             <div
                               key={token}
-                              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm"
+                              className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-white text-sm"
                               onClick={() => {
                                 setFromToken(token)
                                 setIsFromDropdownOpen(false)
@@ -897,7 +897,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
               variant="ghost"
               size="sm"
               onClick={handleTokenSwap}
-              className="p-2 rounded-full bg-gray-700 border-0 hover:bg-gray-600"
+              className="p-2 rounded-full bg-muted/60 border-0 hover:bg-muted/80"
             >
               <ArrowDown className="h-4 w-4 text-white" />
             </Button>
@@ -936,7 +936,7 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                     <Button
                       variant="ghost"
                       onClick={() => setIsToDropdownOpen(!isToDropdownOpen)}
-                      className="bg-transparent hover:bg-gray-600/20 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
+                      className="bg-transparent hover:bg-muted/60 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
                     >
                       <div className="flex items-center gap-2">
                         {toToken ? (
@@ -969,11 +969,11 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
                     </Button>
                     
                     {isToDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-muted/80 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                     {availableToTokens.map((token) => (
                           <div
                             key={token}
-                            className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm"
+                            className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-white text-sm"
                             onClick={() => {
                               setToToken(token)
                               setIsToDropdownOpen(false)
