@@ -115,7 +115,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
   };
 
   const getRankColor = (rank: number) => {
-    return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
+    return 'bg-transparent border-transparent text-gray-100 hover:bg-gray-800/20';
   };
 
   const handleUserClick = (userAddress: string) => {
@@ -163,7 +163,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
           </div>
         )}
       </div>
-      <Card className="bg-transparent border border-gray-700/50">
+      <Card className="bg-transparent border-transparent">
         <CardContent className="p-0">
           <div className="space-y-0">
             {isLoadingRanking ? (
