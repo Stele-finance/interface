@@ -273,7 +273,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
     return (
       <div>
-        <Card className="bg-transparent border border-gray-700/50">
+        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -322,7 +322,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <div className="h-6 bg-gray-700 rounded w-20 animate-pulse"></div>
             </div>
             
-            <Card className="bg-transparent border border-gray-700/50">
+            <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">

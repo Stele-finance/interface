@@ -31,15 +31,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.className} bg-muted/10 dark:bg-muted/10`} suppressHydrationWarning>
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <LanguageProvider>
               <EntryFeeProvider>
                 <MobileMenuProvider>
-                  <div className="flex flex-col min-h-screen">
+                  <div className="flex flex-col min-h-screen bg-muted/40">
                     <Header />
-
                     <main className="flex-1 p-4 md:p-6">
                       {children}
                     </main>

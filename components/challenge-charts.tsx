@@ -288,20 +288,6 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     return null
   }
 
-  const CustomCursor = ({ x, y, width, height }: any) => {
-    return (
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill="rgba(255, 255, 255, 0.1)"
-        rx={8}
-        ry={8}
-      />
-    )
-  }
-
   if (isLoading || weeklyIsLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">

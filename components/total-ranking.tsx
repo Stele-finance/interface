@@ -92,7 +92,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
       <div className="flex items-center gap-2">
         <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
       </div>
-      <Card className="rounded-2xl overflow-hidden bg-muted/40">
+      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
         {rankings.length === 0 ? (
           <div className="text-center py-8 px-6">

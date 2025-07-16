@@ -524,7 +524,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
           />
         </div>
 
-      <Card className="rounded-2xl overflow-hidden bg-muted/40">
+      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>

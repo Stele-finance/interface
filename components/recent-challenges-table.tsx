@@ -113,7 +113,7 @@ export function RecentChallengesTable() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
-        <Card className="bg-transparent border border-gray-700/50">
+        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             <div className="space-y-3 p-6">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -130,7 +130,7 @@ export function RecentChallengesTable() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
-        <Card className="bg-transparent border border-gray-700/50">
+        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             <div className="text-center py-8 px-6">
               <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
@@ -146,7 +146,7 @@ export function RecentChallengesTable() {
       <h2 className="text-3xl text-gray-100">
         {t('totalChallenges')}
       </h2>
-      <Card className="bg-transparent border border-gray-700/50">
+      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
