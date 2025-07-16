@@ -93,6 +93,6 @@ export function getNetworkLogo(network: 'ethereum' | 'arbitrum'): string {
 }
 
 // Get wallet logo path (optimized small version)
-export function getWalletLogo(wallet: 'metamask' | 'phantom'): string {
+export function getWalletLogo(wallet: 'metamask' | 'phantom' | 'walletconnect'): string {
   return `/wallets/small/${wallet}.png`
 }

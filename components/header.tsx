@@ -44,7 +44,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 
-type WalletType = 'metamask' | 'phantom' | null
+type WalletType = 'metamask' | 'phantom' | 'walletconnect' | null
 
 export function Header() {
   const pathname = usePathname()
@@ -76,6 +76,8 @@ export function Header() {
         return getWalletLogo('metamask')
       case 'phantom':
         return getWalletLogo('phantom')
+      case 'walletconnect':
+        return getWalletLogo('walletconnect')
       default:
         return null
     }
@@ -541,6 +543,20 @@ export function Header() {
                   <div className="text-left">
                     <div className="font-semibold">Phantom</div>
                     <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
+                  </div>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                  onClick={() => handleConnectWallet('walletconnect')}
+                  disabled={isConnecting}
+                >
+                  <Wallet className="h-6 w-6 text-blue-500" />
+                  <div className="text-left">
+                    <div className="font-semibold">WalletConnect</div>
+                    <div className="text-sm text-muted-foreground">Mobile Wallets</div>
                   </div>
                 </Button>
               </div>

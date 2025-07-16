@@ -1,14 +1,18 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { ARBITRUM_CHAIN_CONFIG, ETHEREUM_CHAIN_CONFIG } from '@/lib/constants'
+import { ARBITRUM_CHAIN_CONFIG, ETHEREUM_CHAIN_CONFIG, WALLETCONNECT_PROJECT_ID } from '@/lib/constants'
+import { EthereumProvider } from '@walletconnect/ethereum-provider'
 
 interface WalletState {
   address: string | null
   isConnected: boolean
   network: 'solana' | 'ethereum' | 'arbitrum' | null
-  walletType: 'metamask' | 'phantom' | null
+  walletType: 'metamask' | 'phantom' | 'walletconnect' | null
 }
+
+// WalletConnect provider instance
+let walletConnectProvider: any = null
 
 // Global wallet state
 let globalWalletState: WalletState = {
@@ -54,7 +58,7 @@ const initializeWalletState = () => {
 }
 
 // Set up wallet event listeners
-const setupWalletEventListeners = (walletType: 'metamask' | 'phantom') => {
+const setupWalletEventListeners = (walletType: 'metamask' | 'phantom' | 'walletconnect') => {
   if (typeof window !== 'undefined') {
     const provider = walletType === 'metamask' ? (window as any).ethereum : window.phantom?.ethereum
     
@@ -432,7 +436,7 @@ export function useWallet() {
   }, [])
 
   // Get the correct provider based on wallet type
-  const getProvider = useCallback((walletType: 'metamask' | 'phantom') => {
+  const getProvider = useCallback((walletType: 'metamask' | 'phantom' | 'walletconnect') => {
     if (walletType === 'metamask') {
       // For MetaMask, ensure we get the MetaMask provider specifically
       if ((window as any).ethereum) {
@@ -455,18 +459,23 @@ export function useWallet() {
   }, [])
 
   // Connect wallet function
-  const connectWallet = useCallback(async (walletType: 'metamask' | 'phantom') => {
+  const connectWallet = useCallback(async (walletType: 'metamask' | 'phantom' | 'walletconnect') => {
     try {
       // Clear any previous wallet connections
       disconnectWallet()
       
-      const provider = getProvider(walletType)
+      let provider = null
       
-      if (!provider) {
-        if (walletType === 'metamask') {
-          throw new Error('MetaMask is not installed or not active. Please install it from https://metamask.io/')
-        } else {
-          throw new Error('Phantom wallet is not installed or not active. Please install it from https://phantom.app/')
+      // For WalletConnect, skip provider check as it needs to be initialized first
+      if (walletType !== 'walletconnect') {
+        provider = getProvider(walletType)
+        
+        if (!provider) {
+          if (walletType === 'metamask') {
+            throw new Error('MetaMask is not installed or not active. Please install it from https://metamask.io/')
+          } else {
+            throw new Error('Phantom wallet is not installed or not active. Please install it from https://phantom.app/')
+          }
         }
       }
 
@@ -579,6 +588,72 @@ export function useWallet() {
           })
           
           return { address, network: 'solana' }
+        }
+      } else if (walletType === 'walletconnect') {
+        // WalletConnect connection
+        try {
+          // Check if WalletConnect project ID is configured
+          if (!WALLETCONNECT_PROJECT_ID) {
+            throw new Error('WalletConnect project ID is not configured. Please refer to WALLETCONNECT_SETUP.md file to set up environment variables.')
+          }
+          
+          // Initialize WalletConnect provider if not already done
+          if (!walletConnectProvider) {
+            walletConnectProvider = await EthereumProvider.init({
+              projectId: WALLETCONNECT_PROJECT_ID,
+              chains: [1, 42161], // Ethereum mainnet and Arbitrum
+              showQrModal: true,
+              metadata: {
+                name: 'Stele Finance',
+                description: 'Stele Finance DeFi Platform',
+                url: window.location.origin,
+                icons: [`${window.location.origin}/stele_logo.png`]
+              }
+            })
+          }
+
+          // Set provider for WalletConnect
+          provider = walletConnectProvider
+
+          // Connect to WalletConnect
+          const accounts = await walletConnectProvider.enable()
+          
+          if (accounts && accounts.length > 0) {
+            const address = accounts[0]
+            
+            // Get current chain ID
+            const chainId = walletConnectProvider.chainId
+            
+            let network: 'arbitrum' | 'ethereum' = 'ethereum'
+            if (chainId === 1) {
+              network = 'ethereum'
+            } else if (chainId === 42161) {
+              network = 'arbitrum'
+            } else {
+              network = 'ethereum' // Default to ethereum
+            }
+            
+            // Update localStorage
+            localStorage.setItem('walletAddress', address)
+            localStorage.setItem('walletNetwork', network)
+            localStorage.setItem('walletType', 'walletconnect')
+            
+            // Update global state
+            updateGlobalState({
+              address,
+              isConnected: true,
+              network,
+              walletType: 'walletconnect'
+            })
+            
+            // Set up event listeners after successful connection
+            setupWalletEventListeners('walletconnect')
+            
+            return { address, network }
+          }
+        } catch (error) {
+          console.error('WalletConnect connection error:', error)
+          throw new Error('Failed to connect with WalletConnect')
         }
       }
       
