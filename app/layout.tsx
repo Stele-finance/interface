@@ -1,10 +1,12 @@
-import type React from "react"
+import React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
+import { ClientOnly } from "@/components/ClientOnly"
+import { AppKitInitializer } from "@/components/AppKitInitializer"
 
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
@@ -24,6 +26,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+// AppKit initialization component (moved to separate file)
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,6 +41,9 @@ export default function RootLayout({
             <LanguageProvider>
               <EntryFeeProvider>
                 <MobileMenuProvider>
+                  <ClientOnly>
+                    <AppKitInitializer />
+                  </ClientOnly>
                   <div className="flex flex-col min-h-screen bg-muted/40">
                     <Header />
                     <main className="flex-1 p-4 md:p-6">

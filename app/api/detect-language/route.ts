@@ -176,24 +176,9 @@ async function getCountryFromIP(ip: string): Promise<string> {
 
 export async function GET(request: NextRequest) {
   try {
-    const ip = getClientIP(request);
-    
-    // Only output logs in development environment
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Detected IP:', ip);
-    }
-    
+    const ip = getClientIP(request);    
     const country = await getCountryFromIP(ip);
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Detected country:', country);
-    }
-    
     const language = countryToLanguage[country] || 'en';
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Suggested language:', language);
-    }
     
     return NextResponse.json({
       ip,
