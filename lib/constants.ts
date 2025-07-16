@@ -169,3 +169,6 @@ export const BYTE_ZERO = "0x00000000"
 
 // STELE Token total supply (1 billion tokens = 100,000,000 * 10^18)
 export const STELE_TOTAL_SUPPLY = "100000000000000000000000000";
+
+// WalletConnect configuration
+export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
