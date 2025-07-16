@@ -1,25 +1,25 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { ARBITRUM_CHAIN_CONFIG, ETHEREUM_CHAIN_CONFIG, WALLETCONNECT_PROJECT_ID } from '@/lib/constants'
-import { EthereumProvider } from '@walletconnect/ethereum-provider'
+import { useAppKit, useAppKitAccount, useAppKitNetwork, useAppKitProvider } from '@reown/appkit/react'
+import { BrowserProvider } from 'ethers'
+import { ARBITRUM_CHAIN_CONFIG, ETHEREUM_CHAIN_CONFIG } from '@/lib/constants'
 
 interface WalletState {
   address: string | null
   isConnected: boolean
   network: 'solana' | 'ethereum' | 'arbitrum' | null
   walletType: 'metamask' | 'phantom' | 'walletconnect' | null
+  connectedWallet: 'metamask' | 'phantom' | null // For WalletConnect, which actual wallet is connected
 }
-
-// WalletConnect provider instance
-let walletConnectProvider: any = null
 
 // Global wallet state
 let globalWalletState: WalletState = {
   address: null,
   isConnected: false,
   network: null,
-  walletType: null
+  walletType: null,
+  connectedWallet: null
 }
 
 // Subscribers for state updates
@@ -37,751 +37,276 @@ const subscribe = (callback: (state: WalletState) => void) => {
 const updateGlobalState = (newState: Partial<WalletState>) => {
   globalWalletState = { ...globalWalletState, ...newState }
   subscribers.forEach(callback => callback(globalWalletState))
+  
+  // Persist to localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('walletState', JSON.stringify({
+      walletType: globalWalletState.walletType,
+      connectedWallet: globalWalletState.connectedWallet
+    }))
+  }
 }
 
 // Initialize state from localStorage
-const initializeWalletState = () => {
+const initializeFromStorage = () => {
   if (typeof window !== 'undefined') {
-    const savedAddress = localStorage.getItem('walletAddress')
-    const savedNetwork = localStorage.getItem('walletNetwork')
-    const savedWalletType = localStorage.getItem('walletType')
-    
-    if (savedAddress) {
-      updateGlobalState({
-        address: savedAddress,
-        isConnected: true,
-        network: (savedNetwork as 'solana' | 'ethereum' | 'arbitrum') || 'ethereum',
-        walletType: (savedWalletType as 'metamask' | 'phantom') || 'phantom'
-      })
+    try {
+      const stored = localStorage.getItem('walletState')
+      if (stored) {
+        const { walletType, connectedWallet } = JSON.parse(stored)
+        globalWalletState.walletType = walletType
+        globalWalletState.connectedWallet = connectedWallet
+      }
+    } catch (error) {
+      console.error('Failed to parse stored wallet state:', error)
     }
   }
 }
 
-// Set up wallet event listeners
-const setupWalletEventListeners = (walletType: 'metamask' | 'phantom' | 'walletconnect') => {
-  if (typeof window !== 'undefined') {
-    const provider = walletType === 'metamask' ? (window as any).ethereum : window.phantom?.ethereum
-    
-    if (provider) {
-      // Listen for account changes
-      const handleAccountsChanged = async (accounts: string[]) => {        
-        if (accounts.length === 0) {
-          // User disconnected their wallet
-          localStorage.removeItem('walletAddress')
-          localStorage.removeItem('walletNetwork')
-          localStorage.removeItem('walletType')
-          updateGlobalState({
-            address: null,
-            isConnected: false,
-            network: null,
-            walletType: null
-          })
-        } else {
-          // User switched to a different account
-          const newAddress = accounts[0]
-          
-          // Get current chain to determine network
-          try {
-            const chainId = await provider.request({ 
-              method: 'eth_chainId' 
-            })
-            
-            let network: 'arbitrum' | 'ethereum' = 'ethereum'
-            if (chainId === '0x1') {
-              network = 'ethereum'
-            } else if (chainId === '0xa4b1') {
-              network = 'arbitrum'
-            } else {
-              network = 'ethereum' // Default to ethereum
-            }
-            
-            // Update localStorage and global state
-            localStorage.setItem('walletAddress', newAddress)
-            localStorage.setItem('walletNetwork', network)
-            
-            updateGlobalState({
-              address: newAddress,
-              isConnected: true,
-              network
-            })
-          } catch (error) {
-            console.error('Error getting chain ID:', error)
-            // Fallback: just update address
-            localStorage.setItem('walletAddress', newAddress)
-            updateGlobalState({
-              address: newAddress,
-              isConnected: true,
-              network: globalWalletState.network || 'arbitrum'
-            })
-          }
-        }
-      }
-
-      // Listen for chain changes
-      const handleChainChanged = (chainId: string) => {
-        if (globalWalletState.isConnected) {
-          let network: 'arbitrum' | 'ethereum' = 'ethereum'
-          if (chainId === '0x1') {
-            network = 'ethereum'
-          } else if (chainId === '0xa4b1') {
-            network = 'arbitrum'
-          } else {
-            network = 'ethereum' // Default to ethereum
-          }
-          
-          // Update localStorage and global state
-          localStorage.setItem('walletNetwork', network)
-          updateGlobalState({
-            network
-          })
-        }
-      }
-
-      // Add event listeners with type assertions
-      if (provider.on) {
-        provider.on('accountsChanged', handleAccountsChanged)
-        provider.on('chainChanged', handleChainChanged)
-      }
-
-      // Return cleanup function
-      return () => {
-        if (provider.removeListener) {
-          provider.removeListener('accountsChanged', handleAccountsChanged)
-          provider.removeListener('chainChanged', handleChainChanged)
-        }
-      }
-    }
-  }
+// Detect wallet from provider
+const detectWalletFromProvider = (provider: any): 'metamask' | 'phantom' | null => {
+  if (!provider) return null
   
-  return () => {}
+  // Check for MetaMask
+  if (provider.isMetaMask) return 'metamask'
+  
+  // Check for Phantom
+  if (provider.isPhantom) return 'phantom'
+  
+  // Check user agent or other methods
+  const userAgent = navigator.userAgent.toLowerCase()
+  if (userAgent.includes('metamask')) return 'metamask'
+  if (userAgent.includes('phantom')) return 'phantom'
+  
+  return null
 }
 
-// Hook for using wallet state
-export function useWallet() {
-  const [walletState, setWalletState] = useState<WalletState>(globalWalletState)
+// Main useWallet hook
+export const useWallet = () => {
+  // Always call hooks in the same order
+  const [isLoading, setIsLoading] = useState(false)
+  
+  // Safely handle AppKit hooks with individual try-catch
+  let appKitOpen: (() => void) | null = null
+  let appKitAddress: string | undefined = undefined
+  let appKitIsConnected: boolean = false
+  let appKitChainId: number | undefined = undefined
+  let appKitWalletProvider: any = undefined
 
-  // Function to get the correct provider for the active wallet
-  const getActiveProvider = useCallback(() => {
-    if (!globalWalletState.walletType) return null
+  try {
+    const { open } = useAppKit()
+    appKitOpen = open
+  } catch (error) {
+    // console.warn('useAppKit not available:', error)
+  }
 
-    if (globalWalletState.walletType === 'metamask') {
-      // For MetaMask, ensure we get the MetaMask provider specifically
-      if ((window as any).ethereum) {
-        if ((window as any).ethereum.providers) {
-          const metaMaskProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask)
-          return metaMaskProvider || null
-        }
-        if ((window as any).ethereum.isMetaMask) {
-          return (window as any).ethereum
-        }
-      }
-      return null
-    } else if (globalWalletState.walletType === 'phantom') {
-      return window.phantom?.ethereum?.isPhantom ? window.phantom.ethereum : null
-    }
-    
-    return null
-  }, [])
+  try {
+    const { address, isConnected } = useAppKitAccount()
+    appKitAddress = address
+    appKitIsConnected = isConnected
+  } catch (error) {
+    // console.warn('useAppKitAccount not available:', error)
+  }
 
-  // Function to check and update current network state
-  const checkAndUpdateNetworkState = useCallback(async () => {
-    if (!globalWalletState.isConnected || !globalWalletState.walletType) return
+  try {
+    const { chainId } = useAppKitNetwork()
+    appKitChainId = typeof chainId === 'number' ? chainId : undefined
+  } catch (error) {
+    // console.warn('useAppKitNetwork not available:', error)
+  }
 
-    try {
-      const provider = getActiveProvider()
+  try {
+    const { walletProvider } = useAppKitProvider('eip155')
+    appKitWalletProvider = walletProvider
+  } catch (error) {
+    // console.warn('useAppKitProvider not available:', error)
+  }
 
-      if (provider) {
-        // For Ethereum-compatible networks only
-        if (globalWalletState.network !== 'solana') {
-          const currentChainId = await provider.request({ method: 'eth_chainId' })
-          
-          let detectedNetwork: 'ethereum' | 'arbitrum' = 'ethereum'
-          if (currentChainId === '0x1') {
-            detectedNetwork = 'ethereum'
-          } else if (currentChainId === '0xa4b1') {
-            detectedNetwork = 'arbitrum'
-          } else {
-            detectedNetwork = 'ethereum' // Default
-          }
-
-          // Only update if there's a genuine network change
-          if (detectedNetwork !== globalWalletState.network) {
-            localStorage.setItem('walletNetwork', detectedNetwork)
-            updateGlobalState({
-              network: detectedNetwork
-            })
-          }
-        }
-        // For Solana, skip chain ID checks as it uses different methods
-      }
-    } catch (error) {
-      console.warn('Failed to check network state:', error)
-    }
-  }, [getActiveProvider])
-
-  // Function to check and update current account state (especially for Phantom)
-  const checkAndUpdateAccountState = useCallback(async () => {
-    if (!globalWalletState.isConnected || !globalWalletState.walletType) return
-
-    try {
-      const provider = getActiveProvider()
-
-      if (provider) {
-        // For Ethereum-compatible networks only
-        if (globalWalletState.network !== 'solana') {
-          let currentAccounts: string[] = []
-          
-          try {
-            currentAccounts = await provider.request({ method: 'eth_accounts' })
-          } catch (error) {
-            console.warn('Failed to get accounts:', error)
-            
-            // For Phantom, also try to get selectedAddress directly
-            if (globalWalletState.walletType === 'phantom' && provider.selectedAddress) {
-              currentAccounts = [provider.selectedAddress]
-            } else {
-              return
-            }
-          }
-
-          if (currentAccounts.length === 0) {
-            // User disconnected their wallet
-            localStorage.removeItem('walletAddress')
-            localStorage.removeItem('walletNetwork')
-            localStorage.removeItem('walletType')
-            updateGlobalState({
-              address: null,
-              isConnected: false,
-              network: null,
-              walletType: null
-            })
-          } else {
-            const currentAddress = currentAccounts[0]
-            
-            // Check if address has changed
-            if (currentAddress !== globalWalletState.address) {
-              localStorage.setItem('walletAddress', currentAddress)
-              updateGlobalState({
-                address: currentAddress
-              })
-            }
-          }
-        }
-        // For Solana, skip account checks as it uses different methods
-      }
-    } catch (error) {
-      console.warn('Failed to check account state:', error)
-    }
-  }, [getActiveProvider])
-
+  // Initialize from storage on mount
   useEffect(() => {
-    // Initialize from localStorage on first load
-    if (!globalWalletState.address) {
-      initializeWalletState()
+    initializeFromStorage()
+  }, [])
+
+  // Update global state when AppKit state changes
+  useEffect(() => {
+    let network: 'ethereum' | 'arbitrum' | null = null
+    
+    if (appKitChainId === 1) {
+      network = 'ethereum'
+    } else if (appKitChainId === 42161) {
+      network = 'arbitrum'
     }
-    
-    // Set initial state
-    setWalletState(globalWalletState)
-    
-    // Subscribe to state changes
-    const unsubscribe = subscribe(setWalletState)
-    
-    // Set up continuous monitoring for connected wallets
-    if (globalWalletState.isConnected && globalWalletState.walletType) {
-      // Initial check
-      checkAndUpdateNetworkState()
-      
-             // Set up event listeners for the active wallet only
-       const setupEventListeners = () => {
-         const provider = getActiveProvider()
-         const currentWalletType = globalWalletState.walletType
-         
-         if (!provider || !currentWalletType) return
 
-         const handleChainChanged = (chainId: string) => {           
-           // Only process if this is still the active wallet
-           if (globalWalletState.isConnected && globalWalletState.walletType === currentWalletType) {
-             let network: 'arbitrum' | 'ethereum' = 'ethereum'
-             if (chainId === '0x1') {
-               network = 'ethereum'
-             } else if (chainId === '0xa4b1') {
-               network = 'arbitrum'
-             } else {
-               network = 'ethereum'
-             }
-             
-             localStorage.setItem('walletNetwork', network)
-             updateGlobalState({ network })
-           }
-         }
-
-         const handleAccountsChanged = (accounts: string[]) => {           
-           // Only process if this is still the active wallet
-           if (globalWalletState.walletType === currentWalletType) {
-             if (accounts.length === 0) {
-               // Disconnect
-               localStorage.removeItem('walletAddress')
-               localStorage.removeItem('walletNetwork')
-               localStorage.removeItem('walletType')
-               updateGlobalState({
-                 address: null,
-                 isConnected: false,
-                 network: null,
-                 walletType: null
-               })
-             } else {
-               // Account switched
-               const newAddress = accounts[0]
-               localStorage.setItem('walletAddress', newAddress)
-               updateGlobalState({
-                 address: newAddress
-               })
-             }
-           }
-         }
-
-         // Additional event listeners for Phantom
-         const handleConnect = (connectInfo: any) => {
-           console.log(`Connect event detected by ${currentWalletType}:`, connectInfo)
-           // Force account state check
-           setTimeout(() => {
-             checkAndUpdateAccountState()
-           }, 1000)
-         }
-
-         const handleDisconnect = () => {
-           console.log(`Disconnect event detected by ${currentWalletType}`)
-           if (globalWalletState.walletType === currentWalletType) {
-             localStorage.removeItem('walletAddress')
-             localStorage.removeItem('walletNetwork')
-             localStorage.removeItem('walletType')
-             updateGlobalState({
-               address: null,
-               isConnected: false,
-               network: null,
-               walletType: null
-             })
-           }
-         }
-
-         if (provider.on) {
-           provider.on('chainChanged', handleChainChanged)
-           provider.on('accountsChanged', handleAccountsChanged)
-           
-           // Add additional event listeners for better account detection
-           if (currentWalletType === 'phantom') {
-             provider.on('connect', handleConnect)
-             provider.on('disconnect', handleDisconnect)
-           }
-         }
-
-         // Return cleanup function
-         return () => {
-           if (provider.removeListener) {
-             provider.removeListener('chainChanged', handleChainChanged)
-             provider.removeListener('accountsChanged', handleAccountsChanged)
-             
-             if (currentWalletType === 'phantom') {
-               provider.removeListener('connect', handleConnect)
-               provider.removeListener('disconnect', handleDisconnect)
-             }
-           }
-         }
-       }
-
-       const cleanupEventListeners = setupEventListeners()
-
-       // Different polling intervals for different wallets
-       const pollingInterval = globalWalletState.walletType === 'phantom' ? 5000 : 30000 // 5 seconds for Phantom, 30 seconds for MetaMask
-       const networkCheckInterval = setInterval(checkAndUpdateNetworkState, pollingInterval)
-       const accountCheckInterval = setInterval(checkAndUpdateAccountState, pollingInterval)
-
-       // Check on window focus
-       const handleFocus = () => {
-         checkAndUpdateNetworkState()
-         checkAndUpdateAccountState()
-       }
-       window.addEventListener('focus', handleFocus)
-
-       return () => {
-         unsubscribe()
-         clearInterval(networkCheckInterval)
-         clearInterval(accountCheckInterval)
-         window.removeEventListener('focus', handleFocus)
-         if (cleanupEventListeners) {
-           cleanupEventListeners()
-         }
-       }
+    // Detect connected wallet if using WalletConnect
+    let detectedWallet = globalWalletState.connectedWallet
+    if (appKitWalletProvider && !detectedWallet) {
+      detectedWallet = detectWalletFromProvider(appKitWalletProvider)
     }
-    
-    return () => {
-      unsubscribe()
-    }
-  }, [checkAndUpdateAccountState])
 
-    // Disconnect wallet function
-  const disconnectWallet = useCallback(() => {
-    // Clear localStorage
-    localStorage.removeItem('walletAddress')
-    localStorage.removeItem('walletNetwork')
-    localStorage.removeItem('walletType')
+    const walletType = appKitIsConnected ? 'walletconnect' : null
     
-    // Update global state
     updateGlobalState({
-      address: null,
-      isConnected: false,
-      network: null,
-      walletType: null
+      address: appKitAddress,
+      isConnected: appKitIsConnected,
+      network,
+      walletType,
+      connectedWallet: detectedWallet
     })
-  }, [])
-
-  // Get the correct provider based on wallet type
-  const getProvider = useCallback((walletType: 'metamask' | 'phantom' | 'walletconnect') => {
-    if (walletType === 'metamask') {
-      // For MetaMask, ensure we get the MetaMask provider specifically
-      if ((window as any).ethereum) {
-        // If there are multiple providers, find MetaMask specifically
-        if ((window as any).ethereum.providers) {
-          const metaMaskProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask)
-          return metaMaskProvider || null
-        }
-        // If single provider and it's MetaMask
-        if ((window as any).ethereum.isMetaMask) {
-          return (window as any).ethereum
-        }
-      }
-      return null
-    } else if (walletType === 'phantom') {
-      // For Phantom, use only Phantom's Ethereum provider
-      return window.phantom?.ethereum?.isPhantom ? window.phantom.ethereum : null
-    }
-    return null
-  }, [])
+  }, [appKitAddress, appKitIsConnected, appKitChainId, appKitWalletProvider])
 
   // Connect wallet function
-  const connectWallet = useCallback(async (walletType: 'metamask' | 'phantom' | 'walletconnect') => {
-    try {
-      // Clear any previous wallet connections
-      disconnectWallet()
-      
-      let provider = null
-      
-      // For WalletConnect, skip provider check as it needs to be initialized first
-      if (walletType !== 'walletconnect') {
-        provider = getProvider(walletType)
-        
-        if (!provider) {
-          if (walletType === 'metamask') {
-            throw new Error('MetaMask is not installed or not active. Please install it from https://metamask.io/')
-          } else {
-            throw new Error('Phantom wallet is not installed or not active. Please install it from https://phantom.app/')
-          }
+  const connectWallet = useCallback(async (selectedWalletType: 'metamask' | 'phantom' | 'walletconnect') => {
+    if (selectedWalletType === 'walletconnect') {
+      setIsLoading(true)
+      try {
+        if (appKitOpen) {
+          appKitOpen()
+        } else {
+          throw new Error('AppKit not initialized')
         }
+        return { success: true }
+      } catch (error) {
+        console.error('Failed to open AppKit modal:', error)
+        throw error
+      } finally {
+        setIsLoading(false)
       }
-
-      if (walletType === 'metamask') {
-        // MetaMask connection - verify we have the correct provider
-        if (!provider || !provider.isMetaMask) {
-          throw new Error('MetaMask provider not found. Please ensure MetaMask is installed and enabled.')
-        }
-        
-        const accounts = await provider.request({ 
-          method: 'eth_requestAccounts' 
-        })
-        
-        if (accounts && accounts.length > 0) {
-          const address = accounts[0]
-          
-          // Get current chain ID
-          const chainId = await provider.request({ 
-            method: 'eth_chainId' 
-          })
-          
-          let network: 'arbitrum' | 'ethereum' = 'ethereum'
-          if (chainId === '0x1') { // Ethereum mainnet
-            network = 'ethereum'
-          } else if (chainId === '0xa4b1') { // Arbitrum mainnet
-            network = 'arbitrum'
-          } else {
-            network = 'ethereum' // Default to ethereum
-          }
-          
-          // Update localStorage
-          localStorage.setItem('walletAddress', address)
-          localStorage.setItem('walletNetwork', network)
-          localStorage.setItem('walletType', 'metamask')
-          
-          // Update global state
-          updateGlobalState({
-            address,
-            isConnected: true,
-            network,
-            walletType: 'metamask'
-          })
-          
-          // Set up event listeners after successful connection
-          setupWalletEventListeners('metamask')
-          
-          return { address, network }
-        }
-            } else if (walletType === 'phantom') {
-        // Phantom connection - verify we have the correct provider
-        if (provider && provider.isPhantom) {
-          // Phantom connection - Try ETH first
-          const accounts = await provider.request({ 
-            method: 'eth_requestAccounts' 
-          })
-          
-          if (accounts && accounts.length > 0) {
-            const address = accounts[0]
-            
-            // Get current chain ID
-            const chainId = await provider.request({ 
-              method: 'eth_chainId' 
-            })
-            
-            let network: 'ethereum' = 'ethereum'
-            if (chainId === '0x1') { // Ethereum mainnet
-              network = 'ethereum'
-            } else {
-              network = 'ethereum' // Default to ethereum for Phantom
-            }
-            
-            // Update localStorage
-            localStorage.setItem('walletAddress', address)
-            localStorage.setItem('walletNetwork', network)
-            localStorage.setItem('walletType', 'phantom')
-            
-            // Update global state
-            updateGlobalState({
-              address,
-              isConnected: true,
-              network,
-              walletType: 'phantom'
-            })
-            
-            // Set up event listeners after successful connection
-            setupWalletEventListeners('phantom')
-            
-            return { address, network }
-          }
-        }
-        
-        // Fallback to Solana for Phantom
-        const solanaProvider = window.phantom?.solana
-        
-        if (solanaProvider?.isPhantom) {
-          const response = await solanaProvider.connect()
-          const address = response.publicKey.toString()
-          
-          // Update localStorage
-          localStorage.setItem('walletAddress', address)
-          localStorage.setItem('walletNetwork', 'solana')
-          localStorage.setItem('walletType', 'phantom')
-          
-          // Update global state
-          updateGlobalState({
-            address,
-            isConnected: true,
-            network: 'solana',
-            walletType: 'phantom'
-          })
-          
-          return { address, network: 'solana' }
-        }
-      } else if (walletType === 'walletconnect') {
-        // WalletConnect connection
-        try {
-          // Check if WalletConnect project ID is configured
-          console.log('WalletConnect Project ID:', WALLETCONNECT_PROJECT_ID ? 'Configured' : 'Not configured')
-          if (!WALLETCONNECT_PROJECT_ID) {
-            throw new Error('WalletConnect project ID is not configured. Please refer to WALLETCONNECT_SETUP.md file to set up environment variables.')
-          }
-          
-          // Initialize WalletConnect provider if not already done
-          if (!walletConnectProvider) {
-            walletConnectProvider = await EthereumProvider.init({
-              projectId: WALLETCONNECT_PROJECT_ID,
-              chains: [1, 42161], // Ethereum mainnet and Arbitrum
-              showQrModal: true,
-              metadata: {
-                name: 'Stele Finance',
-                description: 'Stele Finance DeFi Platform',
-                url: window.location.origin,
-                icons: [`${window.location.origin}/stele_logo.png`]
-              }
-            })
-          }
-
-          // Set provider for WalletConnect
-          provider = walletConnectProvider
-
-          // Connect to WalletConnect
-          const accounts = await walletConnectProvider.enable()
-          
-          if (accounts && accounts.length > 0) {
-            const address = accounts[0]
-            
-            // Get current chain ID
-            const chainId = walletConnectProvider.chainId
-            
-            let network: 'arbitrum' | 'ethereum' = 'ethereum'
-            if (chainId === 1) {
-              network = 'ethereum'
-            } else if (chainId === 42161) {
-              network = 'arbitrum'
-            } else {
-              network = 'ethereum' // Default to ethereum
-            }
-            
-            // Update localStorage
-            localStorage.setItem('walletAddress', address)
-            localStorage.setItem('walletNetwork', network)
-            localStorage.setItem('walletType', 'walletconnect')
-            
-            // Update global state
-            updateGlobalState({
-              address,
-              isConnected: true,
-              network,
-              walletType: 'walletconnect'
-            })
-            
-            // Set up event listeners after successful connection
-            setupWalletEventListeners('walletconnect')
-            
-            return { address, network }
-          }
-        } catch (error) {
-          console.error('WalletConnect connection error:', error)
-          throw new Error('Failed to connect with WalletConnect')
-        }
-      }
-      
-      throw new Error('Failed to connect to wallet')
-    } catch (error) {
-      console.error('Wallet connection error:', error)
-      throw error
+         } else if (selectedWalletType === 'metamask') {
+       // Direct MetaMask connection
+       if (typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask) {
+         try {
+           setIsLoading(true)
+           const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+           if (accounts && accounts.length > 0) {
+             updateGlobalState({
+               address: accounts[0],
+               isConnected: true,
+               walletType: 'metamask',
+               connectedWallet: 'metamask',
+               network: 'ethereum'
+             })
+             return { address: accounts[0], network: 'ethereum' }
+           }
+         } catch (error) {
+           console.error('MetaMask connection failed:', error)
+           throw error
+         } finally {
+           setIsLoading(false)
+         }
+       } else {
+         throw new Error('MetaMask is not installed')
+       }
+     } else if (selectedWalletType === 'phantom') {
+       // Direct Phantom connection
+       if (typeof window !== 'undefined' && (window as any).phantom?.ethereum) {
+         try {
+           setIsLoading(true)
+           const phantomProvider = (window as any).phantom.ethereum
+           const accounts = await phantomProvider.request({ method: 'eth_requestAccounts' })
+           if (accounts && accounts.length > 0) {
+             updateGlobalState({
+               address: accounts[0],
+               isConnected: true,
+               walletType: 'phantom',
+               connectedWallet: 'phantom',
+               network: 'ethereum'
+             })
+             return { address: accounts[0], network: 'ethereum' }
+           }
+         } catch (error) {
+           console.error('Phantom connection failed:', error)
+           throw error
+         } finally {
+           setIsLoading(false)
+         }
+       } else {
+         throw new Error('Phantom is not installed')
+       }
     }
-  }, [getProvider, disconnectWallet])
+     }, [appKitOpen])
 
-  // Switch network function
-  const switchNetwork = useCallback(async (targetNetwork: 'solana' | 'ethereum' | 'arbitrum') => {
-    const currentWalletType = globalWalletState.walletType
-    if (!currentWalletType) {
+  // Disconnect wallet function
+  const disconnectWallet = useCallback(async () => {
+    try {
+      // Clear global state
+      updateGlobalState({
+        address: null,
+        isConnected: false,
+        network: null,
+        walletType: null,
+        connectedWallet: null
+      })
+      
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('walletState')
+      }
+    } catch (error) {
+      console.error('Failed to disconnect:', error)
+    }
+  }, [])
+
+    // Switch network function
+  const switchNetwork = useCallback(async (targetNetwork: 'ethereum' | 'arbitrum') => {
+    if (!appKitWalletProvider) {
       throw new Error('No wallet connected')
     }
 
-    // Check if trying to switch to Arbitrum with Phantom wallet
-    if (targetNetwork === 'arbitrum' && currentWalletType === 'phantom') {
-      throw new Error('Phantom wallet does not support Arbitrum network. Please use MetaMask.')
-    }
-
     try {
-      const provider = getProvider(currentWalletType)
+      const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
       
-      if (!provider) {
-        throw new Error(`${currentWalletType} wallet not found or not active`)
-      }
-
-      let targetChainId: string
-      let chainConfig: any
-
-      if (targetNetwork === 'arbitrum') {
-        if (currentWalletType !== 'metamask') {
-          throw new Error('Only MetaMask supports Arbitrum network')
+      // Try to switch to the target network
+      await (appKitWalletProvider as any).request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainConfig.chainId }],
+      })
+      
+      updateGlobalState({ network: targetNetwork })
+    } catch (switchError: any) {
+      // If the network doesn't exist, add it
+      if (switchError.code === 4902) {
+        try {
+          const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
+          await (appKitWalletProvider as any).request({
+            method: 'wallet_addEthereumChain',
+            params: [chainConfig],
+          })
+          updateGlobalState({ network: targetNetwork })
+        } catch (addError) {
+          console.error('Failed to add network:', addError)
+          throw addError
         }
-        targetChainId = '0xa4b1'
-        chainConfig = ARBITRUM_CHAIN_CONFIG
-        
-      } else if (targetNetwork === 'ethereum') {
-        targetChainId = '0x1'
-        chainConfig = ETHEREUM_CHAIN_CONFIG
       } else {
-        throw new Error(`Unsupported network: ${targetNetwork}`)
+        console.error('Failed to switch network:', switchError)
+        throw switchError
       }
-
-      // Get current chain ID
-      let currentChainId: string
-      try {
-        currentChainId = await provider.request({ method: 'eth_chainId' })
-      } catch (error) {
-        console.warn('Could not get current chain ID:', error)
-        currentChainId = '0x0' // fallback
-      }
-
-      // If already on the target network, just update state
-      if (currentChainId === targetChainId) {
-        localStorage.setItem('walletNetwork', targetNetwork)
-        updateGlobalState({
-          network: targetNetwork
-        })
-        return
-      }
-
-      // Try to switch to the target chain
-      try {
-        await provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: targetChainId }],
-        })
-        
-        // Successfully switched - update state
-        localStorage.setItem('walletNetwork', targetNetwork)
-        updateGlobalState({
-          network: targetNetwork
-        })
-        
-      } catch (switchError: any) {
-        console.log('Switch error code:', switchError.code)
-        
-        // If the chain doesn't exist in the wallet (error code 4902)
-        if (switchError.code === 4902 || switchError.code === -32603) {
-          try {
-            // Add the chain first
-            await provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [chainConfig],
-            })
-            
-            // After adding, try to switch again
-            await provider.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: targetChainId }],
-            })
-            
-            // Successfully added and switched - update state
-            localStorage.setItem('walletNetwork', targetNetwork)
-            updateGlobalState({
-              network: targetNetwork
-            })
-            
-          } catch (addError: any) {
-            console.error('Error adding chain:', addError)
-            throw new Error(`Failed to add ${targetNetwork} network to wallet. Please add it manually.`)
-          }
-        } else if (switchError.code === 4001) {
-          // User rejected the request
-          throw new Error('Network switch cancelled by user')
-        } else {
-          // Other errors
-          console.error('Network switch error:', switchError)
-          throw new Error(`Failed to switch to ${targetNetwork} network. Please try switching manually in your wallet.`)
-        }
-      }
-    } catch (error) {
-      console.error('Network switch error:', error)
-      throw error
     }
-  }, [getProvider])
+  }, [appKitWalletProvider])
+
+       // Get provider function
+  const getProvider = useCallback(() => {
+    if (appKitWalletProvider) {
+      return new BrowserProvider(appKitWalletProvider as any)
+    }
+    return null
+  }, [appKitWalletProvider])
 
   return {
-    address: walletState.address,
-    isConnected: walletState.isConnected,
-    network: walletState.network,
-    walletType: walletState.walletType,
+    // State
+    address: globalWalletState.address,
+    isConnected: globalWalletState.isConnected,
+    network: globalWalletState.network,
+    walletType: globalWalletState.walletType,
+    connectedWallet: globalWalletState.connectedWallet,
+    isLoading,
+    
+    // Functions
     connectWallet,
     disconnectWallet,
-    switchNetwork
+    switchNetwork,
+    getProvider,
+    
+    // Subscribe to state changes
+    subscribe
   }
 } 

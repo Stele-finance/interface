@@ -54,7 +54,7 @@ export function Header() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   
   // Use global wallet hook
-  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType } = useWallet()
+  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType, connectedWallet } = useWallet()
   
   const [isConnecting, setIsConnecting] = useState(false)
   const [balance, setBalance] = useState<string>('0')
@@ -145,6 +145,8 @@ export function Header() {
   const handleConnectWallet = async (selectedWalletType: WalletType) => {
     if (!selectedWalletType) return
     
+    setWalletSelectOpen(false)
+    
     try {
       setIsConnecting(true)
       await connectWallet(selectedWalletType)
@@ -162,7 +164,7 @@ export function Header() {
   }
 
   // Switch between Networks
-  const switchWalletNetwork = async (targetNetwork: 'solana' | 'ethereum' | 'arbitrum') => {
+  const switchWalletNetwork = async (targetNetwork: 'ethereum' | 'arbitrum') => {
     // Immediate validation before any async operations
     if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
       toast({
@@ -382,7 +384,27 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
-                  {walletIcon ? (
+                  {walletType === 'walletconnect' ? (
+                    <div className="relative mr-2">
+                      <Image 
+                        src={getWalletLogo('walletconnect')} 
+                        alt="WalletConnect"
+                        width={16}
+                        height={16}
+                        style={{ width: 'auto', height: '16px' }}
+                      />
+                      {connectedWallet && (
+                        <Image 
+                          src={getWalletLogo(connectedWallet)} 
+                          alt={`${connectedWallet} wallet`}
+                          width={6}
+                          height={6}
+                          className="absolute -bottom-0.5 -right-0.5 rounded-full"
+                          style={{ width: 'auto', height: '6px' }}
+                        />
+                      )}
+                    </div>
+                  ) : walletIcon ? (
                     <Image 
                       src={walletIcon} 
                       alt={`${walletType} wallet`}
@@ -563,6 +585,8 @@ export function Header() {
             </DialogContent>
           </Dialog>
         )}
+
+
 
         {/* Language Selector - Hidden on mobile */}
         <LanguageSelectorSidebar>
