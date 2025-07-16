@@ -49,7 +49,7 @@ export function LanguageSelectorSidebar({ children }: LanguageSelectorSidebarPro
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent side="right" className="w-64 sm:w-72 flex flex-col">
+      <SheetContent side="right" className="w-64 sm:w-72 flex flex-col bg-muted border-gray-600">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Globe className="h-5 w-5" />

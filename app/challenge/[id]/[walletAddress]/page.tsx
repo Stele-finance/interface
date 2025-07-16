@@ -939,7 +939,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             />
             
             {/* Interval selector */}
-            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8">
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
               <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
                 <button
                   onClick={() => setChartInterval('daily')}
@@ -963,6 +963,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </button>
               </div>
             </div>
+            
+            {/* Separator Bar */}
+            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
               <TabsList className="grid w-full grid-cols-3">
@@ -1499,7 +1502,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               
                               {/* Pagination for Ranking */}
                               {rankingTotalPages > 1 && (
-                                <div className="flex justify-center mt-6 mb-4">
+                                <div className="flex justify-center mt-2">
                                   <Pagination>
                                     <PaginationContent>
                                       <PaginationItem>
@@ -1543,8 +1546,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       )}
                       
                       {rankingData && (
-                        <div className="mt-6 pt-4 border-t border-gray-700">
-                          <div className="text-xs text-gray-500 text-center">
+                        <div className="border-t border-gray-700">
+                          <div className="mt-2 mb-2 text-xs text-gray-500 text-center">
                             Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
                           </div>
                         </div>
@@ -1558,7 +1561,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           
           {/* Right Side - Portfolio Summary / Swap Assets */}
           <div className="lg:col-span-1">
-            <div className="space-y-8 lg:mt-10 md:space-y-4">
+            <div className="space-y-6 lg:mt-10 md:space-y-4">
               {/* Investor Info Section */}
               <div className="flex items-center justify-between gap-4 mb-4">
                                  {/* Action Buttons and Registered status */}

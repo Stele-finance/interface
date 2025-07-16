@@ -400,7 +400,7 @@ export function Header() {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-muted/80 border-gray-600">
+              <DropdownMenuContent align="end" className="w-48 bg-muted border-gray-600">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <span className="text-base font-semibold">{name}</span>
@@ -570,7 +570,7 @@ export function Header() {
               <Menu className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600">
+          <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600">
             <DropdownMenuItem asChild>
               <Link 
                 href="https://github.com/Stele-finance/interface"
@@ -617,7 +617,7 @@ export function Header() {
           />
           
           {/* Menu Panel */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-muted/40 border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-muted border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
             <div className="p-4 pb-4">
               {/* Handle Bar */}
               <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-4"></div>
@@ -681,8 +681,8 @@ export function Header() {
                 </Link>
               </div>
                
-                             {/* Separator */}
-              <div className="border-t border-border mb-4"></div>
+              {/* Separator */}
+              <div className="border-t border-gray-600 my-4 mx-2"></div>
                
                {/* Icon Links - displayed horizontally */}
               <div className="flex items-center justify-center gap-8 px-4 py-0">
@@ -723,7 +723,7 @@ export function Header() {
                </div>
                
                {/* Reduced empty space */}
-               <div className="h-6"></div>
+               <div className="h-2"></div>
              </div>
            </div>
         </>

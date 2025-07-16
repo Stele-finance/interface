@@ -473,7 +473,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </CardContent>
           
           {/* Interval selector - Below chart like investor page */}
-          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-0">
+          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
             <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
               <button
                 onClick={() => setIntervalType('daily')}
@@ -496,6 +496,11 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 {t('weekly')}
               </button>
             </div>
+          </div>
+          
+          {/* Separator Bar - Below daily/weekly buttons, chart width */}
+          <div className="pr-6 mb-4 pt-2">
+            <div className="border-t border-gray-600/50"></div>
           </div>
         </Card>
         
@@ -633,7 +638,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       {/* Total Rewards Chart - Takes 2 columns */}
       <Card className="bg-transparent border-0 lg:col-span-2 -mt-12">
-        <CardHeader className="pb-2 px-1 sm:px-6">
+        <CardHeader className="pb-2 px-1 sm:px-6 md:-ml-6">
           {/* Mobile layout */}
           <div className="block md:hidden">
             {/* First row: Challenge title only */}
@@ -805,11 +810,11 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-1 sm:px-6 md:mr-6">
+        <CardContent className="pr-0 md:mr-6 -ml-6">
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart 
               data={chartData} 
-              margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 10, left: 0, bottom: 0 }}
               onMouseMove={(state: any) => {
                 if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                   setActiveIndexRewards(state.activeTooltipIndex)
@@ -892,6 +897,11 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               {t('weekly')}
             </button>
           </div>
+        </div>
+        
+        {/* Separator Bar - Below daily/weekly buttons, chart width */}
+        <div className="pr-6 md:mr-4 -mr-4 mb-0 pt-2">
+          <div className="border-t border-gray-600/50"></div>
         </div>
       </Card>
 
