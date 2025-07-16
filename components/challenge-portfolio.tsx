@@ -1050,63 +1050,68 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         {/* Transactions */}
         <div className="lg:col-span-2 md:mr-10">
           <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
-          <Card className="bg-transparent border border-gray-700/50">
+          <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <div className="min-w-[500px] space-y-0">
-                  {isLoadingTransactions ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                      <span className="ml-2 text-gray-400">Loading transactions...</span>
-                    </div>
-                  ) : transactionsError ? (
-                    <div className="text-center py-8 text-red-400">
-                      <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="font-medium">Error loading transactions</p>
-                      <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
-                    </div>
-                  ) : transactions.length > 0 ? (
-                  (() => {
-                    // Calculate pagination
-                    const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
-                    const startIndex = (currentPage - 1) * itemsPerPage;
-                    const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                    const paginatedTransactions = transactions.slice(startIndex, endIndex);
-                    const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                {isLoadingTransactions ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <span className="ml-2 text-gray-400">Loading transactions...</span>
+                  </div>
+                ) : transactionsError ? (
+                  <div className="text-center py-8 text-red-400">
+                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="font-medium">Error loading transactions</p>
+                    <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
+                  </div>
+                ) : transactions.length > 0 ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                        <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
+                        <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        // Calculate pagination
+                        const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                        const paginatedTransactions = transactions.slice(startIndex, endIndex);
+                        const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                    return (
-                      <div className="space-y-0">
-                        {paginatedTransactions.map((transaction) => (
-                          <div 
+                        return (
+                          <>
+                            {paginatedTransactions.map((transaction) => (
+                          <tr 
                             key={transaction.id} 
-                            className="flex items-center justify-between py-6 px-8 last:border-b-0 cursor-pointer hover:bg-gray-800/50 rounded-lg transition-colors gap-4 min-w-0"
+                            className="hover:bg-gray-800/30 transition-colors cursor-pointer"
                             onClick={() => {
                               const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                               window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                             }}
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              {/* Update date */}
-                              <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                            <td className="py-6 pl-6 pr-4">
+                              <div className="text-sm text-gray-400">
                                 {formatRelativeTime(transaction.timestamp)}
                               </div>
-                              
-                              {/* Transaction type text */}
-                              <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
                                 {getTransactionTypeText(transaction.type)}
                               </div>
-                              
-                              {/* User address (only for reward type) */}
-                              {transaction.type === 'reward' && (
-                                <div className="text-gray-300 text-sm flex-shrink-0">
-                                  → {formatUserAddress(transaction.user)}
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Transaction details */}
-                            <div className="text-right flex-shrink-0 min-w-0">
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="text-gray-300 text-sm">
+                                {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(transaction.user)}
+                              </div>
+                            </td>
+                            <td className="py-6 px-6">
+                              <div className="text-right">
                               {transaction.type === 'swap' ? (
                                 (() => {
                                   const swapDetails = getSwapDetails(transaction)
@@ -1184,54 +1189,60 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               ) : (
                                 <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
                               )}
-                            </div>
-                          </div>
+                                </div>
+                              </td>
+                            </tr>
                         ))}
                         
-                        {/* Pagination */}
+                        {/* Pagination Row */}
                         {totalPages > 1 && (
-                          <div className="flex justify-center mt-6">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                                
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      onClick={() => setCurrentPage(page)}
-                                      isActive={currentPage === page}
-                                      className="cursor-pointer"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
+                          <tr>
+                            <td colSpan={4} className="py-6">
+                              <div className="flex justify-center">
+                                <Pagination>
+                                  <PaginationContent>
+                                    <PaginationItem>
+                                      <PaginationPrevious 
+                                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                      />
+                                    </PaginationItem>
+                                    
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                      <PaginationItem key={page}>
+                                        <PaginationLink
+                                          onClick={() => setCurrentPage(page)}
+                                          isActive={currentPage === page}
+                                          className="cursor-pointer"
+                                        >
+                                          {page}
+                                        </PaginationLink>
+                                      </PaginationItem>
+                                    ))}
+                                    
+                                    <PaginationItem>
+                                      <PaginationNext 
+                                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                      />
+                                    </PaginationItem>
+                                  </PaginationContent>
+                                </Pagination>
+                              </div>
+                            </td>
+                          </tr>
                         )}
-                      </div>
-                    )
-                  })()
-                ) : (
-                  <div className="text-center py-8 text-gray-400">
-                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No transactions found for this challenge</p>
-                  </div>
-                )}
+                          </>
+                        );
+                      })()}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No transactions found for this challenge</p>
                 </div>
+              )}
               </div>
             </CardContent>
           </Card>

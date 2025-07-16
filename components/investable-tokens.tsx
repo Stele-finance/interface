@@ -94,7 +94,7 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
           {tokens.length} {t('tokens')}
         </Badge>
       </div>
-      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
         {tokens.length === 0 ? (
           <div className="text-center py-8 px-6">
@@ -104,7 +104,7 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
           <div className="rounded-2xl overflow-hidden overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted hover:bg-muted/80">
+                <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                   <TableHead className="text-gray-300 pl-6 text-base">{t('symbol')}</TableHead>
                   <TableHead className="text-gray-300 text-base">{t('tokenAddress')}</TableHead>
                   <TableHead className="text-gray-300 pr-6 text-base">{t('lastUpdated')}</TableHead>

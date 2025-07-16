@@ -92,7 +92,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
       <div className="flex items-center gap-2">
         <h2 className="text-3xl text-gray-100">{t('rank')}</h2>
       </div>
-      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
         {rankings.length === 0 ? (
           <div className="text-center py-8 px-6">
@@ -104,7 +104,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
             <div className="rounded-2xl overflow-hidden overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted hover:bg-muted/80">
+                  <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 text-base px-6">{t('rank')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6 pl-12">{t('user')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6">{t('challenge')}</TableHead>

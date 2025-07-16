@@ -980,96 +980,110 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="space-y-0">
-                      {userTokens.map((token, index) => {
-                        // Get price from Uniswap data
-                        const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
-                        const isLoadingPrice = isLoadingUniswap
-                        const hasValidPrice = tokenPrice > 0
-                        const tokenAmount = parseFloat(token.amount) || 0
-                        const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
-                        
-                        return (
-                          <div 
-                            key={index} 
-                            className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/30 transition-colors"
-                            onClick={() => handleTokenClick(token.address)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="relative">
-                              {(() => {
-                                const logoPath = getTokenLogo(token.address, subgraphNetwork)
-                                
-                                if (logoPath) {
-                                  return (
-                                    <img
-                                      src={logoPath}
-                                      alt={token.symbol}
-                                      className="h-10 w-10 rounded-full object-cover"
-                                      onError={(e: any) => {
-                                        console.error('Failed to load token logo:', logoPath)
-                                        const target = e.target as HTMLImageElement
-                                        target.outerHTML = `
-                                          <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                            ${token.symbol.slice(0, 2)}
+                    <div className="overflow-x-auto">
+                      {userTokens.length > 0 ? (
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                              <th className="text-left py-3 pl-20 sm:pl-24 pr-14 text-sm font-medium text-gray-400">Token</th>
+                              <th className="text-right py-3 px-6 sm:px-20 sm:pr-50 mr-10 text-sm font-medium text-gray-400">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {userTokens.map((token, index) => {
+                              // Get price from Uniswap data
+                              const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
+                              const isLoadingPrice = isLoadingUniswap
+                              const hasValidPrice = tokenPrice > 0
+                              const tokenAmount = parseFloat(token.amount) || 0
+                              const tokenValue = hasValidPrice ? tokenPrice * tokenAmount : 0
+                              
+                              return (
+                                <tr 
+                                  key={index} 
+                                  className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                                  onClick={() => handleTokenClick(token.address)}
+                                >
+                                  <td className="py-6 pl-10 sm:pl-14 pr-10">
+                                    <div className="flex items-center gap-3">
+                                      <div className="relative">
+                                      {(() => {
+                                        const logoPath = getTokenLogo(token.address, subgraphNetwork)
+                                        
+                                        if (logoPath) {
+                                          return (
+                                            <img
+                                              src={logoPath}
+                                              alt={token.symbol}
+                                              className="h-10 w-10 rounded-full object-cover"
+                                              onError={(e: any) => {
+                                                console.error('Failed to load token logo:', logoPath)
+                                                const target = e.target as HTMLImageElement
+                                                target.outerHTML = `
+                                                  <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                                    ${token.symbol.slice(0, 2)}
+                                                  </div>
+                                                `
+                                              }}
+                                            />
+                                          )
+                                        } else {
+                                          return (
+                                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                                              {token.symbol.slice(0, 2)}
+                                            </div>
+                                          )
+                                        }
+                                      })()}
+                                        {/* Show Arbitrum network icon only when connected to Arbitrum */}
+                                        {subgraphNetwork === 'arbitrum' && (
+                                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                            <Image 
+                                              src="/networks/small/arbitrum.png" 
+                                              alt="Arbitrum One"
+                                              width={14}
+                                              height={14}
+                                              className="rounded-full"
+                                              style={{ width: '14px', height: '14px' }}
+                                            />
                                           </div>
-                                        `
-                                      }}
-                                    />
-                                  )
-                                } else {
-                                  return (
-                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                                      {token.symbol.slice(0, 2)}
+                                        )}
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-gray-100">{token.symbol}</p>
+                                        <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
+                                        {/* Show real-time price */}
+                                        {isLoadingPrice ? (
+                                          <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
+                                        ) : tokenPrice > 0 ? (
+                                          <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
+                                        ) : (
+                                          <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
+                                        )}
+                                      </div>
                                     </div>
-                                  )
-                                }
-                              })()}
-                                {/* Show Arbitrum network icon only when connected to Arbitrum */}
-                                {subgraphNetwork === 'arbitrum' && (
-                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                                    <Image 
-                                      src="/networks/small/arbitrum.png" 
-                                      alt="Arbitrum One"
-                                      width={14}
-                                      height={14}
-                                      className="rounded-full"
-                                      style={{ width: '14px', height: '14px' }}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-100">{token.symbol}</p>
-                                <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
-                                {/* Show real-time price */}
-                                {isLoadingPrice ? (
-                                  <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
-                                ) : tokenPrice > 0 ? (
-                                  <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
-                                ) : (
-                                  <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-medium text-gray-100">{token.amount}</p>
-                              {/* Show USD value */}
-                              {isLoadingPrice ? (
-                                <p className="text-sm text-gray-500">{t('loading')}</p>
-                              ) : tokenValue > 0 ? (
-                                <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
-                              ) : (
-                                <p className="text-sm text-gray-500">$0.00</p>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                      
-                      {userTokens.length === 0 && (
+                                  </td>
+                                  <td className="py-6 px-6 sm:px-6">
+                                    <div className="text-right">
+                                      <p className="font-medium text-gray-100">{token.amount}</p>
+                                      {/* Show USD value */}
+                                      {isLoadingPrice ? (
+                                        <p className="text-sm text-gray-500">{t('loading')}</p>
+                                      ) : tokenValue > 0 ? (
+                                        <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
+                                      ) : (
+                                        <p className="text-sm text-gray-500">$0.00</p>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>{t('noTokensFound')}</p>
@@ -1081,7 +1095,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsContent>
 
               <TabsContent value="transactions" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
                   <CardContent className="p-0">
                     <div className="overflow-x-auto">
                       <div className="min-w-[500px] space-y-0">
@@ -1097,46 +1111,52 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <p className="text-sm text-gray-400 mt-2">Please try again later</p>
                           </div>
                         ) : investorTransactions.length > 0 ? (
-                        (() => {
-                          // Calculate pagination
-                          const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
-                          const startIndex = (currentPage - 1) * itemsPerPage;
-                          const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                          const paginatedTransactions = investorTransactions.slice(startIndex, endIndex);
-                          const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                                <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
+                                <th className="text-right py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                              </tr>
+                            </thead>
+                              <tbody>
+                               {(() => {
+                                // Calculate pagination
+                                const totalTransactions = Math.min(investorTransactions.length, maxPages * itemsPerPage);
+                                const startIndex = (currentPage - 1) * itemsPerPage;
+                                const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                                const paginatedTransactions = investorTransactions.slice(startIndex, endIndex);
+                                const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
 
-                          return (
-                            <div className="space-y-0">
-                              {paginatedTransactions.map((transaction) => (
-                                <div 
+                                return (
+                                  <>
+                                    {paginatedTransactions.map((transaction) => (
+                                <tr 
                                   key={transaction.id} 
-                                  className="flex items-center justify-between p-4 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-gray-800/20 transition-colors gap-4 min-w-0"
+                                  className="hover:bg-gray-800/30 transition-colors cursor-pointer"
                                   onClick={() => {
                                     const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
                                     window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                                   }}
                                 >
-                                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                                    {/* Update date */}
-                                    <div className="text-sm text-gray-400 flex-shrink-0 w-16">
+                                  <td className="py-6 pl-6 pr-4">
+                                    <div className="text-sm text-gray-400">
                                       {formatRelativeTime(transaction.timestamp)}
                                     </div>
-                                    
-                                    {/* Transaction type text */}
-                                    <div className={`font-medium flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
                                       {getTransactionTypeText(transaction.type)}
                                     </div>
-                                    
-                                    {/* User address (only for reward type) */}
-                                    {transaction.type === 'reward' && (
-                                      <div className="text-gray-300 text-sm flex-shrink-0">
-                                        → {formatUserAddress(transaction.user)}
-                                      </div>
-                                    )}
-                                  </div>
-                                  
-                                  {/* Transaction details */}
-                                  <div className="text-right flex-shrink-0 min-w-0">
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className="text-gray-300 text-sm">
+                                      {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(walletAddress)}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-6">
+                                    <div className="text-right">
                                     {transaction.type === 'swap' ? (
                                       (() => {
                                         const swapDetails = getSwapDetails(transaction)
@@ -1218,48 +1238,55 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     ) : (
                                       <p className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                                     )}
-                                  </div>
-                                </div>
+                                    </div>
+                                  </td>
+                                </tr>
                               ))}
                               
-                              {/* Pagination */}
+                              {/* Pagination Row */}
                               {totalPages > 1 && (
-                                <div className="flex justify-center mt-6">
-                                  <Pagination>
-                                    <PaginationContent>
-                                      <PaginationItem>
-                                        <PaginationPrevious 
-                                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                        />
-                                      </PaginationItem>
-                                      
-                                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                        <PaginationItem key={page}>
-                                          <PaginationLink
-                                            onClick={() => setCurrentPage(page)}
-                                            isActive={currentPage === page}
-                                            className="cursor-pointer"
-                                          >
-                                            {page}
-                                          </PaginationLink>
-                                        </PaginationItem>
-                                      ))}
-                                      
-                                      <PaginationItem>
-                                        <PaginationNext 
-                                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                        />
-                                      </PaginationItem>
-                                    </PaginationContent>
-                                  </Pagination>
-                                </div>
+                                <tr>
+                                  <td colSpan={4} className="py-6">
+                                    <div className="flex justify-center">
+                                      <Pagination>
+                                        <PaginationContent>
+                                          <PaginationItem>
+                                            <PaginationPrevious 
+                                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                          </PaginationItem>
+                                          
+                                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <PaginationItem key={page}>
+                                              <PaginationLink
+                                                onClick={() => setCurrentPage(page)}
+                                                isActive={currentPage === page}
+                                                className="cursor-pointer"
+                                              >
+                                                {page}
+                                              </PaginationLink>
+                                            </PaginationItem>
+                                          ))}
+                                          
+                                          <PaginationItem>
+                                            <PaginationNext 
+                                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                          </PaginationItem>
+                                        </PaginationContent>
+                                      </Pagination>
+                                    </div>
+                                  </td>
+                                </tr>
                               )}
-                            </div>
+                            </>
                           )
-                        })()
-                      ) : (
+                        })()}
+                      </tbody>
+                    </table>
+                  ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No transactions found for this investor</p>
@@ -1273,9 +1300,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsContent>
 
               <TabsContent value="ranking" className="space-y-4">
-                <Card className="bg-transparent border border-gray-700/50">
+                <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="space-y-0">
+                    <div className="overflow-x-auto">
                       {isLoadingRanking ? (
                         <div className="flex items-center justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin" />
@@ -1297,209 +1324,217 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const rankingTotalPages = Math.min(Math.ceil(totalRankingUsers / itemsPerPage), maxPages);
 
                           return (
-                            <div className="space-y-0">
-                              {paginatedUsers.map((user, paginatedIndex) => {
-                                const actualIndex = rankingStartIndex + paginatedIndex;
-                                const rank = actualIndex + 1;
-                                const score = rankingData.scores[actualIndex];
-                                const profitRatio = rankingData.profitRatios[actualIndex];
-                          
-                          // Format address
-                          const formatAddress = (address: string) => {
-                            if (!address || address === '0x0000000000000000000000000000000000000000') {
-                              return '';
-                            }
-                            return `${address.slice(0, 6)}...${address.slice(-4)}`;
-                          };
-                          
-                          // Format score (USDC value)
-                          const formatScore = (score: string) => {
-                            try {
-                              const scoreValue = parseFloat(score);
-                              return `$${scoreValue.toFixed(2)}`;
-                            } catch {
-                              return '$0.00';
-                            }
-                          };
-                          
-                          // Format profit ratio
-                          const formatProfitRatio = (profitRatio: string) => {
-                            try {
-                              const ratioValue = parseFloat(profitRatio);
-                              return `${ratioValue >= 0 ? '+' : ''}${ratioValue.toFixed(2)}%`;
-                            } catch {
-                              return '0.00%';
-                            }
-                          };
-                          
-                          // Get rank icon
-                          const getRankIcon = (rank: number) => {
-                            switch (rank) {
-                              case 1:
-                                return '🥇';
-                              case 2:
-                                return '🥈';
-                              case 3:
-                                return '🥉';
-                              case 4:
-                                return '4️⃣';
-                              case 5:
-                                return '5️⃣';
-                              default:
-                                return rank.toString();
-                            }
-                          };
-                          
-                          // Get rank color
-                          const getRankColor = (rank: number) => {
-                                return 'bg-transparent border-gray-700/50 text-gray-100 hover:bg-gray-800/20';
-                          };
+                            <>
+                              <table className="w-full">
+                                <thead>
+                                  <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Rank</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">User</th>
+                                    <th className="text-right py-3 px-10 sm:px-10 text-sm font-medium text-gray-400">Profit Ratio</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {paginatedUsers.map((user, paginatedIndex) => {
+                                    const actualIndex = rankingStartIndex + paginatedIndex;
+                                    const rank = actualIndex + 1;
+                                    const score = rankingData.scores[actualIndex];
+                                    const profitRatio = rankingData.profitRatios[actualIndex];
+                              
+                              // Format address
+                              const formatAddress = (address: string) => {
+                                if (!address || address === '0x0000000000000000000000000000000000000000') {
+                                  return '';
+                                }
+                                return `${address.slice(0, 6)}...${address.slice(-4)}`;
+                              };
+                              
+                              // Format score (USDC value)
+                              const formatScore = (score: string) => {
+                                try {
+                                  const scoreValue = parseFloat(score);
+                                  return `$${scoreValue.toFixed(2)}`;
+                                } catch {
+                                  return '$0.00';
+                                }
+                              };
+                              
+                              // Format profit ratio
+                              const formatProfitRatio = (profitRatio: string) => {
+                                try {
+                                  const ratioValue = parseFloat(profitRatio);
+                                  return `${ratioValue >= 0 ? '+' : ''}${ratioValue.toFixed(2)}%`;
+                                } catch {
+                                  return '0.00%';
+                                }
+                              };
+                              
+                              // Get rank icon
+                              const getRankIcon = (rank: number) => {
+                                switch (rank) {
+                                  case 1:
+                                    return '🥇';
+                                  case 2:
+                                    return '🥈';
+                                  case 3:
+                                    return '🥉';
+                                  case 4:
+                                    return '4️⃣';
+                                  case 5:
+                                    return '5️⃣';
+                                  default:
+                                    return rank.toString();
+                                }
+                              };
 
-                          // Handle user click
-                          const handleUserClick = (userAddress: string) => {
-                            // Check if address is empty or zero address
-                            if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
-                              return;
-                            }
-                            router.push(`/challenge/${challengeId}/${userAddress}`);
-                          };
-                          
-                          const formattedAddress = formatAddress(user);
-                          const isEmptySlot = !formattedAddress;
-                          const isCurrentUser = walletAddress && user.toLowerCase() === walletAddress.toLowerCase();
+                              // Handle user click
+                              const handleUserClick = (userAddress: string) => {
+                                // Check if address is empty or zero address
+                                if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+                                  return;
+                                }
+                                router.push(`/challenge/${challengeId}/${userAddress}`);
+                              };
+                              
+                              const formattedAddress = formatAddress(user);
+                              const isEmptySlot = !formattedAddress;
+                              const isCurrentUser = walletAddress && user.toLowerCase() === walletAddress.toLowerCase();
 
-                          return (
-                            <div 
-                              key={`${user}-${rank}`} 
-                              className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
-                                isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
-                              }`}
-                              onClick={() => !isEmptySlot && handleUserClick(user)}
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center justify-center w-10 h-10">
-                                  {rank <= 3 ? (
-                                    <span className="text-3xl">{getRankIcon(rank)}</span>
-                                  ) : rank === 4 ? (
-                                    <div className="relative w-6 h-6 flex items-center justify-center">
-                                      <svg width="24" height="24" viewBox="0 0 24 24">
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          fill="#4F46E5"
-                                          stroke="#FFD700"
-                                          strokeWidth="1"
+                              return (
+                                <tr 
+                                  key={`${user}-${rank}`} 
+                                  className={`hover:bg-gray-800/30 transition-colors ${isCurrentUser ? 'ring-2 ring-blue-500/50' : ''} ${
+                                    isEmptySlot ? 'cursor-default' : 'cursor-pointer'
+                                  }`}
+                                  onClick={() => !isEmptySlot && handleUserClick(user)}
+                                >
+                                  <td className="py-6 pl-6 pr-4">
+                                    <div className="flex items-center justify-center w-10 h-10">
+                                      {rank <= 3 ? (
+                                        <span className="text-3xl">{getRankIcon(rank)}</span>
+                                      ) : rank === 4 ? (
+                                        <div className="relative w-6 h-6 flex items-center justify-center">
+                                          <svg width="24" height="24" viewBox="0 0 24 24">
+                                            <circle
+                                              cx="12"
+                                              cy="12"
+                                              r="10"
+                                              fill="#4F46E5"
+                                              stroke="#FFD700"
+                                              strokeWidth="1"
+                                            />
+                                            <text
+                                              x="12"
+                                              y="13"
+                                              textAnchor="middle"
+                                              dominantBaseline="middle"
+                                              fontSize="12"
+                                              fill="#FFFFFF"
+                                              fontWeight="bold"
+                                            >
+                                              4
+                                            </text>
+                                          </svg>
+                                        </div>
+                                      ) : rank === 5 ? (
+                                        <div className="relative w-6 h-6 flex items-center justify-center">
+                                          <svg width="24" height="24" viewBox="0 0 24 24">
+                                            <circle
+                                              cx="12"
+                                              cy="12"
+                                              r="10"
+                                              fill="#10B981"
+                                              fillOpacity="0.6"
+                                              stroke="#FFD700"
+                                              strokeWidth="1"
+                                            />
+                                            <text
+                                              x="12"
+                                              y="13"
+                                              textAnchor="middle"
+                                              dominantBaseline="middle"
+                                              fontSize="12"
+                                              fill="#FFFFFF"
+                                              fontWeight="bold"
+                                            >
+                                              5
+                                            </text>
+                                          </svg>
+                                        </div>
+                                      ) : (
+                                        <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                          <span className="text-sm font-bold text-white">{rank}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-4">
+                                    <div className="font-medium flex items-center gap-2">
+                                      {isEmptySlot ? (
+                                        <span className="text-gray-500 italic">Empty Slot</span>
+                                      ) : (
+                                        <>
+                                          <span className="text-gray-300">{formattedAddress}</span>
+                                          {isCurrentUser && (
+                                            <Badge variant="outline" className="text-xs border-blue-500 text-blue-400">
+                                              You
+                                            </Badge>
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-6">
+                                    <div className="text-right">
+                                      <div className="font-bold text-lg text-white">{formatScore(score)}</div>
+                                      <div className={`text-sm ${parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                        {formatProfitRatio(profitRatio)}
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                                </tbody>
+                              </table>
+                              
+                              {/* Pagination for Ranking */}
+                              {rankingTotalPages > 1 && (
+                                <div className="flex justify-center mt-6 mb-4">
+                                  <Pagination>
+                                    <PaginationContent>
+                                      <PaginationItem>
+                                        <PaginationPrevious 
+                                          onClick={() => setRankingCurrentPage(Math.max(1, rankingCurrentPage - 1))}
+                                          className={rankingCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                         />
-                                        <text
-                                          x="12"
-                                          y="13"
-                                          textAnchor="middle"
-                                          dominantBaseline="middle"
-                                          fontSize="12"
-                                          fill="#FFFFFF"
-                                          fontWeight="bold"
-                                        >
-                                          4
-                                        </text>
-                                      </svg>
-                                    </div>
-                                  ) : rank === 5 ? (
-                                    <div className="relative w-6 h-6 flex items-center justify-center">
-                                      <svg width="24" height="24" viewBox="0 0 24 24">
-                                        <circle
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          fill="#10B981"
-                                          fillOpacity="0.6"
-                                          stroke="#FFD700"
-                                          strokeWidth="1"
+                                      </PaginationItem>
+                                      
+                                      {Array.from({ length: rankingTotalPages }, (_, i) => i + 1).map((page) => (
+                                        <PaginationItem key={page}>
+                                          <PaginationLink
+                                            onClick={() => setRankingCurrentPage(page)}
+                                            isActive={rankingCurrentPage === page}
+                                            className="cursor-pointer"
+                                          >
+                                            {page}
+                                          </PaginationLink>
+                                        </PaginationItem>
+                                      ))}
+                                      
+                                      <PaginationItem>
+                                        <PaginationNext 
+                                          onClick={() => setRankingCurrentPage(Math.min(rankingTotalPages, rankingCurrentPage + 1))}
+                                          className={rankingCurrentPage === rankingTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                         />
-                                        <text
-                                          x="12"
-                                          y="13"
-                                          textAnchor="middle"
-                                          dominantBaseline="middle"
-                                          fontSize="12"
-                                          fill="#FFFFFF"
-                                          fontWeight="bold"
-                                        >
-                                          5
-                                        </text>
-                                      </svg>
-                                    </div>
-                                  ) : (
-                                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                                      <span className="text-sm font-bold text-white">{rank}</span>
-                                    </div>
-                                  )}
+                                      </PaginationItem>
+                                    </PaginationContent>
+                                  </Pagination>
                                 </div>
-                                <div>
-                                  <div className="font-medium flex items-center gap-2">
-                                    {isEmptySlot ? (
-                                      <span className="text-gray-500 italic">Empty Slot</span>
-                                    ) : (
-                                      <>
-                                        <span>{formattedAddress}</span>
-                                        {isCurrentUser && (
-                                          <Badge variant="outline" className="text-xs border-blue-500 text-blue-400">
-                                            You
-                                          </Badge>
-                                        )}
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-bold text-lg">{formatScore(score)}</div>
-                                <div className={`text-sm ${parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                  {formatProfitRatio(profitRatio)}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        
-                        {/* Pagination for Ranking */}
-                        {rankingTotalPages > 1 && (
-                          <div className="flex justify-center mt-6">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    onClick={() => setRankingCurrentPage(Math.max(1, rankingCurrentPage - 1))}
-                                    className={rankingCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                                
-                                {Array.from({ length: rankingTotalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      onClick={() => setRankingCurrentPage(page)}
-                                      isActive={rankingCurrentPage === page}
-                                      className="cursor-pointer"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    onClick={() => setRankingCurrentPage(Math.min(rankingTotalPages, rankingCurrentPage + 1))}
-                                    className={rankingCurrentPage === rankingTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })()
-                ) : (
+                              )}
+                            </>
+                          )
+                        })()
+                      ) : (
                         <div className="text-center py-8 text-gray-400">
                           <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No ranking data found</p>

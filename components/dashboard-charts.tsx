@@ -139,7 +139,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
       const dataKey = payload[0]?.dataKey
       
       return (
-        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
+        <div className="bg-muted/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
           <p className="text-gray-100 text-sm font-medium">
             {dataKey === 'totalParticipants' ? `${t('users')}: ${value?.toLocaleString()}` : `${t('rewards')}: $${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
@@ -247,7 +247,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-32">
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
                   <DropdownMenuItem onClick={() => setChartType('rewards')}>
                     <DollarSign className="h-4 w-4 mr-2" />
                     {t('rewards')}
@@ -403,7 +403,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-32">
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
                 <DropdownMenuItem onClick={() => setChartType('rewards')}>
                   <DollarSign className="h-4 w-4 mr-2" />
                   {t('rewards')}

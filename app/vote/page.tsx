@@ -1257,7 +1257,7 @@ export default function VotePage() {
                   <div className="rounded-2xl border border-gray-600 bg-transparent overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-muted hover:bg-muted/80">
+                        <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
@@ -1285,10 +1285,10 @@ export default function VotePage() {
                                   abstain={proposal.abstain}
                                 />
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                               <TableCell className="text-center py-6">
@@ -1340,10 +1340,10 @@ export default function VotePage() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                  <div className="rounded-2xl border border-gray-600 bg-transparent overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-muted hover:bg-muted/80">
+                        <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
@@ -1371,10 +1371,10 @@ export default function VotePage() {
                                   abstain={proposal.abstain}
                                 />
                               </TableCell> 
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                               <TableCell className="text-center py-6">
@@ -1426,10 +1426,10 @@ export default function VotePage() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-lg border border-gray-700/50 bg-transparent">
+                  <div className="rounded-2xl border border-gray-600 bg-transparent overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-muted hover:bg-muted/80">
+                        <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
@@ -1457,10 +1457,10 @@ export default function VotePage() {
                                   abstain={proposal.abstain}
                                 />
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6">
+                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                               <TableCell className="text-center py-6">
