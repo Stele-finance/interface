@@ -323,6 +323,7 @@ export const vi = {
   transactionSubmitted: "Giao dịch đã gửi",
   type: "Loại",
   unknown: "Không xác định",
+  updated: "Đã cập nhật",
   user: "Người dùng",
   users: "Người dùng",
   userVotingPower: "Quyền bỏ phiếu của bạn",

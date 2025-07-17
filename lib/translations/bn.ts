@@ -323,6 +323,7 @@ export const bn = {
   transactionSubmitted: "লেনদেন জমা দেওয়া হয়েছে",
   type: "ধরন",
   unknown: "অজানা",
+  updated: "আপডেটেড",
   user: "ব্যবহারকারী",
   users: "ব্যবহারকারীগণ",
   userVotingPower: "আপনার ভোটিং ক্ষমতা",

@@ -323,6 +323,7 @@ export const id = {
   transactionSubmitted: "Transaksi Dikirim",
   type: "Jenis",
   unknown: "Tidak diketahui",
+  updated: "Diperbarui",
   user: "Pengguna",
   users: "Pengguna",
   userVotingPower: "Kekuatan voting Anda",

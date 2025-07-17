@@ -323,6 +323,7 @@ export const fr = {
   transactionSubmitted: "Transaction Soumise",
   type: "Type",
   unknown: "Inconnu",
+  updated: "Mis à jour",
   user: "Utilisateur",
   users: "Utilisateurs",
   userVotingPower: "Votre pouvoir de vote",

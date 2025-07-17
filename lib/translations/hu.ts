@@ -323,6 +323,7 @@ export const hu = {
   transactionSubmitted: "Tranzakció elküldve",
   type: "Típus",
   unknown: "Ismeretlen",
+  updated: "Frissítve",
   user: "Felhasználó",
   users: "Felhasználók",
   userVotingPower: "Az Ön szavazati joga",

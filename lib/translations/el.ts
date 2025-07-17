@@ -323,6 +323,7 @@ export const el = {
   transactionSubmitted: "Υποβλήθηκε Συναλλαγή",
   type: "Τύπος",
   unknown: "Άγνωστο",
+  updated: "Ενημερώθηκε",
   user: "Χρήστης",
   users: "Χρήστες",
   userVotingPower: "Η ισχύς ψήφου σας",

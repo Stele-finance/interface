@@ -323,6 +323,7 @@ export const nl = {
   transactionSubmitted: "Transactie Ingediend",
   type: "Type",
   unknown: "Onbekend",
+  updated: "Bijgewerkt",
   user: "Gebruiker",
   users: "Gebruikers",
   userVotingPower: "Uw stemkracht",

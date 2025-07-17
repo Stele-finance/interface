@@ -323,6 +323,7 @@ export const he = {
   transactionSubmitted: "העסקה נשלחה",
   type: "סוג",
   unknown: "לא ידוע",
+  updated: "עודכן",
   user: "משתמש",
   users: "משתמשים",
   userVotingPower: "כוח ההצבעה שלך",

@@ -323,6 +323,7 @@ export const de = {
   transactionSubmitted: "Transaktion Eingereicht",
   type: "Typ",
   unknown: "Unbekannt",
+  updated: "Aktualisiert",
   user: "Benutzer",
   users: "Benutzer",
   userVotingPower: "Ihre Stimmkraft",

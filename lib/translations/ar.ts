@@ -323,6 +323,7 @@ export const ar = {
   transactionSubmitted: "تم إرسال المعاملة",
   type: "النوع",
   unknown: "غير معروف",
+  updated: "محدث",
   user: "المستخدم",
   users: "المستخدمون",
   userVotingPower: "قوة التصويت الخاصة بك",

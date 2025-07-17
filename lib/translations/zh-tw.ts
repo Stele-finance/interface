@@ -323,6 +323,7 @@ export const zhTw = {
   transactionSubmitted: "交易已提交",
   type: "類型",
   unknown: "未知",
+  updated: "已更新",
   user: "用戶",
   users: "用戶",
   userVotingPower: "您的投票權",

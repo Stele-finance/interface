@@ -323,6 +323,7 @@ export const zhCn = {
   transactionSubmitted: "交易已提交",
   type: "类型",
   unknown: "未知",
+  updated: "已更新",
   user: "用户",
   users: "用户",
   userVotingPower: "您的投票权",

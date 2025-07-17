@@ -323,6 +323,7 @@ export const th = {
   transactionSubmitted: "ธุรกรรมถูกส่ง",
   type: "ประเภท",
   unknown: "ไม่ทราบ",
+  updated: "อัปเดตแล้ว",
   user: "ผู้ใช้",
   users: "ผู้ใช้",
   userVotingPower: "อำนาจการโหวตของคุณ",

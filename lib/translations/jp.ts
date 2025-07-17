@@ -323,6 +323,7 @@ export const jp = {
   transactionSubmitted: "取引送信済み",
   type: "タイプ",
   unknown: "不明",
+  updated: "更新済み",
   user: "ユーザー",
   users: "ユーザー",
   userVotingPower: "あなたの投票権",

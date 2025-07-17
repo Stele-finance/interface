@@ -323,6 +323,7 @@ export const fi = {
   transactionSubmitted: "Transaktio Lähetetty",
   type: "Tyyppi",
   unknown: "Tuntematon",
+  updated: "Päivitetty",
   user: "Käyttäjä",
   users: "Käyttäjät",
   userVotingPower: "Sinun äänioikeutesi",

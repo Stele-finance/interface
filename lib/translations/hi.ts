@@ -323,6 +323,7 @@ export const hi = {
   transactionSubmitted: "लेनदेन सबमिट किया गया",
   type: "प्रकार",
   unknown: "अज्ञात",
+  updated: "अपडेटेड",
   user: "उपयोगकर्ता",
   users: "उपयोगकर्ता",
   userVotingPower: "आपकी वोटिंग पावर",
