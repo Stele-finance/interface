@@ -638,7 +638,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     <div className="mb-6">
       {/* Total Rewards Chart */}
       <Card className="bg-transparent border-0 -mt-12">
-        <CardHeader className="pb-2 px-1 sm:px-6 md:-ml-6">
+        <CardHeader className="pb-2 px-1 sm:px-6 md:-ml-2">
           {/* Mobile layout */}
           <div className="block md:hidden">
             {/* First row: Challenge title only */}
@@ -669,7 +669,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pr-0 md:mr-6 -ml-6">
+        <CardContent className="pr-0 md:mr-16 -ml-6">
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart 
               data={chartData} 
@@ -733,7 +733,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </CardContent>
         
         {/* Interval selector - Below chart like investor page */}
-        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-12">
+        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-20">
           <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
             <button
               onClick={() => setIntervalType('daily')}
@@ -759,7 +759,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </div>
         
         {/* Separator Bar - Below daily/weekly buttons, chart width */}
-        <div className="pr-6 md:mr-4 -mr-4 mb-0 pt-2">
+        <div className="pr-6 md:mr-12 -mr-4 mb-0 pt-2">
           <div className="border-t border-gray-600/50"></div>
         </div>
       </Card>

@@ -1024,7 +1024,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           {/* Transactions Section */}
           <div>
           <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
-          <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+          <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden md:mr-16">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 {isLoadingTransactions ? (
