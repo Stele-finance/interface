@@ -44,7 +44,6 @@ export const jp = {
   connecting: "接続中...",
   connectedWallet: "接続されたウォレット",
   connectToAccess: "ポートフォリオダッシュボードにアクセスするためにウォレットを接続してください",
-  connectToViewPortfolio: "チャレンジポートフォリオとパフォーマンスを表示するためにウォレットを接続してください",
   connectWallet: "接続",
   connectWalletToViewBalance: "トークン残高を表示し、提案に投票するためにウォレットを接続してください",
   copyAddress: "アドレスをコピー",

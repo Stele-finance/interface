@@ -44,7 +44,6 @@ export const fi = {
   connecting: "Yhdistetään...",
   connectedWallet: "Yhdistetty Lompakko",
   connectToAccess: "Yhdistä lompakkosi päästäksesi portfolion hallintapaneeliin",
-  connectToViewPortfolio: "Yhdistä lompakkosi nähdäksesi haasteen portfolion ja suorituksen",
   connectWallet: "Yhdistä",
   connectWalletToViewBalance: "Yhdistä lompakkosi nähdäksesi token saldot ja äänestääksesi ehdotuksista",
   copyAddress: "Kopioi Osoite",

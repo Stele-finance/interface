@@ -44,7 +44,6 @@ export const th = {
   connecting: "กำลังเชื่อมต่อ...",
   connectedWallet: "วอลเล็ตที่เชื่อมต่อแล้ว",
   connectToAccess: "เชื่อมต่อวอลเล็ตของคุณเพื่อเข้าถึงแดชบอร์ดพอร์ตโฟลิโอ",
-  connectToViewPortfolio: "เชื่อมต่อวอลเล็ตของคุณเพื่อดูพอร์ตโฟลิโอชาเลนจ์และประสิทธิภาพ",
   connectWallet: "เชื่อมต่อ",
   connectWalletToViewBalance: "เชื่อมต่อวอลเล็ตของคุณเพื่อดูยอดโทเค็นและโหวตข้อเสนอ",
   copyAddress: "คัดลอกที่อยู่",

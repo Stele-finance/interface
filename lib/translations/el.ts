@@ -44,7 +44,6 @@ export const el = {
   connecting: "Σύνδεση...",
   connectedWallet: "Συνδεδεμένο Wallet",
   connectToAccess: "Συνδέστε το wallet σας για πρόσβαση στον πίνακα ελέγχου χαρτοφυλακίου",
-  connectToViewPortfolio: "Συνδέστε το wallet σας για να δείτε το χαρτοφυλάκιο και την απόδοση της πρόκλησης",
   connectWallet: "Σύνδεση",
   connectWalletToViewBalance: "Συνδέστε το wallet σας για να δείτε το υπόλοιπο token και να ψηφίσετε σε προτάσεις",
   copyAddress: "Αντιγραφή Διεύθυνσης",

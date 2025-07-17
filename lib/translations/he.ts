@@ -44,7 +44,6 @@ export const he = {
   connecting: "מתחבר...",
   connectedWallet: "ארנק מחובר",
   connectToAccess: "חבר את הארנק שלך כדי לגשת לדשבורד הפורטפוליו",
-  connectToViewPortfolio: "חבר את הארנק שלך כדי לראות את פורטפוליו האתגר והביצועים",
   connectWallet: "חבר",
   connectWalletToViewBalance: "חבר את הארנק שלך כדי לראות יתרת טוקנים ולהצביע על הצעות",
   copyAddress: "העתק כתובת",

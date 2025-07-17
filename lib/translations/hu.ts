@@ -44,7 +44,6 @@ export const hu = {
   connecting: "Csatlakozás...",
   connectedWallet: "Csatlakoztatott tárca",
   connectToAccess: "Csatlakoztassa tárcáját a portfólió irányítópult eléréséhez",
-  connectToViewPortfolio: "Csatlakoztassa tárcáját a kihívás portfólió és teljesítmény megtekintéséhez",
   connectWallet: "Csatlakoztatás",
   connectWalletToViewBalance: "Csatlakoztassa tárcáját a token egyenleg megtekintéséhez és javaslatok szavazásához",
   copyAddress: "Cím másolása",

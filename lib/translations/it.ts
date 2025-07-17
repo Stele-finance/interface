@@ -44,7 +44,6 @@ export const it = {
   connecting: "Connessione...",
   connectedWallet: "Wallet Connesso",
   connectToAccess: "Connetti il tuo wallet per accedere alla dashboard del portafoglio",
-  connectToViewPortfolio: "Connetti il tuo wallet per visualizzare il portafoglio sfida e le prestazioni",
   connectWallet: "Connetti",
   connectWalletToViewBalance: "Connetti il tuo wallet per visualizzare il saldo token e votare le proposte",
   copyAddress: "Copia Indirizzo",

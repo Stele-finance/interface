@@ -44,7 +44,6 @@ export const hi = {
   connecting: "कनेक्ट हो रहा है...",
   connectedWallet: "कनेक्टेड Wallet",
   connectToAccess: "अपने पोर्टफोलियो डैशबोर्ड तक पहुंचने के लिए अपना wallet कनेक्ट करें",
-  connectToViewPortfolio: "अपनी चुनौती पोर्टफोलियो और प्रदर्शन देखने के लिए अपना wallet कनेक्ट करें",
   connectWallet: "कनेक्ट करें",
   connectWalletToViewBalance: "टोकन बैलेंस देखने और प्रस्तावों पर मतदान के लिए अपना wallet कनेक्ट करें",
   copyAddress: "पता कॉपी करें",

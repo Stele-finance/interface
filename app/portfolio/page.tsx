@@ -55,9 +55,6 @@ export default function PortfolioPage() {
         <div className="text-center space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-100 mb-2">{t('myPortfolio')}</h1>
-            <p className="text-gray-400">
-              {t('connectToViewPortfolio')}
-            </p>
           </div>
 
           <Card className="bg-muted border-gray-700/50">

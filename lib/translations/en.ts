@@ -44,7 +44,6 @@ export const en = {
   connecting: "Connecting...",
   connectedWallet: "Connected Wallet",
   connectToAccess: "Connect your wallet to access your portfolio dashboard",
-  connectToViewPortfolio: "Connect your wallet to view your challenge portfolio and performance",
   connectWallet: "Connect",
   connectWalletToViewBalance: "Connect your wallet to view token balance and vote on proposals",
   copyAddress: "Copy Address",

@@ -44,7 +44,6 @@ export const nl = {
   connecting: "Verbinden...",
   connectedWallet: "Verbonden Wallet",
   connectToAccess: "Verbind uw wallet om toegang te krijgen tot uw portefeuille dashboard",
-  connectToViewPortfolio: "Verbind uw wallet om uw uitdaging portefeuille en prestaties te bekijken",
   connectWallet: "Verbinden",
   connectWalletToViewBalance: "Verbind uw wallet om token saldo te bekijken en te stemmen op voorstellen",
   copyAddress: "Kopieer Adres",

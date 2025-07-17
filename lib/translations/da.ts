@@ -44,7 +44,6 @@ export const da = {
   connecting: "Tilslutter...",
   connectedWallet: "Tilsluttet Wallet",
   connectToAccess: "Tilslut din wallet for at få adgang til dit portefølje dashboard",
-  connectToViewPortfolio: "Tilslut din wallet for at se din udfordring portefølje og performance",
   connectWallet: "Tilslut",
   connectWalletToViewBalance: "Tilslut din wallet for at se token saldo og stemme på forslag",
   copyAddress: "Kopier Adresse",

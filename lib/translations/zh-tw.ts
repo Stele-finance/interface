@@ -44,7 +44,6 @@ export const zhTw = {
   connecting: "連接中...",
   connectedWallet: "已連接錢包",
   connectToAccess: "連接您的錢包以訪問投資組合儀表板",
-  connectToViewPortfolio: "連接您的錢包以查看挑戰投資組合和表現",
   connectWallet: "連接",
   connectWalletToViewBalance: "連接您的錢包以查看代幣餘額並對提案投票",
   copyAddress: "複製地址",

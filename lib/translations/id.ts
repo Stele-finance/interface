@@ -44,7 +44,6 @@ export const id = {
   connecting: "Menghubungkan...",
   connectedWallet: "Wallet Terhubung",
   connectToAccess: "Hubungkan wallet Anda untuk mengakses dashboard portofolio",
-  connectToViewPortfolio: "Hubungkan wallet Anda untuk melihat portofolio tantangan dan performa",
   connectWallet: "Hubungkan",
   connectWalletToViewBalance: "Hubungkan wallet Anda untuk melihat saldo token dan voting proposal",
   copyAddress: "Salin Alamat",

@@ -44,7 +44,6 @@ export const bn = {
   connecting: "সংযোগ করা হচ্ছে...",
   connectedWallet: "সংযুক্ত ওয়ালেট",
   connectToAccess: "আপনার পোর্টফোলিও ড্যাশবোর্ড অ্যাক্সেস করতে আপনার ওয়ালেট সংযুক্ত করুন",
-  connectToViewPortfolio: "আপনার চ্যালেঞ্জ পোর্টফোলিও এবং পারফরম্যান্স দেখতে আপনার ওয়ালেট সংযুক্ত করুন",
   connectWallet: "সংযুক্ত করুন",
   connectWalletToViewBalance: "টোকেন ব্যালেন্স দেখতে এবং প্রস্তাবে ভোট দিতে আপনার ওয়ালেট সংযুক্ত করুন",
   copyAddress: "ঠিকানা কপি করুন",
