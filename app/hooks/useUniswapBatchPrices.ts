@@ -490,7 +490,7 @@ export function useTokenPrice(
       return
     }
 
-    // USDC는 항상 1달러
+    // USDC is always 1 dollar
     if (tokenSymbol === 'USDC') {
       setPrice(1.0)
       setIsLoading(false)
@@ -783,7 +783,7 @@ export function useSwapTokenPricesIndependent(
        
        // Handle 429 Too Many Requests error specifically
        if (err instanceof Error && err.message.includes('Too Many Requests')) {
-         setError('요청 한도 초과. 잠시 후 다시 시도해주세요.')
+         setError('Rate limit exceeded. Please try again later.')
          
          // Cache the error state to prevent immediate retries
          priceCache.set(fromKey, {

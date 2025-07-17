@@ -121,7 +121,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType, network } = useWallet();
+  const { walletType, network, getProvider, isConnected } = useWallet();
   
   // Use React Query client for better data management
   const queryClient = useQueryClient();

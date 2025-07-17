@@ -54,7 +54,19 @@ export function Header() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   
   // Use global wallet hook
-  const { address: walletAddress, isConnected, network: walletNetwork, connectWallet, disconnectWallet, switchNetwork, walletType, connectedWallet, openWalletModal } = useWallet()
+  const { 
+    address: walletAddress, 
+    isConnected, 
+    network: walletNetwork, 
+    walletType,
+    isLoading: isWalletLoading,
+    connectWallet, 
+    disconnectWallet, 
+    switchNetwork, 
+    openWalletModal,
+    isMobile: isWalletMobile,
+    isWalletAvailable
+  } = useWallet()
   
 
   
@@ -120,26 +132,17 @@ export function Header() {
     try {
       setIsLoadingBalance(true);
       
-      if (walletNetwork === 'solana') {
-        // Get Solana balance
-        if (window.phantom?.solana) {
-          // For Solana, separate API call is needed (using arbitrary value for simplification)
-          // In practice, we would use Solana Web3.js to call getBalance
-          setBalance('1.234');
-        }
-      } else {
-        // Use network-specific RPC URL for accurate balance
-        const networkToUse = walletNetwork === 'ethereum' || walletNetwork === 'arbitrum' ? walletNetwork : 'ethereum';
-        const rpcUrl = getRPCUrl(networkToUse);
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        
-        // Get ETH balance using ethers provider
-        const balanceWei = await provider.getBalance(walletAddress);
-        const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
-        
-        // Display up to 4 decimal places
-        setBalance(balanceInEth.toFixed(4));
-      }
+      // Use network-specific RPC URL for accurate balance
+      const networkToUse = walletNetwork || 'ethereum';
+      const rpcUrl = getRPCUrl(networkToUse);
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
+      
+      // Get ETH balance using ethers provider
+      const balanceWei = await provider.getBalance(walletAddress);
+      const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
+      
+      // Display up to 4 decimal places
+      setBalance(balanceInEth.toFixed(4));
     } catch (error) {
       console.error("Error fetching balance:", error);
       setBalance('?');
@@ -148,14 +151,23 @@ export function Header() {
     }
   };
 
-  const handleConnectWallet = async (selectedWalletType: WalletType) => {
+  const handleConnectWallet = async (selectedWalletType: 'metamask' | 'phantom' | 'walletconnect') => {
     if (!selectedWalletType) return
     
     setWalletSelectOpen(false)
     
     try {
       await connectWallet(selectedWalletType)
-      setWalletSelectOpen(false)
+      
+      // Success toast (exclude WalletConnect as it's handled in modal)
+      if (selectedWalletType !== 'walletconnect') {
+        toast({
+          variant: "default",
+          title: "✅ Connection Successful",
+          description: `Successfully connected to ${selectedWalletType}`,
+          duration: 3000,
+        })
+      }
     } catch (error) {
       console.error("Wallet connection error:", error)
       
@@ -404,10 +416,7 @@ export function Header() {
                   style={{ width: 'auto', height: '16px' }}
                 />
                 <span className="text-base">
-                  {walletNetwork === 'solana'
-                    ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
-                    : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                  }
+                  {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
                 </span>
               </Button>
             ) : (
@@ -427,10 +436,7 @@ export function Header() {
                       <Wallet className="mr-2 h-4 w-4" />
                     )}
                     <span className="text-base">
-                      {walletNetwork === 'solana'
-                        ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
-                        : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                      }
+                      {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -539,56 +545,95 @@ export function Header() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid grid-cols-1 gap-4 py-4">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                  onClick={() => handleConnectWallet('metamask')}
-                >
-                  <Image 
-                    src={getWalletLogo('metamask')} 
-                    alt="MetaMask"
-                    width={24}
-                    height={24}
-                    style={{ width: 'auto', height: '24px' }}
-                  />
-                  <div className="text-left">
-                    <div className="font-semibold">MetaMask</div>
-                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
-                  </div>
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                  onClick={() => handleConnectWallet('phantom')}
-                >
-                  <Image 
-                    src={getWalletLogo('phantom')} 
-                    alt="Phantom"
-                    width={24}
-                    height={24}
-                    style={{ width: 'auto', height: '24px' }}
-                  />
-                  <div className="text-left">
-                    <div className="font-semibold">Phantom</div>
-                    <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
-                  </div>
-                </Button>
+                {/* PC version: Show MetaMask, Phantom, WalletConnect */}
+                {!isWalletMobile && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                      onClick={() => handleConnectWallet('metamask')}
+                      disabled={!isWalletAvailable('metamask')}
+                    >
+                      <Image 
+                        src={getWalletLogo('metamask')} 
+                        alt="MetaMask"
+                        width={24}
+                        height={24}
+                        style={{ width: 'auto', height: '24px' }}
+                      />
+                      <div className="text-left">
+                        <div className="font-semibold">MetaMask</div>
+                        <div className="text-sm text-muted-foreground">
+                          {isWalletAvailable('metamask') ? t('browserExtension') : 'Not Installed'}
+                        </div>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                      onClick={() => handleConnectWallet('phantom')}
+                      disabled={!isWalletAvailable('phantom')}
+                    >
+                      <Image 
+                        src={getWalletLogo('phantom')} 
+                        alt="Phantom"
+                        width={24}
+                        height={24}
+                        style={{ width: 'auto', height: '24px' }}
+                      />
+                      <div className="text-left">
+                        <div className="font-semibold">Phantom</div>
+                        <div className="text-sm text-muted-foreground">
+                          {isWalletAvailable('phantom') ? t('browserExtension') : 'Not Installed'}
+                        </div>
+                      </div>
+                    </Button>
 
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                  onClick={() => handleConnectWallet('walletconnect')}
-                >
-                  <Wallet className="h-6 w-6 text-blue-500" />
-                  <div className="text-left">
-                    <div className="font-semibold">WalletConnect</div>
-                    <div className="text-sm text-muted-foreground">Mobile Wallets</div>
-                  </div>
-                </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                      onClick={() => handleConnectWallet('walletconnect')}
+                    >
+                      <Image 
+                        src={getWalletLogo('walletconnect')} 
+                        alt="WalletConnect"
+                        width={24}
+                        height={24}
+                        style={{ width: 'auto', height: '24px' }}
+                      />
+                      <div className="text-left">
+                        <div className="font-semibold">WalletConnect</div>
+                        <div className="text-sm text-muted-foreground">Mobile & Desktop Wallets</div>
+                      </div>
+                    </Button>
+                  </>
+                )}
+
+                {/* Mobile version: Show WalletConnect only */}
+                {isWalletMobile && (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                    onClick={() => handleConnectWallet('walletconnect')}
+                  >
+                    <Image 
+                      src={getWalletLogo('walletconnect')} 
+                      alt="WalletConnect"
+                      width={24}
+                      height={24}
+                      style={{ width: 'auto', height: '24px' }}
+                    />
+                    <div className="text-left">
+                      <div className="font-semibold">WalletConnect</div>
+                      <div className="text-sm text-muted-foreground">Connect Mobile Wallet</div>
+                    </div>
+                  </Button>
+                )}
               </div>
             </DialogContent>
           </Dialog>

@@ -72,7 +72,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, isConnected, walletType, network } = useWallet()
+  const { address: connectedAddress, isConnected, walletType, network, getProvider } = useWallet()
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'

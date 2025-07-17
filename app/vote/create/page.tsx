@@ -40,7 +40,7 @@ export default function CreateProposalPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { t, language } = useLanguage()
-  const { walletType, network } = useWallet()
+  const { walletType, network, getProvider, isConnected: walletConnected } = useWallet()
   
   // Filter network to supported types for contracts (exclude 'solana')
   const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -351,63 +351,35 @@ export default function CreateProposalPage() {
       return
     }
     
+    // Check if wallet is connected
+    if (!walletConnected || !walletType) {
+      throw new Error("No wallet connected. Please connect your wallet first.");
+    }
+
     setIsSubmitting(true)
     
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // Get provider using useWallet hook
+      const browserProvider = getProvider();
+      if (!browserProvider) {
+        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
       // Request account access if needed
-      const accounts = await walletProvider.request({
-        method: 'eth_requestAccounts'
-      });
+      const accounts = await browserProvider.send('eth_requestAccounts', []);
 
       if (!accounts || accounts.length === 0) {
         throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
       }
 
       // Get current network information
-      const chainId = await walletProvider.request({
-        method: 'eth_chainId'
-      });
+      const chainId = await browserProvider.send('eth_chainId', []);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
 
-      // Create a Web3Provider using the connected wallet provider
-      const provider = new ethers.BrowserProvider(walletProvider);
-      
-      // Get the signer
-      const signer = await provider.getSigner();
+      // Use existing browserProvider and get signer
+      const signer = await browserProvider.getSigner();
       
       // Create contract instance
       const governorContract = new ethers.Contract(
