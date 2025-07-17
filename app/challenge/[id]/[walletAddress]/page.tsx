@@ -247,13 +247,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const getTransactionTypeText = (type: string) => {
     switch (type) {
       case 'create':
-        return 'Created'
+        return t('create')
       case 'join':
-        return 'Joined'
+        return t('join')
       case 'swap':
-        return 'Swapped'
+        return t('swap')
       case 'register':
-        return 'Registered'
+        return t('register')
       case 'reward':
         return 'Rewarded'
       default:

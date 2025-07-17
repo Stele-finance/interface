@@ -248,8 +248,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Check if wallet is connected
       if (!walletConnected || !walletType) {
         throw new Error("No wallet connected. Please connect your wallet first.");
-      }
-
+        }
+        
       // Get provider using useWallet hook
       const browserProvider = getProvider();
       if (!browserProvider) {

@@ -174,25 +174,25 @@ export const useWallet = () => {
   let appKitAccount: any = null
   let appKitNetwork: any = null
   let appKitProvider: any = null
-  
+
   try {
     appKit = useAppKit()
   } catch (e) {
     // AppKit not available
   }
-  
+
   try {
     appKitAccount = useAppKitAccount()
   } catch (e) {
     // AppKitAccount not available
   }
-  
+
   try {
     appKitNetwork = useAppKitNetwork()
   } catch (e) {
     // AppKitNetwork not available
   }
-  
+
   try {
     appKitProvider = useAppKitProvider('eip155')
   } catch (e) {
@@ -209,9 +209,6 @@ export const useWallet = () => {
   useEffect(() => {
     restoreFromStorage()
     setLocalState(globalState)
-    
-    // Component initialization complete
-    console.log('🚀 Wallet hook initialized')
   }, [])
 
   // Monitor WalletConnect state
@@ -226,10 +223,7 @@ export const useWallet = () => {
           address,
           isConnected: true,
           network
-        })
-        
-        // WalletConnect connected - event handlers will now only respond to WalletConnect
-        console.log('🔗 WalletConnect connected')
+        })   
       } else if (globalState.isConnected) {
         // WalletConnect disconnected
         updateState({
@@ -238,9 +232,6 @@ export const useWallet = () => {
           walletType: null,
           network: null
         })
-        
-        // WalletConnect disconnected
-        console.log('🔌 WalletConnect disconnected')
       }
     }
   }, [appKitAccount?.address, appKitAccount?.isConnected, appKitNetwork?.chainId])
@@ -262,9 +253,6 @@ export const useWallet = () => {
                 isConnected: true,
                 network: chainIdToNetwork(chainId)
               })
-              
-              // MetaMask connection restored - event handlers already set up
-              console.log('🔄 MetaMask connection restored EXCLUSIVELY')
             }
           }
         } else if (globalState.walletType === 'phantom') {
@@ -278,9 +266,6 @@ export const useWallet = () => {
                 isConnected: true,
                 network: chainIdToNetwork(chainId)
               })
-              
-              // Phantom connection restored - event handlers already set up
-              console.log('🔄 Phantom connection restored EXCLUSIVELY')
             }
           }
         }
@@ -308,12 +293,9 @@ export const useWallet = () => {
       const handleMetaMaskAccountsChanged = async (accounts: string[]) => {
         // ONLY respond if MetaMask is the connected wallet
         if (globalState.walletType !== 'metamask') {
-          console.log('🚫 IGNORED MetaMask accountsChanged - Current wallet:', globalState.walletType)
           return
         }
-        
-        console.log('✅ MetaMask accounts changed:', accounts)
-        
+                
         if (accounts.length === 0) {
           updateState({
             address: null,
@@ -337,11 +319,9 @@ export const useWallet = () => {
       const handleMetaMaskChainChanged = (chainId: string) => {
         // ONLY respond if MetaMask is the connected wallet
         if (globalState.walletType !== 'metamask') {
-          console.log('🚫 IGNORED MetaMask chainChanged - Current wallet:', globalState.walletType)
           return
         }
         
-        console.log('✅ MetaMask chain changed:', chainId)
         updateState({
           network: chainIdToNetwork(chainId)
         })
@@ -350,7 +330,7 @@ export const useWallet = () => {
       if (metaMaskProvider.on) {
         metaMaskProvider.on('accountsChanged', handleMetaMaskAccountsChanged)
         metaMaskProvider.on('chainChanged', handleMetaMaskChainChanged)
-      }
+        }
     }
 
     // Phantom event listeners
@@ -359,12 +339,9 @@ export const useWallet = () => {
       const handlePhantomAccountsChanged = async (accounts: string[]) => {
         // ONLY respond if Phantom is the connected wallet
         if (globalState.walletType !== 'phantom') {
-          console.log('🚫 IGNORED Phantom accountsChanged - Current wallet:', globalState.walletType)
           return
         }
-        
-        console.log('✅ Phantom accounts changed:', accounts)
-        
+                
         if (accounts.length === 0) {
           updateState({
             address: null,
@@ -388,11 +365,9 @@ export const useWallet = () => {
       const handlePhantomChainChanged = (chainId: string) => {
         // ONLY respond if Phantom is the connected wallet
         if (globalState.walletType !== 'phantom') {
-          console.log('🚫 IGNORED Phantom chainChanged - Current wallet:', globalState.walletType)
           return
         }
         
-        console.log('✅ Phantom chain changed:', chainId)
         updateState({
           network: chainIdToNetwork(chainId)
         })
@@ -405,9 +380,7 @@ export const useWallet = () => {
     }
 
     // Cleanup on unmount - but keep listeners active for real-time detection
-    return () => {
-      console.log('🧹 Component unmounting - keeping wallet event listeners for real-time detection')
-    }
+    return () => {}
   }, []) // Only run once on mount
 
   // Connect wallet
@@ -443,10 +416,7 @@ export const useWallet = () => {
             walletType: 'metamask',
             network: chainIdToNetwork(chainId),
             isLoading: false
-          })
-          
-          // MetaMask connected - event handlers will now only respond to MetaMask
-          console.log('🔗 MetaMask connected EXCLUSIVELY')
+          })          
         }
       } else if (walletType === 'phantom') {
         const provider = getPhantomProvider()
@@ -462,9 +432,6 @@ export const useWallet = () => {
             network: chainIdToNetwork(chainId),
             isLoading: false
           })
-          
-          // Phantom connected - event handlers will now only respond to Phantom
-          console.log('🔗 Phantom connected EXCLUSIVELY')
         }
       } else if (walletType === 'walletconnect') {
         if (appKit?.open) {
@@ -472,8 +439,6 @@ export const useWallet = () => {
             walletType: 'walletconnect',
             isLoading: false
           })
-          // WalletConnect opening - event handlers will only respond to WalletConnect
-          console.log('🔗 WalletConnect opening')
           appKit.open()
         } else {
           throw new Error('WalletConnect not available')
@@ -490,8 +455,8 @@ export const useWallet = () => {
     try {
       if (globalState.walletType === 'walletconnect') {
         // WalletConnect disconnection is handled by AppKit
-        if (typeof window !== 'undefined' && (window as any).appKit) {
-          await (window as any).appKit.disconnect()
+          if (typeof window !== 'undefined' && (window as any).appKit) {
+            await (window as any).appKit.disconnect()
         }
       }
       
@@ -501,9 +466,7 @@ export const useWallet = () => {
         walletType: null,
         network: null,
         isLoading: false
-      })
-      
-      console.log('🔌 Wallet disconnected and ALL event listeners cleared')
+      })      
     } catch (error) {
       console.error('Failed to disconnect wallet:', error)
     }
@@ -515,8 +478,8 @@ export const useWallet = () => {
       throw new Error('No wallet connected')
     }
 
-    const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
-    
+      const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
+      
     try {
       let provider = null
       
@@ -536,7 +499,7 @@ export const useWallet = () => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: chainConfig.chainId }],
       })
-
+      
       updateState({ network: targetNetwork })
     } catch (switchError: any) {
       if (switchError.code === 4902) {
@@ -554,9 +517,9 @@ export const useWallet = () => {
 
           if (provider) {
             await provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [chainConfig],
-            })
+            method: 'wallet_addEthereumChain',
+            params: [chainConfig],
+          })
             updateState({ network: targetNetwork })
           }
         } catch (addError) {

@@ -532,8 +532,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       const browserProvider = getProvider();
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-      }
-
+        }
+        
       // Use BrowserProvider's send method for RPC requests
       // Request account access
       const accounts = await browserProvider.send('eth_requestAccounts', []);
