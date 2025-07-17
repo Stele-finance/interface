@@ -47,7 +47,7 @@ export default function VotePage() {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
   // Use global wallet hook instead of local state
-  const { address: walletAddress, isConnected, walletType, network } = useWallet()
+  const { address: walletAddress, isConnected, walletType, network, getProvider } = useWallet()
   const queryClient = useQueryClient()
   const [isDelegating, setIsDelegating] = useState(false)
   const [proposals, setProposals] = useState<Proposal[]>([])

@@ -40,7 +40,7 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
   const [isCreating, setIsCreating] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType, network } = useWallet();
+  const { walletType, network, getProvider, isConnected } = useWallet();
   
   useEffect(() => {
     // Handle display for challenges that haven't started yet

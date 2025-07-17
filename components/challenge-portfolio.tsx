@@ -269,7 +269,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { address: connectedAddress, isConnected, walletType, network, connectWallet } = useWallet();
+  const { address: connectedAddress, isConnected, walletType, network, connectWallet, getProvider } = useWallet();
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
@@ -641,46 +641,23 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Confirm Join Challenge - Actual transaction
   const confirmJoinChallenge = async () => {
+    // Check if wallet is connected
+    if (!isConnected || !walletType) {
+      throw new Error("No wallet connected. Please connect your wallet first.");
+    }
+
     setIsJoining(true);
     setShowJoinModal(false);
     
     try {      
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // Get provider using useWallet hook
+      const browserProvider = getProvider();
+      if (!browserProvider) {
+        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
       // Request account access
-      const accounts = await walletProvider.request({
-        method: 'eth_requestAccounts'
-      });
+      const accounts = await browserProvider.send('eth_requestAccounts', []);
 
       if (!accounts || accounts.length === 0) {
         throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
@@ -689,9 +666,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       const userAddress = accounts[0];
 
       // Get current network information
-      const chainId = await walletProvider.request({
-        method: 'eth_chainId'
-      });
+      const chainId = await browserProvider.send('eth_chainId', []);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
@@ -700,11 +675,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         throw new Error("Entry fee not loaded yet. Please try again later.");
       }
 
-      // Create a Web3Provider using the current wallet provider
-      const provider = new ethers.BrowserProvider(walletProvider);
-      
-      // Get the signer
-      const signer = await provider.getSigner();
+      // Use existing browserProvider and get signer
+      const signer = await browserProvider.getSigner();
       
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
