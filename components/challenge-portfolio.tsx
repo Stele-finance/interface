@@ -988,39 +988,41 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         </div>
       )}
       
-      {/* Challenge Charts */}
-      <ChallengeCharts 
-        challengeId={challengeId} 
-        network={subgraphNetwork} 
-        joinButton={{
-          isClient,
-          shouldShowGetRewards: shouldShowGetRewards(),
-          hasJoinedChallenge,
-          isChallengeEnded: isChallengeEnded(),
-          isJoining,
-          isLoadingChallenge,
-          challengeData,
-          isLoadingEntryFee,
-          isLoadingBalance,
-          isInsufficientBalance: isInsufficientBalance(),
-          isGettingRewards,
-          handleJoinChallenge,
-          handleNavigateToAccount,
-          handleGetRewards,
-          t,
-          // Wallet connection props
-          isConnected,
-          walletSelectOpen,
-          setWalletSelectOpen,
-          isConnecting,
-          handleConnectWallet
-        }}
-      />
+      {/* Two-Column Layout like Investor Page */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.8fr] lg:gap-6">
+        {/* Left Column: Charts + Transactions */}
+        <div className="space-y-6">
+          {/* Challenge Charts */}
+          <ChallengeCharts 
+            challengeId={challengeId} 
+            network={subgraphNetwork} 
+            joinButton={{
+              isClient,
+              shouldShowGetRewards: shouldShowGetRewards(),
+              hasJoinedChallenge,
+              isChallengeEnded: isChallengeEnded(),
+              isJoining,
+              isLoadingChallenge,
+              challengeData,
+              isLoadingEntryFee,
+              isLoadingBalance,
+              isInsufficientBalance: isInsufficientBalance(),
+              isGettingRewards,
+              handleJoinChallenge,
+              handleNavigateToAccount,
+              handleGetRewards,
+              t,
+              // Wallet connection props
+              isConnected,
+              walletSelectOpen,
+              setWalletSelectOpen,
+              isConnecting,
+              handleConnectWallet
+            }}
+          />
 
-      {/* Transactions and Ranking Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Transactions */}
-        <div className="lg:col-span-2 md:mr-10">
+          {/* Transactions Section */}
+          <div>
           <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
           <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
             <CardContent className="p-0">
@@ -1218,21 +1220,311 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
 
-        {/* Ranking Section */}
-        <RankingSection challengeId={challengeId} network={subgraphNetwork} />
+        {/* Right Column: Challenge Info + Ranking */}
+        <div className="space-y-6">
+          {/* PC Action Buttons */}
+          <div className="hidden lg:block">
+                         {isClient && (
+               <div className="space-y-3">
+                 {/* Connect Wallet Button */}
+                 {!isConnected ? (
+                   <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+                     <DialogTrigger asChild>
+                       <Button 
+                         variant="outline" 
+                         size="lg" 
+                         className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                       >
+                         <Wallet className="mr-2 h-5 w-5" />
+                         Connect Wallet
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="sm:max-w-md">
+                       <DialogHeader>
+                         <DialogTitle>Choose Wallet</DialogTitle>
+                         <DialogDescription>
+                           Choose which wallet to connect with
+                         </DialogDescription>
+                       </DialogHeader>
+                       <div className="grid grid-cols-2 gap-4">
+                         <Button
+                           variant="outline"
+                           onClick={() => handleConnectWallet('metamask')}
+                           disabled={isConnecting}
+                           className="flex flex-col items-center gap-2 h-20"
+                         >
+                           <Image 
+                             src="/wallets/small/metamask.png" 
+                             alt="MetaMask" 
+                             width={32} 
+                             height={32}
+                           />
+                           <span>MetaMask</span>
+                         </Button>
+                         <Button
+                           variant="outline"
+                           onClick={() => handleConnectWallet('phantom')}
+                           disabled={isConnecting}
+                           className="flex flex-col items-center gap-2 h-20"
+                         >
+                           <Image 
+                             src="/wallets/small/phantom.png" 
+                             alt="Phantom" 
+                             width={32} 
+                             height={32}
+                           />
+                           <span>Phantom</span>
+                         </Button>
+                       </div>
+                     </DialogContent>
+                   </Dialog>
+                 ) : hasJoinedChallenge ? (
+                   /* Get Rewards + My Account Buttons */
+                   shouldShowGetRewards() ? (
+                     <div className="grid grid-cols-2 gap-3">
+                       {/* Get Rewards Button */}
+                       <Button 
+                         variant="outline" 
+                         size="lg" 
+                         onClick={handleGetRewards}
+                         disabled={isGettingRewards}
+                         className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-sm"
+                       >
+                         {isGettingRewards ? (
+                           <>
+                             <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                             Claiming...
+                           </>
+                         ) : (
+                           <>
+                             <DollarSign className="mr-1 h-4 w-4" />
+                             Get Rewards
+                           </>
+                         )}
+                       </Button>
+                       
+                       {/* My Account Button */}
+                       <Button 
+                         variant="outline" 
+                         size="lg" 
+                         onClick={handleNavigateToAccount}
+                         className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-sm"
+                       >
+                         <User className="mr-1 h-4 w-4" />
+                         {t('myAccount')}
+                       </Button>
+                     </div>
+                   ) : (
+                     /* My Account Button Only */
+                     <Button 
+                       variant="outline" 
+                       size="lg" 
+                       onClick={handleNavigateToAccount}
+                       className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                     >
+                       <User className="mr-2 h-5 w-5" />
+                       {t('myAccount')}
+                     </Button>
+                   )
+                 ) : !isChallengeEnded() ? (
+                   /* Join Button */
+                   <Button 
+                     variant="outline" 
+                     size="lg" 
+                     onClick={handleJoinChallenge}
+                     disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
+                     className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
+                       isInsufficientBalance()
+                         ? "bg-red-500 hover:bg-red-500 text-white border-red-500 cursor-not-allowed" 
+                         : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                     }`}
+                   >
+                     {isJoining ? (
+                       <>
+                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                         {t('joining')}
+                       </>
+                     ) : isLoadingChallenge || !challengeData?.challenge ? (
+                       <>
+                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                         Loading...
+                       </>
+                     ) : isLoadingEntryFee || isLoadingBalance ? (
+                       <>
+                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                         {t('loading')}
+                       </>
+                     ) : isInsufficientBalance() ? (
+                       <>
+                         <Plus className="mr-2 h-5 w-5" />
+                         Insufficient USDC
+                       </>
+                     ) : (
+                       <>
+                         <Plus className="mr-2 h-5 w-5" />
+                         {t('join')}
+                         <UserPlus className="ml-2 h-5 w-5" />
+                       </>
+                     )}
+                   </Button>
+                 ) : null}
+              </div>
+            )}
+          </div>
+
+          {/* Challenge Info Card */}
+          <Card className="bg-muted border-0 rounded-2xl h-fit">
+            <CardContent className="p-8 space-y-10">
+              {/* Row 1: Type and Status */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Type */}
+                <div className="space-y-2">
+                  <span className="text-base text-gray-400">{t('type')}</span>
+                  <div className="text-3xl text-white">
+                    {challengeData?.challenge ? (() => {
+                      const challengeType = challengeData.challenge.challengeType;
+                      switch(challengeType) {
+                        case 0: return t('oneWeek');
+                        case 1: return t('oneMonth');
+                        case 2: return t('threeMonths');
+                        case 3: return t('sixMonths');
+                        case 4: return t('oneYear');
+                        default: return `Type ${challengeType}`;
+                      }
+                    })() : t('loading')}
+                  </div>
+                </div>
+                
+                {/* Status */}
+                <div className="space-y-2">
+                  <span className="text-base text-gray-400">{t('status')}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
+                      {subgraphNetwork === 'ethereum' ? (
+                        <Image 
+                          src="/networks/small/ethereum.png" 
+                          alt="Ethereum Mainnet"
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                          style={{ width: '24px', height: '24px' }}
+                        />
+                      ) : subgraphNetwork === 'arbitrum' ? (
+                        <Image 
+                          src="/networks/small/arbitrum.png" 
+                          alt="Arbitrum One"
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                          style={{ width: '24px', height: '24px' }}
+                        />
+                      ) : (
+                        <Image 
+                          src="/networks/small/ethereum.png" 
+                          alt="Ethereum Mainnet"
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                          style={{ width: '24px', height: '24px' }}
+                        />
+                      )}
+                    </div>
+                    <span className={`text-xl font-medium ${challengeData?.challenge?.isActive ? 'text-green-400' : 'text-red-400'}`}>
+                      {challengeData?.challenge?.isActive ? t('active') : t('ended')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Total Prize and Users */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Total Prize */}
+                <div className="space-y-2">
+                  <span className="text-base text-gray-400">{t('totalPrize')}</span>
+                  <div className="text-4xl text-white">
+                    ${challengeData?.challenge ? (() => {
+                      const totalPrize = parseInt(challengeData.challenge.rewardAmountUSD);
+                      return totalPrize >= 1000000 
+                        ? `${(totalPrize / 1000000).toFixed(1)}M` 
+                        : totalPrize >= 1000 
+                        ? `${(totalPrize / 1000).toFixed(1)}K` 
+                        : totalPrize.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    })() : '0'}
+                  </div>
+                </div>
+
+                {/* Users */}
+                <div className="space-y-2">
+                  <span className="text-base text-gray-400">{t('users')}</span>
+                  <div className="text-4xl text-white">
+                    {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Progress */}
+              {challengeData?.challenge && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base text-gray-400">{t('progress')}</span>
+                    <span className="text-base font-medium text-gray-300">
+                      {(() => {
+                        const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                        const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                        const currentTime = new Date();
+                        const totalDuration = endTime.getTime() - startTime.getTime();
+                        const elapsed = currentTime.getTime() - startTime.getTime();
+                        const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                        return Math.round(progress);
+                      })()}%
+                    </span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-700 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                      style={{ 
+                        width: `${(() => {
+                          const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                          const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                          const currentTime = new Date();
+                          const totalDuration = endTime.getTime() - startTime.getTime();
+                          const elapsed = currentTime.getTime() - startTime.getTime();
+                          const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                          return Math.round(progress);
+                        })()}%` 
+                      }}
+                    ></div>
+                  </div>
+                  
+                  {/* Time Info */}
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>Start: {new Date(parseInt(challengeData.challenge.startTime) * 1000).toLocaleDateString()}</span>
+                    <span>End: {new Date(parseInt(challengeData.challenge.endTime) * 1000).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Ranking Section */}
+          <RankingSection challengeId={challengeId} network={subgraphNetwork} />
+        </div>
       </div>
 
       {/* Join Challenge Confirmation Modal */}
       <AlertDialog open={showJoinModal} onOpenChange={setShowJoinModal}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-muted border-gray-700">
           <AlertDialogHeader>
             <AlertDialogTitle>Join Challenge</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to join this challenge?
             </AlertDialogDescription>
-            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+            <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-300">Entry Fee:</span>
                 <span className="text-lg font-bold text-white">
@@ -1247,7 +1539,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowJoinModal(false)}>
+            <AlertDialogCancel 
+              onClick={() => setShowJoinModal(false)}
+              className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
