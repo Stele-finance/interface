@@ -162,7 +162,6 @@ export default function VotePage() {
           timestamp: currentBlock.timestamp
         }
         setCurrentBlockInfo(blockInfo)
-        console.log('Using Ethereum mainnet block info for timestamp calculation:', blockInfo)
       }
     } catch (error) {
       console.error('Error getting Ethereum mainnet block info:', error)

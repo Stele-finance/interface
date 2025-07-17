@@ -79,7 +79,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const searchParams = useSearchParams()
   const { id } = use(params)
   const { t } = useLanguage()
-  const { walletType, network, getProvider, isConnected: walletConnected } = useWallet()
+  const { walletType, network, getProvider, isConnected: walletConnected, address, isLoading: walletLoading } = useWallet()
   
   // Use AppKit provider for WalletConnect
   const { walletProvider: appKitProvider } = useAppKitProvider('eip155')
@@ -89,8 +89,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
+
   const [voteOption, setVoteOption] = useState<string | null>(null)
   const [reason, setReason] = useState("")
   const [isVoting, setIsVoting] = useState(false)
@@ -225,14 +224,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   // Get proposal data (from URL params or defaults)
   const proposal = getProposalFromParams()
 
-  // Load wallet address when page loads
-  useEffect(() => {
-    const savedAddress = localStorage.getItem('walletAddress')
-    if (savedAddress) {
-      setWalletAddress(savedAddress)
-      setIsConnected(true)
-    }
-  }, [])
+
 
   // Set current time on client side only
   useEffect(() => {
@@ -245,7 +237,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
   // Get voting power and check if user has already voted
   const checkVotingPowerAndStatus = useCallback(async () => {
-    if (!walletAddress || !id) return
+    if (!walletConnected || !id) return
 
     setIsLoadingVotingPower(true)
     try {
@@ -254,20 +246,28 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         throw new Error("No wallet connected. Please connect your wallet first.");
         }
         
-      // Get provider using useWallet hook
-      const browserProvider = getProvider();
-      if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-      }
-
       // Get current connected address from wallet
-      const accounts = await browserProvider.send('eth_requestAccounts', []);
+      let currentConnectedAddress: string;
+      
+      if (walletType === 'walletconnect') {
+        // For WalletConnect, use the address from useWallet hook
+        if (!address) {
+          throw new Error("No WalletConnect address available")
+        }
+        currentConnectedAddress = address;
+      } else {
+        // For MetaMask and Phantom, use provider method
+        const browserProvider = getProvider();
+        if (!browserProvider) {
+          throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+        }
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts connected in ${walletType} wallet`)
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts connected in ${walletType} wallet`)
+        }
+        currentConnectedAddress = accounts[0];
       }
-
-      const currentConnectedAddress = accounts[0]
       
       // Connect to provider for read-only operations using network-specific RPC
       const rpcUrl = getRPCUrl(contractNetwork)
@@ -295,7 +295,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Get voting power at a safe past block to avoid "future lookup" error
       // Use a more conservative offset to ensure block is finalized and avoid timing issues
       const timepoint = Math.max(1, ethereumBlock - 10)
-      console.log('Querying voting power at Ethereum block:', timepoint, 'current Ethereum block:', ethereumBlock)
       
       const userVotingPower = await governanceContract.getVotes(currentConnectedAddress, timepoint)
       setVotingPower(ethers.formatUnits(userVotingPower, STELE_DECIMALS))      
@@ -324,7 +323,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     } finally {
       setIsLoadingVotingPower(false)
     }
-  }, [walletAddress, id, walletType, contractNetwork, blockInfo, isLoadingBlockNumber])
+  }, [walletConnected, id, walletType, contractNetwork, blockInfo, isLoadingBlockNumber])
 
   // Check proposal state
   const checkProposalState = useCallback(async () => {
@@ -367,11 +366,11 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
   // Check voting power and voting status when wallet is connected
   useEffect(() => {
-    if (walletAddress && id) {
+    if (walletConnected && id) {
       checkVotingPowerAndStatus()
       checkProposalState()
     }
-  }, [walletAddress, id, checkVotingPowerAndStatus, checkProposalState])
+  }, [walletConnected, id, checkVotingPowerAndStatus, checkProposalState])
 
   // Calculate vote percentage based on total supply (1 billion STELE)
   const calculatePercentage = () => {
@@ -398,23 +397,36 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsDelegating(true)
 
     try {
-      // Get provider using useWallet hook
-      const browserProvider = getProvider();
+      // Get current connected address from wallet and provider
+      let currentConnectedAddress: string;
+      let browserProvider: any;
+      
+      if (walletType === 'walletconnect') {
+        // For WalletConnect, use the address from useWallet hook
+        if (!address) {
+          throw new Error("No WalletConnect address available")
+        }
+        currentConnectedAddress = address;
+        browserProvider = getProvider();
+      } else {
+        // For MetaMask and Phantom, use provider method
+        browserProvider = getProvider();
+        if (!browserProvider) {
+          throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+        }
+
+        const accounts = await browserProvider.send('eth_requestAccounts', [])
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts connected in ${walletType} wallet. Please connect your wallet first.`)
+        }
+        currentConnectedAddress = accounts[0];
+      }
+
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
-      // Request wallet connection and get current connected address
-      const accounts = await browserProvider.send('eth_requestAccounts', [])
-      
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts connected in ${walletType} wallet. Please connect your wallet first.`)
-      }
-
-      const currentConnectedAddress = accounts[0]
-      console.log('Delegating tokens for address:', currentConnectedAddress)
-      
-      // Use existing browserProvider and get signer
+      // Use browserProvider and get signer
       const signer = await browserProvider.getSigner()
       const votesContract = new ethers.Contract(getSteleTokenAddress(contractNetwork), ERC20VotesABI.abi, signer)
 
@@ -484,11 +496,11 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     }
 
     // Wallet connection check
-    if (!walletAddress) {
+    if (!walletConnected) {
       toast({
         variant: "destructive",
-        title: "Phantom Wallet Not Connected",
-        description: "Please connect your Phantom wallet to vote",
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to vote",
       })
       return
     }
@@ -511,22 +523,36 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsVoting(true)
 
     try {
-      // Get provider using useWallet hook
-      const browserProvider = getProvider();
+      // Get current connected address from wallet and provider
+      let currentConnectedAddress: string;
+      let browserProvider: any;
+      
+      if (walletType === 'walletconnect') {
+        // For WalletConnect, use the address from useWallet hook
+        if (!address) {
+          throw new Error("No WalletConnect address available")
+        }
+        currentConnectedAddress = address;
+        browserProvider = getProvider();
+      } else {
+        // For MetaMask and Phantom, use provider method
+        browserProvider = getProvider();
+        if (!browserProvider) {
+          throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+        }
+
+        const accounts = await browserProvider.send('eth_requestAccounts', [])
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts connected in ${walletType} wallet`)
+        }
+        currentConnectedAddress = accounts[0];
+      }
+
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
-
-      // Request wallet connection and get current connected address
-      const accounts = await browserProvider.send('eth_requestAccounts', [])
       
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts connected in ${walletType} wallet`)
-      }
-
-      const currentConnectedAddress = accounts[0]
-      
-      // Use existing browserProvider and get signer
+      // Use browserProvider and get signer
       const signer = await browserProvider.getSigner()
       const contract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
@@ -618,7 +644,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
   // Handle queue operation
   const handleQueue = async () => {
-    if (!walletAddress || !proposalDetailsData?.proposalCreateds?.[0]) {
+    if (!walletConnected || !proposalDetailsData?.proposalCreateds?.[0]) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -740,7 +766,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
   // Handle execute operation
   const handleExecute = async () => {
-    if (!walletAddress || !proposalDetailsData?.proposalCreateds?.[0]) {
+    if (!walletConnected || !proposalDetailsData?.proposalCreateds?.[0]) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -1170,7 +1196,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 </div>
               </ClientOnly>
 
-              {isConnected && (
+              {walletLoading && (
+                <div className="text-sm text-gray-400 space-y-1">
+                  <div className="flex items-center">
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    {t('connecting')}
+                  </div>
+                </div>
+              )}
+
+              {walletConnected && !walletLoading && (
                 <div className="text-sm text-gray-400 space-y-1">
                   {isLoadingVotingPower ? (
                     <div className="flex items-center">
@@ -1244,7 +1279,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
             </CardContent>
             <CardFooter className="flex flex-col space-y-3">
               {/* Delegate Button - Show when user has tokens but no voting power */}
-              {isConnected && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
+              {walletConnected && !walletLoading && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleDelegate}
@@ -1268,7 +1303,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <Button 
                 className="w-full bg-orange-500 hover:bg-orange-600" 
                 onClick={handleVote}
-                disabled={proposal.hasVoted || !voteOption || isVoting || !isConnected || Number(votingPower) === 0 || isLoadingVotingPower}
+                disabled={proposal.hasVoted || !voteOption || isVoting || walletLoading || !walletConnected || Number(votingPower) === 0 || isLoadingVotingPower}
               >
                 {isVoting ? (
                   <div className="flex items-center">
@@ -1277,9 +1312,14 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   </div>
                 ) : proposal.hasVoted ? (
                   t('alreadyVoted')
-                ) : !isConnected ? (
-                  t('connectPhantomWalletToVote')
-                                  ) : Number(votingPower) === 0 ? (
+                ) : walletLoading ? (
+                  <div className="flex items-center">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('connecting')}
+                  </div>
+                ) : !walletConnected ? (
+                  t('connectWallet')
+                ) : Number(votingPower) === 0 ? (
                     t('insufficientVotingPower')
                 ) : isLoadingVotingPower ? (
                   <div className="flex items-center">
@@ -1296,7 +1336,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
               {/* Queue Button - Show when proposal is ready for queue (voting ended + majority for) */}
               <ClientOnly>
-                {currentTime && isConnected && isReadyForQueue() && (
+                {currentTime && walletConnected && !walletLoading && isReadyForQueue() && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleQueue}
@@ -1323,7 +1363,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               </ClientOnly>
 
               {/* Execute Button - Show when proposal is queued (state 5) */}
-              {isConnected && proposalState === 5 && (
+              {walletConnected && !walletLoading && proposalState === 5 && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleExecute}
