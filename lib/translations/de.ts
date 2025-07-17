@@ -44,7 +44,6 @@ export const de = {
   connecting: "Verbinden...",
   connectedWallet: "Verbundene Wallet",
   connectToAccess: "Verbinden Sie Ihre Wallet, um auf Ihr Portfolio-Dashboard zuzugreifen",
-  connectToViewPortfolio: "Verbinden Sie Ihre Wallet, um Ihr Herausforderungs-Portfolio und Ihre Leistung zu sehen",
   connectWallet: "Verbinden",
   connectWalletToViewBalance: "Verbinden Sie Ihre Wallet, um Token-Saldo zu sehen und über Vorschläge abzustimmen",
   copyAddress: "Adresse Kopieren",

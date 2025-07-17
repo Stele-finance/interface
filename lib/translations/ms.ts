@@ -44,7 +44,6 @@ export const ms = {
   connecting: "Menyambung...",
   connectedWallet: "Dompet Disambung",
   connectToAccess: "Sambung dompet anda untuk mengakses papan pemuka portfolio",
-  connectToViewPortfolio: "Sambung dompet anda untuk melihat portfolio cabaran dan prestasi",
   connectWallet: "Sambung",
   connectWalletToViewBalance: "Sambung dompet anda untuk melihat baki token dan mengundi cadangan",
   copyAddress: "Salin Alamat",

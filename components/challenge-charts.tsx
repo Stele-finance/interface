@@ -920,37 +920,37 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             <div className="space-y-2">
               <span className="text-base text-gray-400">{t('status')}</span>
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                   {walletNetwork === 'ethereum' ? (
                     <Image 
                       src="/networks/small/ethereum.png" 
                       alt="Ethereum Mainnet"
-                      width={16}
-                      height={16}
+                      width={24}
+                      height={24}
                       className="rounded-full"
-                      style={{ width: '16px', height: '16px' }}
+                      style={{ width: '24px', height: '24px' }}
                     />
                   ) : walletNetwork === 'arbitrum' ? (
                     <Image 
                       src="/networks/small/arbitrum.png" 
                       alt="Arbitrum One"
-                      width={16}
-                      height={16}
+                      width={24}
+                      height={24}
                       className="rounded-full"
-                      style={{ width: '16px', height: '16px' }}
+                      style={{ width: '24px', height: '24px' }}
                     />
                   ) : (
                     <Image 
                       src="/networks/small/ethereum.png" 
                       alt="Ethereum Mainnet"
-                      width={16}
-                      height={16}
+                      width={24}
+                      height={24}
                       className="rounded-full"
-                      style={{ width: '16px', height: '16px' }}
+                      style={{ width: '24px', height: '24px' }}
                     />
                   )}
                 </div>
-                <span className={`text-3xl font-medium ${challengeStatus.color}`}>
+                <span className={`text-xl font-medium ${challengeStatus.color}`}>
                   {challengeStatus.text}
                 </span>
               </div>

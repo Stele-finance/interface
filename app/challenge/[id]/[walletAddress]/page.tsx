@@ -1637,9 +1637,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                      </div>
                                       )}
                    
-                   {/* Registered status */}
+                   {/* Desktop Registered status - Show on desktop, hide on mobile */}
                    {investorData?.investor?.isRegistered === true && (
-                     <div className="w-full bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-3">
+                     <div className="hidden md:block w-full bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-3">
                        <div className="flex items-center justify-center gap-2">
                          <svg className="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -1712,29 +1712,29 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                             <Image 
                               src="/networks/small/ethereum.png" 
                               alt="Ethereum Mainnet"
-                              width={16}
-                              height={16}
+                              width={24}
+                              height={24}
                               className="rounded-full"
-                              style={{ width: '16px', height: '16px' }}
+                              style={{ width: '24px', height: '24px' }}
                             />
                           ) : network === 'arbitrum' ? (
                             <Image 
                               src="/networks/small/arbitrum.png" 
                               alt="Arbitrum One"
-                              width={16}
-                              height={16}
+                              width={24}
+                              height={24}
                               className="rounded-full"
-                              style={{ width: '16px', height: '16px' }}
+                              style={{ width: '24px', height: '24px' }}
                             />
                           ) : (
                             // Default to Ethereum icon if network is not recognized
                             <Image 
                               src="/networks/small/ethereum.png" 
                               alt="Ethereum Mainnet"
-                              width={16}
-                              height={16}
+                              width={24}
+                              height={24}
                               className="rounded-full"
-                              style={{ width: '16px', height: '16px' }}
+                              style={{ width: '24px', height: '24px' }}
                             />
                           );
 
@@ -1742,10 +1742,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           if (investorData?.investor?.isRegistered === true) {
                             return (
                               <>
-                                <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                                   {networkIcon}
                                 </div>
-                                <span className="text-3xl text-red-400">{t('finished')}</span>
+                                <span className="text-xl text-red-400">{t('finished')}</span>
                               </>
                             )
                           }
@@ -1753,10 +1753,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           const isActive = challengeData?.challenge?.isActive
                           return (
                             <>
-                              <div className="w-5 h-5 rounded-full bg-transparent flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                                 {networkIcon}
                               </div>
-                              <span className={`text-3xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
+                              <span className={`text-xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
                                 {isActive ? t('active') : 'Pending reward'}
                               </span>
                             </>

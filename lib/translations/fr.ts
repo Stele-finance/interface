@@ -44,7 +44,6 @@ export const fr = {
   connecting: "Connexion...",
   connectedWallet: "Portefeuille Connecté",
   connectToAccess: "Connectez votre portefeuille pour accéder à votre tableau de bord de portefeuille",
-  connectToViewPortfolio: "Connectez votre portefeuille pour voir votre portefeuille de défis et vos performances",
   connectWallet: "Connecter",
   connectWalletToViewBalance: "Connectez votre portefeuille pour voir le solde des tokens et voter sur les propositions",
   copyAddress: "Copier l'Adresse",

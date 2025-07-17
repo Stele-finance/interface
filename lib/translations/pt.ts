@@ -44,7 +44,6 @@ export const pt = {
   connecting: "Conectando...",
   connectedWallet: "Carteira Conectada",
   connectToAccess: "Conecte sua carteira para acessar seu painel de portfólio",
-  connectToViewPortfolio: "Conecte sua carteira para ver seu portfólio de desafios e desempenho",
   connectWallet: "Conectar",
   connectWalletToViewBalance: "Conecte sua carteira para ver o saldo de tokens e votar em propostas",
   copyAddress: "Copiar Endereço",

@@ -532,10 +532,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                 <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                   <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
+                  <TableHead className="text-gray-300 w-28">{t('status')}</TableHead>
                   <TableHead className="text-gray-300 w-32">{t('progress')}</TableHead>
                   <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
-                  <TableHead className="text-gray-300 w-20">{t('challenge')}</TableHead>
-                  <TableHead className="text-gray-300 w-28 pr-6">{t('status')}</TableHead>
+                  <TableHead className="text-gray-300 w-20 pr-6">{t('challenge')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -578,6 +578,9 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                       {challenge.prize}
                     </TableCell>
                     <TableCell className="py-6">
+                      {getStatusBadge(challenge.status)}
+                    </TableCell>
+                    <TableCell className="py-6">
                       <div className="flex items-center gap-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -603,13 +606,10 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                         <span>{challenge.participants}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="py-6">
+                    <TableCell className="pr-6 py-6">
                       <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
                         {challenge.challengeId}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="pr-6 py-6">
-                      {getStatusBadge(challenge.status)}
                     </TableCell>
                   </TableRow>
                 ))}

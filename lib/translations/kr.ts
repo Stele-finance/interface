@@ -44,7 +44,6 @@ export const kr = {
   connecting: "연결 중...",
   connectedWallet: "연결된 지갑",
   connectToAccess: "포트폴리오 대시보드에 액세스하려면 지갑을 연결하세요",
-  connectToViewPortfolio: "챌린지 포트폴리오와 성과를 보려면 지갑을 연결하세요",
   connectWallet: "연결",
   connectWalletToViewBalance: "토큰 잔액을 보고 제안에 투표하려면 지갑을 연결하세요",
   copyAddress: "주소 복사",

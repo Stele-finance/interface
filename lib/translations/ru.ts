@@ -44,7 +44,6 @@ export const ru = {
   connecting: "Подключение...",
   connectedWallet: "Подключенный Кошелек",
   connectToAccess: "Подключите ваш кошелек для доступа к панели портфолио",
-  connectToViewPortfolio: "Подключите ваш кошелек для просмотра портфолио вызовов и результатов",
   connectWallet: "Подключить",
   connectWalletToViewBalance: "Подключите ваш кошелек для просмотра баланса токенов и голосования по предложениям",
   copyAddress: "Копировать Адрес",

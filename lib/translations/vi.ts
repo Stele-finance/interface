@@ -44,7 +44,6 @@ export const vi = {
   connecting: "Đang kết nối...",
   connectedWallet: "Ví đã kết nối",
   connectToAccess: "Kết nối ví của bạn để truy cập bảng điều khiển danh mục đầu tư",
-  connectToViewPortfolio: "Kết nối ví của bạn để xem danh mục đầu tư thử thách và hiệu suất",
   connectWallet: "Kết nối",
   connectWalletToViewBalance: "Kết nối ví của bạn để xem số dư token và bỏ phiếu cho đề xuất",
   copyAddress: "Sao chép địa chỉ",

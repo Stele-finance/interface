@@ -44,7 +44,6 @@ export const ar = {
   connecting: "جاري الاتصال...",
   connectedWallet: "المحفظة المتصلة",
   connectToAccess: "اربط محفظتك للوصول إلى لوحة معلومات محفظتك",
-  connectToViewPortfolio: "اربط محفظتك لعرض محفظة التحدي وأدائها",
   connectWallet: "ربط",
   connectWalletToViewBalance: "اربط محفظتك لعرض رصيد الرمز والتصويت على المقترحات",
   copyAddress: "نسخ العنوان",
