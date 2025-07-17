@@ -490,9 +490,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     // Only show insufficient if we have valid numbers and balance is actually less than fee
     if (isNaN(balance) || isNaN(fee)) return false;
     
-    const isInsufficient = balance < fee;
-    console.log(`Balance check: ${balance} USDC < ${fee} USDC = ${isInsufficient}`);
-    
+    const isInsufficient = balance < fee;    
     return isInsufficient;
   };
 
