@@ -199,6 +199,32 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     }
   }
 
+  // Format token amount to limit decimal places for mobile display
+  const formatTokenAmount = (amount: string) => {
+    const num = parseFloat(amount)
+    
+    // If the number is 0 or invalid, return "0"
+    if (isNaN(num) || num === 0) return "0"
+    
+    // For very small numbers (less than 0.00001), use scientific notation
+    if (num < 0.00001 && num > 0) {
+      return num.toExponential(2)
+    }
+    
+    // For numbers >= 1000, show without decimals
+    if (num >= 1000) {
+      return num.toFixed(0)
+    }
+    
+    // For numbers >= 1, limit to 5 decimal places maximum
+    if (num >= 1) {
+      return num.toFixed(5).replace(/\.?0+$/, '')
+    }
+    
+    // For numbers < 1, show up to 5 decimal places, removing trailing zeros
+    return num.toFixed(5).replace(/\.?0+$/, '')
+  }
+
   // Get transaction type color
   const getTransactionTypeColor = (type: string) => {
     switch (type) {
@@ -987,11 +1013,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <CardContent className="p-0">
                     <div className="overflow-x-auto">
                       {userTokens.length > 0 ? (
-                        <table className="w-full">
+                        <table className="w-full min-w-[300px]">
                           <thead>
                             <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                              <th className="text-left py-3 pl-20 sm:pl-24 pr-14 text-sm font-medium text-gray-400">Token</th>
-                              <th className="text-right py-3 px-6 sm:px-20 sm:pr-50 mr-10 text-sm font-medium text-gray-400">Amount</th>
+                              <th className="text-left py-3 pl-10 md:pl-14 sm:pl-6 pr-4 text-sm font-medium text-gray-400">Token</th>
+                              <th className="text-right py-3 pr-10 md:pr-10 sm:pr-6 px-4 sm:px-6 text-sm font-medium text-gray-400">Amount</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1009,9 +1035,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                   className="hover:bg-gray-800/30 transition-colors cursor-pointer"
                                   onClick={() => handleTokenClick(token.address)}
                                 >
-                                  <td className="py-6 pl-10 sm:pl-14 pr-10">
+                                  <td className="py-6 pl-4 sm:pl-6 pr-4">
                                     <div className="flex items-center gap-3">
-                                      <div className="relative">
+                                      <div className="relative flex-shrink-0">
                                       {(() => {
                                         const logoPath = getTokenLogo(token.address, subgraphNetwork)
                                         
@@ -1054,7 +1080,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                           </div>
                                         )}
                                       </div>
-                                      <div>
+                                      <div className="min-w-0 flex-1">
                                         <p className="font-medium text-gray-100">{token.symbol}</p>
                                         <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
                                         {/* Show real-time price */}
@@ -1068,9 +1094,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="py-6 px-6 sm:px-6">
+                                  <td className="py-6 px-4 sm:px-6">
                                     <div className="text-right">
-                                      <p className="font-medium text-gray-100">{token.amount}</p>
+                                      <p className="font-medium text-gray-100">{formatTokenAmount(token.amount)}</p>
                                       {/* Show USD value */}
                                       {isLoadingPrice ? (
                                         <p className="text-sm text-gray-500">{t('loading')}</p>
