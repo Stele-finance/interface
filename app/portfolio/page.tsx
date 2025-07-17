@@ -16,6 +16,7 @@ import { Wallet, Loader2 } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { getWalletLogo } from "@/lib/utils"
+import { useIsMobile } from "@/components/ui/use-mobile"
 import Image from "next/image"
 
 type WalletType = 'metamask' | 'phantom' | 'walletconnect' | null
@@ -23,9 +24,10 @@ type WalletType = 'metamask' | 'phantom' | 'walletconnect' | null
 export default function PortfolioPage() {
   const { t } = useLanguage()
   const router = useRouter()
-  const { address, isConnected, connectWallet } = useWallet()
+  const { address, isConnected, connectWallet, isWalletAvailable } = useWallet()
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     // If wallet is already connected, redirect to portfolio page
@@ -95,65 +97,97 @@ export default function PortfolioPage() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid grid-cols-1 gap-4 py-4">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                          onClick={() => handleConnectWallet('metamask')}
-                          disabled={isConnecting}
-                        >
-                          <Image 
-                            src={getWalletLogo('metamask')} 
-                            alt="MetaMask"
-                            width={24}
-                            height={24}
-                            style={{ width: 'auto', height: '24px' }}
-                          />
-                          <div className="text-left">
-                            <div className="font-semibold">MetaMask</div>
-                            <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
-                          </div>
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                          onClick={() => handleConnectWallet('phantom')}
-                          disabled={isConnecting}
-                        >
-                          <Image 
-                            src={getWalletLogo('phantom')} 
-                            alt="Phantom"
-                            width={24}
-                            height={24}
-                            style={{ width: 'auto', height: '24px' }}
-                          />
-                          <div className="text-left">
-                            <div className="font-semibold">Phantom</div>
-                            <div className="text-sm text-muted-foreground">{t('browserExtension')}</div>
-                          </div>
-                        </Button>
+                        {/* PC version: Show MetaMask, Phantom, WalletConnect */}
+                        {!isMobile && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                              onClick={() => handleConnectWallet('metamask')}
+                              disabled={!isWalletAvailable('metamask') || isConnecting}
+                            >
+                              <Image 
+                                src={getWalletLogo('metamask')} 
+                                alt="MetaMask"
+                                width={24}
+                                height={24}
+                                style={{ width: 'auto', height: '24px' }}
+                              />
+                              <div className="text-left">
+                                <div className="font-semibold">MetaMask</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {isWalletAvailable('metamask') ? t('browserExtension') : 'Not Installed'}
+                                </div>
+                              </div>
+                            </Button>
+                            
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                              onClick={() => handleConnectWallet('phantom')}
+                              disabled={!isWalletAvailable('phantom') || isConnecting}
+                            >
+                              <Image 
+                                src={getWalletLogo('phantom')} 
+                                alt="Phantom"
+                                width={24}
+                                height={24}
+                                style={{ width: 'auto', height: '24px' }}
+                              />
+                              <div className="text-left">
+                                <div className="font-semibold">Phantom</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {isWalletAvailable('phantom') ? t('browserExtension') : 'Not Installed'}
+                                </div>
+                              </div>
+                            </Button>
 
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                          onClick={() => handleConnectWallet('walletconnect')}
-                          disabled={isConnecting}
-                        >
-                          <Image 
-                            src={getWalletLogo('walletconnect')} 
-                            alt="WalletConnect"
-                            width={24}
-                            height={24}
-                            style={{ width: 'auto', height: '24px' }}
-                          />
-                          <div className="text-left">
-                            <div className="font-semibold">WalletConnect</div>
-                            <div className="text-sm text-muted-foreground">Mobile Wallets</div>
-                          </div>
-                        </Button>
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                              onClick={() => handleConnectWallet('walletconnect')}
+                              disabled={isConnecting}
+                            >
+                              <Image 
+                                src={getWalletLogo('walletconnect')} 
+                                alt="WalletConnect"
+                                width={24}
+                                height={24}
+                                style={{ width: 'auto', height: '24px' }}
+                              />
+                              <div className="text-left">
+                                <div className="font-semibold">WalletConnect</div>
+                                <div className="text-sm text-muted-foreground">Mobile & Desktop Wallets</div>
+                              </div>
+                            </Button>
+                          </>
+                        )}
+
+                        {/* Mobile version: Show WalletConnect only */}
+                        {isMobile && (
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                            onClick={() => handleConnectWallet('walletconnect')}
+                            disabled={isConnecting}
+                          >
+                            <Image 
+                              src={getWalletLogo('walletconnect')} 
+                              alt="WalletConnect"
+                              width={24}
+                              height={24}
+                              style={{ width: 'auto', height: '24px' }}
+                            />
+                            <div className="text-left">
+                              <div className="font-semibold">WalletConnect</div>
+                              <div className="text-sm text-muted-foreground">Connect Mobile Wallet</div>
+                            </div>
+                          </Button>
+                        )}
                       </div>
                     </DialogContent>
                   </Dialog>
