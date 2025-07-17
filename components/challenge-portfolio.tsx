@@ -32,6 +32,7 @@ import { useInvestorData } from "@/app/subgraph/Account"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
+import { useAppKitProvider } from '@reown/appkit/react'
 import { getTokenLogo } from "@/lib/utils"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Wallet } from "lucide-react"
@@ -271,6 +272,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Use wallet hook to get current wallet info
   const { address: connectedAddress, isConnected, walletType, network, connectWallet, getProvider } = useWallet();
   
+  // Use AppKit provider for WalletConnect
+  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
+  
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
 
@@ -468,14 +472,26 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check if USDC balance is insufficient
   const isInsufficientBalance = () => {
+    // If wallet is not connected, don't show insufficient balance (show connect wallet instead)
+    if (!isConnected || !currentWalletAddress) return false;
+    
     // If challenge data is not loaded yet, don't show insufficient balance
     if (!challengeData?.challenge || isLoadingChallenge) return false;
-    if (!entryFee || !usdcBalance || isLoadingBalance || isLoadingEntryFee) return false;
+    
+    // If still loading balance or entry fee, don't show insufficient balance yet
+    if (isLoadingBalance || isLoadingEntryFee) return false;
+    
+    // If entryFee or usdcBalance is not available, don't show insufficient balance
+    if (!entryFee || !usdcBalance) return false;
     
     const balance = parseFloat(usdcBalance);
     const fee = parseFloat(entryFee);
     
-    return balance < fee;
+    // Only show insufficient if we have valid numbers and balance is actually less than fee
+    if (isNaN(balance) || isNaN(fee)) return false;
+    
+    const isInsufficient = balance < fee;    
+    return isInsufficient;
   };
 
   // Check USDC balance
@@ -484,53 +500,29 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     
     setIsLoadingBalance(true);
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          setUsdcBalance('0');
-          return;
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          setUsdcBalance('0');
-          return;
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined' || !window.phantom?.ethereum) {
-          setUsdcBalance('0');
-          return;
-        }
-        walletProvider = window.phantom.ethereum;
-      } else {
+      // Use the getProvider from useWallet hook for better reliability
+      const browserProvider = getProvider();
+      if (!browserProvider) {
+        console.warn('No wallet provider available');
         setUsdcBalance('0');
         return;
       }
 
-      // Create a Web3Provider using the current wallet provider
-      const provider = new ethers.BrowserProvider(walletProvider);
-      
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
       
-      // Create USDC contract instance
+      // Create USDC contract instance using the provider from useWallet hook
       const usdcContract = new ethers.Contract(
         getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
-        provider
+        browserProvider
       );
 
-      // Get USDC balance
+      // Get USDC balance for the specified address
       const balance = await usdcContract.balanceOf(address);
       const formattedBalance = ethers.formatUnits(balance, USDC_DECIMALS);
+      
+      console.log(`USDC Balance for ${address}: ${formattedBalance} USDC`);
       setUsdcBalance(formattedBalance);
     } catch (error) {
       console.error('Error checking USDC balance:', error);
@@ -541,21 +533,34 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   };
 
   useEffect(() => {
-    // Get wallet address from localStorage
-    const storedAddress = localStorage.getItem('walletAddress');
-    if (storedAddress) {
-      setWalletAddress(storedAddress);
-    }
-    // Set client-side flag
+    // Set client-side flag first
     setIsClient(true);
-  }, []);
-
-  // Check USDC balance when wallet address changes
-  useEffect(() => {
-    if (currentWalletAddress && isClient) {
-      checkUSDCBalance(currentWalletAddress);
+    
+    // Use connected address from useWallet hook, fallback to localStorage only if needed
+    if (connectedAddress) {
+      setWalletAddress(connectedAddress);
+    } else {
+      // Only use localStorage if no connected address
+      const storedAddress = localStorage.getItem('walletAddress');
+      if (storedAddress) {
+        setWalletAddress(storedAddress);
+      }
     }
-  }, [currentWalletAddress, isClient]);
+  }, [connectedAddress]);
+
+  // Check USDC balance when wallet address or connection state changes
+  useEffect(() => {
+    if (!isClient) return;
+    
+    if (currentWalletAddress && isConnected && walletType) {
+      console.log(`Checking USDC balance for wallet: ${currentWalletAddress}, type: ${walletType}, network: ${network}`);
+      checkUSDCBalance(currentWalletAddress);
+    } else {
+      // Clear balance when wallet is not connected
+      setUsdcBalance('0');
+      setIsLoadingBalance(false);
+    }
+  }, [currentWalletAddress, isClient, isConnected, walletType, network]);
 
   // Update time every second for accurate countdown
   useEffect(() => {
@@ -890,6 +895,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         }
         
         walletProvider = window.phantom.ethereum;
+      } else if (walletType === 'walletconnect') {
+        if (!appKitProvider) {
+          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
+        }
+        walletProvider = appKitProvider;
       } else {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }

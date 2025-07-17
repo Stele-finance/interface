@@ -15,6 +15,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useAppKitProvider } from '@reown/appkit/react'
 
 interface ChallengeCardProps {
   id?: string
@@ -41,6 +42,9 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
   
   // Use wallet hook to get current wallet info
   const { walletType, network, getProvider, isConnected } = useWallet();
+  
+  // Use AppKit provider for WalletConnect
+  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
   
   useEffect(() => {
     // Handle display for challenges that haven't started yet
@@ -110,6 +114,11 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
         }
         
         walletProvider = window.phantom.ethereum;
+      } else if (walletType === 'walletconnect') {
+        if (!appKitProvider) {
+          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
+        }
+        walletProvider = appKitProvider;
       } else {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }
