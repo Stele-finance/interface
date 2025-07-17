@@ -40,7 +40,7 @@ export default function CreateProposalPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { t, language } = useLanguage()
-  const { walletType, network, getProvider, isConnected: walletConnected } = useWallet()
+  const { walletType, network, getProvider, isConnected: walletConnected, address: walletAddress } = useWallet()
   
   // Filter network to supported types for contracts (exclude 'solana')
   const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -144,8 +144,7 @@ export default function CreateProposalPage() {
     }
   ]
   
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
+  // Removed local wallet state - using useWallet hook directly
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [transactionHash, setTransactionHash] = useState<string | null>(null)
   
@@ -164,14 +163,7 @@ export default function CreateProposalPage() {
   const [functionSignature, setFunctionSignature] = useState("")
   const [functionParams, setFunctionParams] = useState("")
   
-  // Load wallet address when page loads
-  useEffect(() => {
-    const savedAddress = localStorage.getItem('walletAddress')
-    if (savedAddress) {
-      setWalletAddress(savedAddress)
-      setIsConnected(true)
-    }
-  }, [])
+  // No longer needed - useWallet hook manages wallet state
 
   // Get appropriate explorer URL based on chain ID
   const getExplorerUrl = (chainId: string, txHash: string) => {
@@ -331,8 +323,21 @@ export default function CreateProposalPage() {
   
   // Proposal creation function
   const handleCreateProposal = async () => {
+    console.log('🚀 handleCreateProposal started');
+    console.log('Wallet state:', { 
+      walletAddress, 
+      walletConnected, 
+      walletType, 
+      network, 
+      title, 
+      description, 
+      selectedTemplate, 
+      isCustomProposal 
+    });
+
     // Validation
     if (!title || !description) {
+      console.log('❌ Missing title or description');
       toast({
         variant: "destructive",
         title: "Missing Fields",
@@ -343,6 +348,7 @@ export default function CreateProposalPage() {
     
     // Wallet connection check
     if (!walletAddress) {
+      console.log('❌ No wallet address');
       toast({
         variant: "destructive",
         title: "Wallet Not Connected",
@@ -353,17 +359,27 @@ export default function CreateProposalPage() {
     
     // Check if wallet is connected
     if (!walletConnected || !walletType) {
-      throw new Error("No wallet connected. Please connect your wallet first.");
+      console.log('❌ Wallet not connected:', { walletConnected, walletType });
+      toast({
+        variant: "destructive",
+        title: "Wallet Not Connected",
+        description: "No wallet connected. Please connect your wallet first.",
+      })
+      return
     }
     
+    console.log('✅ All validations passed, starting submission...');
     setIsSubmitting(true)
     
     try {
       // Get provider using useWallet hook
+      console.log('🔗 Getting wallet provider...');
       const browserProvider = getProvider();
       if (!browserProvider) {
+        console.log('❌ No browser provider available');
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
+      console.log('✅ Browser provider obtained');
 
       // Request account access if needed
       const accounts = await browserProvider.send('eth_requestAccounts', []);
@@ -493,13 +509,34 @@ export default function CreateProposalPage() {
         throw new Error("Invalid proposal parameters. Please check your inputs.");
       }
     } catch (error: any) {
-      console.error("Error creating proposal:", error);
+      console.error("❌ Error creating proposal:", error);
+      console.error("Error details:", {
+        message: error.message,
+        code: error.code,
+        reason: error.reason,
+        stack: error.stack
+      });
+      
+      let errorMessage = error.message || "An unknown error occurred";
+      
+      // Provide more specific error messages based on error type
+      if (error.message?.includes("user rejected")) {
+        errorMessage = "Transaction was rejected by user";
+      } else if (error.message?.includes("insufficient funds")) {
+        errorMessage = "Insufficient funds for gas fees";
+      } else if (error.message?.includes("Failed to get wallet provider")) {
+        errorMessage = "Wallet connection lost. Please reconnect your wallet.";
+      } else if (error.message?.includes("No accounts found")) {
+        errorMessage = "No wallet accounts found. Please check your wallet connection.";
+      }
+      
       toast({
         variant: "destructive",
         title: "Proposal Creation Failed",
-        description: error.message || "There was an error creating your proposal. Please try again.",
+        description: errorMessage,
       });
     } finally {
+      console.log('🏁 Proposal creation process finished, resetting isSubmitting');
       setIsSubmitting(false);
       
       // Navigate to vote page only if there's no error and we have stored proposal data
@@ -710,9 +747,22 @@ export default function CreateProposalPage() {
               <Button 
                 variant="default"
                 size="lg"
-                onClick={handleCreateProposal}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('🖱️ Create button clicked!');
+                  console.log('Button disabled conditions:', {
+                    isSubmitting,
+                    hasTitle: !!title,
+                    hasDescription: !!description,
+                    isCustomProposal,
+                    hasSelectedTemplate: !!selectedTemplate
+                  });
+                  handleCreateProposal();
+                }}
                 disabled={isSubmitting || !title || !description || (!isCustomProposal && !selectedTemplate)}
-                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-12 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg min-w-[200px] border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
+                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-12 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg min-w-[200px] border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 {isSubmitting ? (
                   <>

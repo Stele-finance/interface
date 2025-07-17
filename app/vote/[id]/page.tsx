@@ -33,6 +33,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
+import { useAppKitProvider } from '@reown/appkit/react'
 import { ClientOnly } from "@/components/ClientOnly"
 
 interface ProposalDetailPageProps {
@@ -79,6 +80,9 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const { id } = use(params)
   const { t } = useLanguage()
   const { walletType, network, getProvider, isConnected: walletConnected } = useWallet()
+  
+  // Use AppKit provider for WalletConnect
+  const { walletProvider: appKitProvider } = useAppKitProvider('eip155')
   
   // Filter network to supported types for contracts (exclude 'solana')
   const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -655,6 +659,11 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         }
         
         walletProvider = window.phantom.ethereum;
+      } else if (walletType === 'walletconnect') {
+        if (!appKitProvider) {
+          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
+        }
+        walletProvider = appKitProvider;
       } else {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }
@@ -772,6 +781,11 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         }
         
         walletProvider = window.phantom.ethereum;
+      } else if (walletType === 'walletconnect') {
+        if (!appKitProvider) {
+          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
+        }
+        walletProvider = appKitProvider;
       } else {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }

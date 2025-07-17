@@ -47,6 +47,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
+import { useAppKitProvider } from '@reown/appkit/react'
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -73,6 +74,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   
   // Use hooks
   const { address: connectedAddress, isConnected, walletType, network, getProvider } = useWallet()
+  
+  // Use AppKit provider for WalletConnect
+  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -803,6 +807,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         }
         
         walletProvider = window.phantom.ethereum;
+      } else if (walletType === 'walletconnect') {
+        if (!appKitProvider) {
+          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
+        }
+        
+        walletProvider = appKitProvider;
       } else {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }
