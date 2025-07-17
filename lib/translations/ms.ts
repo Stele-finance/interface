@@ -323,6 +323,7 @@ export const ms = {
   transactionSubmitted: "Transaksi Dihantar",
   type: "Jenis",
   unknown: "Tidak diketahui",
+  updated: "Dikemas kini",
   user: "Pengguna",
   users: "Pengguna",
   userVotingPower: "Kuasa mengundi anda",

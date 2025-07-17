@@ -355,7 +355,7 @@ export default function CreateProposalPage() {
     if (!walletConnected || !walletType) {
       throw new Error("No wallet connected. Please connect your wallet first.");
     }
-
+    
     setIsSubmitting(true)
     
     try {

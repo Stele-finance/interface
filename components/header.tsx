@@ -132,17 +132,17 @@ export function Header() {
     try {
       setIsLoadingBalance(true);
       
-      // Use network-specific RPC URL for accurate balance
+        // Use network-specific RPC URL for accurate balance
       const networkToUse = walletNetwork || 'ethereum';
-      const rpcUrl = getRPCUrl(networkToUse);
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
-      
-      // Get ETH balance using ethers provider
-      const balanceWei = await provider.getBalance(walletAddress);
-      const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
-      
-      // Display up to 4 decimal places
-      setBalance(balanceInEth.toFixed(4));
+        const rpcUrl = getRPCUrl(networkToUse);
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        
+        // Get ETH balance using ethers provider
+        const balanceWei = await provider.getBalance(walletAddress);
+        const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
+        
+        // Display up to 4 decimal places
+        setBalance(balanceInEth.toFixed(4));
     } catch (error) {
       console.error("Error fetching balance:", error);
       setBalance('?');
@@ -615,12 +615,12 @@ export function Header() {
 
                 {/* Mobile version: Show WalletConnect only */}
                 {isWalletMobile && (
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                    onClick={() => handleConnectWallet('walletconnect')}
-                  >
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                  onClick={() => handleConnectWallet('walletconnect')}
+                >
                     <Image 
                       src={getWalletLogo('walletconnect')} 
                       alt="WalletConnect"
@@ -628,11 +628,11 @@ export function Header() {
                       height={24}
                       style={{ width: 'auto', height: '24px' }}
                     />
-                    <div className="text-left">
-                      <div className="font-semibold">WalletConnect</div>
+                  <div className="text-left">
+                    <div className="font-semibold">WalletConnect</div>
                       <div className="text-sm text-muted-foreground">Connect Mobile Wallet</div>
-                    </div>
-                  </Button>
+                  </div>
+                </Button>
                 )}
               </div>
             </DialogContent>

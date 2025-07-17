@@ -1259,10 +1259,10 @@ export default function VotePage() {
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1278,6 +1278,9 @@ export default function VotePage() {
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
                               <TableCell className="min-w-52 py-6">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
@@ -1291,14 +1294,11 @@ export default function VotePage() {
                               <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
-                              <TableCell className="text-center py-6">
-                                <StatusBadge proposal={proposal} />
-                              </TableCell>
                             </TableRow>
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center py-12 text-gray-400">
+                            <TableCell colSpan={5} className="text-center py-12 text-gray-400">
                               {t('noActiveProposalsFound')}
                             </TableCell>
                           </TableRow>
@@ -1345,10 +1345,10 @@ export default function VotePage() {
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1364,6 +1364,9 @@ export default function VotePage() {
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
                               <TableCell className="min-w-52 py-6">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
@@ -1376,9 +1379,6 @@ export default function VotePage() {
                               </TableCell>
                               <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
-                              </TableCell>
-                              <TableCell className="text-center py-6">
-                                <StatusBadge proposal={proposal} />
                               </TableCell>
                             </TableRow>
                           ))
@@ -1431,10 +1431,10 @@ export default function VotePage() {
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                           <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                           <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
                           <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1450,6 +1450,9 @@ export default function VotePage() {
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
+                              <TableCell className="text-center py-6">
+                                <StatusBadge proposal={proposal} />
+                              </TableCell>
                               <TableCell className="min-w-52 py-6">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
@@ -1463,14 +1466,11 @@ export default function VotePage() {
                               <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
-                              <TableCell className="text-center py-6">
-                                <StatusBadge proposal={proposal} />
-                              </TableCell>
                             </TableRow>
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center py-12 text-gray-400">
+                            <TableCell colSpan={5} className="text-center py-12 text-gray-400">
                               {t('noProposalsFound')}
                             </TableCell>
                           </TableRow>

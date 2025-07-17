@@ -323,6 +323,7 @@ export const da = {
   transactionSubmitted: "Transaktion Indsendt",
   type: "Type",
   unknown: "Ukendt",
+  updated: "Opdateret",
   user: "Bruger",
   users: "Brugere",
   userVotingPower: "Din stemmeret",

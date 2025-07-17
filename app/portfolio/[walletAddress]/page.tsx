@@ -63,41 +63,6 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
       return parseFloat(value) || 0
     }
   }
-  
-  // We'll categorize challenges based on individual challenge data from useChallenge hook
-  // This will be calculated per row in the ChallengeRow component
-
-  // Calculate portfolio summary
-  const portfolioSummary = useMemo(() => {
-    if (!investors.length) {
-      return {
-        totalChallenges: 0,
-        totalInvestment: 0,
-        totalCurrentValue: 0,
-        totalProfit: 0,
-        totalProfitRatio: 0,
-        activeChallenges: 0,
-        completedChallenges: 0
-      }
-    }
-
-    const totalInvestment = investors.reduce((sum, inv) => sum + safeFormatUSD(inv.seedMoneyUSD), 0)
-    const totalCurrentValue = investors.reduce((sum, inv) => sum + safeFormatUSD(inv.currentUSD), 0)
-    // Calculate profit as difference between current value and investment
-    const totalProfit = totalCurrentValue - totalInvestment
-    // Calculate weighted average profit ratio
-    const totalProfitRatio = totalInvestment > 0 ? (totalProfit / totalInvestment) * 100 : 0
-
-    return {
-      totalChallenges: investors.length,
-      totalInvestment,
-      totalCurrentValue,
-      totalProfit,
-      totalProfitRatio,
-      activeChallenges: 0, // Will be calculated dynamically
-      completedChallenges: 0 // Will be calculated dynamically
-    }
-  }, [investors])
 
   // Utility functions
   const getChallengeTitle = (challengeType: number) => {
@@ -138,15 +103,6 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     })
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value)
-  }
-
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(3)}%`
   }
@@ -181,15 +137,6 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         className="hover:bg-gray-800/30 transition-colors cursor-pointer" 
         onClick={handleRowClick}
       >
-        <td className="py-6 pl-6 pr-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                {investor.challengeId}
-              </Badge>
-            </div>
-          </div>
-        </td>
         <td className="py-6 px-4 whitespace-nowrap">
           <span className="font-medium text-gray-100">
             {challengeTitle}
@@ -207,22 +154,6 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             )}>
               {formatPercentage(profitRatio)}
             </span>
-          </div>
-        </td>
-        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
-          <div>
-            {challengeData?.challenge?.startTime ? 
-              formatDateTime(challengeData.challenge.startTime) : 
-              '-'
-            }
-          </div>
-        </td>
-        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
-          <div>
-            {challengeData?.challenge?.endTime ? 
-              formatDateTime(challengeData.challenge.endTime) : 
-              '-'
-            }
           </div>
         </td>
         <td className="py-6 px-6">
@@ -263,6 +194,31 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             )}
           </div>
         </td>
+        <td className="py-6 pl-6 pr-4">
+          <div className="flex items-center gap-3">
+            <div>
+              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                {investor.challengeId}
+              </Badge>
+            </div>
+          </div>
+        </td>
+        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
+          <div>
+            {challengeData?.challenge?.startTime ? 
+              formatDateTime(challengeData.challenge.startTime) : 
+              '-'
+            }
+          </div>
+        </td>
+        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
+          <div>
+            {challengeData?.challenge?.endTime ? 
+              formatDateTime(challengeData.challenge.endTime) : 
+              '-'
+            }
+          </div>
+        </td>
       </tr>
     )
   }
@@ -279,12 +235,12 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6">{t('challenge')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">{t('type')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('status')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6">{t('challenge')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('startDate')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('endDate')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -328,29 +284,41 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-700 bg-gray-900/80">
+                        <th className="text-left py-3 px-4">
+                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                        </th>
+                        <th className="text-left py-3 px-4">
+                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                        </th>
+                        <th className="text-left py-3 px-6">
+                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                        </th>
                         <th className="text-left py-3 px-6">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
                         </th>
                         <th className="text-left py-3 px-4">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-4">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-4">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
                         </th>
                         <th className="text-left py-3 px-4">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-6">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {[1, 2, 3, 4, 5].map((i) => (
                         <tr key={i} className="border-0">
+                          <td className="py-6 px-4">
+                            <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                          </td>
+                          <td className="py-6 px-4">
+                            <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className="flex gap-2">
+                              <div className="h-6 bg-gray-700 rounded-full w-16 animate-pulse"></div>
+                              <div className="h-6 bg-gray-700 rounded-full w-14 animate-pulse"></div>
+                            </div>
+                          </td>
                           <td className="py-6 px-6">
                             <div className="space-y-2">
                               <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
@@ -361,19 +329,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                             <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
                           </td>
                           <td className="py-6 px-4">
-                            <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-4">
                             <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-4">
-                            <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-6">
-                            <div className="flex gap-2">
-                              <div className="h-6 bg-gray-700 rounded-full w-16 animate-pulse"></div>
-                              <div className="h-6 bg-gray-700 rounded-full w-14 animate-pulse"></div>
-                            </div>
                           </td>
                         </tr>
                       ))}

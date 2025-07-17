@@ -534,8 +534,8 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                   <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
                   <TableHead className="text-gray-300 w-28">{t('status')}</TableHead>
                   <TableHead className="text-gray-300 w-32">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
                   <TableHead className="text-gray-300 w-20 pr-6">{t('challenge')}</TableHead>
+                  <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -600,16 +600,16 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                         <span className="text-sm text-gray-400 font-medium">{Math.round(challenge.progress)}%</span>
                       </div>
                     </TableCell>
+                    <TableCell className="pr-6 py-6">
+                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                        {challenge.challengeId}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="py-6">
                       <div className="flex items-center gap-2 text-gray-300 text-base">
                         <Users className="h-4 w-4" />
                         <span>{challenge.participants}</span>
                       </div>
-                    </TableCell>
-                    <TableCell className="pr-6 py-6">
-                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                        {challenge.challengeId}
-                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}

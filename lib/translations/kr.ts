@@ -323,6 +323,7 @@ export const kr = {
   transactionSubmitted: "거래 제출됨",
   type: "유형",
   unknown: "알 수 없음",
+  updated: "업데이트됨",
   user: "사용자",
   users: "사용자",
   userVotingPower: "귀하의 투표권",

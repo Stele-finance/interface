@@ -107,7 +107,7 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
                 <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                   <TableHead className="text-gray-300 pl-6 text-base">{t('symbol')}</TableHead>
                   <TableHead className="text-gray-300 text-base">{t('tokenAddress')}</TableHead>
-                  <TableHead className="text-gray-300 pr-6 text-base">{t('lastUpdated')}</TableHead>
+                  <TableHead className="text-gray-300 pr-6 text-base">{t('updated')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -153,9 +153,9 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
                       </div>
                     </TableCell>
                     <TableCell className="py-6">
-                      <code className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded">
+                      <span className="text-sm text-gray-300 font-mono">
                         {formatAddress(token.tokenAddress)}
-                      </code>
+                      </span>
                     </TableCell>
                     <TableCell className="text-gray-400 pr-6 py-6 text-base whitespace-nowrap">
                       {formatDate(token.updatedTimestamp)}

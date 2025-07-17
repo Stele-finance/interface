@@ -155,10 +155,10 @@ export function RecentChallengesTable() {
                 <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
                 <TableHead className="text-gray-300 pl-8">{t('prize')}</TableHead>
                 <TableHead className="text-gray-300">{t('status')}</TableHead>
+                <TableHead className="text-gray-300 pl-6">{t('challenge')}</TableHead>
                 <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
                 <TableHead className="text-gray-300 pl-20">{t('startDate')}</TableHead>
                 <TableHead className="text-gray-300 pl-16">{t('endDate')}</TableHead>
-                <TableHead className="text-gray-300 pl-6">{t('challenge')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -190,6 +190,11 @@ export function RecentChallengesTable() {
                       <TableCell className="py-6">
                         {getStatusBadge(getChallengeStatus(challenge))}
                       </TableCell>
+                      <TableCell className="pl-6 py-6">
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                          {challenge.challengeId}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="pl-10 py-6">
                         <div className="flex items-center gap-1 text-gray-300">
                           <Users className="h-4 w-4 text-gray-400" />
@@ -205,11 +210,6 @@ export function RecentChallengesTable() {
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           {formatDate(challenge.endTime)}
                         </div>
-                      </TableCell>
-                      <TableCell className="pl-6 py-6">
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                          {challenge.challengeId}
-                        </Badge>
                       </TableCell>
                     </TableRow>
                   )

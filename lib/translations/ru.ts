@@ -323,6 +323,7 @@ export const ru = {
   transactionSubmitted: "Транзакция Отправлена",
   type: "Тип",
   unknown: "Неизвестно",
+  updated: "Обновлено",
   user: "Пользователь",
   users: "Пользователи",
   userVotingPower: "Ваша сила голоса",

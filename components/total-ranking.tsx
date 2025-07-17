@@ -107,8 +107,8 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
                   <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 text-base px-6">{t('rank')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6 pl-12">{t('user')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6">{t('profit')}</TableHead>
                     <TableHead className="text-gray-300 text-base px-6">{t('challenge')}</TableHead>
-                    <TableHead className="text-gray-300 text-base px-6">{t('profitRatio')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,14 +128,9 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
                           </div>
                         </TableCell>
                         <TableCell className="px-6 py-6">
-                          <code className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded">
+                          <span className="text-sm text-gray-300 font-mono">
                             {formatAddress(ranking.user)}
-                          </code>
-                        </TableCell>
-                        <TableCell className="px-6 pl-8 py-6">
-                          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                            {getChallengeType(ranking.challengeId)}
-                          </Badge>
+                          </span>
                         </TableCell>
                         <TableCell className="px-6 py-6">
                           <div className={cn(
@@ -145,6 +140,11 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
                             {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                             {formatProfitRatio(ranking.profitRatio)}
                           </div>
+                        </TableCell>
+                        <TableCell className="px-6 pl-8 py-6">
+                          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                            {getChallengeType(ranking.challengeId)}
+                          </Badge>
                         </TableCell>
                       </TableRow>
                     )
