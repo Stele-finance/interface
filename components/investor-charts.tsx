@@ -448,9 +448,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               {/* Action buttons (Swap, Register) */}
               {actionButtons}
               
-              {/* Registered status */}
+              {/* Registered status - Show on mobile only */}
               {investorData?.investor?.isRegistered === true && (
-                <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+                <div className="block md:hidden bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
                   <div className="flex items-center gap-2">
                     <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -508,9 +508,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
             {/* Action buttons (Swap, Register) */}
             {actionButtons}
             
-            {/* Registered status */}
+            {/* Registered status - Show on mobile only */}
             {investorData?.investor?.isRegistered === true && (
-              <div className="bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
+              <div className="block md:hidden bg-green-900/30 border border-green-500/50 rounded-lg px-3 py-1.5">
                 <div className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -1637,9 +1637,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                      </div>
                                       )}
                    
-                   {/* Registered status */}
+                   {/* Desktop Registered status - Show on desktop, hide on mobile */}
                    {investorData?.investor?.isRegistered === true && (
-                     <div className="w-full bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-3">
+                     <div className="hidden md:block w-full bg-green-900/30 border border-green-500/50 rounded-lg px-6 py-3">
                        <div className="flex items-center justify-center gap-2">
                          <svg className="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
