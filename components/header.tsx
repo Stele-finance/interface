@@ -366,57 +366,37 @@ export function Header() {
                 )}
               </span>
             </div>
-            {walletType === 'walletconnect' ? (
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
-                onClick={() => openWalletModal && openWalletModal()}
-              >
-                {getWalletIcon() ? (
-                  <Image 
-                    src={getWalletIcon()!} 
-                    alt="Connected Wallet"
-                    width={16}
-                    height={16}
-                    className="mr-2"
-                    style={{ width: 'auto', height: '16px' }}
-                  />
-                ) : (
-                  <Image 
-                    src={getWalletLogo('walletconnect')} 
-                    alt="WalletConnect"
-                    width={16}
-                    height={16}
-                    className="mr-2"
-                    style={{ width: 'auto', height: '16px' }}
-                  />
-                )}
-                <span className="text-base">
-                  {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
-                </span>
-              </Button>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="lg" className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg">
-                    {walletIcon ? (
-                      <Image 
-                        src={walletIcon} 
-                        alt={`${walletType} wallet`}
-                        width={16}
-                        height={16}
-                        className="mr-2"
-                        style={{ width: 'auto', height: '16px' }}
-                      />
-                    ) : (
-                      <Wallet className="mr-2 h-4 w-4" />
-                    )}
-                    <span className="text-base">
-                      {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                >
+                  {getWalletIcon() ? (
+                    <Image 
+                      src={getWalletIcon()!} 
+                      alt="Connected Wallet"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                      style={{ width: 'auto', height: '16px' }}
+                    />
+                  ) : (
+                    <Image 
+                      src={getWalletLogo('walletconnect')} 
+                      alt="WalletConnect"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                      style={{ width: 'auto', height: '16px' }}
+                    />
+                  )}
+                  <span className="text-base">
+                    {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-muted border-gray-600">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
@@ -429,6 +409,12 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => {
                   navigator.clipboard.writeText(walletAddress)
+                  toast({
+                    variant: "default",
+                    title: "✅ Address copied!",
+                    description: "Wallet address copied to clipboard",
+                    duration: 2000,
+                  })
                 }}>
                   {t('copyAddress')}
                 </DropdownMenuItem>
@@ -473,7 +459,6 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            )}
           </div>
         ) : (
           <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
