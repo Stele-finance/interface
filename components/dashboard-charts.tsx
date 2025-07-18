@@ -176,38 +176,13 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
             
             {/* Desktop Controls - same line as title */}
             <div className="hidden sm:flex items-center gap-4">
-              {/* Daily/Weekly selector */}
-              <div className="flex items-center space-x-2">
-                <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setIntervalType('daily')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'daily' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setIntervalType('weekly')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'weekly' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('weekly')}
-                  </button>
-                </div>
-              </div>
-              
               {/* Users/Rewards dropdown */}
-              <DropdownMenu>
+              <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline" 
                     className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     {chartType === 'participants' ? (
                       <>
@@ -234,6 +209,32 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              
+              {/* Daily/Weekly selector */}
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                  <button
+                    onClick={() => setIntervalType('daily')}
+                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'daily' 
+                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('daily')}
+                  </button>
+                  <button
+                    onClick={() => setIntervalType('weekly')}
+                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                      intervalType === 'weekly' 
+                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    }`}
+                  >
+                    {t('weekly')}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -334,6 +335,38 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           
           {/* Mobile Controls - below chart */}
           <div className="flex sm:hidden items-center justify-between w-full -mb-4 px-2 gap-4">
+            {/* Users/Rewards dropdown */}
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  {chartType === 'participants' ? (
+                    <>
+                      {t('users')}
+                    </>
+                  ) : (
+                    <>
+                      {t('rewards')}
+                    </>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
+                <DropdownMenuItem onClick={() => setChartType('rewards')}>
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  {t('rewards')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setChartType('participants')}>
+                  <Users className="h-4 w-4 mr-2" />
+                  {t('users')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             {/* Daily/Weekly selector */}
             <div className="flex items-center space-x-2">
               <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
@@ -359,37 +392,6 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </button>
               </div>
             </div>
-            
-            {/* Users/Rewards dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                >
-                  {chartType === 'participants' ? (
-                    <>
-                      {t('users')}
-                    </>
-                  ) : (
-                    <>
-                      {t('rewards')}
-                    </>
-                  )}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
-                <DropdownMenuItem onClick={() => setChartType('rewards')}>
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  {t('rewards')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setChartType('participants')}>
-                  <Users className="h-4 w-4 mr-2" />
-                  {t('users')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </CardContent>
       </Card>
