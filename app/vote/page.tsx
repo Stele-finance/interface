@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -45,6 +46,7 @@ interface Proposal {
 export default function VotePage() {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
+  const router = useRouter()
   // Use global wallet hook instead of local state
   const { address: walletAddress, isConnected, walletType, network, getProvider } = useWallet()
   const queryClient = useQueryClient()
@@ -273,12 +275,14 @@ export default function VotePage() {
       }
 
       if (found) {
-        // Proposal found in the list, clean up and refresh page
+        // Proposal found in the list, clean up and update state
         localStorage.removeItem('recentlyCreatedProposal');
         setHasCheckedForNewProposal(true);
         setRecentlyCreatedProposal(null);
-        // Refresh the page to show the new proposal
-        window.location.reload();
+        // Instead of reload, just refetch data to update UI
+        refetchActionable();
+        refetchAllByStatus();
+        refetchCompletedByStatus();
       }
     };
 
@@ -1241,7 +1245,7 @@ export default function VotePage() {
                             <TableRow 
                               key={proposal.id} 
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                              onClick={() => router.push(createProposalUrl(proposal))}
                             >
                               <TableCell className="max-w-xs py-6">
                                 <div className="flex items-center gap-2">
@@ -1327,7 +1331,7 @@ export default function VotePage() {
                             <TableRow 
                               key={proposal.id} 
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                              onClick={() => router.push(createProposalUrl(proposal))}
                             >
                               <TableCell className="max-w-xs py-6">
                                 <div className="flex items-center gap-2">
@@ -1413,7 +1417,7 @@ export default function VotePage() {
                             <TableRow 
                               key={proposal.id} 
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
-                              onClick={() => window.location.href = createProposalUrl(proposal)}
+                              onClick={() => router.push(createProposalUrl(proposal))}
                             >
                               <TableCell className="max-w-xs py-6">
                                 <div className="flex items-center gap-2">

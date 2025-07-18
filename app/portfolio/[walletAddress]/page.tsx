@@ -1,6 +1,6 @@
 "use client"
 
-import { notFound } from "next/navigation"
+import { notFound, useRouter } from "next/navigation"
 import { useMemo, use } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +33,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
   const { walletAddress } = use(params)
   const { t } = useLanguage()
   const { network } = useWallet()
+  const router = useRouter()
   
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -123,7 +124,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     const challengeTitle = getChallengeTitle(challengeType)
 
     const handleRowClick = () => {
-      window.location.href = `/challenge/${investor.challengeId}/${walletAddress}`
+      router.push(`/challenge/${investor.challengeId}/${walletAddress}`)
     }
 
     return (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 
 export function RecentChallengesTable() {
   const { t } = useLanguage()
+  const router = useRouter()
   const { network } = useWallet()
   
   // Filter network for subgraph usage (exclude solana)
@@ -175,7 +177,7 @@ export function RecentChallengesTable() {
                     <TableRow 
                       key={challenge.id} 
                       className="border-0 hover:bg-gray-800/50 cursor-pointer transition-colors"
-                      onClick={() => window.location.href = `/challenge/${challenge.challengeId}`}
+                      onClick={() => router.push(`/challenge/${challenge.challengeId}`)}
                     >
                       <TableCell className="pl-6 py-6 whitespace-nowrap">
                         <span className="font-medium text-gray-100 text-base">

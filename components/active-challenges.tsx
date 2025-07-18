@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -113,6 +114,7 @@ interface ActiveChallengesProps {
 
 export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesProps) {
   const { t } = useLanguage()
+  const router = useRouter()
   const [isCreating, setIsCreating] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -558,7 +560,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                     }`}
                     onClick={() => {
                       if (challenge.challengeId && challenge.challengeId !== "") {
-                        window.location.href = `/challenge/${challenge.challengeId}`
+                        router.push(`/challenge/${challenge.challengeId}`)
                       }
                     }}
                   >
