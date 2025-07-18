@@ -1,29 +1,19 @@
 "use client"
 
 
-import React, { useState, useMemo, use, useEffect, useCallback } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useState, use, useEffect, useCallback } from "react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn, getTokenLogo } from "@/lib/utils"
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Target, 
-  Clock, 
-  CheckCircle2,
-  XCircle,
-  Star,
+import { getTokenLogo } from "@/lib/utils"
+import {
   BarChart3,
   Wallet,
   Repeat,
   Activity,
-  User,
   Trophy,
   ArrowLeft,
   ArrowRight,
@@ -43,7 +33,6 @@ import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "@/app/hooks/useInvestorTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
-import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -51,10 +40,7 @@ import { useAppKitProvider } from '@reown/appkit/react'
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  USDC_DECIMALS,
+import {
   getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
@@ -73,11 +59,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, isConnected, walletType, network, getProvider } = useWallet()
+  const { address: connectedAddress, walletType, network, getProvider } = useWallet()
   
-  // Use AppKit provider for WalletConnect
-  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
-  
+
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
@@ -292,11 +276,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       return `https://arbiscan.io/address/${walletAddress}`
     }
     return `https://etherscan.io/address/${walletAddress}`
-  }
-
-  // Handle wallet address click
-  const handleWalletClick = () => {
-    window.open(getWalletExplorerUrl(walletAddress), '_blank')
   }
 
   // Ensure client-side rendering for time calculations
@@ -633,46 +612,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const gainLossPercentage = formattedSeedMoney > 0 ? (gainLoss / formattedSeedMoney) * 100 : 0
   const isPositive = gainLoss >= 0
 
-  // Simple challenge progress based on profit
-  const challengeProgress = isClient ? Math.min(Math.max(gainLossPercentage, 0), 100) : 0;
-
-  // Get challenge title from real data
-  const getChallengeTitle = () => {
-    if (challengeData?.challenge) {
-      const challengeType = challengeData.challenge.challengeType;
-      switch(challengeType) {
-        case 0:
-          return 'One Week Challenge';
-        case 1:
-          return 'One Month Challenge';
-        case 2:
-          return 'Three Month Challenge';
-        case 3:
-          return 'Six Month Challenge';
-        case 4:
-          return 'One Year Challenge';
-        default:
-          return `Challenge Type ${challengeType}`;
-      }
-    }
-    
-    // Fallback logic using challengeId
-    switch(challengeId) {
-      case '1':
-        return 'One Week Challenge';
-      case '2':
-        return 'One Month Challenge';
-      case '3':
-        return 'Three Month Challenge';
-      case '4':
-        return 'Six Month Challenge';
-      case '5':
-        return 'One Year Challenge';
-      default:
-        return 'Challenge';
-    }
-  }
-
   // Get challenge details from real data
   const getChallengeDetails = () => {
     if (challengeData?.challenge) {
@@ -779,51 +718,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     setIsRegistering(true);
     
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else if (walletType === 'walletconnect') {
-        if (!appKitProvider) {
-          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
-        }
-        
-        walletProvider = appKitProvider;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await walletProvider.request({
-        method: 'eth_requestAccounts'
-      });
+      const accounts = await provider.send('eth_requestAccounts', []);
 
       if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        throw new Error("No accounts found. Please connect your wallet first.");
       }
 
       // Verify the connected wallet matches the investor address
@@ -832,18 +737,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
-      // Get current network information
-      const chainId = await walletProvider.request({
-        method: 'eth_chainId'
-      });
+      // Get current network
+      const chainId = await provider.send('eth_chainId', []);
       
-      // Use current network without switching
-      // No automatic network switching - use whatever network user is currently on
-
-      // Create a Web3Provider using the current wallet provider
-      const provider = new ethers.BrowserProvider(walletProvider);
-      
-      // Get the signer
+      // Connect to provider with signer
       const signer = await provider.getSigner();
       
       // Filter network to supported types for contracts (exclude 'solana')
@@ -1416,10 +1313,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     return '🥈';
                                   case 3:
                                     return '🥉';
-                                  case 4:
-                                    return '4️⃣';
-                                  case 5:
-                                    return '5️⃣';
                                   default:
                                     return rank.toString();
                                 }
@@ -1811,10 +1704,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       </div>
                     )}
                   </div>
-
-
-
-
                 </CardContent>
               </Card>
 

@@ -1,28 +1,13 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '@/app/hooks/useInvestorSnapshots'
 import { useInvestorWeeklySnapshots } from '@/app/hooks/useInvestorWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
-import { DollarSign, TrendingUp, TrendingDown, User, Trophy } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { ethers } from 'ethers'
-import { USDC_DECIMALS } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
-
-interface ChartDataPoint {
-  id: string
-  currentUSD: number
-  seedMoneyUSD: number
-  profitRatio: number
-  formattedDate: string
-  fullDate: string
-  timeLabel: string
-  dateLabel: string
-  isRealTime?: boolean
-}
 
 interface RealTimePortfolio {
   totalValue: number

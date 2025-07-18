@@ -96,8 +96,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const [votingPower, setVotingPower] = useState<string>("0")
   const [hasVoted, setHasVoted] = useState(false)
   const [isLoadingVotingPower, setIsLoadingVotingPower] = useState(false)
-  const [tokenBalance, setTokenBalance] = useState<string>("0")
-  const [delegatedTo, setDelegatedTo] = useState<string>("")
   const [isDelegating, setIsDelegating] = useState(false)
   const [isQueuing, setIsQueuing] = useState(false)
   const [proposalState, setProposalState] = useState<number | null>(null)
@@ -657,45 +655,13 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     
     setIsQueuing(true)
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else if (walletType === 'walletconnect') {
-        if (!appKitProvider) {
-          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
-        }
-        walletProvider = appKitProvider;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Connect to provider with signer
-      const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
@@ -779,45 +745,13 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     
     setIsExecuting(true)
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else if (walletType === 'walletconnect') {
-        if (!appKitProvider) {
-          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
-        }
-        walletProvider = appKitProvider;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Connect to provider with signer
-      const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
 
@@ -1264,17 +1198,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     <Label htmlFor="abstain">{t('abstain')}</Label>
                   </div>
                 </RadioGroup>
-
-                {/* <div className="space-y-2">
-                  <Label htmlFor="reason">Reason (Optional)</Label>
-                  <Textarea 
-                    id="reason" 
-                    placeholder="Why are you voting this way?" 
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    disabled={proposal.hasVoted || isVoting}
-                  />
-                </div> */}
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-3">

@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { Check, Clock, XCircle, Plus, FileText, Vote as VoteIcon, Loader2 } from "lucide-react"
-import { useProposalsData, useActiveProposalsData, useMultipleProposalVoteResults, useProposalsByStatus, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
+import { Clock, Plus, Vote as VoteIcon, Loader2 } from "lucide-react"
+import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
 import { useQueryClient } from '@tanstack/react-query'
 import { STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"
@@ -19,7 +19,6 @@ import { useWallet } from "@/app/hooks/useWallet"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 
@@ -54,7 +53,6 @@ export default function VotePage() {
   const [activeProposals, setActiveProposals] = useState<Proposal[]>([])
   const [completedProposals, setCompletedProposals] = useState<Proposal[]>([])
   const [isInitialLoading, setIsInitialLoading] = useState(true)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [mountTimestamp, setMountTimestamp] = useState(Date.now())
   
   // Fetch governance configuration from smart contract
@@ -806,8 +804,8 @@ export default function VotePage() {
     if (!walletAddress) {
       toast({
         variant: "destructive",
-        title: t('phantomWalletNotConnected'),
-        description: t('connectPhantomWalletToDelegate'),
+        title: t('walletNotConnected'),
+        description: t('connectWallet'),
       })
       return
     }
@@ -815,43 +813,16 @@ export default function VotePage() {
     setIsDelegating(true)
 
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Request wallet connection
-      await walletProvider.request({ method: 'eth_requestAccounts' })
+      await provider.send('eth_requestAccounts', [])
       
       // Connect to provider with signer
-      const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
       const steleTokenAddress = getSteleTokenAddress(subgraphNetwork)
       const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)

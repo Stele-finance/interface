@@ -16,7 +16,7 @@ import {
   RadioGroupItem
 } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Loader2, Plus, Trophy } from "lucide-react"
+import { Loader2, Plus } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 interface ChallengeTypeModalProps {

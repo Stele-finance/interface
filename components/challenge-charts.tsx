@@ -5,26 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
-import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
-import { Users, DollarSign, Clock, Trophy, Calendar, Plus, UserPlus, User, Loader2, Wallet } from 'lucide-react'
+import { DollarSign, Plus, UserPlus, User, Loader2, Wallet } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-
-interface ChartDataPoint {
-  id: string
-  investorCount: number
-  rewardAmountUSD: number
-  formattedDate: string
-  fullDate: string
-  timeLabel: string
-  dateLabel: string
-}
 
 interface ChallengeChartsProps {
   challengeId: string
@@ -57,7 +46,6 @@ interface ChallengeChartsProps {
 export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeChartsProps) {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
-  const { network: walletNetwork } = useWallet()
   const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
   const { data: weeklyData, isLoading: weeklyIsLoading, error: weeklyError } = useChallengeWeeklySnapshots(challengeId, 30, network)
