@@ -85,7 +85,13 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
     )
   }
 
-  const rankings = rankingData || []
+  // Sort rankings by profit ratio in descending order
+  const rankings = (rankingData || [])
+    .sort((a, b) => {
+      const profitA = parseFloat(a.profitRatio) || 0
+      const profitB = parseFloat(b.profitRatio) || 0
+      return profitB - profitA  // Descending order (highest profit first)
+    })
 
   return (
     <div className={cn("space-y-4 mt-6", className)}>

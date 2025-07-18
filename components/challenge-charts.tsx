@@ -39,7 +39,7 @@ interface ChallengeChartsProps {
     walletSelectOpen: boolean
     setWalletSelectOpen: (open: boolean) => void
     isConnecting: boolean
-    handleConnectWallet: (walletType: 'metamask' | 'phantom') => Promise<void>
+    handleConnectWallet: () => Promise<void>
   }
 }
 
@@ -359,7 +359,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                         <div className="grid gap-4 py-4">
                           <Button
                             variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            onClick={() => joinButton.handleConnectWallet()}
                             disabled={joinButton.isConnecting}
                             className="w-full justify-start"
                           >
@@ -378,7 +378,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                           </Button>
                           <Button
                             variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            onClick={() => joinButton.handleConnectWallet()}
                             disabled={joinButton.isConnecting}
                             className="w-full justify-start"
                           >
@@ -783,7 +783,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                         <div className="grid gap-4 py-4">
                           <Button
                             variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('metamask')}
+                            onClick={() => joinButton.handleConnectWallet()}
                             disabled={joinButton.isConnecting}
                             className="w-full justify-start"
                           >
@@ -802,7 +802,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                           </Button>
                           <Button
                             variant="outline"
-                            onClick={() => joinButton.handleConnectWallet('phantom')}
+                            onClick={() => joinButton.handleConnectWallet()}
                             disabled={joinButton.isConnecting}
                             className="w-full justify-start"
                           >

@@ -5,7 +5,7 @@ import { request } from 'graphql-request'
 import { getSubgraphUrl, headers } from '@/lib/constants'
 
 const GET_TOTAL_RANKING_QUERY = `
-  query GetTotalRanking($first: Int = 100, $orderBy: TotalRanking_orderBy = profitRatio, $orderDirection: OrderDirection = desc) {
+  query GetTotalRanking($first: Int = 5, $orderBy: TotalRanking_orderBy = profitRatio, $orderDirection: OrderDirection = desc) {
     totalRankings(first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
       id
       challengeId
@@ -44,7 +44,7 @@ export function useTotalRanking(network: 'ethereum' | 'arbitrum' | null = 'ether
           GET_TOTAL_RANKING_QUERY,
           { 
             first: 100, 
-            orderBy: 'score',
+            orderBy: 'profitRatio',
             orderDirection: 'desc'
           },
           headers
