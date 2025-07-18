@@ -1177,41 +1177,34 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                          Connect Wallet
                        </Button>
                      </DialogTrigger>
-                     <DialogContent className="sm:max-w-md">
+                     <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
                        <DialogHeader>
-                         <DialogTitle>Choose Wallet</DialogTitle>
+                         <DialogTitle>{t('connectWallet')}</DialogTitle>
                          <DialogDescription>
-                           Choose which wallet to connect with
+                           {t('selectWalletToConnect')}
                          </DialogDescription>
                        </DialogHeader>
-                       <div className="grid grid-cols-2 gap-4">
+                       <div className="grid grid-cols-1 gap-4 py-4">
                          <Button
                            variant="outline"
+                           size="lg"
+                           className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                            onClick={() => handleConnectWallet()}
                            disabled={isConnecting}
-                           className="flex flex-col items-center gap-2 h-20"
                          >
                            <Image 
-                             src="/wallets/small/metamask.png" 
-                             alt="MetaMask" 
-                             width={32} 
-                             height={32}
+                             src="/wallets/walletconnect.png"
+                             alt="WalletConnect"
+                             width={24}
+                             height={24}
+                             style={{ width: 'auto', height: '24px' }}
                            />
-                           <span>MetaMask</span>
-                         </Button>
-                         <Button
-                           variant="outline"
-                           onClick={() => handleConnectWallet()}
-                           disabled={isConnecting}
-                           className="flex flex-col items-center gap-2 h-20"
-                         >
-                           <Image 
-                             src="/wallets/small/phantom.png" 
-                             alt="Phantom" 
-                             width={32} 
-                             height={32}
-                           />
-                           <span>Phantom</span>
+                           <div className="text-left">
+                             <div className="font-semibold">WalletConnect</div>
+                             <div className="text-sm text-muted-foreground">
+                               Mobile & Desktop Wallets
+                             </div>
+                           </div>
                          </Button>
                        </div>
                      </DialogContent>

@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
@@ -15,7 +17,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
-import { Users, Clock, Trophy } from "lucide-react"
+import { Users, Clock, Trophy, Wallet } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -115,9 +117,11 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [walletSelectOpen, setWalletSelectOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType, network, getProvider, isConnected } = useWallet();
+  const { walletType, network, getProvider, isConnected, connectWallet } = useWallet();
   
   // Use AppKit provider for WalletConnect
   const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
@@ -152,6 +156,25 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
 
     return () => clearInterval(interval);
   }, [isClient]);
+
+  // Handle Connect Wallet
+  const handleConnectWallet = async () => {
+    setIsConnecting(true);
+    setWalletSelectOpen(false);
+    
+    try {
+      await connectWallet();
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
+      toast({
+        variant: "destructive",
+        title: "Connection Failed",
+        description: error instanceof Error ? error.message : "Failed to connect wallet",
+      });
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   // Handle Create Challenge with selected type
   const handleCreateChallenge = async (challengeType: number) => {
@@ -456,11 +479,58 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       <div className="space-y-4 mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
-          <ChallengeTypeModal 
-            onCreateChallenge={handleCreateChallenge}
-            isCreating={isCreating}
-            activeChallenges={activeChallengesData}
-          />
+          {isConnected ? (
+            <ChallengeTypeModal 
+              onCreateChallenge={handleCreateChallenge}
+              isCreating={isCreating}
+              activeChallenges={activeChallengesData}
+            />
+          ) : (
+            <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="default" 
+                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                  onClick={() => setWalletSelectOpen(true)}
+                >
+                  <Wallet className="mr-3 h-5 w-5" />
+                  {t('connectWallet')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+                <DialogHeader>
+                  <DialogTitle>{t('connectWallet')}</DialogTitle>
+                  <DialogDescription>
+                    {t('selectWalletToConnect')}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 gap-4 py-4">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                    onClick={() => handleConnectWallet()}
+                    disabled={isConnecting}
+                  >
+                    <Image 
+                      src="/wallets/walletconnect.png"
+                      alt="WalletConnect"
+                      width={24}
+                      height={24}
+                      style={{ width: 'auto', height: '24px' }}
+                    />
+                    <div className="text-left">
+                      <div className="font-semibold">WalletConnect</div>
+                      <div className="text-sm text-muted-foreground">
+                        Mobile & Desktop Wallets
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
       <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
