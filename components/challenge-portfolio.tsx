@@ -282,13 +282,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [walletSelectOpen, setWalletSelectOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Handle wallet connection
-  const handleConnectWallet = async (selectedWalletType: 'metamask' | 'phantom') => {
-    if (!selectedWalletType) return
-    
+  // Handle wallet connection - WalletConnect only
+  const handleConnectWallet = async () => {
     try {
       setIsConnecting(true)
-      await connectWallet(selectedWalletType)
+      await connectWallet() // No parameters needed - WalletConnect only
       setWalletSelectOpen(false)
     } catch (error) {
       console.error("Wallet connection error:", error)
@@ -429,7 +427,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Use connected address for checking if user has joined the challenge
   const currentWalletAddress = connectedAddress || walletAddress;
 
-  // Check if current user has joined this challenge
+  // Check if current user has joined the challenge
   const { data: investorData, isLoading: isLoadingInvestor, refetch: refetchInvestorData } = useInvestorData(
     challengeId, 
     currentWalletAddress || "",
@@ -578,44 +576,16 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     try {
       // Use connected address first, fallback to stored wallet address
       if (!currentWalletAddress) {
-        let walletProvider;
-        
-        // Get the appropriate wallet provider based on connected wallet type
-        if (walletType === 'metamask') {
-          if (typeof (window as any).ethereum === 'undefined') {
-            throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-          }
-          
-          // For MetaMask, find the correct provider
-          if ((window as any).ethereum.providers) {
-            walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-          } else if ((window as any).ethereum.isMetaMask) {
-            walletProvider = (window as any).ethereum;
-          }
-          
-          if (!walletProvider) {
-            throw new Error("MetaMask provider not found");
-          }
-        } else if (walletType === 'phantom') {
-          if (typeof window.phantom === 'undefined') {
-            throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-          }
-
-          if (!window.phantom?.ethereum) {
-            throw new Error("Ethereum provider not found in Phantom wallet");
-          }
-          
-          walletProvider = window.phantom.ethereum;
-        } else {
-          throw new Error("No wallet connected. Please connect your wallet first.");
+        // WalletConnect only - use getProvider from useWallet hook
+        const provider = getProvider();
+        if (!provider || walletType !== 'walletconnect') {
+          throw new Error("WalletConnect not available. Please connect your wallet first.");
         }
 
-        const accounts = await walletProvider.request({
-          method: 'eth_requestAccounts'
-        });
+        const accounts = await provider.send('eth_requestAccounts', []);
 
         if (!accounts || accounts.length === 0) {
-          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+          throw new Error("No accounts found. Please connect your wallet first.");
         }
 
         // Save address to state and localStorage
@@ -867,68 +837,30 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     setIsGettingRewards(true);
     
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else if (walletType === 'walletconnect') {
-        if (!appKitProvider) {
-          throw new Error("WalletConnect provider not available. Please reconnect your wallet.");
-        }
-        walletProvider = appKitProvider;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Request account access
-      const accounts = await walletProvider.request({
-        method: 'eth_requestAccounts'
-      });
+      const accounts = await provider.send('eth_requestAccounts', []);
 
       if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        throw new Error("No accounts found. Please connect your wallet first.");
       }
 
+      // Connect to provider with signer
+      const signer = await provider.getSigner()
+
       // Get current network information
-      const chainId = await walletProvider.request({
-        method: 'eth_chainId'
-      });
+      const chainId = await provider.send('eth_chainId', []);
 
       console.log('Current network chain ID for get rewards:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
 
-      // Create a Web3Provider using the current wallet provider
-      const provider = new ethers.BrowserProvider(walletProvider);
-      
-      // Get the signer
-      const signer = await provider.getSigner();
-      
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
       
@@ -1262,7 +1194,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                        <div className="grid grid-cols-2 gap-4">
                          <Button
                            variant="outline"
-                           onClick={() => handleConnectWallet('metamask')}
+                           onClick={() => handleConnectWallet()}
                            disabled={isConnecting}
                            className="flex flex-col items-center gap-2 h-20"
                          >
@@ -1276,7 +1208,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                          </Button>
                          <Button
                            variant="outline"
-                           onClick={() => handleConnectWallet('phantom')}
+                           onClick={() => handleConnectWallet()}
                            disabled={isConnecting}
                            className="flex flex-col items-center gap-2 h-20"
                          >

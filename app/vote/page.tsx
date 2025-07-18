@@ -806,8 +806,8 @@ export default function VotePage() {
     if (!walletAddress) {
       toast({
         variant: "destructive",
-        title: t('phantomWalletNotConnected'),
-        description: t('connectPhantomWalletToDelegate'),
+        title: t('walletNotConnected'),
+        description: t('connectWallet'),
       })
       return
     }
@@ -815,43 +815,16 @@ export default function VotePage() {
     setIsDelegating(true)
 
     try {
-      let walletProvider;
-      
-      // Get the appropriate wallet provider based on connected wallet type
-      if (walletType === 'metamask') {
-        if (typeof (window as any).ethereum === 'undefined') {
-          throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
-        }
-        
-        // For MetaMask, find the correct provider
-        if ((window as any).ethereum.providers) {
-          walletProvider = (window as any).ethereum.providers.find((provider: any) => provider.isMetaMask);
-        } else if ((window as any).ethereum.isMetaMask) {
-          walletProvider = (window as any).ethereum;
-        }
-        
-        if (!walletProvider) {
-          throw new Error("MetaMask provider not found");
-        }
-      } else if (walletType === 'phantom') {
-        if (typeof window.phantom === 'undefined') {
-          throw new Error("Phantom wallet is not installed. Please install it from https://phantom.app/");
-        }
-
-        if (!window.phantom?.ethereum) {
-          throw new Error("Ethereum provider not found in Phantom wallet");
-        }
-        
-        walletProvider = window.phantom.ethereum;
-      } else {
-        throw new Error("No wallet connected. Please connect your wallet first.");
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Request wallet connection
-      await walletProvider.request({ method: 'eth_requestAccounts' })
+      await provider.send('eth_requestAccounts', [])
       
       // Connect to provider with signer
-      const provider = new ethers.BrowserProvider(walletProvider)
       const signer = await provider.getSigner()
       const steleTokenAddress = getSteleTokenAddress(subgraphNetwork)
       const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)

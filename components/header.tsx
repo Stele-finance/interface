@@ -472,21 +472,13 @@ export function Header() {
             )}
           </div>
         ) : (
-          <Dialog open={isWalletMobile && walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+          <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="bg-orange-500 hover:bg-orange-600 border-orange-500 hover:border-orange-600 text-white font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
-                onClick={(e) => {
-                  // PC에서는 바로 WalletConnect 열기, 모바일에서는 다이얼로그 열기
-                  if (!isWalletMobile) {
-                    e.preventDefault()
-                    handleConnectWallet()
-                  } else {
-                    setWalletSelectOpen(true)
-                  }
-                }}
+                onClick={() => setWalletSelectOpen(true)}
               >
                 <Wallet className="mr-2 h-5 w-5" />
                 <span className="text-base">
@@ -494,38 +486,37 @@ export function Header() {
                 </span>
               </Button>
             </DialogTrigger>
-            {/* 다이얼로그 콘텐츠는 모바일에서만 표시 */}
-            {isWalletMobile && (
-              <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
-                <DialogHeader>
-                  <DialogTitle>{t('connectWallet')}</DialogTitle>
-                  <DialogDescription>
-                    {t('selectWalletToConnect')}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 gap-4 py-4">
-                  {/* Mobile version: Show WalletConnect only */}
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                    onClick={() => handleConnectWallet()}
-                  >
-                    <Image 
-                      src={getWalletLogo('walletconnect')} 
-                      alt="WalletConnect"
-                      width={24}
-                      height={24}
-                      style={{ width: 'auto', height: '24px' }}
-                    />
-                    <div className="text-left">
-                      <div className="font-semibold">WalletConnect</div>
-                      <div className="text-sm text-muted-foreground">Connect Mobile Wallet</div>
+            <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+              <DialogHeader>
+                <DialogTitle>{t('connectWallet')}</DialogTitle>
+                <DialogDescription>
+                  {t('selectWalletToConnect')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-1 gap-4 py-4">
+                {/* PC & Mobile: Show WalletConnect only */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                  onClick={() => handleConnectWallet()}
+                >
+                  <Image 
+                    src={getWalletLogo('walletconnect')} 
+                    alt="WalletConnect"
+                    width={24}
+                    height={24}
+                    style={{ width: 'auto', height: '24px' }}
+                  />
+                  <div className="text-left">
+                    <div className="font-semibold">WalletConnect</div>
+                    <div className="text-sm text-muted-foreground">
+                      {isWalletMobile ? 'Connect Mobile Wallet' : 'Mobile & Desktop Wallets'}
                     </div>
-                  </Button>
-                </div>
-              </DialogContent>
-            )}
+                  </div>
+                </Button>
+              </div>
+            </DialogContent>
           </Dialog>
         )}
 
