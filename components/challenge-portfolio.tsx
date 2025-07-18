@@ -73,38 +73,9 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
   };
 
   const getRankIcon = (rank: number) => {
-    if (rank <= 3) {
-      const emojis = ['🥇', '🥈', '🥉'];
+    if (rank <= 5) {
+      const emojis = ['🥇', '🥈', '🥉', '🏅', '🎖️'];
       return <span className="text-3xl">{emojis[rank - 1]}</span>;
-    } else if (rank <= 5) {
-      return (
-        <div className="relative w-6 h-6 flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            {/* Medal circle */}
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-              fill={rank === 4 ? '#4F46E5' : '#10B981'}
-              fillOpacity={rank === 4 ? '1' : '0.6'}
-              stroke="#FFD700"
-              strokeWidth="1"
-            />
-            {/* Number */}
-            <text
-              x="12"
-              y="13"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize="12"
-              fill="#FFFFFF"
-              fontWeight="bold"
-            >
-              {rank}
-            </text>
-          </svg>
-        </div>
-      );
     } else {
       return <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">{rank}</div>;
     }

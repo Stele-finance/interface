@@ -300,6 +300,10 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     <div className="flex items-center gap-2">
                       {/* Use same icons as chart */}
                       {(ranking.rank === 4 || ranking.rank === 5) ? (
+                        <span className="text-lg">
+                          {ranking.rank === 4 ? '🏅' : '🎖️'}
+                        </span>
+                      ) : (
                         <div className="relative w-3 h-3 flex items-center justify-center">
                           <svg width="12" height="12" viewBox="0 0 24 24">
                             <circle
@@ -324,10 +328,6 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                             </text>
                           </svg>
                         </div>
-                      ) : (
-                        <span className="text-sm">
-                          {ranking.emoji}
-                        </span>
                       )}
                       <span className="text-gray-300 text-xs">
                         {ranking.user}

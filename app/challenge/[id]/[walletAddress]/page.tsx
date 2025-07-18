@@ -1313,6 +1313,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                     return '🥈';
                                   case 3:
                                     return '🥉';
+                                  case 4:
+                                    return '🏅';
+                                  case 5:
+                                    return '🎖️';
                                   default:
                                     return rank.toString();
                                 }
@@ -1341,57 +1345,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                                 >
                                   <td className="py-6 pl-6 pr-4">
                                     <div className="flex items-center justify-center w-10 h-10">
-                                      {rank <= 3 ? (
+                                      {rank <= 5 ? (
                                         <span className="text-3xl">{getRankIcon(rank)}</span>
-                                      ) : rank === 4 ? (
-                                        <div className="relative w-6 h-6 flex items-center justify-center">
-                                          <svg width="24" height="24" viewBox="0 0 24 24">
-                                            <circle
-                                              cx="12"
-                                              cy="12"
-                                              r="10"
-                                              fill="#4F46E5"
-                                              stroke="#FFD700"
-                                              strokeWidth="1"
-                                            />
-                                            <text
-                                              x="12"
-                                              y="13"
-                                              textAnchor="middle"
-                                              dominantBaseline="middle"
-                                              fontSize="12"
-                                              fill="#FFFFFF"
-                                              fontWeight="bold"
-                                            >
-                                              4
-                                            </text>
-                                          </svg>
-                                        </div>
-                                      ) : rank === 5 ? (
-                                        <div className="relative w-6 h-6 flex items-center justify-center">
-                                          <svg width="24" height="24" viewBox="0 0 24 24">
-                                            <circle
-                                              cx="12"
-                                              cy="12"
-                                              r="10"
-                                              fill="#10B981"
-                                              fillOpacity="0.6"
-                                              stroke="#FFD700"
-                                              strokeWidth="1"
-                                            />
-                                            <text
-                                              x="12"
-                                              y="13"
-                                              textAnchor="middle"
-                                              dominantBaseline="middle"
-                                              fontSize="12"
-                                              fill="#FFFFFF"
-                                              fontWeight="bold"
-                                            >
-                                              5
-                                            </text>
-                                          </svg>
-                                        </div>
                                       ) : (
                                         <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                                           <span className="text-sm font-bold text-white">{rank}</span>
