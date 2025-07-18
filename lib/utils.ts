@@ -5,6 +5,91 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Detect actual wallet type from AppKit provider
+export function detectActualWalletType(walletProvider: any): 'metamask' | 'phantom' | 'walletconnect' {
+  if (!walletProvider) return 'walletconnect'
+  
+  const provider = walletProvider as any
+  
+  // Check Web3Modal connector peerMeta (most reliable method)
+  if (provider?.connector?.peerMeta?.name) {
+    const peerName = provider.connector.peerMeta.name.toLowerCase()
+    if (peerName.includes('phantom')) {
+      return 'phantom'
+    }
+    if (peerName.includes('metamask')) {
+      return 'metamask'
+    }
+  }
+  
+  // Check alternative connector paths
+  if (provider?.connector?.name) {
+    const connectorName = provider.connector.name.toLowerCase()
+    if (connectorName.includes('phantom')) {
+      return 'phantom'
+    }
+    if (connectorName.includes('metamask')) {
+      return 'metamask'
+    }
+  }
+  
+  // Check session metadata if available (prioritize this over provider properties)
+  if (provider?.session?.peer?.metadata?.name) {
+    const walletName = provider.session.peer.metadata.name.toLowerCase()
+    if (walletName.includes('phantom')) {
+      return 'phantom'
+    }
+    if (walletName.includes('metamask')) {
+      return 'metamask'
+    }
+  }
+  
+  // **IMPORTANT**: Check for Phantom FIRST (before MetaMask)
+  // Phantom sets isMetaMask=true for compatibility, so we need to check Phantom first
+  
+  // Most reliable Phantom detection: provider.isPhantom === true
+  if (provider?.isPhantom === true) {
+    return 'phantom'
+  }
+  
+  // Secondary Phantom checks (only if isPhantom is not explicitly false)
+  if (provider?.connection?.url?.includes('phantom') ||
+      provider?.provider?.isPhantom) {
+    return 'phantom'
+  }
+  
+  // Check for MetaMask (only if isPhantom is not true)
+  if (provider?.isPhantom !== true && 
+      (provider?.isMetaMask || 
+       provider?.connection?.url?.includes('metamask') || 
+       provider?.provider?.isMetaMask ||
+       provider?.selectedProvider?.isMetaMask)) {
+    return 'metamask'
+  }
+  
+  // Check provider connection name
+  if (provider?.connection?.name) {
+    const connectionName = provider.connection.name.toLowerCase()
+    if (connectionName.includes('phantom')) {
+      return 'phantom'
+    }
+    if (connectionName.includes('metamask')) {
+      return 'metamask'
+    }
+  }
+  
+  // Check user agent for wallet browser detection (last resort)
+  if (typeof window !== 'undefined') {
+    const userAgent = window.navigator.userAgent.toLowerCase()
+    if (userAgent.includes('metamask')) {
+      return 'metamask'
+    }
+  }
+  
+  // Fallback to WalletConnect
+  return 'walletconnect'
+}
+
 // Get token logo path based on address or symbol
 export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'arbitrum'): string | null {
   // Input validation
