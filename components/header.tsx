@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, Trophy, BarChart3, Vote } from "lucide-react"
+import { Trophy, BarChart3, Vote } from "lucide-react"
 import { cn, getNetworkLogo, getWalletLogo } from "@/lib/utils"
-import { Bell, Search, User, Wallet, DollarSign, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
+import { User, Wallet, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import {
   Dialog,
   DialogContent,
@@ -30,10 +24,7 @@ import {
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { ethers } from "ethers"
-import { 
-  ETHEREUM_CHAIN_ID, 
-  ETHEREUM_CHAIN_CONFIG, 
-  USDC_DECIMALS,
+import {
   getRPCUrl
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"

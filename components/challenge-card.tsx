@@ -9,8 +9,6 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  getChainId,
-  getChainConfig, 
   getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
@@ -34,17 +32,11 @@ interface ChallengeCardProps {
 }
 
 export function ChallengeCard({ title, type, participants, timeLeft, prize, progress, status, id, startTime, endTime, isCompleted, walletAddress, challengeId }: ChallengeCardProps) {
-  // If no ID is provided, convert the title to kebab-case and use it as ID
-  const displayId = id || title.toLowerCase().replace(/\s+/g, '-');
-  
   const [startDate, setStartDate] = useState<string>("Not started yet");
   const [isCreating, setIsCreating] = useState(false);
   
   // Use wallet hook to get current wallet info
   const { walletType, network, getProvider, isConnected } = useWallet();
-  
-  // Use AppKit provider for WalletConnect
-  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
   
   useEffect(() => {
     // Handle display for challenges that haven't started yet

@@ -1,26 +1,21 @@
 'use client'
 
-import { ChallengeCard } from "@/components/challenge-card"
 import { ChallengeTypeModal } from "@/components/challenge-type-modal"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  getChainId,
-  getChainConfig, 
   getSteleContractAddress
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
-import { ExternalLink, Users, Clock, Trophy, Loader2 } from "lucide-react"
-import Link from "next/link"
+import { Users, Clock, Trophy } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"

@@ -1,8 +1,8 @@
 "use client"
 
 import { notFound } from "next/navigation"
-import { useState, useMemo, use } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useMemo, use } from "react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -10,13 +10,7 @@ import { cn } from "@/lib/utils"
 import { 
   TrendingUp, 
   TrendingDown, 
-  DollarSign, 
-  ArrowLeft,
-  Loader2,
-  ExternalLink,
   Trophy,
-  Calendar,
-  BarChart3,
   Clock,
   CheckCircle,
   UserCheck

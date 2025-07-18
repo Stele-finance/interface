@@ -96,8 +96,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const [votingPower, setVotingPower] = useState<string>("0")
   const [hasVoted, setHasVoted] = useState(false)
   const [isLoadingVotingPower, setIsLoadingVotingPower] = useState(false)
-  const [tokenBalance, setTokenBalance] = useState<string>("0")
-  const [delegatedTo, setDelegatedTo] = useState<string>("")
   const [isDelegating, setIsDelegating] = useState(false)
   const [isQueuing, setIsQueuing] = useState(false)
   const [proposalState, setProposalState] = useState<number | null>(null)
@@ -1200,17 +1198,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     <Label htmlFor="abstain">{t('abstain')}</Label>
                   </div>
                 </RadioGroup>
-
-                {/* <div className="space-y-2">
-                  <Label htmlFor="reason">Reason (Optional)</Label>
-                  <Textarea 
-                    id="reason" 
-                    placeholder="Why are you voting this way?" 
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    disabled={proposal.hasVoted || isVoting}
-                  />
-                </div> */}
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-3">

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useActiveChallengesSnapshots } from '@/app/hooks/useActiveChallengesSnapshots'
 import { useActiveChallengesWeeklySnapshots } from '@/app/hooks/useActiveChallengesWeeklySnapshots'
-import { Users, DollarSign, TrendingUp, Calendar, ChevronDown } from 'lucide-react'
+import { Users, DollarSign, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
 import {
@@ -123,16 +123,6 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
     return currentChartData[currentChartData.length - 1]?.totalRewards || 0
   }, [currentChartData])
 
-  // Get current date for header
-  const currentDate = new Date().toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
-
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const value = payload[0]?.value
@@ -147,20 +137,6 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
       )
     }
     return null
-  }
-
-  const CustomCursor = ({ x, y, width, height }: any) => {
-    return (
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill="rgba(255, 255, 255, 0.1)"
-        rx={8}
-        ry={8}
-      />
-    )
   }
 
   if (isLoading) {

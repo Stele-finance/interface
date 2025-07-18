@@ -9,11 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
-import Link from "next/link"
 import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"

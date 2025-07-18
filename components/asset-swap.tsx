@@ -1,13 +1,12 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowDown, RefreshCw, TrendingUp, TrendingDown, Loader2, XCircle, ChevronDown, Check } from "lucide-react"
+import { ArrowDown, Loader2, ChevronDown, Check } from "lucide-react"
 import { HTMLAttributes, useState, useEffect } from "react"
 import { cn, getTokenLogo } from "@/lib/utils"
-import { useSwapTokenPrices, useSwapTokenPricesIndependent, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
-import { Badge } from "@/components/ui/badge"
+import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -680,14 +679,6 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
             : "0"))
     : "0";
   
-  const minimumReceived = fromAmount && parseFloat(fromAmount) > 0
-    ? (swapQuote
-        ? (parseFloat(fromAmount) * swapQuote.exchangeRate * 0.99).toFixed(Math.min(4, getTokenDecimals(toToken)))
-        : (simpleSwapQuote 
-            ? (simpleSwapQuote.toAmount * 0.99).toFixed(Math.min(4, getTokenDecimals(toToken)))
-            : "0"))
-    : "0";
-
   // Show if using basic estimate
   const isUsingBasicEstimate = !swapQuote && simpleSwapQuote;
 

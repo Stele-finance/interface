@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { Check, Clock, XCircle, Plus, FileText, Vote as VoteIcon, Loader2 } from "lucide-react"
-import { useProposalsData, useActiveProposalsData, useMultipleProposalVoteResults, useProposalsByStatus, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
+import { Clock, Plus, Vote as VoteIcon, Loader2 } from "lucide-react"
+import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
 import { useQueryClient } from '@tanstack/react-query'
 import { STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"
@@ -19,7 +19,6 @@ import { useWallet } from "@/app/hooks/useWallet"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 
@@ -54,7 +53,6 @@ export default function VotePage() {
   const [activeProposals, setActiveProposals] = useState<Proposal[]>([])
   const [completedProposals, setCompletedProposals] = useState<Proposal[]>([])
   const [isInitialLoading, setIsInitialLoading] = useState(true)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [mountTimestamp, setMountTimestamp] = useState(Date.now())
   
   // Fetch governance configuration from smart contract

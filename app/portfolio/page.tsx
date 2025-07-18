@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Wallet, Loader2 } from "lucide-react"
+import { Wallet } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { getWalletLogo } from "@/lib/utils"

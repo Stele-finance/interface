@@ -2,13 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
-import { useMobileMenu } from "@/lib/mobile-menu-context"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { ArrowRight, BarChart3, LineChart, PieChart, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
-import Link from "next/link"
+import { Card, CardContent} from "@/components/ui/card"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
@@ -16,8 +13,6 @@ import { ToastAction } from "@/components/ui/toast"
 import { ChallengeCharts } from "@/components/challenge-charts"
 import { useRouter } from "next/navigation"
 import { 
-  getChainId,
-  getChainConfig, 
   getSteleContractAddress,
   getUSDCTokenAddress,
   USDC_DECIMALS
@@ -249,10 +244,8 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
 
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { t } = useLanguage()
-  const { isMobileMenuOpen } = useMobileMenu()
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [isGettingRewards, setIsGettingRewards] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -1504,7 +1497,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
     </div>
   )
 }
