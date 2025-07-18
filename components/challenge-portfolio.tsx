@@ -405,7 +405,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       case 'register':
         return t('register')
       case 'reward':
-        return 'Rewarded'
+        return t('rewards')
       default:
         return type
     }

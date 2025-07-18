@@ -81,10 +81,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 month: 'short', 
                 day: 'numeric'
               })
-            : date.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
+            : date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
               }),
           dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           isRealTime: false
@@ -114,10 +113,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           minute: '2-digit',
           hour12: true
         })} (Live)`,
-        timeLabel: currentDate.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
+        timeLabel: currentDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
         }),
         dateLabel: currentDate.toISOString().split('T')[0],
         isRealTime: true
