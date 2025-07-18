@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { Trophy, BarChart3, Vote } from "lucide-react"
-import { cn, getNetworkLogo, getWalletLogo } from "@/lib/utils"
+import { cn, getNetworkLogo, getWalletLogo, detectActualWalletType } from "@/lib/utils"
 import { User, Wallet, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
 import {
   DropdownMenu,
@@ -34,6 +34,7 @@ import { LanguageSelectorSidebar } from "./language-selector-sidebar"
 import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
+import { useAppKitProvider, useAppKitAccount } from '@reown/appkit/react'
 
 export function Header() {
   const pathname = usePathname()
@@ -56,12 +57,9 @@ export function Header() {
     isMobile: isWalletMobile
   } = useWallet()
   
-
-  
-
-
-
-
+  // Use AppKit provider and account to get actual wallet info
+  const { walletProvider } = useAppKitProvider('eip155')
+  const appKitAccount = useAppKitAccount()
 
   const [balance, setBalance] = useState<string>('0')
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
@@ -75,13 +73,17 @@ export function Header() {
   // Get entry fee from context
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee()
 
-  // Get wallet icon - WalletConnect only
-  const getWalletIcon = () => {
-    if (walletType === 'walletconnect') {
-      return getWalletLogo('walletconnect')
+  // Get wallet icon - detect actual wallet type from provider
+  const getWalletIcon = () => {    
+    if (walletType === 'walletconnect' && walletProvider) {
+      const actualWalletType = detectActualWalletType(walletProvider)
+      return getWalletLogo(actualWalletType)
     }
     return null
   }
+
+  // Force re-render when wallet provider changes
+  useEffect(() => {}, [walletProvider, isConnected, walletType])
 
   // Get network icon based on network type
   const getNetworkIcon = () => {
@@ -371,14 +373,25 @@ export function Header() {
                 className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
                 onClick={() => openWalletModal && openWalletModal()}
               >
-                <Image 
-                  src={getWalletLogo('walletconnect')} 
-                  alt="WalletConnect"
-                  width={16}
-                  height={16}
-                  className="mr-2"
-                  style={{ width: 'auto', height: '16px' }}
-                />
+                {getWalletIcon() ? (
+                  <Image 
+                    src={getWalletIcon()!} 
+                    alt="Connected Wallet"
+                    width={16}
+                    height={16}
+                    className="mr-2"
+                    style={{ width: 'auto', height: '16px' }}
+                  />
+                ) : (
+                  <Image 
+                    src={getWalletLogo('walletconnect')} 
+                    alt="WalletConnect"
+                    width={16}
+                    height={16}
+                    className="mr-2"
+                    style={{ width: 'auto', height: '16px' }}
+                  />
+                )}
                 <span className="text-base">
                   {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
                 </span>
