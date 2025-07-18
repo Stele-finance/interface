@@ -243,7 +243,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       case 'register':
         return t('register')
       case 'reward':
-        return 'Rewarded'
+        return t('rewards')
       default:
         return type
     }

@@ -87,10 +87,9 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             minute: '2-digit',
             hour12: true
           }),
-          timeLabel: date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
+          timeLabel: date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
           }),
           dateLabel: date.toISOString().split('T')[0] // YYYY-MM-DD format
         }

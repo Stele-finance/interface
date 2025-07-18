@@ -67,10 +67,9 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           minute: '2-digit',
           hour12: true
         }),
-        timeLabel: actualDate.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
+        timeLabel: actualDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
         }),
         dateLabel: actualDate.toISOString().split('T')[0]
       }
