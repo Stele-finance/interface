@@ -110,6 +110,22 @@ export const getExplorerName = (network: 'ethereum' | 'arbitrum' | null): string
   return NETWORK_CONTRACTS.ethereum.EXPLORER_NAME; // Default to Ethereum
 };
 
+// Helper functions to build explorer URLs for transactions and addresses
+export const buildTransactionUrl = (network: 'ethereum' | 'arbitrum' | null, txHash: string): string => {
+  const baseUrl = getExplorerUrl(network);
+  return `${baseUrl}/tx/${txHash}`;
+};
+
+export const buildAddressUrl = (network: 'ethereum' | 'arbitrum' | null, address: string): string => {
+  const baseUrl = getExplorerUrl(network);
+  return `${baseUrl}/address/${address}`;
+};
+
+export const buildTokenUrl = (network: 'ethereum' | 'arbitrum' | null, tokenAddress: string): string => {
+  const baseUrl = getExplorerUrl(network);
+  return `${baseUrl}/token/${tokenAddress}`;
+};
+
 // Uniswap V3 related helper functions
 export const getUniswapQuoterAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.UNISWAP_V3_QUOTER;

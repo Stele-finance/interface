@@ -10,7 +10,7 @@ import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { getSteleContractAddress, getChainId, getChainConfig } from "@/lib/constants"
+import { getSteleContractAddress, getChainId, getChainConfig, buildTransactionUrl, getExplorerName } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useParams } from "next/navigation"
 import { useInvestableTokensForSwap, getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useInvestableTokens"
@@ -609,12 +609,16 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
         amountInWei
       );
 
+      // Get network-specific explorer info
+      const explorerName = getExplorerName(network);
+      const submittedTxUrl = buildTransactionUrl(network, tx.hash);
+      
       toast({
         title: "Transaction Submitted",
         description: "Your swap transaction has been sent to the network.",
         action: (
-          <ToastAction altText="View on Etherscan" onClick={() => window.open(`https://etherscan.io/tx/${tx.hash}`, '_blank')}>
-            View on Etherscan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(submittedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
         ),
       });
@@ -623,12 +627,14 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       const receipt = await tx.wait();
 
       if (receipt.status === 1) {
+        const confirmedTxUrl = buildTransactionUrl(network, receipt.hash);
+        
         toast({
           title: "Swap Successful",
           description: `Successfully swapped ${fromAmount} ${fromToken} for ${toToken}!`,
           action: (
-          <ToastAction altText="View on Etherscan" onClick={() => window.open(`https://etherscan.io/tx/${receipt.hash}`, '_blank')}>
-            View on Etherscan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(confirmedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
           ),
         });

@@ -13,6 +13,7 @@ import {
   getRPCUrl
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
+import { useWallet } from "@/app/hooks/useWallet"
 
 type EntryFeeContextType = {
   entryFee: string | null
@@ -24,45 +25,60 @@ type EntryFeeContextType = {
 const EntryFeeContext = createContext<EntryFeeContextType | undefined>(undefined)
 
 function useEntryFeeQuery() {
+  const { network } = useWallet()
+  
+  // Use current connected network, fallback to ethereum
+  const targetNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  console.log('🔍 useEntryFee - Current network:', network, '→ Target network:', targetNetwork)
+  
   return useQuery<string>({
-    queryKey: ['entryFee'],
+    queryKey: ['entryFee', targetNetwork],
     queryFn: async () => {
+      console.log('📡 Fetching entry fee for network:', targetNetwork)
+      
       // Add delay to prevent overwhelming RPC
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))
       
-      // Use ethereum as default network for entry fee
-      const defaultNetwork = 'ethereum'
-      const rpcUrl = getRPCUrl(defaultNetwork)
+      const rpcUrl = getRPCUrl(targetNetwork)
+      console.log('🌐 Using RPC URL:', rpcUrl)
       
       // Create a read-only provider
       const provider = new ethers.JsonRpcProvider(rpcUrl)
       
-      // Create contract instance
+      // Create contract instance for the specific network
+      const contractAddress = getSteleContractAddress(targetNetwork)
+      console.log('📋 Using contract address:', contractAddress, 'for network:', targetNetwork)
+      
       const steleContract = new ethers.Contract(
-        getSteleContractAddress(defaultNetwork),
+        contractAddress,
         SteleABI.abi,
         provider
       )
       
       // Call entryFee view function
       const fee = await steleContract.entryFee()
+      console.log('💰 Raw entry fee from contract:', fee.toString(), 'for network:', targetNetwork)
       
       // The contract returns a value that needs to be divided by 100 to get the actual USDC amount
       // For example: contract returns 1000 (raw) -> should be 0.01 USDC
       const adjustedFee = fee
       const formattedFee = ethers.formatUnits(adjustedFee, USDC_DECIMALS);
+      console.log('💱 Formatted entry fee:', formattedFee, 'USDC for network:', targetNetwork)
       
       // Convert to integer (remove decimal places)
       const integerFee = Math.floor(parseFloat(formattedFee)).toString();
+      console.log('✅ Final entry fee:', integerFee, 'USDC for network:', targetNetwork)
 
       return integerFee
     },
-    staleTime: 15 * 60 * 1000, // Entry fee rarely changes - keep fresh for 15 minutes
-    refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
-    retry: 1, // Reduce retry attempts
-    retryDelay: (attemptIndex) => Math.min(5000 * 2 ** attemptIndex, 60000), // Longer delay between retries
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    enabled: !!network, // Only run query when network is available
+    staleTime: 5 * 60 * 1000, // Reduce stale time to 5 minutes for faster updates
+    refetchInterval: 15 * 60 * 1000, // Refetch every 15 minutes
+    retry: 2, // Increase retry attempts
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Faster retry
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Always refetch when component mounts
   })
 }
 

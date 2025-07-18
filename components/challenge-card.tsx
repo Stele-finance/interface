@@ -9,7 +9,9 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  getSteleContractAddress
+  getSteleContractAddress,
+  buildTransactionUrl,
+  getExplorerName
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -108,12 +110,15 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
       const tx = await steleContract.createChallenge(challengeTypeNumber);
       
       // Show toast notification for transaction submitted
+      const explorerName = getExplorerName(network);
+      const submittedTxUrl = buildTransactionUrl(network, tx.hash);
+      
       toast({
         title: "Transaction Submitted",
         description: "Your challenge creation transaction has been sent to the network.",
         action: (
-          <ToastAction altText="View on Etherscan" onClick={() => window.open(`https://etherscan.io/tx/${tx.hash}`, '_blank')}>
-            View on Etherscan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(submittedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
         ),
       });
@@ -122,12 +127,14 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
       await tx.wait();
       
       // Show toast notification for transaction confirmed
+      const confirmedTxUrl = buildTransactionUrl(network, tx.hash);
+      
       toast({
         title: "Challenge Created",
         description: `Your ${type} has been created successfully!`,
         action: (
-          <ToastAction altText="View on Etherscan" onClick={() => window.open(`https://etherscan.io/tx/${tx.hash}`, '_blank')}>
-            View on Etherscan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(confirmedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
         ),
       });
