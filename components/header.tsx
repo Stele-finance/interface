@@ -44,8 +44,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 
-type WalletType = 'metamask' | 'phantom' | 'walletconnect' | null
-
 export function Header() {
   const pathname = usePathname()
   const router = useRouter()
@@ -64,8 +62,7 @@ export function Header() {
     disconnectWallet, 
     switchNetwork, 
     openWalletModal,
-    isMobile: isWalletMobile,
-    isWalletAvailable
+    isMobile: isWalletMobile
   } = useWallet()
   
 
@@ -87,18 +84,12 @@ export function Header() {
   // Get entry fee from context
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee()
 
-  // Get wallet icon based on wallet type
+  // Get wallet icon - WalletConnect only
   const getWalletIcon = () => {
-    switch (walletType) {
-      case 'metamask':
-        return getWalletLogo('metamask')
-      case 'phantom':
-        return getWalletLogo('phantom')
-      case 'walletconnect':
-        return getWalletLogo('walletconnect')
-      default:
-        return null
+    if (walletType === 'walletconnect') {
+      return getWalletLogo('walletconnect')
     }
+    return null
   }
 
   // Get network icon based on network type
@@ -151,23 +142,19 @@ export function Header() {
     }
   };
 
-  const handleConnectWallet = async (selectedWalletType: 'metamask' | 'phantom' | 'walletconnect') => {
-    if (!selectedWalletType) return
-    
+  const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
     
     try {
-      await connectWallet(selectedWalletType)
+      await connectWallet() // No parameters needed - WalletConnect only
       
-      // Success toast (exclude WalletConnect as it's handled in modal)
-      if (selectedWalletType !== 'walletconnect') {
-        toast({
-          variant: "default",
-          title: "✅ Connection Successful",
-          description: `Successfully connected to ${selectedWalletType}`,
-          duration: 3000,
-        })
-      }
+      // Success toast
+      toast({
+        variant: "default",
+        title: "✅ Connection Successful",
+        description: "Successfully connected to WalletConnect",
+        duration: 3000,
+      })
     } catch (error) {
       console.error("Wallet connection error:", error)
       
@@ -188,17 +175,6 @@ export function Header() {
 
   // Switch between Networks
   const switchWalletNetwork = async (targetNetwork: 'ethereum' | 'arbitrum') => {
-    // Immediate validation before any async operations
-    if (targetNetwork === 'arbitrum' && walletType === 'phantom') {
-      toast({
-        variant: "destructive",
-        title: `🚫 ${t('networkNotSupported')}`,
-        description: t('phantomDoesNotSupportArbitrum'),
-        duration: 5000,
-      })
-      return
-    }
-    
     try {
       await switchNetwork(targetNetwork)
       
@@ -222,9 +198,6 @@ export function Header() {
           description = t('youCancelledNetworkSwitch')
         } else if (error.message.includes("manually")) {
           title = t('manualActionRequired')
-          description = error.message
-        } else if (error.message.includes("not support")) {
-          title = t('networkNotSupported')
           description = error.message
         } else {
           description = error.message
@@ -476,44 +449,19 @@ export function Header() {
                   </DropdownMenuItem>
                 )}
                 {walletNetwork !== 'arbitrum' && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div>
-                          <DropdownMenuItem 
-                            onClick={() => switchWalletNetwork('arbitrum')}
-                            disabled={walletType === 'phantom'}
-                            className={walletType === 'phantom' ? 'opacity-50 cursor-not-allowed' : ''}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex items-center gap-2">
-                                <Image 
-                                  src={getNetworkLogo('arbitrum')} 
-                                  alt="Arbitrum One"
-                                  width={16}
-                                  height={16}
-                                  className="rounded-full"
-                                  style={{ width: '16px', height: '16px' }}
-                                />
-                              <span>Arbitrum</span>
-                              </div>
-                              {walletType === 'phantom' && (
-                                <span className="text-xs text-muted-foreground ml-2">
-                                  🚫
-                                </span>
-                              )}
-                            </div>
-                          </DropdownMenuItem>
-                        </div>
-                      </TooltipTrigger>
-                      {walletType === 'phantom' && (
-                        <TooltipContent>
-                          <p>{t('arbitrumNotSupportedByPhantom')}</p>
-                          <p>{t('pleaseUseMetaMaskForArbitrum')}</p>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
+                  <DropdownMenuItem onClick={() => switchWalletNetwork('arbitrum')}>
+                    <div className="flex items-center gap-2">
+                      <Image 
+                        src={getNetworkLogo('arbitrum')} 
+                        alt="Arbitrum One"
+                        width={16}
+                        height={16}
+                        className="rounded-full"
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Arbitrum</span>
+                    </div>
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDisconnectWallet}>
@@ -524,12 +472,21 @@ export function Header() {
             )}
           </div>
         ) : (
-          <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
+          <Dialog open={isWalletMobile && walletSelectOpen} onOpenChange={setWalletSelectOpen}>
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="bg-orange-500 hover:bg-orange-600 border-orange-500 hover:border-orange-600 text-white font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                onClick={(e) => {
+                  // PC에서는 바로 WalletConnect 열기, 모바일에서는 다이얼로그 열기
+                  if (!isWalletMobile) {
+                    e.preventDefault()
+                    handleConnectWallet()
+                  } else {
+                    setWalletSelectOpen(true)
+                  }
+                }}
               >
                 <Wallet className="mr-2 h-5 w-5" />
                 <span className="text-base">
@@ -537,90 +494,23 @@ export function Header() {
                 </span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
-              <DialogHeader>
-                <DialogTitle>{t('connectWallet')}</DialogTitle>
-                <DialogDescription>
-                  {t('selectWalletToConnect')}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-1 gap-4 py-4">
-                {/* PC version: Show MetaMask, Phantom, WalletConnect */}
-                {!isWalletMobile && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                      onClick={() => handleConnectWallet('metamask')}
-                      disabled={!isWalletAvailable('metamask')}
-                    >
-                      <Image 
-                        src={getWalletLogo('metamask')} 
-                        alt="MetaMask"
-                        width={24}
-                        height={24}
-                        style={{ width: 'auto', height: '24px' }}
-                      />
-                      <div className="text-left">
-                        <div className="font-semibold">MetaMask</div>
-                        <div className="text-sm text-muted-foreground">
-                          {isWalletAvailable('metamask') ? t('browserExtension') : 'Not Installed'}
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                      onClick={() => handleConnectWallet('phantom')}
-                      disabled={!isWalletAvailable('phantom')}
-                    >
-                      <Image 
-                        src={getWalletLogo('phantom')} 
-                        alt="Phantom"
-                        width={24}
-                        height={24}
-                        style={{ width: 'auto', height: '24px' }}
-                      />
-                      <div className="text-left">
-                        <div className="font-semibold">Phantom</div>
-                        <div className="text-sm text-muted-foreground">
-                          {isWalletAvailable('phantom') ? t('browserExtension') : 'Not Installed'}
-                        </div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                      onClick={() => handleConnectWallet('walletconnect')}
-                    >
-                      <Image 
-                        src={getWalletLogo('walletconnect')} 
-                        alt="WalletConnect"
-                        width={24}
-                        height={24}
-                        style={{ width: 'auto', height: '24px' }}
-                      />
-                      <div className="text-left">
-                        <div className="font-semibold">WalletConnect</div>
-                        <div className="text-sm text-muted-foreground">Mobile & Desktop Wallets</div>
-                      </div>
-                    </Button>
-                  </>
-                )}
-
-                {/* Mobile version: Show WalletConnect only */}
-                {isWalletMobile && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                  onClick={() => handleConnectWallet('walletconnect')}
-                >
+            {/* 다이얼로그 콘텐츠는 모바일에서만 표시 */}
+            {isWalletMobile && (
+              <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+                <DialogHeader>
+                  <DialogTitle>{t('connectWallet')}</DialogTitle>
+                  <DialogDescription>
+                    {t('selectWalletToConnect')}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 gap-4 py-4">
+                  {/* Mobile version: Show WalletConnect only */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                    onClick={() => handleConnectWallet()}
+                  >
                     <Image 
                       src={getWalletLogo('walletconnect')} 
                       alt="WalletConnect"
@@ -628,14 +518,14 @@ export function Header() {
                       height={24}
                       style={{ width: 'auto', height: '24px' }}
                     />
-                  <div className="text-left">
-                    <div className="font-semibold">WalletConnect</div>
+                    <div className="text-left">
+                      <div className="font-semibold">WalletConnect</div>
                       <div className="text-sm text-muted-foreground">Connect Mobile Wallet</div>
-                  </div>
-                </Button>
-                )}
-              </div>
-            </DialogContent>
+                    </div>
+                  </Button>
+                </div>
+              </DialogContent>
+            )}
           </Dialog>
         )}
 
