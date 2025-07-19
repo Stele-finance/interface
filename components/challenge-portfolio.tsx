@@ -423,9 +423,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     return shouldShow;
   };
 
-  // Check if USDC balance is insufficient
+  // Check if USDC balance is insufficient (only used in modal now)
   const isInsufficientBalance = () => {
-    // If wallet is not connected, don't show insufficient balance (show connect wallet instead)
+    // If wallet is not connected, don't show insufficient balance
     if (!isConnected || !currentWalletAddress) return false;
     
     // If challenge data is not loaded yet, don't show insufficient balance
@@ -434,8 +434,16 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     // If still loading balance or entry fee, don't show insufficient balance yet
     if (isLoadingBalance || isLoadingEntryFee) return false;
     
-    // If entryFee or usdcBalance is not available, don't show insufficient balance
-    if (!entryFee || !usdcBalance) return false;
+    // If entryFee is not available, don't show insufficient balance
+    if (!entryFee) return false;
+    
+    // IMPORTANT: Only check if balance has been actually fetched (not just '0' default)
+    // If balance hasn't been checked yet, don't show insufficient (balance will be checked when needed)
+    if (!usdcBalance || usdcBalance === '0') {
+      // Only return true if we've actually checked the balance and it's confirmed to be 0
+      // For now, return false to avoid showing insufficient before balance is checked
+      return false;
+    }
     
     const balance = parseFloat(usdcBalance);
     const fee = parseFloat(entryFee);
@@ -1051,8 +1059,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               isLoadingChallenge,
               challengeData,
               isLoadingEntryFee,
-              isLoadingBalance,
-              isInsufficientBalance: isInsufficientBalance(),
               isGettingRewards,
               entryFee,
               handleJoinChallenge,
@@ -1375,12 +1381,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                      variant="outline" 
                      size="lg" 
                      onClick={handleJoinChallenge}
-                     disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee || isLoadingBalance || isInsufficientBalance()}
-                     className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
-                       isInsufficientBalance()
-                         ? "bg-red-500 hover:bg-red-500 text-white border-red-500 cursor-not-allowed" 
-                         : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                     }`}
+                     disabled={isJoining || isLoadingChallenge || !challengeData?.challenge || isLoadingEntryFee}
+                     className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                    >
                      {isJoining ? (
                        <>
@@ -1392,15 +1394,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                          Loading...
                        </>
-                     ) : isLoadingEntryFee || isLoadingBalance ? (
+                     ) : isLoadingEntryFee ? (
                        <>
                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                          {t('loading')}
-                       </>
-                     ) : isInsufficientBalance() ? (
-                       <>
-                         <Plus className="mr-2 h-5 w-5" />
-                         Insufficient USDC
                        </>
                      ) : (
                        <>
@@ -1655,6 +1652,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   ${isLoadingEntryFee ? 'Loading...' : entryFee || '0'} USDC
                 </span>
               </div>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-sm text-gray-300">Your Balance:</span>
+                <span className="text-lg font-bold text-white">
+                  ${isLoadingBalance ? 'Checking...' : usdcBalance || '0'} USDC
+                </span>
+              </div>
               {isInsufficientBalance() && (
                 <div className="mt-2 text-sm text-red-400">
                   ⚠️ Insufficient USDC balance to join this challenge
@@ -1671,14 +1674,25 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmJoinChallenge}
-              disabled={isJoining || isLoadingEntryFee || isInsufficientBalance()}
-              className="bg-orange-500 hover:bg-orange-600"
+              disabled={isJoining || isLoadingEntryFee || isLoadingBalance}
+              className={`${
+                isInsufficientBalance() && !isLoadingBalance
+                  ? "bg-red-500 hover:bg-red-600" 
+                  : "bg-orange-500 hover:bg-orange-600"
+              }`}
             >
               {isJoining ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Joining...
                 </>
+              ) : isLoadingBalance ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Checking Balance...
+                </>
+              ) : isInsufficientBalance() ? (
+                'Insufficient USDC'
               ) : (
                 'Confirm Join'
               )}

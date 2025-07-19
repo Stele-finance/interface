@@ -27,8 +27,6 @@ interface ChallengeChartsProps {
     isLoadingChallenge: boolean
     challengeData: any
     isLoadingEntryFee: boolean
-    isLoadingBalance: boolean
-    isInsufficientBalance: boolean
     isGettingRewards: boolean
     entryFee: string | null
     handleJoinChallenge: () => void
@@ -413,12 +411,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="sm" 
                       onClick={joinButton.handleJoinChallenge} 
-                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                      className={`font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
-                        joinButton.isInsufficientBalance
-                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
-                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
-                      }`}
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee}
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-3 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                     >
                       {joinButton.isJoining ? (
                         <>
@@ -430,15 +424,10 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Loading...
                         </>
-                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                      ) : joinButton.isLoadingEntryFee ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           {joinButton.t('loading')}
-                        </>
-                      ) : joinButton.isInsufficientBalance ? (
-                        <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          Insufficient USDC
                         </>
                       ) : (
                         <>
@@ -559,12 +548,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="lg" 
                       onClick={joinButton.handleJoinChallenge} 
-                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                      className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
-                        joinButton.isInsufficientBalance
-                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
-                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
-                      }`}
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       {joinButton.isJoining ? (
                         <>
@@ -576,15 +561,10 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Loading...
                         </>
-                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                      ) : joinButton.isLoadingEntryFee ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           {joinButton.t('loading')}
-                        </>
-                      ) : joinButton.isInsufficientBalance ? (
-                        <>
-                          <Plus className="mr-2 h-5 w-5" />
-                          Insufficient USDC
                         </>
                       ) : (
                         <>
@@ -876,12 +856,8 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       variant="outline" 
                       size="lg" 
                       onClick={joinButton.handleJoinChallenge} 
-                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee || joinButton.isLoadingBalance || joinButton.isInsufficientBalance}
-                      className={`w-full font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base ${
-                        joinButton.isInsufficientBalance
-                          ? "bg-gray-500 hover:bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" 
-                          : "bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
-                      }`}
+                      disabled={joinButton.isJoining || joinButton.isLoadingChallenge || !joinButton.challengeData?.challenge || joinButton.isLoadingEntryFee}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       {joinButton.isJoining ? (
                         <>
@@ -893,15 +869,10 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Loading...
                         </>
-                      ) : joinButton.isLoadingEntryFee || joinButton.isLoadingBalance ? (
+                      ) : joinButton.isLoadingEntryFee ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           {joinButton.t('loading')}
-                        </>
-                      ) : joinButton.isInsufficientBalance ? (
-                        <>
-                          <Plus className="mr-2 h-5 w-5" />
-                          Insufficient USDC
                         </>
                       ) : (
                         <>
