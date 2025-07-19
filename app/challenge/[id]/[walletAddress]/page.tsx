@@ -900,7 +900,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 </TabsTrigger>
                 <TabsTrigger value="ranking" className="flex items-center gap-2">
                   <Trophy className="h-4 w-4" />
-                  Ranking
+                  {t('ranking')}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="portfolio" className="space-y-4">
@@ -911,8 +911,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                         <table className="w-full min-w-[300px]">
                           <thead>
                             <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                              <th className="text-left py-3 pl-10 md:pl-14 sm:pl-6 pr-4 text-sm font-medium text-gray-400">Token</th>
-                              <th className="text-right py-3 pr-10 md:pr-10 sm:pr-6 px-4 sm:px-6 text-sm font-medium text-gray-400">Amount</th>
+                              <th className="text-left py-3 pl-10 md:pl-14 sm:pl-6 pr-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('token')}</th>
+                              <th className="text-right py-3 pr-10 md:pr-10 sm:pr-6 px-4 sm:px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('amount')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1038,10 +1038,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                           <table className="w-full">
                             <thead>
                               <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
-                                <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
-                                <th className="text-right py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('time')}</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('type')}</th>
+                                <th className="text-left py-3 px-10 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
+                                <th className="text-right py-3 px-20 sm:px-40 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
                               </tr>
                             </thead>
                               <tbody>
@@ -1252,9 +1252,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                               <table className="w-full">
                                 <thead>
                                   <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Rank</th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">User</th>
-                                    <th className="text-right py-3 px-10 sm:px-10 text-sm font-medium text-gray-400">Profit Ratio</th>
+                                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap min-w-[80px]">{t('rank')}</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap min-w-[120px]">{t('user')}</th>
+                                    <th className="text-right py-3 px-10 sm:px-10 text-sm font-medium text-gray-400 whitespace-nowrap min-w-[120px]">{t('profitRatio')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
