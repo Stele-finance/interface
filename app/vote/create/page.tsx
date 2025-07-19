@@ -361,11 +361,27 @@ export default function CreateProposalPage() {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
-      // Request account access if needed
-      const accounts = await browserProvider.send('eth_requestAccounts', []);
+      // Try to get signer first, only request accounts if needed
+      let signer;
+      try {
+        signer = await browserProvider.getSigner();
+        await signer.getAddress(); // Verify we can get address
+      } catch (error: any) {
+        console.warn('Could not get signer, requesting accounts:', error);
+        
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+        
+        // Request account access as fallback
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        }
+        
+        signer = await browserProvider.getSigner();
       }
 
       // Get current network information
@@ -373,9 +389,6 @@ export default function CreateProposalPage() {
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
-
-      // Use existing browserProvider and get signer
-      const signer = await browserProvider.getSigner();
       
       // Create contract instance
       const governorContract = new ethers.Contract(
@@ -498,10 +511,14 @@ export default function CreateProposalPage() {
       });
       
       let errorMessage = error.message || "An unknown error occurred";
+      let toastVariant: "destructive" | "default" = "destructive";
+      let toastTitle = "Proposal Creation Failed";
       
       // Provide more specific error messages based on error type
-      if (error.message?.includes("user rejected")) {
-        errorMessage = "Transaction was rejected by user";
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+        errorMessage = "Transaction was cancelled by user";
+        toastVariant = "default";
+        toastTitle = "Transaction Cancelled";
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees";
       } else if (error.message?.includes("Failed to get wallet provider")) {
@@ -511,8 +528,8 @@ export default function CreateProposalPage() {
       }
       
       toast({
-        variant: "destructive",
-        title: "Proposal Creation Failed",
+        variant: toastVariant,
+        title: toastTitle,
         description: errorMessage,
       });
     } finally {

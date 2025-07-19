@@ -549,8 +549,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       try {
         const signer = await provider.getSigner();
         userAddress = await signer.getAddress();
-      } catch (error) {
+      } catch (error: any) {
         console.warn('Could not get address from signer, requesting accounts:', error);
+        
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+        
         // Only call eth_requestAccounts if we can't get address from signer
         const accounts = await provider.send('eth_requestAccounts', []);
 
@@ -572,11 +578,21 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       router.push(`/challenge/${challengeId}/${userAddress}`);
     } catch (error: any) {
       console.error("Error navigating to account:", error);
-      toast({
-        variant: "destructive",
-        title: "Error Navigating to Account",
-        description: error.message || "An unknown error occurred",
-      });
+      
+      // Check if user rejected the request
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+        toast({
+          variant: "default",
+          title: "Request Cancelled",
+          description: "Connection request was cancelled by user",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error Navigating to Account",
+          description: error.message || "An unknown error occurred",
+        });
+      }
     }
   };
 
@@ -610,8 +626,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         try {
           const signer = await browserProvider.getSigner();
           userAddress = await signer.getAddress();
-        } catch (error) {
+        } catch (error: any) {
           console.warn('Could not get address from signer, requesting accounts:', error);
+          
+          // Check if user rejected the request
+          if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+            throw new Error("Connection request was rejected by user");
+          }
+          
           // Only request accounts if we can't get address from signer
           const accounts = await browserProvider.send('eth_requestAccounts', []);
 
@@ -807,12 +829,21 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     } catch (error: any) {
       console.error("❌ Error in confirmJoinChallenge:", error);
       
-      // Show error toast
-      toast({
-        title: "Error",
-        description: `Failed to join challenge: ${error.message}`,
-        variant: "destructive",
-      });
+      // Check if user rejected the request
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+        toast({
+          variant: "default",
+          title: "Transaction Cancelled",
+          description: "Transaction was cancelled by user",
+        });
+      } else {
+        // Show error toast
+        toast({
+          title: "Error",
+          description: `Failed to join challenge: ${error.message}`,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsJoining(false);
     }
@@ -844,8 +875,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         try {
           const signer = await provider.getSigner();
           userAddress = await signer.getAddress();
-        } catch (error) {
+        } catch (error: any) {
           console.warn('Could not get address from signer, requesting accounts:', error);
+          
+          // Check if user rejected the request
+          if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+            throw new Error("Connection request was rejected by user");
+          }
+          
           // Only request accounts if we can't get address from signer
           const accounts = await provider.send('eth_requestAccounts', []);
 
@@ -916,12 +953,21 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     } catch (error: any) {
       console.error("Error claiming rewards:", error);
       
-      // Show toast notification for error
-      toast({
-        variant: "destructive",
-        title: "Error Claiming Rewards",
-        description: error.message || "An unknown error occurred",
-      });
+      // Check if user rejected the request
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+        toast({
+          variant: "default",
+          title: "Request Cancelled",
+          description: "Reward claim request was cancelled by user",
+        });
+      } else {
+        // Show toast notification for error
+        toast({
+          variant: "destructive",
+          title: "Error Claiming Rewards",
+          description: error.message || "An unknown error occurred",
+        });
+      }
       
     } finally {
       setIsGettingRewards(false);

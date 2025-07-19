@@ -823,11 +823,23 @@ export default function VotePage() {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
-      // Request wallet connection
-      await provider.send('eth_requestAccounts', [])
-      
-      // Connect to provider with signer
-      const signer = await provider.getSigner()
+      // Try to get signer first, only request accounts if needed
+      let signer;
+      try {
+        signer = await provider.getSigner();
+        await signer.getAddress(); // Verify we can get address
+      } catch (error: any) {
+        console.warn('Could not get signer, requesting accounts:', error);
+        
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+        
+        // Request wallet connection as fallback
+        await provider.send('eth_requestAccounts', [])
+        signer = await provider.getSigner();
+      }
       const steleTokenAddress = getSteleTokenAddress(subgraphNetwork)
       const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
@@ -865,9 +877,13 @@ export default function VotePage() {
       console.error("Delegation error:", error)
       
       let errorMessage = t('errorDelegatingTokens')
+      let toastVariant: "destructive" | "default" = "destructive"
+      let toastTitle = t('delegationFailed')
       
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
         errorMessage = t('transactionRejected')
+        toastVariant = "default"
+        toastTitle = "Request Cancelled"
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = t('insufficientFundsGas')
       } else if (error.message?.includes("Phantom wallet is not installed")) {
@@ -875,8 +891,8 @@ export default function VotePage() {
       }
 
       toast({
-        variant: "destructive",
-        title: t('delegationFailed'),
+        variant: toastVariant,
+        title: toastTitle,
         description: errorMessage,
       })
     } finally {

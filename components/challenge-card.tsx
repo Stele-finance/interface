@@ -92,8 +92,14 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
       try {
         const signer = await provider.getSigner();
         userAddress = await signer.getAddress();
-      } catch (error) {
+      } catch (error: any) {
         console.warn('Could not get address from signer, requesting accounts:', error);
+        
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+        
         // Only request accounts if we can't get address from signer
         const accounts = await provider.send('eth_requestAccounts', []);
 
@@ -156,12 +162,21 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
     } catch (error: any) {
       console.error("Error creating challenge:", error);
       
-      // Show toast notification for error
-      toast({
-        variant: "destructive",
-        title: "Error Creating Challenge",
-        description: error.message || "An unknown error occurred",
-      });
+      // Check if user rejected the request
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+        toast({
+          variant: "default",
+          title: "Request Cancelled",
+          description: "Challenge creation was cancelled by user",
+        });
+      } else {
+        // Show toast notification for error
+        toast({
+          variant: "destructive",
+          title: "Error Creating Challenge",
+          description: error.message || "An unknown error occurred",
+        });
+      }
       
     } finally {
       setIsCreating(false);
