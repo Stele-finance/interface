@@ -105,6 +105,7 @@ const restoreFromStorage = () => {
 
 export const useWallet = () => {
   const [localState, setLocalState] = useState<WalletState>(globalState)
+  const [isAppKitReady, setIsAppKitReady] = useState(false)
   
   // AppKit hooks
   let appKit: any = null
@@ -142,11 +143,22 @@ export const useWallet = () => {
     return unsubscribe
   }, [])
 
-  // Initialize
+  // Check if AppKit is ready
   useEffect(() => {
-    restoreFromStorage()
-    setLocalState(globalState)
-  }, [])
+    if (appKit && appKitAccount && appKitNetwork && appKitProvider) {
+      setIsAppKitReady(true)
+    } else {
+      setIsAppKitReady(false)
+    }
+  }, [appKit, appKitAccount, appKitNetwork, appKitProvider])
+
+  // Initialize - only restore from storage after AppKit is ready
+  useEffect(() => {
+    if (isAppKitReady) {
+      restoreFromStorage()
+      setLocalState(globalState)
+    }
+  }, [isAppKitReady])
 
   // Monitor WalletConnect state
   useEffect(() => {
@@ -278,12 +290,12 @@ export const useWallet = () => {
   }, [appKitProvider])
 
   return {
-    // State
-    address: localState.address,
-    isConnected: localState.isConnected,
-    walletType: localState.walletType,
-    network: localState.network,
-    isLoading: localState.isLoading,
+    // State - only show as connected if AppKit is ready and actually connected
+    address: isAppKitReady ? localState.address : null,
+    isConnected: isAppKitReady && localState.isConnected,
+    walletType: isAppKitReady ? localState.walletType : null,
+    network: isAppKitReady ? localState.network : null,
+    isLoading: localState.isLoading || !isAppKitReady,
     
     // Functions
     connectWallet, // No parameters needed - WalletConnect only
@@ -295,5 +307,6 @@ export const useWallet = () => {
     isWalletAvailable: true, // WalletConnect is always available
     isMobile: isMobile(),
     openWalletModal: appKit?.open || null,
+    isAppKitReady, // Export this for debugging
   }
 } 
