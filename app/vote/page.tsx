@@ -89,32 +89,40 @@ export default function VotePage() {
   const shouldFetchCompleted = currentTab === "completed"
   const shouldFetchAll = currentTab === "all"
 
+  // Define status arrays to prevent empty arrays
+  const activeStatuses = ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED']
+  const completedStatuses = ['EXECUTED']
+  const allStatuses = ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED']
+
   // Fetch paginated proposals from subgraph - only for current tab
   const { data: actionableProposals, isLoading: isLoadingActionable, error: errorActionable, refetch: refetchActionable } = useProposalsByStatusPaginated(
-    shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [], 
+    activeStatuses,
     activeProposalsPage, 
     ITEMS_PER_PAGE,
-    subgraphNetwork
+    subgraphNetwork,
+    shouldFetchActive // Only enable when current tab is active
   )
   
   const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(
-    shouldFetchCompleted ? ['EXECUTED'] : [], 
+    completedStatuses,
     completedProposalsPage, 
     ITEMS_PER_PAGE,
-    subgraphNetwork
+    subgraphNetwork,
+    shouldFetchCompleted // Only enable when current tab is completed
   )
   
   const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(
-    shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [], 
+    allStatuses,
     allProposalsPage, 
     ITEMS_PER_PAGE,
-    subgraphNetwork
+    subgraphNetwork,
+    shouldFetchAll // Only enable when current tab is all
   )
   
   // Fetch total counts for pagination - only for current tab
-  const { data: actionableCount } = useProposalsCountByStatus(shouldFetchActive ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED'] : [], subgraphNetwork)
-  const { data: completedCount } = useProposalsCountByStatus(shouldFetchCompleted ? ['EXECUTED'] : [], subgraphNetwork)
-  const { data: allCount } = useProposalsCountByStatus(shouldFetchAll ? ['PENDING', 'ACTIVE', 'QUEUED', 'EXECUTED', 'CANCELED'] : [], subgraphNetwork)
+  const { data: actionableCount } = useProposalsCountByStatus(activeStatuses, subgraphNetwork, shouldFetchActive)
+  const { data: completedCount } = useProposalsCountByStatus(completedStatuses, subgraphNetwork, shouldFetchCompleted)
+  const { data: allCount } = useProposalsCountByStatus(allStatuses, subgraphNetwork, shouldFetchAll)
   
   // Get proposal IDs only for current tab to reduce API calls
   const getCurrentTabProposalIds = () => {

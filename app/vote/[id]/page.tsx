@@ -1179,87 +1179,106 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <RadioGroup 
-                  value={voteOption || ""} 
-                  onValueChange={setVoteOption}
-                  disabled={proposal.hasVoted || isVoting}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="for" id="for" />
-                    <Label htmlFor="for">{t('voteFor')}</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="against" id="against" />
-                    <Label htmlFor="against">{t('voteAgainst')}</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="abstain" id="abstain" />
-                    <Label htmlFor="abstain">{t('abstain')}</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+              {/* Voting UI - Only show during Active voting period (proposalState === 1) */}
+              {proposalState === 1 && (
+                <div className="space-y-4">
+                  <RadioGroup 
+                    value={voteOption || ""} 
+                    onValueChange={setVoteOption}
+                    disabled={proposal.hasVoted || isVoting}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="for" id="for" />
+                      <Label htmlFor="for">{t('voteFor')}</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="against" id="against" />
+                      <Label htmlFor="against">{t('voteAgainst')}</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="abstain" id="abstain" />
+                      <Label htmlFor="abstain">{t('abstain')}</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+              {/* Status message when not in voting period */}
+              {proposalState !== 1 && proposalState !== null && (
+                <div className="text-center py-4 text-gray-400">
+                  {proposalState === 0 && "Voting period has not started yet"}
+                  {proposalState === 2 && "This proposal has been canceled"}
+                  {proposalState === 3 && "This proposal was defeated"}
+                  {proposalState === 4 && "Voting has ended - proposal succeeded and is ready to be queued"}
+                  {proposalState === 5 && "Proposal is queued and ready for execution"}
+                  {proposalState === 6 && "This proposal has expired"}
+                  {proposalState === 7 && "This proposal has been executed"}
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex flex-col space-y-3">
-              {/* Delegate Button - Show when user has tokens but no voting power */}
-              {walletConnected && !walletLoading && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
-                <Button 
-                  className="w-full bg-orange-500 hover:bg-orange-600" 
-                  onClick={handleDelegate}
-                  disabled={isDelegating}
-                >
-                  {isDelegating ? (
-                    <div className="flex items-center">
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t('delegating')}
-                    </div>
-                  ) : (
-                    <>
-                      <VoteIcon className="mr-2 h-4 w-4" />
-                      {t('delegateTokensToEnableVoting')}
-                    </>
+              {/* Voting Period UI - Only show during Active voting period (proposalState === 1) */}
+              {proposalState === 1 && (
+                <>
+                  {/* Delegate Button - Show when user has tokens but no voting power */}
+                  {walletConnected && !walletLoading && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
+                    <Button 
+                      className="w-full bg-orange-500 hover:bg-orange-600" 
+                      onClick={handleDelegate}
+                      disabled={isDelegating}
+                    >
+                      {isDelegating ? (
+                        <div className="flex items-center">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('delegating')}
+                        </div>
+                      ) : (
+                        <>
+                          <VoteIcon className="mr-2 h-4 w-4" />
+                          {t('delegateTokensToEnableVoting')}
+                        </>
+                      )}
+                    </Button>
                   )}
-                </Button>
+                  
+                  {/* Submit Vote Button */}
+                  <Button 
+                    className="w-full bg-orange-500 hover:bg-orange-600" 
+                    onClick={handleVote}
+                    disabled={proposal.hasVoted || !voteOption || isVoting || walletLoading || !walletConnected || Number(votingPower) === 0 || isLoadingVotingPower}
+                  >
+                    {isVoting ? (
+                      <div className="flex items-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t('submittingVote')}
+                      </div>
+                    ) : proposal.hasVoted ? (
+                      t('alreadyVoted')
+                    ) : walletLoading ? (
+                      <div className="flex items-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t('connecting')}
+                      </div>
+                    ) : !walletConnected ? (
+                      t('connectWallet')
+                    ) : Number(votingPower) === 0 ? (
+                        t('insufficientVotingPower')
+                    ) : isLoadingVotingPower ? (
+                      <div className="flex items-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t('checkingVotingPower')}
+                      </div>
+                    ) : (
+                      <>
+                        <VoteIcon className="mr-2 h-4 w-4" />
+                        {t('submitVote')}
+                      </>
+                    )}
+                  </Button>
+                </>
               )}
-              
-              {/* Vote Button */}
-              <Button 
-                className="w-full bg-orange-500 hover:bg-orange-600" 
-                onClick={handleVote}
-                disabled={proposal.hasVoted || !voteOption || isVoting || walletLoading || !walletConnected || Number(votingPower) === 0 || isLoadingVotingPower}
-              >
-                {isVoting ? (
-                  <div className="flex items-center">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('submittingVote')}
-                  </div>
-                ) : proposal.hasVoted ? (
-                  t('alreadyVoted')
-                ) : walletLoading ? (
-                  <div className="flex items-center">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('connecting')}
-                  </div>
-                ) : !walletConnected ? (
-                  t('connectWallet')
-                ) : Number(votingPower) === 0 ? (
-                    t('insufficientVotingPower')
-                ) : isLoadingVotingPower ? (
-                  <div className="flex items-center">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('checkingVotingPower')}
-                  </div>
-                ) : (
-                  <>
-                    <VoteIcon className="mr-2 h-4 w-4" />
-                    {t('submitVote')}
-                  </>
-                )}
-              </Button>
 
-              {/* Queue Button - Show when proposal is ready for queue (voting ended + majority for) */}
-              <ClientOnly>
-                {currentTime && walletConnected && !walletLoading && isReadyForQueue() && (
+              {/* Queue Button - Show when proposal is succeeded (state 4) */}
+              {walletConnected && !walletLoading && proposalState === 4 && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600" 
                   onClick={handleQueue}
@@ -1283,7 +1302,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                   )}
                 </Button>
               )}
-              </ClientOnly>
 
               {/* Execute Button - Show when proposal is queued (state 5) */}
               {walletConnected && !walletLoading && proposalState === 5 && (

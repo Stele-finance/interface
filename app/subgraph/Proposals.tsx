@@ -383,7 +383,8 @@ export function useProposalsByStatusPaginated(
   statuses: string[] = ['ACTIVE'],
   page: number = 1,
   pageSize: number = 10,
-  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum',
+  enabled: boolean = true
 ) {
   const skip = (page - 1) * pageSize
   const subgraphUrl = getSubgraphUrl(network)
@@ -409,7 +410,7 @@ export function useProposalsByStatusPaginated(
       
       return result
     },
-    enabled: statuses.length > 0, // Only run query if statuses array is not empty
+    enabled: enabled && statuses.length > 0, // Only run query if enabled and statuses array is not empty
     refetchInterval: 60 * 1000, // Refetch every 1 minute
     staleTime: 30 * 1000, // 30 seconds
     retry: 1,
@@ -432,7 +433,11 @@ export interface ProposalsCountResponse {
 }
 
 // Hook to get total count of proposals by status
-export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE'], network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+export function useProposalsCountByStatus(
+  statuses: string[] = ['ACTIVE'], 
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum',
+  enabled: boolean = true
+) {
   const subgraphUrl = getSubgraphUrl(network)
   
   return useQuery<ProposalsCountResponse>({
@@ -452,7 +457,7 @@ export function useProposalsCountByStatus(statuses: string[] = ['ACTIVE'], netwo
       
       return result
     },
-    enabled: statuses.length > 0, // Only run query if statuses array is not empty
+    enabled: enabled && statuses.length > 0, // Only run query if enabled and statuses array is not empty
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (less frequent)
     staleTime: 60 * 1000, // 1 minute
     retry: 1,

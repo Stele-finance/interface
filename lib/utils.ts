@@ -116,10 +116,9 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
       arbitrum: {
         '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc',
         '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth',
-        '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'usdt',
         '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc',
         '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0': 'uni',
-        '0xd403d1624daef243fbcbd4a80d8a6f36affe32b2': 'link',
+        '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4': 'link',
         '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'dai',
         '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
         '0x9623063377AD1B27544C965cCd7342f7EA7e88C7': 'grt',
