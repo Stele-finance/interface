@@ -77,7 +77,7 @@ const chainIdToNetwork = (chainId: string | number): NetworkType => {
   }
 }
 
-// Restore state from localStorage
+// Restore state from localStorage - only restore if AppKit actually shows as connected
 const restoreFromStorage = () => {
   if (typeof window === 'undefined') return
   
@@ -86,14 +86,15 @@ const restoreFromStorage = () => {
     if (stored) {
       const { walletType, address, network } = JSON.parse(stored)
       
-      // Only restore WalletConnect
+      // Only restore WalletConnect but DON'T automatically set as connected
+      // Let AppKit's actual connection state determine if we're connected
       if (walletType === 'walletconnect') {
         globalState = {
           ...globalState,
           walletType,
           address,
           network,
-          isConnected: true // WalletConnect state will be verified by AppKit
+          isConnected: false // Don't automatically set as connected - let AppKit determine this
         }
       }
     }
@@ -152,10 +153,10 @@ export const useWallet = () => {
     }
   }, [appKit, appKitAccount, appKitNetwork, appKitProvider])
 
-  // Initialize - only restore from storage after AppKit is ready
+  // Initialize - DON'T auto-restore from storage to prevent automatic wallet prompts
   useEffect(() => {
     if (isAppKitReady) {
-      restoreFromStorage()
+      // Only set local state, don't auto-restore from storage
       setLocalState(globalState)
     }
   }, [isAppKitReady])

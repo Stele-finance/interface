@@ -453,6 +453,13 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     
     setIsLoadingBalance(true);
     try {
+      // Only proceed if wallet is actually connected and we have AppKit provider
+      if (!isConnected || !walletType || !appKitProvider) {
+        console.warn('Wallet not properly connected');
+        setUsdcBalance('0');
+        return;
+      }
+
       // Use the getProvider from useWallet hook for better reliability
       const browserProvider = getProvider();
       if (!browserProvider) {
@@ -500,17 +507,19 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   }, [connectedAddress]);
 
   // Check USDC balance when wallet address or connection state changes
+  // DISABLED: Automatic balance checking to prevent unwanted wallet popups
+  // Balance will be checked when user actually interacts with join button
   useEffect(() => {
     if (!isClient) return;
     
-    if (currentWalletAddress && isConnected && walletType) {
-      checkUSDCBalance(currentWalletAddress);
-    } else {
-      // Clear balance when wallet is not connected
+    // Only clear balance when disconnected, don't auto-check to prevent popups
+    if (!isConnected || !currentWalletAddress || !walletType) {
       setUsdcBalance('0');
       setIsLoadingBalance(false);
     }
-  }, [currentWalletAddress, isClient, isConnected, walletType, network]);
+    // Note: Removed automatic balance checking to prevent wallet connection popups
+    // Balance will be checked when user clicks join button
+  }, [currentWalletAddress, isClient, isConnected, walletType]);
 
   // Update time every second for accurate countdown
   useEffect(() => {
@@ -631,7 +640,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   };
 
   // Handle Join Challenge - Show modal
-  const handleJoinChallenge = () => {
+  const handleJoinChallenge = async () => {
+    // Check USDC balance before showing modal (only when user clicks join)
+    if (currentWalletAddress && isConnected && walletType) {
+      await checkUSDCBalance(currentWalletAddress);
+    }
     setShowJoinModal(true);
   };
 
