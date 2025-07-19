@@ -453,27 +453,27 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
             <Clock className="h-4 w-4" />
             {t('active')}
           </Badge>
         )
       case "pending":
         return (
-          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
             <Clock className="h-4 w-4" />
             {t('pending')}
           </Badge>
         )
       case "finished":
         return (
-          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
+          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-blue-500/20 focus:bg-blue-500/20 transition-none">
             <Trophy className="h-4 w-4" />
             {t('finished')}
           </Badge>
         )
       default:
-        return <Badge variant="secondary" className="px-3 py-1.5 text-sm whitespace-nowrap">{t('unknown')}</Badge>
+        return <Badge variant="secondary" className="px-3 py-1.5 text-sm whitespace-nowrap pointer-events-none hover:bg-secondary focus:bg-secondary transition-none">{t('unknown')}</Badge>
     }
   }
 

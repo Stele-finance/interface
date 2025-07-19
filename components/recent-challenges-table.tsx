@@ -70,25 +70,25 @@ export function RecentChallengesTable() {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit whitespace-nowrap">
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
             <Clock className="h-3 w-3" />
             {t('active')}
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300 whitespace-nowrap">{t('pending')}</Badge>
+        return <Badge variant="outline" className="border-gray-600 text-gray-300 whitespace-nowrap pointer-events-none hover:bg-background focus:bg-background transition-none">{t('pending')}</Badge>
       case "finished":
         return (
           <Badge 
             variant="secondary"
-            className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
+            className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none"
           >
             <CheckCircle className="h-3 w-3 mr-1" />
             {t('finished')}
           </Badge>
         )
       default:
-        return <Badge variant="secondary" className="whitespace-nowrap">{t('unknown')}</Badge>
+        return <Badge variant="secondary" className="whitespace-nowrap pointer-events-none hover:bg-secondary focus:bg-secondary transition-none">{t('unknown')}</Badge>
     }
   }
 
