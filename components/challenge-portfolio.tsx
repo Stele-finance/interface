@@ -470,9 +470,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
       // Get USDC balance for the specified address
       const balance = await usdcContract.balanceOf(address);
-      const formattedBalance = ethers.formatUnits(balance, USDC_DECIMALS);
-      
-      console.log(`USDC Balance for ${address}: ${formattedBalance} USDC`);
+      const formattedBalance = ethers.formatUnits(balance, USDC_DECIMALS);      
       setUsdcBalance(formattedBalance);
     } catch (error) {
       console.error('Error checking USDC balance:', error);
@@ -503,7 +501,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     if (!isClient) return;
     
     if (currentWalletAddress && isConnected && walletType) {
-      console.log(`Checking USDC balance for wallet: ${currentWalletAddress}, type: ${walletType}, network: ${network}`);
       checkUSDCBalance(currentWalletAddress);
     } else {
       // Clear balance when wallet is not connected
@@ -807,8 +804,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
       // Get current network information
       const chainId = await provider.send('eth_chainId', []);
-
-      console.log('Current network chain ID for get rewards:', chainId);
       
       // Use current network without switching
       // No automatic network switching - use whatever network user is currently on
