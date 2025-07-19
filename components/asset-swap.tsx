@@ -536,12 +536,18 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       // Use BrowserProvider's send method for RPC requests
       // Try to get address from signer first before requesting accounts
       let userAddress: string | null = null;
-      
+    
       try {
         const signer = await browserProvider.getSigner();
         userAddress = await signer.getAddress();
-      } catch (error) {
+      } catch (error: any) {
         console.warn('Could not get address from signer, requesting accounts:', error);
+        
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+        
         // Only request accounts if we can't get address from signer
         const accounts = await browserProvider.send('eth_requestAccounts', []);
 
@@ -666,9 +672,13 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       console.error("Swap error:", error);
       
       let errorMessage = "An error occurred while swapping. Please try again.";
+      let toastVariant: "destructive" | "default" = "destructive";
+      let toastTitle = "Swap Failed";
       
-      if (error.code === 4001) {
-        errorMessage = "Transaction was rejected by user";
+      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+        errorMessage = "Transaction was cancelled by user";
+        toastVariant = "default";
+        toastTitle = "Transaction Cancelled";
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees";
       } else if (error.message?.includes("Phantom wallet is not installed")) {
@@ -680,8 +690,8 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
       }
 
       toast({
-        variant: "destructive",
-        title: "Swap Failed", 
+        variant: toastVariant,
+        title: toastTitle, 
         description: errorMessage,
       });
     } finally {
