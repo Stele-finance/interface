@@ -224,8 +224,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hasJoinedLocally, setHasJoinedLocally] = useState(false);
-  const [usdcBalance, setUsdcBalance] = useState<string>('0');
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
@@ -425,78 +423,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check if USDC balance is insufficient (only used in modal now)
   const isInsufficientBalance = () => {
-    // If wallet is not connected, don't show insufficient balance
-    if (!isConnected || !currentWalletAddress) return false;
-    
-    // If challenge data is not loaded yet, don't show insufficient balance
-    if (!challengeData?.challenge || isLoadingChallenge) return false;
-    
-    // If still loading balance or entry fee, don't show insufficient balance yet
-    if (isLoadingBalance || isLoadingEntryFee) return false;
-    
-    // If entryFee is not available, don't show insufficient balance
-    if (!entryFee) return false;
-    
-    // IMPORTANT: Only check if balance has been actually fetched (not just '0' default)
-    // If balance hasn't been checked yet, don't show insufficient (balance will be checked when needed)
-    if (!usdcBalance || usdcBalance === '0') {
-      // Only return true if we've actually checked the balance and it's confirmed to be 0
-      // For now, return false to avoid showing insufficient before balance is checked
-      return false;
-    }
-    
-    const balance = parseFloat(usdcBalance);
-    const fee = parseFloat(entryFee);
-    
-    // Only show insufficient if we have valid numbers and balance is actually less than fee
-    if (isNaN(balance) || isNaN(fee)) return false;
-    
-    const isInsufficient = balance < fee;    
-    return isInsufficient;
+    // USDC balance check is no longer needed for join modal
+    return false;
   };
 
-  // Check USDC balance
-  const checkUSDCBalance = async (address: string) => {
-    if (!address || !isClient) return;
-    
-    setIsLoadingBalance(true);
-    try {
-      // Only proceed if wallet is actually connected and we have AppKit provider
-      if (!isConnected || !walletType || !appKitProvider) {
-        console.warn('Wallet not properly connected');
-        setUsdcBalance('0');
-        return;
-      }
 
-      // Use the getProvider from useWallet hook for better reliability
-      const browserProvider = getProvider();
-      if (!browserProvider) {
-        console.warn('No wallet provider available');
-        setUsdcBalance('0');
-        return;
-      }
-
-      // Filter network to supported types for contracts (exclude 'solana')
-      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
-      
-      // Create USDC contract instance using the provider from useWallet hook
-      const usdcContract = new ethers.Contract(
-        getUSDCTokenAddress(contractNetwork),
-        ERC20ABI.abi,
-        browserProvider
-      );
-
-      // Get USDC balance for the specified address
-      const balance = await usdcContract.balanceOf(address);
-      const formattedBalance = ethers.formatUnits(balance, USDC_DECIMALS);      
-      setUsdcBalance(formattedBalance);
-    } catch (error) {
-      console.error('Error checking USDC balance:', error);
-      setUsdcBalance('0');
-    } finally {
-      setIsLoadingBalance(false);
-    }
-  };
 
   useEffect(() => {
     // Set client-side flag first
@@ -516,18 +447,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Check USDC balance when wallet address or connection state changes
   // DISABLED: Automatic balance checking to prevent unwanted wallet popups
-  // Balance will be checked when user actually interacts with join button
-  useEffect(() => {
-    if (!isClient) return;
-    
-    // Only clear balance when disconnected, don't auto-check to prevent popups
-    if (!isConnected || !currentWalletAddress || !walletType) {
-      setUsdcBalance('0');
-      setIsLoadingBalance(false);
-    }
-    // Note: Removed automatic balance checking to prevent wallet connection popups
-    // Balance will be checked when user clicks join button
-  }, [currentWalletAddress, isClient, isConnected, walletType]);
+  // USDC balance checking removed - no longer needed for join modal
 
   // Update time every second for accurate countdown
   useEffect(() => {
@@ -649,10 +569,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
   // Handle Join Challenge - Show modal
   const handleJoinChallenge = async () => {
-    // Check USDC balance before showing modal (only when user clicks join)
-    if (currentWalletAddress && isConnected && walletType) {
-      await checkUSDCBalance(currentWalletAddress);
-    }
     setShowJoinModal(true);
   };
 
@@ -1652,17 +1568,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   ${isLoadingEntryFee ? 'Loading...' : entryFee || '0'} USDC
                 </span>
               </div>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-sm text-gray-300">Your Balance:</span>
-                <span className="text-lg font-bold text-white">
-                  ${isLoadingBalance ? 'Checking...' : usdcBalance || '0'} USDC
-                </span>
-              </div>
-              {isInsufficientBalance() && (
-                <div className="mt-2 text-sm text-red-400">
-                  ⚠️ Insufficient USDC balance to join this challenge
-                </div>
-              )}
+
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1674,25 +1580,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmJoinChallenge}
-              disabled={isJoining || isLoadingEntryFee || isLoadingBalance}
-              className={`${
-                isInsufficientBalance() && !isLoadingBalance
-                  ? "bg-red-500 hover:bg-red-600" 
-                  : "bg-orange-500 hover:bg-orange-600"
-              }`}
+              disabled={isJoining || isLoadingEntryFee}
+              className="bg-orange-500 hover:bg-orange-600"
             >
               {isJoining ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Joining...
                 </>
-              ) : isLoadingBalance ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking Balance...
-                </>
-              ) : isInsufficientBalance() ? (
-                'Insufficient USDC'
               ) : (
                 'Confirm Join'
               )}
