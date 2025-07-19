@@ -190,7 +190,7 @@ export function ChallengeCard({ title, type, participants, timeLeft, prize, prog
           <CardTitle className="text-lg text-gray-100">{title}</CardTitle>
           <Badge
             variant={status === "active" ? "default" : status === "pending" ? "outline" : "secondary"}
-            className={status === "active" ? "bg-emerald-500" : status === "pending" ? "border-gray-600 text-gray-300" : ""}
+            className={`${status === "active" ? "bg-emerald-500" : status === "pending" ? "border-gray-600 text-gray-300" : ""} pointer-events-none transition-none hover:${status === "active" ? "bg-emerald-500" : status === "pending" ? "bg-background" : "bg-secondary"} focus:${status === "active" ? "bg-emerald-500" : status === "pending" ? "bg-background" : "bg-secondary"}`}
           >
             {status === "active" ? "Active" : status === "pending" ? "Pending" : "Completed"}
           </Badge>

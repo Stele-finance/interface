@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
@@ -1039,183 +1040,183 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
                   </div>
                 ) : transactions.length > 0 ? (
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
-                        <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
-                        <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(() => {
-                        // Calculate pagination
-                        const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
-                        const startIndex = (currentPage - 1) * itemsPerPage;
-                        const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                        const paginatedTransactions = transactions.slice(startIndex, endIndex);
-                        const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
-
-                        return (
-                          <>
-                            {paginatedTransactions.map((transaction) => (
-                          <tr 
-                            key={transaction.id} 
-                            className="hover:bg-gray-800/30 transition-colors cursor-pointer"
-                            onClick={() => {
-                              const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-                              window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
-                            }}
-                          >
-                            <td className="py-6 pl-6 pr-4">
-                              <div className="text-sm text-gray-400">
-                                {formatRelativeTime(transaction.timestamp)}
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
-                                {getTransactionTypeText(transaction.type)}
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className="text-gray-300 text-sm">
-                                {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(transaction.user)}
-                              </div>
-                            </td>
-                            <td className="py-6 px-6">
-                              <div className="text-right">
-                              {transaction.type === 'swap' ? (
-                                (() => {
-                                  const swapDetails = getSwapDetails(transaction)
-                                  if (swapDetails) {
-                                    const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
-                                    const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
-                                    return (
-                                      <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <div className="relative flex-shrink-0">
-                                          {fromLogo ? (
-                                            <Image 
-                                              src={fromLogo} 
-                                              alt={swapDetails.fromTokenSymbol || 'Token'}
-                                              width={20}
-                                              height={20}
-                                              className="rounded-full"
-                                            />
-                                          ) : (
-                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.fromTokenSymbol?.slice(0, 1) || '?'}
-                                            </div>
-                                          )}
-                                            {subgraphNetwork === 'arbitrum' && (
-                                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
-                                                <Image 
-                                                  src="/networks/small/arbitrum.png" 
-                                                  alt="Arbitrum"
-                                                  width={12}
-                                                  height={12}
-                                                  className="w-full h-full object-contain"
-                                                />
-                                              </div>
-                                            )}
-                                          </div>
-                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
-                                        </div>
-                                        <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <div className="relative flex-shrink-0">
-                                          {toLogo ? (
-                                            <Image 
-                                              src={toLogo} 
-                                              alt={swapDetails.toTokenSymbol || 'Token'}
-                                              width={20}
-                                              height={20}
-                                              className="rounded-full"
-                                            />
-                                          ) : (
-                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
-                                              {swapDetails.toTokenSymbol?.slice(0, 1) || '?'}
-                                            </div>
-                                          )}
-                                            {subgraphNetwork === 'arbitrum' && (
-                                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
-                                                <Image 
-                                                  src="/networks/small/arbitrum.png" 
-                                                  alt="Arbitrum"
-                                                  width={12}
-                                                  height={12}
-                                                  className="w-full h-full object-contain"
-                                                />
-                                              </div>
-                                            )}
-                                          </div>
-                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
-                                        </div>
-                                      </div>
-                                    )
-                                  }
-                                  return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
-                                })()
-                              ) : transaction.type === 'join' || transaction.type === 'register' ? (
-                                <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
-                              ) : (
-                                <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
-                              )}
-                                </div>
-                              </td>
-                            </tr>
-                        ))}
-                        
-                        {/* Pagination Row */}
-                        {totalPages > 1 && (
-                          <tr>
-                            <td colSpan={4} className="py-6">
-                              <div className="flex justify-center">
-                                <Pagination>
-                                  <PaginationContent>
-                                    <PaginationItem>
-                                      <PaginationPrevious 
-                                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                      />
-                                    </PaginationItem>
-                                    
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                      <PaginationItem key={page}>
-                                        <PaginationLink
-                                          onClick={() => setCurrentPage(page)}
-                                          isActive={currentPage === page}
-                                          className="cursor-pointer"
-                                        >
-                                          {page}
-                                        </PaginationLink>
-                                      </PaginationItem>
-                                    ))}
-                                    
-                                    <PaginationItem>
-                                      <PaginationNext 
-                                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                      />
-                                    </PaginationItem>
-                                  </PaginationContent>
-                                </Pagination>
-                              </div>
-                            </td>
+                  <>
+                    <div className="rounded-2xl overflow-hidden overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
+                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
                           </tr>
-                        )}
-                          </>
-                        );
-                      })()}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="text-center py-8 text-gray-400">
-                  <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No transactions found for this challenge</p>
-                </div>
-              )}
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            // Calculate pagination
+                            const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                            const startIndex = (currentPage - 1) * itemsPerPage;
+                            const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                            const paginatedTransactions = transactions.slice(startIndex, endIndex);
+
+                            return paginatedTransactions.map((transaction) => (
+                              <tr 
+                                key={transaction.id} 
+                                className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                                onClick={() => {
+                                  const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+                                  window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
+                                }}
+                              >
+                                <td className="py-6 pl-6 pr-4">
+                                  <div className="text-sm text-gray-400">
+                                    {formatRelativeTime(transaction.timestamp)}
+                                  </div>
+                                </td>
+                                <td className="py-6 px-4">
+                                  <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
+                                    {getTransactionTypeText(transaction.type)}
+                                  </div>
+                                </td>
+                                <td className="py-6 px-4">
+                                  <div className="text-gray-300 text-sm">
+                                    {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(transaction.user)}
+                                  </div>
+                                </td>
+                                <td className="py-6 px-6">
+                                  <div className="text-right">
+                                  {transaction.type === 'swap' ? (
+                                    (() => {
+                                      const swapDetails = getSwapDetails(transaction)
+                                      if (swapDetails) {
+                                        const fromLogo = getTokenLogo(swapDetails.fromToken, subgraphNetwork)
+                                        const toLogo = getTokenLogo(swapDetails.toToken, subgraphNetwork)
+                                        return (
+                                          <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                              <div className="relative flex-shrink-0">
+                                              {fromLogo ? (
+                                                <Image 
+                                                  src={fromLogo} 
+                                                  alt={swapDetails.fromTokenSymbol || 'Token'}
+                                                  width={20}
+                                                  height={20}
+                                                  className="rounded-full"
+                                                />
+                                              ) : (
+                                                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                                                  {swapDetails.fromTokenSymbol?.slice(0, 1) || '?'}
+                                                </div>
+                                              )}
+                                                {subgraphNetwork === 'arbitrum' && (
+                                                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                                    <Image 
+                                                      src="/networks/small/arbitrum.png" 
+                                                      alt="Arbitrum"
+                                                      width={12}
+                                                      height={12}
+                                                      className="w-full h-full object-contain"
+                                                    />
+                                                  </div>
+                                                )}
+                                              </div>
+                                              <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.fromAmount} {swapDetails.fromTokenSymbol}</span>
+                                            </div>
+                                            <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                            <div className="flex items-center gap-2 min-w-0">
+                                              <div className="relative flex-shrink-0">
+                                              {toLogo ? (
+                                                <Image 
+                                                  src={toLogo} 
+                                                  alt={swapDetails.toTokenSymbol || 'Token'}
+                                                  width={20}
+                                                  height={20}
+                                                  className="rounded-full"
+                                                />
+                                              ) : (
+                                                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-sm font-bold text-white">
+                                                  {swapDetails.toTokenSymbol?.slice(0, 1) || '?'}
+                                                </div>
+                                              )}
+                                                {subgraphNetwork === 'arbitrum' && (
+                                                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                                    <Image 
+                                                      src="/networks/small/arbitrum.png" 
+                                                      alt="Arbitrum"
+                                                      width={12}
+                                                      height={12}
+                                                      className="w-full h-full object-contain"
+                                                    />
+                                                  </div>
+                                                )}
+                                              </div>
+                                              <span className="text-sm md:text-base font-medium text-gray-100 truncate">{swapDetails.toAmount} {swapDetails.toTokenSymbol}</span>
+                                            </div>
+                                          </div>
+                                        )
+                                      }
+                                      return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                    })()
+                                  ) : transaction.type === 'join' || transaction.type === 'register' ? (
+                                    <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
+                                  ) : (
+                                    <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
+                                  )}
+                                    </div>
+                                  </td>
+                                </tr>
+                            ));
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {/* Pagination - outside table, fixed at bottom */}
+                    {(() => {
+                      const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                      const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                      
+                      return totalPages > 1 && (
+                        <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                          <Pagination>
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious 
+                                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                />
+                              </PaginationItem>
+                              
+                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <PaginationItem key={page}>
+                                  <PaginationLink
+                                    onClick={() => setCurrentPage(page)}
+                                    isActive={currentPage === page}
+                                    className="cursor-pointer hover:bg-gray-700"
+                                  >
+                                    {page}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              ))}
+                              
+                              <PaginationItem>
+                                <PaginationNext 
+                                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      );
+                    })()}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No transactions found for this challenge</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -1476,22 +1477,65 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-700 rounded-full h-3">
-                    <div 
-                      className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                      style={{ 
-                        width: `${(() => {
-                          const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                          const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                          const currentTime = new Date();
-                          const totalDuration = endTime.getTime() - startTime.getTime();
-                          const elapsed = currentTime.getTime() - startTime.getTime();
-                          const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                          return Math.round(progress);
-                        })()}%` 
-                      }}
-                    ></div>
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="w-full bg-gray-700 rounded-full h-3 cursor-pointer">
+                          <div 
+                            className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                            style={{ 
+                              width: `${(() => {
+                                const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                                const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                                const currentTime = new Date();
+                                const totalDuration = endTime.getTime() - startTime.getTime();
+                                const elapsed = currentTime.getTime() - startTime.getTime();
+                                const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                                return Math.round(progress);
+                              })()}%` 
+                            }}
+                          ></div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm font-medium">
+                          {(() => {
+                            const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                            const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                            const currentTime = new Date();
+                            const remainingMs = endTime.getTime() - currentTime.getTime();
+                            
+                            if (remainingMs <= 0) return t('ended');
+                            
+                            const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                            
+                            if (days > 30) {
+                              const months = Math.floor(days / 30);
+                              const remainingDays = days % 30;
+                              return `${months} ${t('months')} ${remainingDays} ${t('days')}`;
+                            }
+                            
+                            if (days > 0) {
+                              return `${days} ${t('days')} ${hours} ${t('hours')}`;
+                            }
+                            
+                            if (hours > 0) {
+                              return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
+                            }
+                            
+                            if (minutes > 0) {
+                              return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
+                            }
+                            
+                            return `${seconds} ${t('seconds')}`;
+                          })()}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   
                   {/* Time Info */}
                   <div className="flex justify-between text-sm text-gray-500">

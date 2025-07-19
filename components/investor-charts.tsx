@@ -298,37 +298,31 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 {rankingData.map((ranking) => (
                   <div key={ranking.rank} className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      {/* Use same icons as chart */}
-                      {(ranking.rank === 4 || ranking.rank === 5) ? (
-                        <span className="text-lg">
-                          {ranking.rank === 4 ? '🏅' : '🎖️'}
-                        </span>
-                      ) : (
-                        <div className="relative w-3 h-3 flex items-center justify-center">
-                          <svg width="12" height="12" viewBox="0 0 24 24">
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              fill={ranking.color}
-                              fillOpacity={ranking.rank === 5 ? 0.6 : 1}
-                              stroke="#FFD700"
-                              strokeWidth="1"
-                            />
-                            <text
-                              x="12"
-                              y="13"
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              fontSize="10"
-                              fill="#FFFFFF"
-                              fontWeight="bold"
-                            >
-                              {ranking.rank}
-                            </text>
-                          </svg>
-                        </div>
-                      )}
+                      {/* Uniform circle design for all ranks 1-5 */}
+                      <div className="relative w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24">
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            fill={ranking.color}
+                            fillOpacity={ranking.rank === 5 ? 0.6 : 1}
+                            stroke="#FFD700"
+                            strokeWidth="1"
+                          />
+                          <text
+                            x="12"
+                            y="13"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fontSize="10"
+                            fill="#FFFFFF"
+                            fontWeight="bold"
+                          >
+                            {ranking.rank}
+                          </text>
+                        </svg>
+                      </div>
                       <span className="text-gray-300 text-xs">
                         {ranking.user}
                       </span>
@@ -596,44 +590,31 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                       </filter>
                     </defs>
                     
-                    {/* Custom medal for 4th and 5th place */}
-                    {(ranking.rank === 4 || ranking.rank === 5) ? (
-                      <g filter={`url(#glow-${ranking.rank})`}>
-                        {/* Medal circle */}
-                        <circle
-                          cx={props.cx}
-                          cy={props.cy}
-                          r="8"
-                          fill={ranking.color}
-                          fillOpacity={ranking.rank === 5 ? 0.6 : 1}
-                          stroke="#FFD700"
-                          strokeWidth="1"
-                        />
-                        {/* Number */}
-                        <text
-                          x={props.cx}
-                          y={props.cy + 1}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fontSize="12"
-                          fill="#FFFFFF"
-                          fontWeight="bold"
-                        >
-                          {ranking.rank}
-                        </text>
-                      </g>
-                    ) : (
-                      /* Standard emoji for 1st, 2nd, 3rd place */
+                    {/* Uniform circle design for all ranks 1-5 */}
+                    <g filter={`url(#glow-${ranking.rank})`}>
+                      {/* Medal circle */}
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r="8"
+                        fill={ranking.color}
+                        fillOpacity={ranking.rank === 5 ? 0.6 : 1}
+                        stroke="#FFD700"
+                        strokeWidth="1"
+                      />
+                      {/* Number */}
                       <text
                         x={props.cx}
                         y={props.cy + 1}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fontSize="32"
+                        fontSize="12"
+                        fill="#FFFFFF"
+                        fontWeight="bold"
                       >
-                        {ranking.emoji}
+                        {ranking.rank}
                       </text>
-                    )}
+                    </g>
                   </g>
                 )
                 
