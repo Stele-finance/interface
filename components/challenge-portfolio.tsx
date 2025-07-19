@@ -523,36 +523,42 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
     try {
-      // Use connected address first, fallback to stored wallet address
-      if (!currentWalletAddress) {
-        // WalletConnect only - use getProvider from useWallet hook
-        const provider = getProvider();
-        if (!provider || walletType !== 'walletconnect') {
-          throw new Error("WalletConnect not available. Please connect your wallet first.");
-        }
-
-        const accounts = await provider.send('eth_requestAccounts', []);
-
-        if (!accounts || accounts.length === 0) {
-          throw new Error("No accounts found. Please connect your wallet first.");
-        }
-
-        // Save address to state and localStorage
-        const address = accounts[0];
-        setWalletAddress(address);
-        localStorage.setItem('walletAddress', address);
-        
-        // Navigate to account page
-        router.push(`/challenge/${challengeId}/${address}`);
-      } else {
-        // Use the existing wallet address
+      // If wallet is already connected and we have the address, use it directly
+      if (currentWalletAddress && isConnected) {
         router.push(`/challenge/${challengeId}/${currentWalletAddress}`);
+        return;
       }
+
+      // Only request accounts if wallet is not connected or no address available
+      if (!isConnected) {
+        throw new Error("Please connect your wallet first.");
+      }
+
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      }
+
+      // Only call eth_requestAccounts if we don't have the address
+      const accounts = await provider.send('eth_requestAccounts', []);
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts found. Please connect your wallet first.");
+      }
+
+      // Save address to state and localStorage
+      const address = accounts[0];
+      setWalletAddress(address);
+      localStorage.setItem('walletAddress', address);
+      
+      // Navigate to account page
+      router.push(`/challenge/${challengeId}/${address}`);
     } catch (error: any) {
-      console.error("Error connecting wallet:", error);
+      console.error("Error navigating to account:", error);
       toast({
         variant: "destructive",
-        title: "Error Connecting Wallet",
+        title: "Error Navigating to Account",
         description: error.message || "An unknown error occurred",
       });
     }
@@ -580,14 +586,19 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
-      // Request account access
-      const accounts = await browserProvider.send('eth_requestAccounts', []);
+      // Use connected address if available, otherwise request accounts
+      let userAddress = currentWalletAddress;
+      
+      if (!userAddress) {
+        // Only request accounts if we don't have the connected address
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        }
+
+        userAddress = accounts[0];
       }
-
-      const userAddress = accounts[0];
 
       // Get current network information
       const chainId = await browserProvider.send('eth_chainId', []);
@@ -786,17 +797,28 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     setIsGettingRewards(true);
     
     try {
+      // Check if wallet is connected
+      if (!isConnected || !walletType) {
+        throw new Error("No wallet connected. Please connect your wallet first.");
+      }
+
       // WalletConnect only - use getProvider from useWallet hook
       const provider = getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
-      // Request account access
-      const accounts = await provider.send('eth_requestAccounts', []);
+      // Use connected address if available, otherwise request accounts
+      if (!currentWalletAddress) {
+        // Only request accounts if we don't have the connected address
+        const accounts = await provider.send('eth_requestAccounts', []);
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect your wallet first.");
+        if (!accounts || accounts.length === 0) {
+          throw new Error("No accounts found. Please connect your wallet first.");
+        }
+        
+        // Update wallet address if we had to request it
+        setWalletAddress(accounts[0]);
       }
 
       // Connect to provider with signer
