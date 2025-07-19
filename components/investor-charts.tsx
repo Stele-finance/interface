@@ -275,8 +275,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       
       // Show ranking info if:
       // 1. Real-time data point, OR
-      // 2. Registered user hovering over the last data point
-      const shouldShowRanking = isRealTime || (isRegistered && isLastDataPoint)
+      // 2. Any user (registered or not) hovering over the last data point
+      const shouldShowRanking = isRealTime || isLastDataPoint
       
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-4 py-3 shadow-xl backdrop-blur-sm min-w-[280px]">
@@ -343,13 +343,13 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               <div className="border-t border-gray-600 pt-2 mt-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full border border-white flex items-center justify-center ${isRealTime ? 'bg-green-400' : 'bg-blue-400'}`}>
+                    <div className={`w-3 h-3 rounded-full border border-white flex items-center justify-center ${isRealTime ? 'bg-green-400' : isRegistered ? 'bg-blue-400' : 'bg-orange-400'}`}>
                     </div>
-                    <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : 'text-blue-400'}`}>
-                      {isRealTime ? 'Your Position (Live)' : 'Your Position (Registered)'}
+                    <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : isRegistered ? 'text-blue-400' : 'text-orange-400'}`}>
+                      {isRealTime ? 'Your Position (Live)' : isRegistered ? 'Your Position (Registered)' : 'Your Position (Active)'}
                     </span>
                   </div>
-                  <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : 'text-blue-400'}`}>
+                  <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : isRegistered ? 'text-blue-400' : 'text-orange-400'}`}>
                     ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -563,7 +563,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               content={<CustomTooltipPortfolio />} 
               cursor={{ stroke: '#f97316', strokeWidth: 1 }}
             />
-            <Area
+                        <Area
               type="monotone"
               dataKey="currentUSD"
               stroke="#f97316"
@@ -572,58 +572,48 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               dot={false}
               activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
             />
-            {/* Display ranking dots at current time position */}
-            {chartData.length > 0 && (() => {
+            
+            {/* Display ranking dots on the last data point */}
+            {chartData.length > 0 && rankingData.length > 0 && (() => {
               const lastDataPoint = chartData[chartData.length - 1]
               if (!lastDataPoint) return null
               
               return rankingData.map((ranking) => {
-                const RankingPulsingDot = (props: any) => (
-                  <g>
-                    <defs>
-                      <filter id={`glow-${ranking.rank}`}>
-                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                        <feMerge> 
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    
-                    {/* Uniform circle design for all ranks 1-5 */}
-                    <g filter={`url(#glow-${ranking.rank})`}>
-                      {/* Medal circle */}
-                      <circle
-                        cx={props.cx}
-                        cy={props.cy}
-                        r="8"
-                        fill={ranking.color}
-                        fillOpacity={ranking.rank === 5 ? 0.6 : 1}
-                        stroke="#FFD700"
-                        strokeWidth="1"
-                      />
-                      {/* Number */}
-                      <text
-                        x={props.cx}
-                        y={props.cy + 1}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize="12"
-                        fill="#FFFFFF"
-                        fontWeight="bold"
-                      >
-                        {ranking.rank}
-                      </text>
-                    </g>
-                  </g>
-                )
-                
                 return (
                   <ReferenceDot
                     key={`ranking-dot-${ranking.rank}`}
-                    x={lastDataPoint.timeLabel}
+                    x={chartData.length - 1}
                     y={ranking.value}
-                    shape={<RankingPulsingDot />}
+                    r={9}
+                    fill={ranking.color}
+                    stroke="#FFD700"
+                    strokeWidth={1.5}
+                    shape={(props: any) => {
+                      return (
+                        <g>
+                          <circle
+                            cx={props.cx}
+                            cy={props.cy}
+                            r="9"
+                            fill={ranking.color}
+                            stroke="#FFD700"
+                            strokeWidth="1.5"
+                            opacity={0.9}
+                          />
+                          <text
+                            x={props.cx}
+                            y={props.cy + 1}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fontSize="12"
+                            fill="#FFFFFF"
+                            fontWeight="bold"
+                          >
+                            {ranking.rank}
+                          </text>
+                        </g>
+                      )
+                    }}
                   />
                 )
               })
@@ -641,7 +631,6 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     fill="#22c55e"
                     stroke="#ffffff"
                     strokeWidth={3}
-                    style={{ zIndex: 1000 }}
                   >
                     <animate
                       attributeName="opacity"
@@ -655,13 +644,46 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 return (
                   <ReferenceDot
                     key={`realtime-ref-dot-${lastDataPoint.id}`}
-                    x={lastDataPoint.timeLabel}
+                    x={chartData.length - 1}
                     y={lastDataPoint.currentUSD}
                     shape={<PulsingDot />}
                   />
                 )
               }
               return null
+            })()}
+            
+            {/* Display current user's position dot (for non-real-time data) */}
+            {(!realTimePortfolio || realTimePortfolio.totalValue === 0) && chartData.length > 0 && (() => {
+              const lastDataPoint = chartData[chartData.length - 1]
+              if (!lastDataPoint) return null
+              
+              const UserPositionDot = (props: any) => (
+                <circle
+                  cx={props.cx}
+                  cy={props.cy}
+                  r={8}
+                  fill="#f97316"
+                  stroke="#ffffff"
+                  strokeWidth={3}
+                >
+                  <animate
+                    attributeName="opacity"
+                    values="1;0.5;1"
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              )
+              
+              return (
+                <ReferenceDot
+                  key={`user-position-dot-${lastDataPoint.id}`}
+                  x={chartData.length - 1}
+                  y={lastDataPoint.currentUSD}
+                  shape={<UserPositionDot />}
+                />
+              )
             })()}
           </AreaChart>
         </ResponsiveContainer>

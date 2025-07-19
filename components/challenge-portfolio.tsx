@@ -230,6 +230,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -520,6 +521,23 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
     return () => clearInterval(interval);
   }, [isClient]);
+
+  // Handle click outside to close mobile tooltip
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMobileTooltip) {
+        setShowMobileTooltip(false);
+      }
+    };
+
+    if (showMobileTooltip) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showMobileTooltip]);
 
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
@@ -1477,65 +1495,75 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   </div>
                   
                   {/* Progress Bar */}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-full bg-gray-700 rounded-full h-3 cursor-pointer">
+                  <div className="relative">
+                    <TooltipProvider>
+                      <Tooltip open={showMobileTooltip}>
+                        <TooltipTrigger asChild>
                           <div 
-                            className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                            style={{ 
-                              width: `${(() => {
-                                const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                                const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                                const currentTime = new Date();
-                                const totalDuration = endTime.getTime() - startTime.getTime();
-                                const elapsed = currentTime.getTime() - startTime.getTime();
-                                const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                                return Math.round(progress);
-                              })()}%` 
+                            className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowMobileTooltip(!showMobileTooltip);
                             }}
-                          ></div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm font-medium">
-                          {(() => {
-                            const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                            const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                            const currentTime = new Date();
-                            const remainingMs = endTime.getTime() - currentTime.getTime();
-                            
-                            if (remainingMs <= 0) return t('ended');
-                            
-                            const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
-                            
-                            if (days > 30) {
-                              const months = Math.floor(days / 30);
-                              const remainingDays = days % 30;
-                              return `${months} ${t('months')} ${remainingDays} ${t('days')}`;
-                            }
-                            
-                            if (days > 0) {
-                              return `${days} ${t('days')} ${hours} ${t('hours')}`;
-                            }
-                            
-                            if (hours > 0) {
-                              return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
-                            }
-                            
-                            if (minutes > 0) {
-                              return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
-                            }
-                            
-                            return `${seconds} ${t('seconds')}`;
-                          })()}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                            onMouseEnter={() => !showMobileTooltip && setShowMobileTooltip(true)}
+                            onMouseLeave={() => setShowMobileTooltip(false)}
+                          >
+                            <div 
+                              className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                              style={{ 
+                                width: `${(() => {
+                                  const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                                  const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                                  const currentTime = new Date();
+                                  const totalDuration = endTime.getTime() - startTime.getTime();
+                                  const elapsed = currentTime.getTime() - startTime.getTime();
+                                  const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                                  return Math.round(progress);
+                                })()}%` 
+                              }}
+                            ></div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm font-medium">
+                            {(() => {
+                              const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                              const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                              const currentTime = new Date();
+                              const remainingMs = endTime.getTime() - currentTime.getTime();
+                              
+                              if (remainingMs <= 0) return t('ended');
+                              
+                              const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+                              const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                              const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                              const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                              
+                              if (days > 30) {
+                                const months = Math.floor(days / 30);
+                                const remainingDays = days % 30;
+                                return `${months} ${t('months')} ${remainingDays} ${t('days')}`;
+                              }
+                              
+                              if (days > 0) {
+                                return `${days} ${t('days')} ${hours} ${t('hours')}`;
+                              }
+                              
+                              if (hours > 0) {
+                                return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
+                              }
+                              
+                              if (minutes > 0) {
+                                return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
+                              }
+                              
+                              return `${seconds} ${t('seconds')}`;
+                            })()}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   
                   {/* Time Info */}
                   <div className="flex justify-between text-sm text-gray-500">
