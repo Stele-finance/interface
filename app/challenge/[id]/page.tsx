@@ -4,6 +4,9 @@ import { use } from "react"
 import { ChallengePortfolio } from "@/components/challenge-portfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
+import { useRouter } from 'next/navigation'
+import { useLanguage } from '@/lib/language-context'
+import { ArrowLeft } from 'lucide-react'
 
 interface ChallengePageProps {
   params: Promise<{
@@ -13,6 +16,8 @@ interface ChallengePageProps {
 
 function ChallengeContent({ challengeId }: { challengeId: string }) {
   const { network } = useWallet()
+  const router = useRouter()
+  const { t } = useLanguage()
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
@@ -54,7 +59,23 @@ function ChallengeContent({ challengeId }: { challengeId: string }) {
 
   // For now, we'll just pass challengeId to maintain compatibility with existing ChallengePortfolio
   // Later, we can modify ChallengePortfolio to accept challenge data as props if needed
-  return <ChallengePortfolio challengeId={challengeId} />
+  return (
+    <div className="space-y-8">
+      {/* Back to Dashboard Button */}
+      <div className="px-2 sm:px-0 -mt-8">
+        <button 
+          onClick={() => router.push('/')}
+          className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          {t('dashboard')}
+        </button>
+      </div>
+      
+      {/* Challenge Portfolio Component */}
+      <ChallengePortfolio challengeId={challengeId} />
+    </div>
+  )
 }
 
 export default function ChallengePage({ params }: ChallengePageProps) {
