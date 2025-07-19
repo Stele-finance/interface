@@ -112,6 +112,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
   const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false)
+  const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   
   // Use React Query client for better data management
   const queryClient = useQueryClient()
@@ -293,6 +295,37 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
     return () => clearInterval(timeInterval);
   }, [isClient]);
+
+  // Handle click outside to close mobile tooltip
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMobileTooltip) {
+        setShowMobileTooltip(false);
+        // Clear timer when closing tooltip
+        if (tooltipTimer) {
+          clearTimeout(tooltipTimer);
+          setTooltipTimer(null);
+        }
+      }
+    };
+
+    if (showMobileTooltip) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showMobileTooltip, tooltipTimer]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimer) {
+        clearTimeout(tooltipTimer);
+      }
+    };
+  }, [tooltipTimer]);
 
   // Handle loading and error states
   if (isLoadingInvestor || isLoadingChallenge || isLoadingTransactions) {
@@ -1703,38 +1736,80 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     </div>
                     
                     {/* Progress Bar */}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="w-full bg-gray-700 rounded-full h-3">
+                    <div className="relative">
+                      <TooltipProvider>
+                        <Tooltip open={showMobileTooltip}>
+                          <TooltipTrigger asChild>
                             <div 
-                              className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                              style={{ 
-                                width: `${(() => {
-                                  if (!challengeDetails || !isClient) return 0;
+                              className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                
+                                // Clear existing timer
+                                if (tooltipTimer) {
+                                  clearTimeout(tooltipTimer);
+                                  setTooltipTimer(null);
+                                }
+                                
+                                if (!showMobileTooltip) {
+                                  // Show tooltip
+                                  setShowMobileTooltip(true);
                                   
-                                  const startTime = challengeDetails.startTime.getTime();
-                                  const endTime = challengeDetails.endTime.getTime();
-                                  const now = currentTime.getTime();
-                                  
-                                  if (now < startTime) return 0;
-                                  if (now >= endTime) return 100;
-                                  
-                                  const totalDuration = endTime - startTime;
-                                  const elapsed = now - startTime;
-                                  const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                                  
-                                  return progress;
-                                })()}%` 
+                                  // Auto-close after 4 seconds on mobile
+                                  if (!window.matchMedia('(hover: hover)').matches) {
+                                    const timer = setTimeout(() => {
+                                      setShowMobileTooltip(false);
+                                      setTooltipTimer(null);
+                                    }, 4000);
+                                    setTooltipTimer(timer);
+                                  }
+                                } else {
+                                  // Hide tooltip
+                                  setShowMobileTooltip(false);
+                                }
                               }}
-                            ></div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-sm font-medium">{timeRemaining.text}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                              onMouseEnter={() => {
+                                // Only trigger on desktop (devices with hover capability)
+                                if (window.matchMedia('(hover: hover)').matches) {
+                                  setShowMobileTooltip(true);
+                                }
+                              }}
+                              onMouseLeave={() => {
+                                // Only trigger on desktop (devices with hover capability)
+                                if (window.matchMedia('(hover: hover)').matches) {
+                                  setShowMobileTooltip(false);
+                                }
+                              }}
+                            >
+                              <div 
+                                className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                                style={{ 
+                                  width: `${(() => {
+                                    if (!challengeDetails || !isClient) return 0;
+                                    
+                                    const startTime = challengeDetails.startTime.getTime();
+                                    const endTime = challengeDetails.endTime.getTime();
+                                    const now = currentTime.getTime();
+                                    
+                                    if (now < startTime) return 0;
+                                    if (now >= endTime) return 100;
+                                    
+                                    const totalDuration = endTime - startTime;
+                                    const elapsed = now - startTime;
+                                    const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                                    
+                                    return progress;
+                                  })()}%` 
+                                }}
+                              ></div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-sm font-medium">{timeRemaining.text}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     
                     {/* Time Info */}
                     <div className="flex justify-between text-sm text-gray-500">
