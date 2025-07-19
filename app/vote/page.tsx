@@ -711,7 +711,7 @@ export default function VotePage() {
     }
     
     return (
-      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}>
+      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${statusColor}`}>
         {statusIcon} {statusText}
       </div>
     )
@@ -1074,7 +1074,7 @@ export default function VotePage() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl text-gray-100">{t('governance')}</h1>
+        <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('governance')}</h1>
         <div className="flex items-center gap-4">
           {/* Desktop buttons - hidden on mobile */}
           <div className="hidden md:flex items-center gap-4">
@@ -1213,9 +1213,9 @@ export default function VotePage() {
 
       <Tabs defaultValue="active" value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-muted/30">
-          <TabsTrigger value="active" className="text-base font-medium data-[state=active]:bg-muted/90">{t('active')}</TabsTrigger>
-          <TabsTrigger value="completed" className="text-base font-medium data-[state=active]:bg-muted/90">{t('completed')}</TabsTrigger>
-          <TabsTrigger value="all" className="text-base font-medium data-[state=active]:bg-muted/90">{t('allProposals')}</TabsTrigger>
+          <TabsTrigger value="active" className="text-base font-medium data-[state=active]:bg-muted/90 whitespace-nowrap">{t('active')}</TabsTrigger>
+          <TabsTrigger value="completed" className="text-base font-medium data-[state=active]:bg-muted/90 whitespace-nowrap">{t('completed')}</TabsTrigger>
+          <TabsTrigger value="all" className="text-base font-medium data-[state=active]:bg-muted/90 whitespace-nowrap">{t('allProposals')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="mt-4">
@@ -1232,11 +1232,11 @@ export default function VotePage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
-                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium min-w-[200px] whitespace-nowrap">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium min-w-[120px] whitespace-nowrap">{t('status')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium min-w-[150px] whitespace-nowrap">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('ends')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1247,25 +1247,25 @@ export default function VotePage() {
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
                               onClick={() => router.push(createProposalUrl(proposal))}
                             >
-                              <TableCell className="max-w-xs py-6">
+                              <TableCell className="max-w-xs py-6 min-w-[200px] whitespace-nowrap">
                                 <div className="flex items-center gap-2">
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
-                              <TableCell className="text-center py-6">
+                              <TableCell className="text-center py-6 min-w-[120px] whitespace-nowrap">
                                 <StatusBadge proposal={proposal} />
                               </TableCell>
-                              <TableCell className="min-w-52 py-6">
+                              <TableCell className="min-w-52 py-6 min-w-[150px] whitespace-nowrap">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
                                   votesAgainst={proposal.votesAgainst} 
                                   abstain={proposal.abstain}
                                 />
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                             </TableRow>
@@ -1318,11 +1318,11 @@ export default function VotePage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
-                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium min-w-[200px] whitespace-nowrap">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium min-w-[120px] whitespace-nowrap">{t('status')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium min-w-[150px] whitespace-nowrap">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('ends')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1333,25 +1333,25 @@ export default function VotePage() {
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
                               onClick={() => router.push(createProposalUrl(proposal))}
                             >
-                              <TableCell className="max-w-xs py-6">
+                              <TableCell className="max-w-xs py-6 min-w-[200px] whitespace-nowrap">
                                 <div className="flex items-center gap-2">
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
-                              <TableCell className="text-center py-6">
+                              <TableCell className="text-center py-6 min-w-[120px] whitespace-nowrap">
                                 <StatusBadge proposal={proposal} />
                               </TableCell>
-                              <TableCell className="min-w-52 py-6">
+                              <TableCell className="min-w-52 py-6 min-w-[150px] whitespace-nowrap">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
                                   votesAgainst={proposal.votesAgainst} 
                                   abstain={proposal.abstain}
                                 />
                               </TableCell> 
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                             </TableRow>
@@ -1404,11 +1404,11 @@ export default function VotePage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
-                          <TableHead className="text-gray-300 pl-12 text-base font-medium">{t('title')}</TableHead>
-                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium">{t('status')}</TableHead>
-                          <TableHead className="text-gray-300 pl-20 text-base font-medium">{t('progress')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('start')}</TableHead>
-                          <TableHead className="text-gray-300 pl-14 text-base font-medium">{t('ends')}</TableHead>
+                          <TableHead className="text-gray-300 pl-12 text-base font-medium min-w-[200px] whitespace-nowrap">{t('title')}</TableHead>
+                          <TableHead className="text-gray-300 text-center pl-6 text-base font-medium min-w-[120px] whitespace-nowrap">{t('status')}</TableHead>
+                          <TableHead className="text-gray-300 pl-20 text-base font-medium min-w-[150px] whitespace-nowrap">{t('progress')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('start')}</TableHead>
+                          <TableHead className="text-gray-300 pl-14 text-base font-medium min-w-[100px] whitespace-nowrap">{t('ends')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1419,25 +1419,25 @@ export default function VotePage() {
                               className="border-0 hover:bg-gray-800/30 cursor-pointer"
                               onClick={() => router.push(createProposalUrl(proposal))}
                             >
-                              <TableCell className="max-w-xs py-6">
+                              <TableCell className="max-w-xs py-6 min-w-[200px] whitespace-nowrap">
                                 <div className="flex items-center gap-2">
                                   <h3 className="font-medium text-gray-100 truncate">{proposal.title}</h3>
                                 </div>
                               </TableCell>
-                              <TableCell className="text-center py-6">
+                              <TableCell className="text-center py-6 min-w-[120px] whitespace-nowrap">
                                 <StatusBadge proposal={proposal} />
                               </TableCell>
-                              <TableCell className="min-w-52 py-6">
+                              <TableCell className="min-w-52 py-6 min-w-[150px] whitespace-nowrap">
                                 <ProgressBar 
                                   votesFor={proposal.votesFor} 
                                   votesAgainst={proposal.votesAgainst} 
                                   abstain={proposal.abstain}
                                 />
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.startTime)}
                               </TableCell>
-                              <TableCell className="text-sm text-gray-300 py-6 whitespace-nowrap">
+                              <TableCell className="text-sm text-gray-300 py-6 min-w-[100px] whitespace-nowrap">
                                 {formatDate(proposal.endTime)}
                               </TableCell>
                             </TableRow>

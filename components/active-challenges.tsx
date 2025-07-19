@@ -424,27 +424,27 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
             <Clock className="h-4 w-4" />
             {t('active')}
           </Badge>
         )
       case "pending":
         return (
-          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
             <Clock className="h-4 w-4" />
             {t('pending')}
           </Badge>
         )
       case "finished":
         return (
-          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm">
+          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap">
             <Trophy className="h-4 w-4" />
             {t('finished')}
           </Badge>
         )
       default:
-        return <Badge variant="secondary" className="px-3 py-1.5 text-sm">{t('unknown')}</Badge>
+        return <Badge variant="secondary" className="px-3 py-1.5 text-sm whitespace-nowrap">{t('unknown')}</Badge>
     }
   }
 
@@ -548,12 +548,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                  <TableHead className="text-gray-300 pl-6 w-40 whitespace-nowrap">{t('type')}</TableHead>
-                  <TableHead className="text-gray-300 w-24">{t('prize')}</TableHead>
-                  <TableHead className="text-gray-300 w-28">{t('status')}</TableHead>
-                  <TableHead className="text-gray-300 w-32">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 w-20 pr-6">{t('challenge')}</TableHead>
-                  <TableHead className="text-gray-300 w-24">{t('users')}</TableHead>
+                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">{t('challenge')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -571,7 +571,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                       }
                     }}
                   >
-                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg w-40 whitespace-nowrap">
+                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="relative">
                         <Trophy className="h-5 w-5 text-yellow-500" />
@@ -589,16 +589,16 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                             </div>
                           )}
                         </div>
-                        {challenge.title}
+                        <span className="whitespace-nowrap">{challenge.title}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium text-yellow-400 py-6 text-lg">
+                    <TableCell className="font-medium text-yellow-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
                       {challenge.prize}
                     </TableCell>
-                    <TableCell className="py-6">
+                    <TableCell className="py-6 min-w-[100px]">
                       {getStatusBadge(challenge.status)}
                     </TableCell>
-                    <TableCell className="py-6">
+                    <TableCell className="py-6 min-w-[120px]">
                       <div className="flex items-center gap-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -615,16 +615,16 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                        <span className="text-sm text-gray-400 font-medium">{Math.round(challenge.progress)}%</span>
+                        <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(challenge.progress)}%</span>
                       </div>
                     </TableCell>
-                    <TableCell className="pr-6 py-6">
-                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                    <TableCell className="pr-6 py-6 min-w-[80px]">
+                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
                         {challenge.challengeId}
                       </Badge>
                     </TableCell>
-                    <TableCell className="py-6">
-                      <div className="flex items-center gap-2 text-gray-300 text-base">
+                    <TableCell className="py-6 min-w-[80px]">
+                      <div className="flex items-center gap-2 text-gray-300 text-base whitespace-nowrap">
                         <Users className="h-4 w-4" />
                         <span>{challenge.participants}</span>
                       </div>

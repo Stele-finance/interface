@@ -70,25 +70,25 @@ export function RecentChallengesTable() {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit">
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit whitespace-nowrap">
             <Clock className="h-3 w-3" />
             {t('active')}
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300">{t('pending')}</Badge>
+        return <Badge variant="outline" className="border-gray-600 text-gray-300 whitespace-nowrap">{t('pending')}</Badge>
       case "finished":
         return (
           <Badge 
             variant="secondary"
-            className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
+            className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
           >
             <CheckCircle className="h-3 w-3 mr-1" />
             {t('finished')}
           </Badge>
         )
       default:
-        return <Badge variant="secondary">{t('unknown')}</Badge>
+        return <Badge variant="secondary" className="whitespace-nowrap">{t('unknown')}</Badge>
     }
   }
 
@@ -151,13 +151,13 @@ export function RecentChallengesTable() {
             <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                <TableHead className="text-gray-300 pl-6">{t('type')}</TableHead>
-                <TableHead className="text-gray-300 pl-8">{t('prize')}</TableHead>
-                <TableHead className="text-gray-300">{t('status')}</TableHead>
-                <TableHead className="text-gray-300 pl-6">{t('challenge')}</TableHead>
-                <TableHead className="text-gray-300 pl-10">{t('users')}</TableHead>
-                <TableHead className="text-gray-300 pl-20">{t('startDate')}</TableHead>
-                <TableHead className="text-gray-300 pl-16">{t('endDate')}</TableHead>
+                <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</TableHead>
+                <TableHead className="text-gray-300 pl-8 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
+                <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
+                <TableHead className="text-gray-300 pl-6 min-w-[80px] whitespace-nowrap">{t('challenge')}</TableHead>
+                <TableHead className="text-gray-300 pl-10 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
+                <TableHead className="text-gray-300 pl-20 min-w-[140px] whitespace-nowrap">{t('startDate')}</TableHead>
+                <TableHead className="text-gray-300 pl-16 min-w-[140px] whitespace-nowrap">{t('endDate')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -178,34 +178,34 @@ export function RecentChallengesTable() {
                       className="border-0 hover:bg-gray-800/50 cursor-pointer transition-colors"
                       onClick={() => router.push(`/challenge/${challenge.challengeId}`)}
                     >
-                      <TableCell className="pl-6 py-6 whitespace-nowrap">
-                        <span className="font-medium text-gray-100 text-base">
+                      <TableCell className="pl-6 py-6 min-w-[120px] whitespace-nowrap">
+                        <span className="font-medium text-gray-100 text-base whitespace-nowrap">
                           {getChallengeTypeName(challenge.challengeType)}
                         </span>
                       </TableCell>
-                      <TableCell className="font-medium text-yellow-400 pl-8 py-6">
+                      <TableCell className="font-medium text-yellow-400 pl-8 py-6 min-w-[80px] whitespace-nowrap">
                         {formatUSDAmount(challenge.rewardAmountUSD)}
                       </TableCell>
-                      <TableCell className="py-6">
+                      <TableCell className="py-6 min-w-[100px]">
                         {getStatusBadge(getChallengeStatus(challenge))}
                       </TableCell>
-                      <TableCell className="pl-6 py-6">
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                      <TableCell className="pl-6 py-6 min-w-[80px]">
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
                           {challenge.challengeId}
                         </Badge>
                       </TableCell>
-                      <TableCell className="pl-10 py-6">
-                        <div className="flex items-center gap-1 text-gray-300">
+                      <TableCell className="pl-10 py-6 min-w-[80px]">
+                        <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
                           <Users className="h-4 w-4 text-gray-400" />
                           {challenge.investorCounter}
                         </div>
                       </TableCell>
-                      <TableCell className="pl-10 py-6 whitespace-nowrap">
+                      <TableCell className="pl-10 py-6 min-w-[140px] whitespace-nowrap">
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           {formatDate(challenge.startTime)}
                         </div>
                       </TableCell>
-                      <TableCell className="pl-4 py-6 whitespace-nowrap">
+                      <TableCell className="pl-4 py-6 min-w-[140px] whitespace-nowrap">
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           {formatDate(challenge.endTime)}
                         </div>
