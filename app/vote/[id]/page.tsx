@@ -461,9 +461,19 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       console.error("Delegation error:", error)
       
       let errorMessage = "There was an error delegating your tokens. Please try again."
+      let isUserRejection = false
       
-      if (error.code === 4001) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes("rejected") ||
+          error.message?.includes("denied") ||
+          error.message?.includes("cancelled") ||
+          error.message?.includes("User rejected") ||
+          error.message?.includes("User denied") ||
+          error.message?.includes("Transaction was rejected")) {
         errorMessage = "Transaction was rejected by user"
+        isUserRejection = true
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees"
       } else if (error.message?.includes("Phantom wallet is not installed")) {
@@ -472,12 +482,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         errorMessage = "No accounts connected in Phantom wallet. Please connect your wallet first."
       }
 
-      toast({
-        variant: "destructive",
-        title: "Delegation Failed",
-        description: errorMessage,
-      })
+      // Only show error toast for non-user-rejection errors
+      if (!isUserRejection) {
+        toast({
+          variant: "destructive",
+          title: "Delegation Failed",
+          description: errorMessage,
+        })
+      }
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsDelegating(false)
     }
   }
@@ -617,9 +631,19 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       console.error("Voting error:", error)
       
       let errorMessage = "There was an error casting your vote. Please try again."
+      let isUserRejection = false
       
-      if (error.code === 4001) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes("rejected") ||
+          error.message?.includes("denied") ||
+          error.message?.includes("cancelled") ||
+          error.message?.includes("User rejected") ||
+          error.message?.includes("User denied") ||
+          error.message?.includes("Transaction was rejected")) {
         errorMessage = "Transaction was rejected by user"
+        isUserRejection = true
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees"
       } else if (error.message?.includes("already voted")) {
@@ -630,12 +654,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         errorMessage = "No accounts connected in Phantom wallet. Please connect your wallet first."
       }
 
-      toast({
-        variant: "destructive",
-        title: "Voting Failed",
-        description: errorMessage,
-      })
+      // Only show error toast for non-user-rejection errors
+      if (!isUserRejection) {
+        toast({
+          variant: "destructive",
+          title: "Voting Failed",
+          description: errorMessage,
+        })
+      }
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsVoting(false)
     }
   }
@@ -709,9 +737,19 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       console.error("Queue error:", error)
       
       let errorMessage = "There was an error queuing the proposal. Please try again."
+      let isUserRejection = false
       
-      if (error.code === 4001) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes("rejected") ||
+          error.message?.includes("denied") ||
+          error.message?.includes("cancelled") ||
+          error.message?.includes("User rejected") ||
+          error.message?.includes("User denied") ||
+          error.message?.includes("Transaction was rejected")) {
         errorMessage = "Transaction was rejected by user"
+        isUserRejection = true
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees"
       } else if (error.message?.includes("Phantom wallet is not installed")) {
@@ -720,12 +758,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         errorMessage = "Proposal has not succeeded yet and cannot be queued"
       }
 
-      toast({
-        variant: "destructive",
-        title: "Queue Failed",
-        description: errorMessage,
-      })
+      // Only show error toast for non-user-rejection errors
+      if (!isUserRejection) {
+        toast({
+          variant: "destructive",
+          title: "Queue Failed",
+          description: errorMessage,
+        })
+      }
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsQueuing(false)
     }
   }
@@ -821,9 +863,19 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       console.error("Execute error:", error)
       
       let errorMessage = "There was an error executing the proposal. Please try again."
+      let isUserRejection = false
       
-      if (error.code === 4001) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes("rejected") ||
+          error.message?.includes("denied") ||
+          error.message?.includes("cancelled") ||
+          error.message?.includes("User rejected") ||
+          error.message?.includes("User denied") ||
+          error.message?.includes("Transaction was rejected")) {
         errorMessage = "Transaction was rejected by user"
+        isUserRejection = true
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = "Insufficient funds for gas fees"
       } else if (error.message?.includes("not in queued state")) {
@@ -840,12 +892,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
       }
 
-      toast({
-        variant: "destructive",
-        title: "Execute Failed",
-        description: errorMessage,
-      })
+      // Only show error toast for non-user-rejection errors
+      if (!isUserRejection) {
+        toast({
+          variant: "destructive",
+          title: "Execute Failed",
+          description: errorMessage,
+        })
+      }
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsExecuting(false)
     }
   }

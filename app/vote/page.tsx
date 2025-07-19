@@ -887,23 +887,35 @@ export default function VotePage() {
       let errorMessage = t('errorDelegatingTokens')
       let toastVariant: "destructive" | "default" = "destructive"
       let toastTitle = t('delegationFailed')
+      let isUserRejection = false
       
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes('rejected') || 
+          error.message?.includes('denied') || 
+          error.message?.includes('cancelled') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('User denied') ||
+          error.message?.includes('Connection request was rejected')) {
         errorMessage = t('transactionRejected')
         toastVariant = "default"
         toastTitle = "Request Cancelled"
+        isUserRejection = true
       } else if (error.message?.includes("insufficient funds")) {
         errorMessage = t('insufficientFundsGas')
       } else if (error.message?.includes("Phantom wallet is not installed")) {
         errorMessage = t('phantomWalletNotInstalled')
       }
 
+      // Show toast for all cases (user rejection gets a neutral variant)
       toast({
         variant: toastVariant,
         title: toastTitle,
         description: errorMessage,
       })
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsDelegating(false)
     }
   }

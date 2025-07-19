@@ -515,7 +515,15 @@ export default function CreateProposalPage() {
       let toastTitle = "Proposal Creation Failed";
       
       // Provide more specific error messages based on error type
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
+      // Check for various user rejection patterns
+      if (error.code === 4001 || 
+          error.code === "ACTION_REJECTED" ||
+          error.message?.includes('rejected') || 
+          error.message?.includes('denied') || 
+          error.message?.includes('cancelled') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('User denied') ||
+          error.message?.includes('Connection request was rejected')) {
         errorMessage = "Transaction was cancelled by user";
         toastVariant = "default";
         toastTitle = "Transaction Cancelled";
@@ -533,6 +541,7 @@ export default function CreateProposalPage() {
         description: errorMessage,
       });
     } finally {
+      // Always ensure loading state is cleared, even if there are unexpected errors
       setIsSubmitting(false);
       
       // Navigate to vote page only if there's no error and we have stored proposal data
