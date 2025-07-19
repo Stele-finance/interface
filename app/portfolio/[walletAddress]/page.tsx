@@ -132,12 +132,12 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         className="hover:bg-gray-800/30 transition-colors cursor-pointer" 
         onClick={handleRowClick}
       >
-        <td className="py-6 px-4 whitespace-nowrap">
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
           <span className="font-medium text-gray-100">
             {challengeTitle}
           </span>
         </td>
-        <td className="py-6 px-4">
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-1">
             {isPositive ? 
               <TrendingUp className="h-3 w-3 text-emerald-400" /> : 
@@ -151,7 +151,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             </span>
           </div>
         </td>
-        <td className="py-6 px-6">
+        <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
           <div className="flex items-center gap-2">
             {investor.isRegistered && (
               <TooltipProvider>
@@ -159,7 +159,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   <TooltipTrigger>
                     <Badge 
                       variant="default"
-                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
+                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs whitespace-nowrap"
                     >
                       <UserCheck className="h-3 w-3" />
                     </Badge>
@@ -173,7 +173,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             {isActive ? (
               <Badge 
                 variant="default"
-                className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
+                className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap"
               >
                 <Clock className="h-3 w-3 mr-1" />
                 {t('active')}
@@ -181,7 +181,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             ) : (
               <Badge 
                 variant="secondary"
-                className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
+                className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
               >
                 <CheckCircle className="h-3 w-3 mr-1" />
                 {t('finished')}
@@ -189,16 +189,16 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             )}
           </div>
         </td>
-        <td className="py-6 pl-6 pr-4">
+        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-3">
             <div>
-              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
                 {investor.challengeId}
               </Badge>
             </div>
           </div>
         </td>
-        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
+        <td className="py-6 px-4 text-gray-300 min-w-[140px] whitespace-nowrap">
           <div>
             {challengeData?.challenge?.startTime ? 
               formatDateTime(challengeData.challenge.startTime) : 
@@ -206,7 +206,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             }
           </div>
         </td>
-        <td className="py-6 px-4 text-gray-300 whitespace-nowrap">
+        <td className="py-6 px-4 text-gray-300 min-w-[140px] whitespace-nowrap">
           <div>
             {challengeData?.challenge?.endTime ? 
               formatDateTime(challengeData.challenge.endTime) : 
@@ -230,12 +230,12 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6">{t('type')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8">{t('profit')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10">{t('status')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6">{t('challenge')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('startDate')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10">{t('endDate')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8 min-w-[100px] whitespace-nowrap">{t('profit')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10 min-w-[120px] whitespace-nowrap">{t('status')}</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6 min-w-[100px] whitespace-nowrap">{t('challenge')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">{t('startDate')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">{t('endDate')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -279,22 +279,22 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-700 bg-gray-900/80">
-                        <th className="text-left py-3 px-4">
+                        <th className="text-left py-3 px-4 min-w-[120px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
                         </th>
-                        <th className="text-left py-3 px-4">
+                        <th className="text-left py-3 px-4 min-w-[100px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
                         </th>
-                        <th className="text-left py-3 px-6">
+                        <th className="text-left py-3 px-6 min-w-[120px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
                         </th>
-                        <th className="text-left py-3 px-6">
+                        <th className="text-left py-3 px-6 min-w-[100px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
                         </th>
-                        <th className="text-left py-3 px-4">
+                        <th className="text-left py-3 px-4 min-w-[140px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
                         </th>
-                        <th className="text-left py-3 px-4">
+                        <th className="text-left py-3 px-4 min-w-[140px] whitespace-nowrap">
                           <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
                         </th>
                       </tr>
@@ -302,28 +302,28 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                     <tbody>
                       {[1, 2, 3, 4, 5].map((i) => (
                         <tr key={i} className="border-0">
-                          <td className="py-6 px-4">
+                          <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
                             <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
                           </td>
-                          <td className="py-6 px-4">
+                          <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
                             <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
                           </td>
-                          <td className="py-6 px-6">
+                          <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
                             <div className="flex gap-2">
                               <div className="h-6 bg-gray-700 rounded-full w-16 animate-pulse"></div>
                               <div className="h-6 bg-gray-700 rounded-full w-14 animate-pulse"></div>
                             </div>
                           </td>
-                          <td className="py-6 px-6">
+                          <td className="py-6 px-6 min-w-[100px] whitespace-nowrap">
                             <div className="space-y-2">
                               <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
                               <div className="h-3 bg-gray-700 rounded w-16 animate-pulse"></div>
                             </div>
                           </td>
-                          <td className="py-6 px-4">
+                          <td className="py-6 px-4 min-w-[140px] whitespace-nowrap">
                             <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
                           </td>
-                          <td className="py-6 px-4">
+                          <td className="py-6 px-4 min-w-[140px] whitespace-nowrap">
                             <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
                           </td>
                         </tr>
@@ -352,8 +352,8 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between w-full gap-4">
-              <h1 className="text-3xl text-gray-100">{t('portfolio')}</h1>
-              <p className="text-xl text-gray-400 font-mono">
+              <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('portfolio')}</h1>
+              <p className="text-xl text-gray-400 font-mono whitespace-nowrap">
                 {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
               </p>
             </div>

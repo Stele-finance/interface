@@ -111,10 +111,10 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
-                    <TableHead className="text-gray-300 text-base px-6">{t('rank')}</TableHead>
-                    <TableHead className="text-gray-300 text-base px-6 pl-12">{t('user')}</TableHead>
-                    <TableHead className="text-gray-300 text-base px-6">{t('profit')}</TableHead>
-                    <TableHead className="text-gray-300 text-base px-6">{t('challenge')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6 min-w-[80px] whitespace-nowrap">{t('rank')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6 pl-12 min-w-[120px] whitespace-nowrap">{t('user')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6 min-w-[100px] whitespace-nowrap">{t('profit')}</TableHead>
+                    <TableHead className="text-gray-300 text-base px-6 min-w-[100px] whitespace-nowrap">{t('challenge')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,27 +128,27 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
                         className="hover:bg-gray-800/30 border-0 cursor-pointer transition-colors"
                         onClick={() => handleRowClick(ranking.challengeId, ranking.user)}
                       >
-                        <TableCell className="font-medium text-gray-100 text-base px-6 py-6">
+                        <TableCell className="font-medium text-gray-100 text-base px-6 py-6 min-w-[80px] whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <span>#{index + 1}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 py-6">
+                        <TableCell className="px-6 py-6 min-w-[120px] whitespace-nowrap">
                           <span className="text-sm text-gray-300 font-mono">
                             {formatAddress(ranking.user)}
                           </span>
                         </TableCell>
-                        <TableCell className="px-6 py-6">
+                        <TableCell className="px-6 py-6 min-w-[100px] whitespace-nowrap">
                           <div className={cn(
-                            "flex items-center gap-1 font-medium text-base",
+                            "flex items-center gap-1 font-medium text-base whitespace-nowrap",
                             isPositive ? "text-green-400" : "text-red-400"
                           )}>
                             {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                             {formatProfitRatio(ranking.profitRatio)}
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 pl-8 py-6">
-                          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                        <TableCell className="px-6 pl-8 py-6 min-w-[100px] whitespace-nowrap">
+                          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
                             {getChallengeType(ranking.challengeId)}
                           </Badge>
                         </TableCell>
