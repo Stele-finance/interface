@@ -534,11 +534,25 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
         }
         
       // Use BrowserProvider's send method for RPC requests
-      // Request account access
-      const accounts = await browserProvider.send('eth_requestAccounts', []);
+      // Try to get address from signer first before requesting accounts
+      let userAddress: string | null = null;
+      
+      try {
+        const signer = await browserProvider.getSigner();
+        userAddress = await signer.getAddress();
+      } catch (error) {
+        console.warn('Could not get address from signer, requesting accounts:', error);
+        // Only request accounts if we can't get address from signer
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        }
+        userAddress = accounts[0];
+      }
+
+      if (!userAddress) {
+        throw new Error('Could not determine user address');
       }
 
       // Check if we are on correct network

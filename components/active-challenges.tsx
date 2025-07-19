@@ -191,11 +191,25 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
-      // Request account access
-      const accounts = await provider.send('eth_requestAccounts', []);
+      // Try to get address from signer first before requesting accounts
+      let userAddress: string | null = null;
+      
+      try {
+        const signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+      } catch (error) {
+        console.warn('Could not get address from signer, requesting accounts:', error);
+        // Only request accounts if we can't get address from signer
+        const accounts = await provider.send('eth_requestAccounts', []);
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect your wallet first.");
+        if (!accounts || accounts.length === 0) {
+          throw new Error("No accounts found. Please connect your wallet first.");
+        }
+        userAddress = accounts[0];
+      }
+
+      if (!userAddress) {
+        throw new Error('Could not determine user address');
       }
 
       // Connect to provider with signer
