@@ -114,6 +114,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
+  const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   
   // Use React Query client for better data management
   const queryClient = useQueryClient()
@@ -494,7 +495,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           <div className="mb-4">
             <button 
               onClick={() => router.push(`/challenge/${challengeId}`)}
-              className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
             >
               <ArrowLeft className="h-5 w-5" />
               {t('goToChallenge')} {challengeId}
@@ -869,7 +870,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           <div className="px-2 sm:px-0">
           <button 
             onClick={() => router.push(`/challenge/${challengeId}`)}
-            className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
           >
             <ArrowLeft className="h-5 w-5" />
             {t('goToChallenge')} {challengeId}
@@ -1496,13 +1497,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                          variant="default" 
                          size="lg" 
                          onClick={handleRegister}
-                         disabled={isRegistering}
-                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                         disabled={isRegistering || isAssetSwapping}
+                         className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                        >
                          {isRegistering ? (
                            <>
                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                              {t('registering')}
+                           </>
+                         ) : isAssetSwapping ? (
+                           <>
+                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                             {t('swapping')}
                            </>
                          ) : (
                            <>
@@ -1532,7 +1538,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               {/* Desktop version - static position */}
               {isSwapMode && (
                 <div className="hidden md:block">
-                  <AssetSwap userTokens={userTokens} />
+                  <AssetSwap 
+                    userTokens={userTokens} 
+                    onSwappingStateChange={setIsAssetSwapping}
+                  />
                 </div>
               )}
               
@@ -1543,7 +1552,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
                     <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                       <div className="bg-muted rounded-2xl p-6 shadow-2xl">
-                        <AssetSwap userTokens={userTokens} />
+                        <AssetSwap 
+                          userTokens={userTokens} 
+                          onSwappingStateChange={setIsAssetSwapping}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1863,13 +1875,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     variant="default" 
                     size="lg" 
                     onClick={handleRegister}
-                    disabled={isRegistering}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    disabled={isRegistering || isAssetSwapping}
+                    className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                   >
                     {isRegistering ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         {t('registering')}
+                      </>
+                    ) : isAssetSwapping ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        {t('swapping')}
                       </>
                     ) : (
                       <>

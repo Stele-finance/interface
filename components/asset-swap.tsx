@@ -22,9 +22,10 @@ import { useWallet } from "@/app/hooks/useWallet"
 
 interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
+  onSwappingStateChange?: (isSwapping: boolean) => void;
 }
 
-export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapProps) {
+export function AssetSwap({ className, userTokens = [], onSwappingStateChange, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, network, getProvider, isConnected } = useWallet()
   
@@ -36,6 +37,11 @@ export function AssetSwap({ className, userTokens = [], ...props }: AssetSwapPro
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("WETH")
   const [isSwapping, setIsSwapping] = useState(false)
+  
+  // Notify parent component when swapping state changes
+  useEffect(() => {
+    onSwappingStateChange?.(isSwapping);
+  }, [isSwapping, onSwappingStateChange]);
   const [isHoveringFromToken, setIsHoveringFromToken] = useState(false)
   const [isFromDropdownOpen, setIsFromDropdownOpen] = useState(false)
   const [isToDropdownOpen, setIsToDropdownOpen] = useState(false)
