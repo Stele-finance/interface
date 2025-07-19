@@ -29,26 +29,20 @@ function useEntryFeeQuery() {
   
   // Use current connected network, fallback to ethereum
   const targetNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  
-  console.log('🔍 useEntryFee - Current network:', network, '→ Target network:', targetNetwork)
-  
+    
   return useQuery<string>({
     queryKey: ['entryFee', targetNetwork],
-    queryFn: async () => {
-      console.log('📡 Fetching entry fee for network:', targetNetwork)
-      
+    queryFn: async () => {      
       // Add delay to prevent overwhelming RPC
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500))
       
       const rpcUrl = getRPCUrl(targetNetwork)
-      console.log('🌐 Using RPC URL:', rpcUrl)
-      
+
       // Create a read-only provider
       const provider = new ethers.JsonRpcProvider(rpcUrl)
       
       // Create contract instance for the specific network
       const contractAddress = getSteleContractAddress(targetNetwork)
-      console.log('📋 Using contract address:', contractAddress, 'for network:', targetNetwork)
       
       const steleContract = new ethers.Contract(
         contractAddress,
@@ -58,18 +52,14 @@ function useEntryFeeQuery() {
       
       // Call entryFee view function
       const fee = await steleContract.entryFee()
-      console.log('💰 Raw entry fee from contract:', fee.toString(), 'for network:', targetNetwork)
       
       // The contract returns a value that needs to be divided by 100 to get the actual USDC amount
       // For example: contract returns 1000 (raw) -> should be 0.01 USDC
       const adjustedFee = fee
       const formattedFee = ethers.formatUnits(adjustedFee, USDC_DECIMALS);
-      console.log('💱 Formatted entry fee:', formattedFee, 'USDC for network:', targetNetwork)
       
       // Convert to integer (remove decimal places)
       const integerFee = Math.floor(parseFloat(formattedFee)).toString();
-      console.log('✅ Final entry fee:', integerFee, 'USDC for network:', targetNetwork)
-
       return integerFee
     },
     enabled: !!network, // Only run query when network is available
