@@ -47,7 +47,6 @@ export function RecentChallengesTable() {
       case "3": return t('sixMonths')
       case "4": return t('oneYear')
       default: 
-        console.log('No match found for type:', typeStr)
         return t('unknown')
     }
   }

@@ -14,7 +14,9 @@ import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { 
-  getSteleContractAddress
+  getSteleContractAddress,
+  buildTransactionUrl,
+  getExplorerName
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
@@ -210,12 +212,15 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       const tx = await steleContract.createChallenge(challengeType);
       
       // Show toast notification for transaction submitted
+      const explorerName = getExplorerName(subgraphNetwork);
+      const submittedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
+      
       toast({
         title: "Transaction Submitted",
         description: "Your challenge creation transaction has been sent to the network.",
         action: (
-          <ToastAction altText="View on BaseScan" onClick={() => window.open(`https://basescan.org/tx/${tx.hash}`, '_blank')}>
-            View on BaseScan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(submittedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
         ),
       });
@@ -224,12 +229,14 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       await tx.wait();
       
       // Show toast notification for transaction confirmed
+      const confirmedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
+      
       toast({
         title: "Challenge Created",
         description: "Your challenge has been created successfully!",
         action: (
-          <ToastAction altText="View on BaseScan" onClick={() => window.open(`https://basescan.org/tx/${tx.hash}`, '_blank')}>
-            View on BaseScan
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(confirmedTxUrl, '_blank')}>
+            View on {explorerName}
           </ToastAction>
         ),
       });

@@ -10,7 +10,6 @@ export function AppKitInitializer() {
     const timer = setTimeout(() => {
       import("@/lib/appkit-config").then(() => {
         setInitialized(true)
-        console.log('AppKit initialized successfully')
       }).catch((error) => {
         console.error('Failed to initialize AppKit:', error)
       })

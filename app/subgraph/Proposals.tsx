@@ -246,10 +246,8 @@ export function useActiveProposalsData(currentBlockNumber?: number, network: 'et
           // Use provided block number from global hook
           blockNumberToUse = currentBlockNumber.toString()
         } else {
-          // Fallback: fetch block number
-          const rpcUrl = process.env.NEXT_PUBLIC_INFURA_API_KEY 
-            ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
-            : getRPCUrl(network)
+                  // Fallback: fetch block number
+        const rpcUrl = getRPCUrl(network)
             
           const provider = new ethers.JsonRpcProvider(rpcUrl)
           const fetchedBlockNumber = await provider.getBlockNumber()

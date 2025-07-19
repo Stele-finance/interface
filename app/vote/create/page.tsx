@@ -322,21 +322,8 @@ export default function CreateProposalPage() {
   
   // Proposal creation function
   const handleCreateProposal = async () => {
-    console.log('🚀 handleCreateProposal started');
-    console.log('Wallet state:', { 
-      walletAddress, 
-      walletConnected, 
-      walletType, 
-      network, 
-      title, 
-      description, 
-      selectedTemplate, 
-      isCustomProposal 
-    });
-
     // Validation
     if (!title || !description) {
-      console.log('❌ Missing title or description');
       toast({
         variant: "destructive",
         title: "Missing Fields",
@@ -347,7 +334,6 @@ export default function CreateProposalPage() {
     
     // Wallet connection check
     if (!walletAddress) {
-      console.log('❌ No wallet address');
       toast({
         variant: "destructive",
         title: "Wallet Not Connected",
@@ -358,7 +344,6 @@ export default function CreateProposalPage() {
     
     // Check if wallet is connected
     if (!walletConnected || !walletType) {
-      console.log('❌ Wallet not connected:', { walletConnected, walletType });
       toast({
         variant: "destructive",
         title: "Wallet Not Connected",
@@ -367,18 +352,14 @@ export default function CreateProposalPage() {
       return
     }
     
-    console.log('✅ All validations passed, starting submission...');
     setIsSubmitting(true)
     
     try {
       // Get provider using useWallet hook
-      console.log('🔗 Getting wallet provider...');
       const browserProvider = getProvider();
       if (!browserProvider) {
-        console.log('❌ No browser provider available');
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
-      console.log('✅ Browser provider obtained');
 
       // Request account access if needed
       const accounts = await browserProvider.send('eth_requestAccounts', []);
@@ -535,7 +516,6 @@ export default function CreateProposalPage() {
         description: errorMessage,
       });
     } finally {
-      console.log('🏁 Proposal creation process finished, resetting isSubmitting');
       setIsSubmitting(false);
       
       // Navigate to vote page only if there's no error and we have stored proposal data
@@ -749,14 +729,6 @@ export default function CreateProposalPage() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('🖱️ Create button clicked!');
-                  console.log('Button disabled conditions:', {
-                    isSubmitting,
-                    hasTitle: !!title,
-                    hasDescription: !!description,
-                    isCustomProposal,
-                    hasSelectedTemplate: !!selectedTemplate
-                  });
                   handleCreateProposal();
                 }}
                 disabled={isSubmitting || !title || !description || (!isCustomProposal && !selectedTemplate)}
