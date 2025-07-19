@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, UserPlus, Plus } from "lucide-react"
+import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
@@ -230,7 +230,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false)
+  const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null);
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -527,6 +528,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (showMobileTooltip) {
         setShowMobileTooltip(false);
+        // Clear timer when closing tooltip
+        if (tooltipTimer) {
+          clearTimeout(tooltipTimer);
+          setTooltipTimer(null);
+        }
       }
     };
 
@@ -537,7 +543,16 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [showMobileTooltip]);
+  }, [showMobileTooltip, tooltipTimer]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimer) {
+        clearTimeout(tooltipTimer);
+      }
+    };
+  }, [tooltipTimer]);
 
   // Handle navigation to account page
   const handleNavigateToAccount = async () => {
@@ -1026,6 +1041,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               isLoadingBalance,
               isInsufficientBalance: isInsufficientBalance(),
               isGettingRewards,
+              entryFee,
               handleJoinChallenge,
               handleNavigateToAccount,
               handleGetRewards,
@@ -1376,8 +1392,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                      ) : (
                        <>
                          <Plus className="mr-2 h-5 w-5" />
-                         {t('join')}
-                         <UserPlus className="ml-2 h-5 w-5" />
+                         {t('join')} (USDC $10)
                        </>
                      )}
                    </Button>
@@ -1503,10 +1518,42 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                             className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setShowMobileTooltip(!showMobileTooltip);
+                              
+                              // Clear existing timer
+                              if (tooltipTimer) {
+                                clearTimeout(tooltipTimer);
+                                setTooltipTimer(null);
+                              }
+                              
+                              if (!showMobileTooltip) {
+                                // Show tooltip
+                                setShowMobileTooltip(true);
+                                
+                                // Auto-close after 4 seconds on mobile
+                                if (!window.matchMedia('(hover: hover)').matches) {
+                                  const timer = setTimeout(() => {
+                                    setShowMobileTooltip(false);
+                                    setTooltipTimer(null);
+                                  }, 4000);
+                                  setTooltipTimer(timer);
+                                }
+                              } else {
+                                // Hide tooltip
+                                setShowMobileTooltip(false);
+                              }
                             }}
-                            onMouseEnter={() => !showMobileTooltip && setShowMobileTooltip(true)}
-                            onMouseLeave={() => setShowMobileTooltip(false)}
+                            onMouseEnter={() => {
+                              // Only trigger on desktop (devices with hover capability)
+                              if (window.matchMedia('(hover: hover)').matches) {
+                                setShowMobileTooltip(true);
+                              }
+                            }}
+                            onMouseLeave={() => {
+                              // Only trigger on desktop (devices with hover capability)
+                              if (window.matchMedia('(hover: hover)').matches) {
+                                setShowMobileTooltip(false);
+                              }
+                            }}
                           >
                             <div 
                               className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"

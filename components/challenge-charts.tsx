@@ -10,7 +10,7 @@ import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
-import { DollarSign, Plus, UserPlus, User, Loader2, Wallet } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -30,6 +30,7 @@ interface ChallengeChartsProps {
     isLoadingBalance: boolean
     isInsufficientBalance: boolean
     isGettingRewards: boolean
+    entryFee: string | null
     handleJoinChallenge: () => void
     handleNavigateToAccount: () => void
     handleGetRewards: () => void
@@ -442,8 +443,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-1 h-4 w-4" />
-                          {joinButton.t('join')}
-                          <UserPlus className="ml-1 h-4 w-4" />
+                          {joinButton.t('join')} (USDC $10)
                         </>
                       )}
                     </Button>
@@ -589,8 +589,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-2 h-5 w-5" />
-                          {joinButton.t('join')}
-                          <UserPlus className="ml-2 h-5 w-5" />
+                          {joinButton.t('join')} (USDC $10)
                         </>
                       )}
                     </Button>
@@ -907,8 +906,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-2 h-5 w-5" />
-                          {joinButton.t('join')}
-                          <UserPlus className="ml-2 h-5 w-5" />
+                          {joinButton.t('join')} (USDC $10)
                         </>
                       )}
                     </Button>
