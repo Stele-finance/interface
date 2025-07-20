@@ -1,4 +1,4 @@
-import { AssetSwap } from '@/components/asset-swap';
+import { AssetSwap } from './components/AssetSwap';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap } from 'lucide-react';
 import Link from 'next/link';

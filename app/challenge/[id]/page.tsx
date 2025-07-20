@@ -1,7 +1,7 @@
 "use client"
 
 import { use } from "react"
-import { ChallengePortfolio } from "@/components/challenge-portfolio"
+import { ChallengePortfolio } from "./components/ChallengePortfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
 import { useRouter } from 'next/navigation'

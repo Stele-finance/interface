@@ -27,10 +27,9 @@ import { ethers } from "ethers"
 import {
   getRPCUrl
 } from "@/lib/constants"
-import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
-import { LanguageSelectorSidebar } from "./language-selector-sidebar"
+import { LanguageSelectorSidebar } from "@/components/LanguageSelectorSidebar"
 import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
@@ -72,9 +71,6 @@ export function Header() {
   const prevNetworkRef = useRef<string | null>(null)
   const prevWalletAddressRef = useRef<string | null>(null)
   
-  // Get entry fee from context
-  const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee()
-
   // Get wallet icon - detect actual wallet type from provider
   const getWalletIcon = () => {    
     if (walletType === 'walletconnect' && walletProvider) {

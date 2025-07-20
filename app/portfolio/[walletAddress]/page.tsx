@@ -15,7 +15,7 @@ import {
   CheckCircle,
   UserCheck
 } from "lucide-react"
-import { useInvestorPortfolio } from "@/app/hooks/useInvestorPortfolio"
+import { useInvestorPortfolio } from "../hooks/useInvestorPortfolio"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"

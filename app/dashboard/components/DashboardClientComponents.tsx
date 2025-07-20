@@ -5,17 +5,17 @@ import { Suspense } from "react"
 
 // Dynamically import client components with SSR disabled
 const ActiveChallenges = dynamic(
-  () => import("@/components/active-challenges").then(mod => ({ default: mod.ActiveChallenges })),
+  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
   { ssr: false }
 )
 
 const InvestableTokens = dynamic(
-  () => import("@/components/investable-tokens").then(mod => ({ default: mod.InvestableTokens })),
+  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
   { ssr: false }
 )
 
 const TotalRanking = dynamic(
-  () => import("@/components/total-ranking").then(mod => ({ default: mod.TotalRanking })),
+  () => import("./TotalRanking").then(mod => ({ default: mod.TotalRanking })),
   { ssr: false }
 )
 

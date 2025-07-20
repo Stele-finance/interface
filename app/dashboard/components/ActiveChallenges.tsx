@@ -1,6 +1,6 @@
 'use client'
 
-import { ChallengeTypeModal } from "@/components/challenge-type-modal"
+import { ChallengeTypeModal } from "./ChallengeTypeModal"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -19,7 +19,7 @@ import {
   getExplorerName
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
-import { useActiveChallenges } from "@/app/hooks/useActiveChallenges"
+import { useActiveChallenges } from "../hooks/useActiveChallenges"
 import { Users, Clock, Trophy, Wallet } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"

@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { useActiveChallengesSnapshots } from '@/app/hooks/useActiveChallengesSnapshots'
-import { useActiveChallengesWeeklySnapshots } from '@/app/hooks/useActiveChallengesWeeklySnapshots'
+import { useActiveChallengesSnapshots } from '../hooks/useActiveChallengesSnapshots'
+import { useActiveChallengesWeeklySnapshots } from '../hooks/useActiveChallengesWeeklySnapshots'
 import { Users, DollarSign, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'

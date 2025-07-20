@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
-import { useChallengeSnapshots } from '@/app/hooks/useChallengeSnapshots'
-import { useChallengeWeeklySnapshots } from '@/app/hooks/useChallengeWeeklySnapshots'
+import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
+import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
 import { DollarSign, Plus, User, Loader2, Wallet } from 'lucide-react'

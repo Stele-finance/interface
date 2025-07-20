@@ -8,9 +8,6 @@ import {
   getMulticallAddress,
   getUSDCTokenAddress,
   getWETHAddress,
-  getWBTCAddress,
-  getUNIAddress,
-  getLINKAddress
 } from "@/lib/constants"
 
 // QuoterV2 ABI (simplified)
@@ -777,31 +774,30 @@ export function useSwapTokenPricesIndependent(
           }
         }
       }
-
-         } catch (err) {
-       console.error('Error fetching token prices:', err)
-       
-       // Handle 429 Too Many Requests error specifically
-       if (err instanceof Error && err.message.includes('Too Many Requests')) {
-         setError('Rate limit exceeded. Please try again later.')
-         
-         // Cache the error state to prevent immediate retries
-         priceCache.set(fromKey, {
-           price: null,
-           timestamp: now,
-           isLoading: false
-         })
-         priceCache.set(toKey, {
-           price: null,
-           timestamp: now,
-           isLoading: false
-         })
-       } else {
-         setError(err instanceof Error ? err.message : 'Failed to fetch prices')
-       }
-     } finally {
-       setIsLoading(false)
-     }
+    } catch (err) {
+      console.error('Error fetching token prices:', err)
+      
+      // Handle 429 Too Many Requests error specifically
+      if (err instanceof Error && err.message.includes('Too Many Requests')) {
+        setError('Rate limit exceeded. Please try again later.')
+        
+        // Cache the error state to prevent immediate retries
+        priceCache.set(fromKey, {
+          price: null,
+          timestamp: now,
+          isLoading: false
+        })
+        priceCache.set(toKey, {
+          price: null,
+          timestamp: now,
+          isLoading: false
+        })
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to fetch prices')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }, [fromTokenSymbol, toTokenSymbol, getTokenAddress, getTokenDecimals, network])
 
   useEffect(() => {

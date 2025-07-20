@@ -1,7 +1,7 @@
 'use client'
 
-import { DashboardClientComponents } from "@/components/DashboardClientComponents"
-import { DashboardCharts } from "@/components/dashboard-charts"
+import { DashboardClientComponents } from "./components/DashboardClientComponents"
+import { DashboardCharts } from "./components/DashboardCharts"
 import { useWallet } from "@/app/hooks/useWallet"
 
 export default function Dashboard() {

@@ -13,7 +13,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
-import { useRecentChallenges, RecentChallenge } from "@/app/hooks/useRecentChallenges"
+import { useRecentChallenges, RecentChallenge } from "../hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 
