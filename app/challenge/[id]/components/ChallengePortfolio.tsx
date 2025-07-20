@@ -11,7 +11,7 @@ import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { ChallengeCharts } from "@/components/challenge-charts"
+import { ChallengeCharts } from "./ChallengeCharts"
 import { useRouter } from "next/navigation"
 import { 
   getSteleContractAddress,
