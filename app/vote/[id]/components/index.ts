@@ -1,0 +1,5 @@
+export * from "./types"
+export { ProposalHeader } from "./ProposalHeader"
+export { ProposalVotingCard } from "./ProposalVotingCard"
+export { ProposalStats } from "./ProposalStats"
+export { ProposalActions } from "./ProposalActions" 

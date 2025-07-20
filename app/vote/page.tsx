@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Clock, Plus, Loader2 } from "lucide-react"
-import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/hooks/useProposals"
+import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "./hooks/useProposals"
 import { useQueryClient } from '@tanstack/react-query'
 import { getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"
-import { useGovernanceConfig } from "@/app/hooks/useGovernanceConfig"
+import { useGovernanceConfig } from "./hooks/useGovernanceConfig"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
-import { useWalletTokenInfo } from "@/app/hooks/useWalletTokenInfo"
+import { useWalletTokenInfo } from "./hooks/useWalletTokenInfo"
 import { useWallet } from "@/app/hooks/useWallet"
 import { toast } from "@/components/ui/use-toast"
 import { useLanguage } from "@/lib/language-context"
@@ -22,7 +22,6 @@ import { useMobileMenu } from "@/lib/mobile-menu-context"
 import {
   Proposal,
   BlockInfo,
-  WalletTokenInfo,
   ProposalTable,
   PaginationComponent,
   WalletTokenInfo as WalletTokenInfoComponent
@@ -33,7 +32,7 @@ import {
   createProposalUrl,
   handleDelegate
 } from "./utils"
-import { getTotalPages, getPaginationInfo } from "./utils/pagination"
+import { getTotalPages } from "./utils/pagination"
 
 export default function VotePage() {
   const { t } = useLanguage()
@@ -68,7 +67,6 @@ export default function VotePage() {
   
   // State for tracking recently created proposal
   const [recentlyCreatedProposal, setRecentlyCreatedProposal] = useState<any>(null)
-  const [hasCheckedForNewProposal, setHasCheckedForNewProposal] = useState(false)
   
   // Pagination state for each tab
   const [activeProposalsPage, setActiveProposalsPage] = useState(1)

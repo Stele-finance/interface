@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, use } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { 
   Card, 
@@ -28,7 +28,7 @@ import {
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
-import { useProposalVoteResult, useProposalDetails } from "@/app/hooks/useProposals"
+import { useProposalVoteResult, useProposalDetails } from "../hooks/useProposals"
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
@@ -36,61 +36,29 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useAppKitProvider } from '@reown/appkit/react'
 import { ClientOnly } from "@/components/ClientOnly"
 
+// Import separated components and utilities
+import { VoteOption } from "./components"
+import { openScanSite } from "./utils"
+
 interface ProposalDetailPageProps {
   params: Promise<{
     id: string
   }>
 }
 
-// Helper function to get scan site URL based on network
-const getScanSiteUrl = (network: 'ethereum' | 'arbitrum' | null) => {
-  switch (network) {
-    case 'ethereum':
-      return 'https://etherscan.io'
-    case 'arbitrum':
-      return 'https://arbiscan.io'
-    default:
-      return 'https://etherscan.io' // default to ethereum
-  }
-}
-
-// Helper function to open scan site in new tab
-const openScanSite = (network: 'ethereum' | 'arbitrum' | null, type: 'tx' | 'address' | 'block', value: string) => {
-  const baseUrl = getScanSiteUrl(network)
-  let url = ''
-  
-  switch (type) {
-    case 'tx':
-      url = `${baseUrl}/tx/${value}`
-      break
-    case 'address':
-      url = `${baseUrl}/address/${value}`
-      break
-    case 'block':
-      url = `${baseUrl}/block/${value}`
-      break
-  }
-  
-  window.open(url, '_blank')
-}
-
 export default function ProposalDetailPage({ params }: ProposalDetailPageProps) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { id } = use(params)
   const { t } = useLanguage()
   const { walletType, network, getProvider, isConnected: walletConnected, address, isLoading: walletLoading } = useWallet()
-  
-  // Use AppKit provider for WalletConnect
-  const { walletProvider: appKitProvider } = useAppKitProvider('eip155')
-  
+    
   // Filter network to supported types for contracts (exclude 'solana')
   const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
 
-  const [voteOption, setVoteOption] = useState<string | null>(null)
+  const [voteOption, setVoteOption] = useState<VoteOption>(null)
   const [reason, setReason] = useState("")
   const [isVoting, setIsVoting] = useState(false)
   const [votingPower, setVotingPower] = useState<string>("0")
@@ -382,8 +350,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       abstain: ((proposal.abstain / totalSupplyInStele) * 100).toFixed(2),
     }
   }
-
-  const percentages = calculatePercentage()
 
   // Delegate tokens to self
   const handleDelegate = async () => {
@@ -1056,12 +1022,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const handleProposerClick = () => {
     openScanSite(contractNetwork, 'address', proposal.fullProposer)
   }
-  
-  const handleBlockClick = () => {
-    if (proposal.blockNumber) {
-      openScanSite(contractNetwork, 'block', proposal.blockNumber)
-    }
-  }
 
   return (
     <div className="container mx-auto px-2 py-6">
@@ -1204,17 +1164,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     </div>
                   ) : (
                     <>
-                      {/* <div>Token balance: {Number(proposal.cachedTokenBalance).toLocaleString()} STELE</div> */}
                       <div>{t('userVotingPower')}: {Number(votingPower).toLocaleString()}</div>
-                      {/* {proposal.cachedDelegatedTo && (
-                        <div>Delegated to: {
-                          proposal.cachedDelegatedTo === "0x0000000000000000000000000000000000000000" 
-                            ? "Not delegated" 
-                            : proposal.cachedDelegatedTo === walletAddress 
-                              ? "Self" 
-                              : `${proposal.cachedDelegatedTo.slice(0, 6)}...${proposal.cachedDelegatedTo.slice(-4)}`
-                        }</div>
-                      )} */}
                       {proposalState !== null && (
                         <div>{t('status')}: {
                           isReadyForQueue() && proposalState !== 5 ? t('pendingQueue') :
@@ -1240,7 +1190,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                 <div className="space-y-4">
                   <RadioGroup 
                     value={voteOption || ""} 
-                    onValueChange={setVoteOption}
+                    onValueChange={(value) => setVoteOption(value as VoteOption)}
                     disabled={proposal.hasVoted || isVoting}
                   >
                     <div className="flex items-center space-x-2">
