@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { RecentChallengesTable } from "@/components/recent-challenges-table"
+import { RecentChallengesTable } from "./components/RecentChallengesTable"
 
 export const metadata: Metadata = {
   title: "Challenges - Stele",

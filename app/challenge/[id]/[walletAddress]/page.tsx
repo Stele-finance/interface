@@ -11,7 +11,7 @@ import { useInvestorData } from "@/app/subgraph/Account"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallenge } from "@/app/hooks/useChallenge"
-import { useInvestorTransactions } from "@/app/hooks/useInvestorTransactions"
+import { useInvestorTransactions } from "./hooks/useInvestorTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
@@ -277,183 +277,183 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         <div className="max-w-6xl mx-auto space-y-2 sm:space-y-0">
           {/* Go to Challenge Button */}
           <div className="px-2 sm:px-0">
-            <button 
-              onClick={() => router.push(`/challenge/${challengeId}`)}
-              className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              {t('goToChallenge')} {challengeId}
-            </button>
+          <button 
+            onClick={() => router.push(`/challenge/${challengeId}`)}
+            className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            {t('goToChallenge')} {challengeId}
+          </button>
+        </div>
+
+        {/* Main Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
+          {/* Left Side - Charts + Tabs */}
+          <div className="lg:col-span-2 space-y-4 sm:space-y-4">
+            {/* Investor Charts */}
+            <InvestorCharts 
+              challengeId={challengeId} 
+              investor={walletAddress} 
+              network={subgraphNetwork}
+              investorData={investorData}
+              realTimePortfolio={realTimePortfolio}
+              interval={chartInterval}
+            />
+            
+            {/* Interval selector */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
+                <button
+                  onClick={() => setChartInterval('daily')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'daily' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('daily')}
+                </button>
+                <button
+                  onClick={() => setChartInterval('weekly')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
+                    chartInterval === 'weekly' 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  }`}
+                >
+                  {t('weekly')}
+                </button>
+              </div>
+            </div>
+            
+            {/* Separator Bar */}
+            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="portfolio" className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  {t('portfolio')}
+                </TabsTrigger>
+                <TabsTrigger value="transactions" className="flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  {t('transactions')}
+                </TabsTrigger>
+                <TabsTrigger value="ranking" className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  {t('ranking')}
+                </TabsTrigger>
+              </TabsList>
+                
+              <TabsContent value="portfolio" className="space-y-4">
+                <PortfolioTab 
+                  userTokens={userTokens}
+                  uniswapPrices={uniswapPrices}
+                  isLoadingUniswap={isLoadingUniswap}
+                  subgraphNetwork={subgraphNetwork}
+                  onTokenClick={handleTokenClick}
+                />
+              </TabsContent>
+
+              <TabsContent value="transactions" className="space-y-4">
+                <TransactionsTab 
+                  investorTransactions={investorTransactions}
+                  isLoadingTransactions={isLoadingTransactions}
+                  transactionsError={transactionsError}
+                  subgraphNetwork={subgraphNetwork}
+                  walletAddress={walletAddress}
+                />
+              </TabsContent>
+
+              <TabsContent value="ranking" className="space-y-4">
+                <RankingTab 
+                  rankingData={rankingData}
+                  isLoadingRanking={isLoadingRanking}
+                  rankingError={rankingError}
+                  challengeId={challengeId}
+                  walletAddress={walletAddress}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
-        
-          {/* Main Content Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-12">
-            {/* Left Side - Charts + Tabs */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-4">
-              {/* Investor Charts */}
-              <InvestorCharts 
-                challengeId={challengeId} 
-                investor={walletAddress} 
-                network={subgraphNetwork}
-                investorData={investorData}
-                realTimePortfolio={realTimePortfolio}
-                interval={chartInterval}
-              />
-              
-              {/* Interval selector */}
-              <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
-                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setChartInterval('daily')}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      chartInterval === 'daily' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setChartInterval('weekly')}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      chartInterval === 'weekly' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
-                    {t('weekly')}
-                  </button>
+          
+          {/* Right Side - Portfolio Summary / Swap Assets */}
+          <div className="lg:col-span-1">
+            <div className="space-y-6 lg:mt-10 md:space-y-4">
+              {/* Investor Info Section */}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                {/* Action Buttons and Registered status */}
+                <div className="w-full">
+                  <ActionButtons 
+                    connectedAddress={connectedAddress}
+                    walletAddress={walletAddress}
+                    isRegistered={investorData?.investor?.isRegistered === true}
+                    isSwapMode={isSwapMode}
+                    isRegistering={isRegistering}
+                    isAssetSwapping={isAssetSwapping}
+                    onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
+                    onRegister={handleRegister}
+                  />
+                  
+                  {/* Desktop Registered status - Show on desktop, hide on mobile */}
+                  {investorData?.investor?.isRegistered === true && <RegisteredStatus />}
                 </div>
               </div>
               
-              {/* Separator Bar */}
-              <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
-              
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="portfolio" className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    {t('portfolio')}
-                  </TabsTrigger>
-                  <TabsTrigger value="transactions" className="flex items-center gap-2">
-                    <Activity className="h-4 w-4" />
-                    {t('transactions')}
-                  </TabsTrigger>
-                  <TabsTrigger value="ranking" className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4" />
-                    {t('ranking')}
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="portfolio" className="space-y-4">
-                  <PortfolioTab 
-                    userTokens={userTokens}
-                    uniswapPrices={uniswapPrices}
-                    isLoadingUniswap={isLoadingUniswap}
-                    subgraphNetwork={subgraphNetwork}
-                    onTokenClick={handleTokenClick}
+              {/* Swap Assets (when swap mode is active) */}
+              {/* Desktop version - static position */}
+              {isSwapMode && (
+                <div className="hidden md:block">
+                  <AssetSwap 
+                    userTokens={userTokens} 
+                    onSwappingStateChange={setIsAssetSwapping}
                   />
-                </TabsContent>
-
-                <TabsContent value="transactions" className="space-y-4">
-                  <TransactionsTab 
-                    investorTransactions={investorTransactions}
-                    isLoadingTransactions={isLoadingTransactions}
-                    transactionsError={transactionsError}
-                    subgraphNetwork={subgraphNetwork}
-                    walletAddress={walletAddress}
-                  />
-                </TabsContent>
-
-                <TabsContent value="ranking" className="space-y-4">
-                  <RankingTab 
-                    rankingData={rankingData}
-                    isLoadingRanking={isLoadingRanking}
-                    rankingError={rankingError}
-                    challengeId={challengeId}
-                    walletAddress={walletAddress}
-                  />
-                </TabsContent>
-              </Tabs>
-            </div>
-            
-            {/* Right Side - Portfolio Summary / Swap Assets */}
-            <div className="lg:col-span-1">
-              <div className="space-y-6 lg:mt-10 md:space-y-4">
-                {/* Investor Info Section */}
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  {/* Action Buttons and Registered status */}
-                  <div className="w-full">
-                    <ActionButtons 
-                      connectedAddress={connectedAddress}
-                      walletAddress={walletAddress}
-                      isRegistered={investorData?.investor?.isRegistered === true}
-                      isSwapMode={isSwapMode}
-                      isRegistering={isRegistering}
-                      isAssetSwapping={isAssetSwapping}
-                      onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
-                      onRegister={handleRegister}
-                    />
-                    
-                    {/* Desktop Registered status - Show on desktop, hide on mobile */}
-                    {investorData?.investor?.isRegistered === true && <RegisteredStatus />}
-                  </div>
                 </div>
-                
-                {/* Swap Assets (when swap mode is active) */}
-                {/* Desktop version - static position */}
-                {isSwapMode && (
-                  <div className="hidden md:block">
-                    <AssetSwap 
-                      userTokens={userTokens} 
-                      onSwappingStateChange={setIsAssetSwapping}
-                    />
-                  </div>
-                )}
-                
-                {/* Mobile version - floating */}
-                {isSwapMode && (
-                  <div className="fixed inset-0 z-50 md:hidden">
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
-                    <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
-                      <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        <div className="bg-muted rounded-2xl p-6 shadow-2xl">
-                          <AssetSwap 
-                            userTokens={userTokens} 
-                            onSwappingStateChange={setIsAssetSwapping}
-                          />
-                        </div>
+              )}
+              
+              {/* Mobile version - floating */}
+              {isSwapMode && (
+                <div className="fixed inset-0 z-50 md:hidden">
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
+                  <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
+                    <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                      <div className="bg-muted rounded-2xl p-6 shadow-2xl">
+                        <AssetSwap 
+                          userTokens={userTokens} 
+                          onSwappingStateChange={setIsAssetSwapping}
+                        />
                       </div>
                     </div>
                   </div>
-                )}
-                
-                {/* Portfolio Summary (always visible) */}
-                {portfolioMetrics && (
-                  <PortfolioSummary 
-                    portfolioMetrics={portfolioMetrics}
-                    realTimePortfolio={realTimePortfolio}
-                    isLoadingUniswap={isLoadingUniswap}
-                    challengeData={challengeData}
-                    network={network || 'ethereum'}
-                    investorData={investorData}
-                  />
-                )}
-
-                {/* Challenge Info */}
-                <ChallengeInfo 
-                  challengeId={challengeId}
+                </div>
+              )}
+              
+              {/* Portfolio Summary (always visible) */}
+              {portfolioMetrics && (
+                <PortfolioSummary 
+                  portfolioMetrics={portfolioMetrics}
+                  realTimePortfolio={realTimePortfolio}
+                  isLoadingUniswap={isLoadingUniswap}
                   challengeData={challengeData}
-                  challengeDetails={challengeDetails}
-                  timeRemaining={timeRemaining}
-                  isClient={isClient}
-                  currentTime={currentTime}
+                  network={network || 'ethereum'}
+                  investorData={investorData}
                 />
-              </div>
+              )}
+
+              {/* Challenge Info */}
+              <ChallengeInfo 
+                challengeId={challengeId}
+                challengeData={challengeData}
+                challengeDetails={challengeDetails}
+                timeRemaining={timeRemaining}
+                isClient={isClient}
+                currentTime={currentTime}
+              />
             </div>
           </div>
         </div>
       </div>
+    </div>
     </>
   )
 } 
