@@ -1097,7 +1097,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               <div>
                 <h3 className="text-lg font-medium mb-2 text-gray-100">{t('description')}</h3>
                 <div className="prose max-w-none dark:prose-invert">
-                  <p className="text-gray-300">{proposal.description}</p>
+                  <p className="text-gray-300 break-words whitespace-pre-wrap overflow-wrap-anywhere">{proposal.description}</p>
                 </div>
               </div>
               
@@ -1105,8 +1105,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               
               <div>
                 <h3 className="text-lg font-medium mb-2 text-gray-100">{t('proposalDetails')}</h3>
-                <div className="prose max-w-none dark:prose-invert whitespace-pre-line">
-                  <p className="text-gray-300">{proposal.details}</p>
+                <div className="prose max-w-none dark:prose-invert">
+                  <p className="text-gray-300 break-words whitespace-pre-wrap overflow-wrap-anywhere">{proposal.details}</p>
                 </div>
               </div>
             </CardContent>
