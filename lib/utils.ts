@@ -122,6 +122,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'dai',
         '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
         '0x9623063377AD1B27544C965cCd7342f7EA7e88C7': 'grt',
+        '0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978': 'crv',
       }
     }
     
