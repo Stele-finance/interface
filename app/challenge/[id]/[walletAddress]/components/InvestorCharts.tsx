@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
-import { useInvestorSnapshots } from '@/app/hooks/useInvestorSnapshots'
-import { useInvestorWeeklySnapshots } from '@/app/hooks/useInvestorWeeklySnapshots'
+import { useInvestorSnapshots } from '../../../hooks/useInvestorSnapshots'
+import { useInvestorWeeklySnapshots } from '../../../hooks/useInvestorWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
 import { useMemo, useState } from 'react'

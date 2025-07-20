@@ -30,7 +30,7 @@ import {
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
-import { LanguageSelectorSidebar } from "./language-selector-sidebar"
+import { LanguageSelectorSidebar } from "@/components/LanguageSelectorSidebar"
 import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"

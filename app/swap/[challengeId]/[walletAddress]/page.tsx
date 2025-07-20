@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Zap } from 'lucide-react'
-import { AssetSwap } from '@/components/asset-swap'
+import { AssetSwap } from '../../components/AssetSwap'
 import { useUserTokens } from '@/app/hooks/useUserTokens'
 import { useWallet } from '@/app/hooks/useWallet'
 import { Loader2 } from 'lucide-react'

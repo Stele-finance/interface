@@ -3,15 +3,15 @@
 import React, { useState, use, useEffect, useCallback } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, BarChart3, Activity, Trophy, Loader2 } from "lucide-react"
-import { AssetSwap } from "@/components/asset-swap"
-import { InvestorCharts } from "@/components/investor-charts"
+import { AssetSwap } from "../../../swap/components/AssetSwap"
+import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/subgraph/Account"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallenge } from "@/app/hooks/useChallenge"
-import { useInvestorTransactions } from "./hooks/useInvestorTransactions"
+import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
 import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
@@ -355,7 +355,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 />
               </TabsContent>
 
-              <TabsContent value="transactions" className="space-y-4">
+                            <TabsContent value="transactions" className="space-y-4">
                 <TransactionsTab 
                   investorTransactions={investorTransactions}
                   isLoadingTransactions={isLoadingTransactions}
@@ -382,8 +382,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="space-y-6 lg:mt-10 md:space-y-4">
               {/* Investor Info Section */}
               <div className="flex items-center justify-between gap-4 mb-4">
-                {/* Action Buttons and Registered status */}
-                <div className="w-full">
+                                 {/* Action Buttons and Registered status */}
+                 <div className="w-full">
                   <ActionButtons 
                     connectedAddress={connectedAddress}
                     walletAddress={walletAddress}
@@ -394,10 +394,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
                     onRegister={handleRegister}
                   />
-                  
-                  {/* Desktop Registered status - Show on desktop, hide on mobile */}
+                   
+                   {/* Desktop Registered status - Show on desktop, hide on mobile */}
                   {investorData?.investor?.isRegistered === true && <RegisteredStatus />}
-                </div>
+                 </div>
               </div>
               
               {/* Swap Assets (when swap mode is active) */}
@@ -449,9 +449,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 isClient={isClient}
                 currentTime={currentTime}
               />
-            </div>
-          </div>
-        </div>
+                      </div>
+                    </div>
+                      </div>
       </div>
     </div>
     </>
