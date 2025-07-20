@@ -14,6 +14,7 @@ interface RealTimePortfolio {
   tokensWithPrices: number
   totalTokens: number
   timestamp: number
+  isRegistered?: boolean // Add registration status flag
 }
 
 interface InvestorChartsProps {
@@ -85,7 +86,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 month: 'short',
                 day: 'numeric'
               }),
-          dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
+                    dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           isRealTime: false
         }
       })
@@ -121,8 +122,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         isRealTime: true
       }
       
-      // Add real-time point to the end of the chart
-      processedData.push(realTimeDataPoint)
+              // Add real-time point to the end of the chart
+        processedData.push(realTimeDataPoint)
     }
 
     return processedData
@@ -298,8 +299,8 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 {rankingData.map((ranking) => (
                   <div key={ranking.rank} className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      {/* Uniform circle design for all ranks 1-5 */}
-                      <div className="relative w-3 h-3 flex items-center justify-center">
+                                          {/* Uniform circle design for all ranks 1-5 */}
+                    <div className="relative w-3 h-3 flex items-center justify-center">
                         <svg width="12" height="12" viewBox="0 0 24 24">
                           <circle
                             cx="12"
@@ -619,45 +620,56 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               })
             })()}
             
-            {/* Display real-time data points as ReferenceDot - HIGHEST PRIORITY */}
-            {realTimePortfolio && realTimePortfolio.totalValue > 0 && chartData.length > 0 && (() => {
-              const lastDataPoint = chartData[chartData.length - 1]
-              if (lastDataPoint && lastDataPoint.isRealTime) {
-                const PulsingDot = (props: any) => (
-                  <circle
-                    cx={props.cx}
-                    cy={props.cy}
-                    r={8}
-                    fill="#22c55e"
-                    stroke="#ffffff"
-                    strokeWidth={3}
-                  >
-                    <animate
-                      attributeName="opacity"
-                      values="1;0.3;1"
-                      dur="2s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                )
-                
-                return (
-                  <ReferenceDot
-                    key={`realtime-ref-dot-${lastDataPoint.id}`}
-                    x={chartData.length - 1}
-                    y={lastDataPoint.currentUSD}
-                    shape={<PulsingDot />}
-                  />
-                )
-              }
-              return null
-            })()}
-            
-            {/* Display current user's position dot (for non-real-time data) */}
-            {(!realTimePortfolio || realTimePortfolio.totalValue === 0) && chartData.length > 0 && (() => {
+            {/* Display real-time data points as ReferenceDot - Portfolio tab's lenient conditions */}
+            {realTimePortfolio && chartData.length > 0 && (() => {
+              // Portfolio tab's lenient conditions: display if any token has price
+              const hasAnyPriceData = realTimePortfolio.tokensWithPrices > 0
+              const portfolioValue = realTimePortfolio.totalValue
+              
+              if (!hasAnyPriceData) return null
+              
               const lastDataPoint = chartData[chartData.length - 1]
               if (!lastDataPoint) return null
               
+              // Use real-time data point if available, otherwise use current portfolio value
+              const useRealTimePoint = lastDataPoint.isRealTime
+              const displayValue = useRealTimePoint ? lastDataPoint.currentUSD : portfolioValue
+              
+              // Same way as Portfolio tab: display if value exists (even 0 is displayable)
+              const PulsingDot = (props: any) => (
+                <circle
+                  cx={props.cx}
+                  cy={props.cy}
+                  r={8}
+                  fill={useRealTimePoint ? "#22c55e" : "#3b82f6"} // Distinguish real-time vs regular data
+                  stroke="#ffffff"
+                  strokeWidth={3}
+                >
+                  <animate
+                    attributeName="opacity"
+                    values="1;0.3;1"
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              )
+              
+              return (
+                <ReferenceDot
+                  key={`portfolio-ref-dot-${Date.now()}`}
+                  x={chartData.length - 1}
+                  y={Math.max(displayValue, 0)} // Display at minimum 0 or above
+                  shape={<PulsingDot />}
+                />
+              )
+            })()}
+            
+            {/* Display fallback position dot when no real-time data available */}
+            {(!realTimePortfolio || realTimePortfolio.tokensWithPrices === 0) && chartData.length > 0 && (() => {
+              const lastDataPoint = chartData[chartData.length - 1]
+              if (!lastDataPoint) return null
+              
+              // Portfolio tab's lenient conditions: display if chart data exists
               const UserPositionDot = (props: any) => (
                 <circle
                   cx={props.cx}
@@ -678,9 +690,9 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               
               return (
                 <ReferenceDot
-                  key={`user-position-dot-${lastDataPoint.id}`}
+                  key={`fallback-position-dot-${lastDataPoint.id}`}
                   x={chartData.length - 1}
-                  y={lastDataPoint.currentUSD}
+                  y={Math.max(lastDataPoint.currentUSD, 0)} // Display at minimum 0 or above
                   shape={<UserPositionDot />}
                 />
               )
