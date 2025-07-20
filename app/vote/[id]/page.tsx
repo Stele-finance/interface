@@ -28,7 +28,7 @@ import {
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
-import { useProposalVoteResult, useProposalDetails } from "@/app/subgraph/Proposals"
+import { useProposalVoteResult, useProposalDetails } from "@/app/hooks/useProposals"
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"

@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Clock, Plus, Vote as VoteIcon, Loader2 } from "lucide-react"
-import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/subgraph/Proposals"
+import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "@/app/hooks/useProposals"
 import { useQueryClient } from '@tanstack/react-query'
 import { STELE_DECIMALS, getSteleTokenAddress, getRPCUrl } from "@/lib/constants"
 import { ethers } from "ethers"

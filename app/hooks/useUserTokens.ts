@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query";
-import { useInvestorData } from "@/app/subgraph/Account";
+import { useInvestorData } from "./useInvestorData";
 
 export interface UserTokenInfo {
   address: string;
