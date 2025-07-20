@@ -1497,18 +1497,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                          variant="default" 
                          size="lg" 
                          onClick={handleRegister}
-                         disabled={isRegistering || isAssetSwapping}
+                         disabled={isRegistering || isAssetSwapping || isSwapMode}
                          className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                        >
                          {isRegistering ? (
                            <>
                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                              {t('registering')}
-                           </>
-                         ) : isAssetSwapping ? (
-                           <>
-                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                             {t('swapping')}
                            </>
                          ) : (
                            <>
@@ -1875,18 +1870,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     variant="default" 
                     size="lg" 
                     onClick={handleRegister}
-                    disabled={isRegistering || isAssetSwapping}
+                                         disabled={isRegistering || isAssetSwapping || isSwapMode}
                     className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                   >
                     {isRegistering ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         {t('registering')}
-                      </>
-                    ) : isAssetSwapping ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        {t('swapping')}
                       </>
                     ) : (
                       <>
