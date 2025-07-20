@@ -77,32 +77,40 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     subgraphNetwork
   )
 
-  // Calculate real-time portfolio value - only if not closed
-  const calculateRealTimePortfolioValue = useCallback(() => {
-    // Don't calculate real-time portfolio if investor is closed
-    if (investorData?.investor?.isRegistered === true) return null
-    if (!uniswapPrices?.tokens || userTokens.length === 0) return null
+  // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
+  const calculateRealTimePortfolioValue = () => {
+    // Only check basic conditions - calculate if tokens and price data exist
+    if (!userTokens.length || !uniswapPrices?.tokens) {
+      return null
+    }
     
     let totalValue = 0
     let tokensWithPrices = 0
     
+    // Process individual tokens the same way as Portfolio tab
     userTokens.forEach(token => {
-      const tokenPrice = uniswapPrices.tokens[token.symbol]?.priceUSD
-      if (tokenPrice && tokenPrice > 0) {
-        const tokenAmount = parseFloat(token.amount) || 0
+      const tokenPrice = uniswapPrices.tokens[token.symbol]?.priceUSD || 0
+      const tokenAmount = parseFloat(token.amount) || 0
+      
+      // Only include tokens with price in calculation (same as Portfolio tab)
+      if (tokenPrice > 0 && tokenAmount > 0) {
         totalValue += tokenPrice * tokenAmount
         tokensWithPrices++
       }
     })
     
+    // Display if at least one token has price (same leniency as Portfolio tab)
     return {
       totalValue,
       tokensWithPrices,
       totalTokens: userTokens.length,
-      timestamp: uniswapPrices.timestamp || Date.now()
+      timestamp: uniswapPrices.timestamp || Date.now(),
+      // Add flag to allow display regardless of registration status
+      isRegistered: investorData?.investor?.isRegistered === true
     }
-  }, [uniswapPrices, userTokens, investorData?.investor?.isRegistered])
+  }
 
+  // Remove useCallback for immediate reaction (same as Portfolio tab)
   const realTimePortfolio = calculateRealTimePortfolioValue()
 
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -1497,18 +1505,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                          variant="default" 
                          size="lg" 
                          onClick={handleRegister}
-                         disabled={isRegistering || isAssetSwapping}
+                         disabled={isRegistering || isAssetSwapping || isSwapMode}
                          className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                        >
                          {isRegistering ? (
                            <>
                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                              {t('registering')}
-                           </>
-                         ) : isAssetSwapping ? (
-                           <>
-                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                             {t('swapping')}
                            </>
                          ) : (
                            <>
@@ -1875,18 +1878,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     variant="default" 
                     size="lg" 
                     onClick={handleRegister}
-                    disabled={isRegistering || isAssetSwapping}
+                                         disabled={isRegistering || isAssetSwapping || isSwapMode}
                     className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                   >
                     {isRegistering ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         {t('registering')}
-                      </>
-                    ) : isAssetSwapping ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        {t('swapping')}
                       </>
                     ) : (
                       <>
