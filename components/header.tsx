@@ -346,27 +346,18 @@ export function Header() {
         
         {walletAddress ? (
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex flex-col items-end px-3 py-2">
-              <div className="flex items-center gap-2">
-                {getNetworkIcon() && (
-                  <Image 
-                    src={getNetworkIcon()!} 
-                    alt={`${walletNetwork} network`}
-                    width={16}
-                    height={16}
-                    className="rounded-full"
-                    style={{ width: 'auto', height: '16px' }}
-                  />
-                )}
-                <span className="text-sm font-medium text-gray-300">{name}</span>
-              </div>
-              <span className="text-base font-semibold text-white">
-                {isLoadingBalance ? (
-                  <span className="text-gray-400">{t('loading')}</span>
-                ) : (
-                  `${balance} ${symbol}`
-                )}
-              </span>
+            <div className="hidden md:flex items-center gap-2 px-3 py-2">
+              {getNetworkIcon() && (
+                <Image 
+                  src={getNetworkIcon()!} 
+                  alt={`${walletNetwork} network`}
+                  width={16}
+                  height={16}
+                  className="rounded-full"
+                  style={{ width: 'auto', height: '16px' }}
+                />
+              )}
+              <span className="text-sm font-medium text-gray-300">{name}</span>
             </div>
             {isMobile ? (
               // Mobile: Open AppKit modal directly on click
