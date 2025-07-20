@@ -99,7 +99,7 @@ export function Header() {
   const getNetworkInfo = () => {
     switch (walletNetwork) {
       case 'ethereum':
-        return { symbol: 'ETH', name: 'Ethereum Mainnet' };
+        return { symbol: 'ETH', name: 'Mainnet' };
       case 'arbitrum':
         return { symbol: 'ETH', name: 'Arbitrum' };
       default:
@@ -341,50 +341,46 @@ export function Header() {
       <div className="flex items-center gap-2 md:gap-4">
         
         {walletAddress ? (
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 px-3 py-2">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Network info - visible on both mobile and desktop */}
+            <div className="flex flex-col items-center gap-1 px-2 md:px-3 py-1 md:py-2">
               {getNetworkIcon() && (
                 <Image 
                   src={getNetworkIcon()!} 
                   alt={`${walletNetwork} network`}
                   width={16}
                   height={16}
-                  className="rounded-full"
+                  className="rounded-full md:w-5 md:h-5"
                   style={{ width: 'auto', height: '16px' }}
                 />
               )}
-              <span className="text-sm font-medium text-gray-300">{name}</span>
+              <span className="text-xs md:text-xs font-medium text-gray-300 text-center leading-tight">{name}</span>
             </div>
             {isMobile ? (
-              // Mobile: Open AppKit modal directly on click
+              // Mobile: Open AppKit modal directly on click - icon only
               <Button 
                 variant="outline" 
-                size="lg" 
-                className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                size="sm" 
+                className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium p-2 h-auto"
                 onClick={() => openWalletModal()}
               >
                 {getWalletIcon() ? (
                   <Image 
                     src={getWalletIcon()!} 
                     alt="Connected Wallet"
-                    width={16}
-                    height={16}
-                    className="mr-2"
-                    style={{ width: 'auto', height: '16px' }}
+                    width={20}
+                    height={20}
+                    style={{ width: 'auto', height: '20px' }}
                   />
                 ) : (
                   <Image 
                     src={getWalletLogo('walletconnect')} 
                     alt="WalletConnect"
-                    width={16}
-                    height={16}
-                    className="mr-2"
-                    style={{ width: 'auto', height: '16px' }}
+                    width={20}
+                    height={20}
+                    style={{ width: 'auto', height: '20px' }}
                   />
                 )}
-                <span className="text-base">
-                  {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
-                </span>
               </Button>
             ) : (
               // PC: Show dropdown menu
