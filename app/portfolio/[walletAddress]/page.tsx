@@ -351,9 +351,19 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-2">
-            <div className="flex items-center justify-between w-full gap-4">
+            {/* Mobile: vertical layout, Desktop: horizontal layout */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 sm:gap-4">
               <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('portfolio')}</h1>
-              <p className="text-xl text-gray-400 font-mono whitespace-nowrap">
+              <p 
+                className="text-lg sm:text-xl text-gray-400 font-mono whitespace-nowrap cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                onClick={() => {
+                  const explorerUrl = subgraphNetwork === 'arbitrum' 
+                    ? `https://arbiscan.io/address/${walletAddress}`
+                    : `https://etherscan.io/address/${walletAddress}`
+                  window.open(explorerUrl, '_blank')
+                }}
+                title={`View on ${subgraphNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+              >
                 {walletAddress.slice(0, 8)}...{walletAddress.slice(-8)}
               </p>
             </div>
