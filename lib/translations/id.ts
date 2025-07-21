@@ -82,6 +82,7 @@ export const id = {
   disconnect: "Putuskan",
   doc: "Dokumentasi",
   duration: "Durasi",
+  empty: "Kosong",
   end: "Selesai",
   endDate: "Tanggal Berakhir",
   ended: "Berakhir",

@@ -82,6 +82,7 @@ export const nl = {
   disconnect: "Verbinding verbreken",
   doc: "Documentatie",
   duration: "Duur",
+  empty: "Leeg",
   end: "Einde",
   endDate: "Einddatum",
   ended: "Beëindigd",

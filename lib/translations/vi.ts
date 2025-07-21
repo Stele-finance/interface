@@ -82,6 +82,7 @@ export const vi = {
   disconnect: "Ngắt kết nối",
   doc: "Tài liệu",
   duration: "Thời gian",
+  empty: "Trống",
   end: "Kết thúc",
   endDate: "Ngày kết thúc",
   ended: "Đã kết thúc",

@@ -82,6 +82,7 @@ export const th = {
   disconnect: "ตัดการเชื่อมต่อ",
   doc: "เอกสาร",
   duration: "ระยะเวลา",
+  empty: "ว่าง",
   end: "จบ",
   endDate: "วันที่สิ้นสุด",
   ended: "สิ้นสุดแล้ว",

@@ -82,6 +82,7 @@ export const jp = {
   disconnect: "切断",
   doc: "ドキュメント",
   duration: "期間",
+  empty: "空",
   end: "終了",
   endDate: "終了日",
   ended: "終了",

@@ -82,6 +82,7 @@ export const hu = {
   disconnect: "Lekapcsolás",
   doc: "Dokumentum",
   duration: "Időtartam",
+  empty: "Üres",
   end: "Vége",
   endDate: "Befejezés dátuma",
   ended: "Befejezett",

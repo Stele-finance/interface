@@ -82,6 +82,7 @@ export const da = {
   disconnect: "Frakobl",
   doc: "Dokumentation",
   duration: "Varighed",
+  empty: "Tom",
   end: "Slutning",
   endDate: "Slutdato",
   ended: "Afsluttet",

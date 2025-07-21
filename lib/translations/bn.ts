@@ -82,6 +82,7 @@ export const bn = {
   disconnect: "সংযোগ বিচ্ছিন্ন করুন",
   doc: "ডকুমেন্টেশন",
   duration: "সময়কাল",
+  empty: "খালি",
   end: "শেষ",
   endDate: "শেষের তারিখ",
   ended: "শেষ হয়েছে",

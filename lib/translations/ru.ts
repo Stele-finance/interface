@@ -82,6 +82,7 @@ export const ru = {
   disconnect: "Отключить",
   doc: "Документация",
   duration: "Продолжительность",
+  empty: "Пусто",
   end: "Конец",
   endDate: "Дата Окончания",
   ended: "Завершено",

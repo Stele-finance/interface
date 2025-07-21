@@ -82,6 +82,7 @@ export const el = {
   disconnect: "Αποσύνδεση",
   doc: "Έγγραφο",
   duration: "Διάρκεια",
+  empty: "Κενό",
   end: "Τέλος",
   endDate: "Ημερομηνία Λήξης",
   ended: "Τελείωσε",

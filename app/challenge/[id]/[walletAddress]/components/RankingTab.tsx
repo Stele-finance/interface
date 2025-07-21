@@ -150,7 +150,7 @@ export function RankingTab({
                             <td className="py-6 px-4">
                               <div className="font-medium flex items-center gap-2">
                                 {isEmptySlot ? (
-                                  <span className="text-gray-500 italic">Empty Slot</span>
+                                  <span className="text-gray-500 italic">{t('empty')}</span>
                                 ) : (
                                   <>
                                     <span className="text-gray-300">{formattedAddress}</span>
@@ -225,7 +225,7 @@ export function RankingTab({
           {rankingData && (
             <div className="border-t border-gray-700">
               <div className="mt-2 mb-2 text-xs text-gray-500 text-center">
-                Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
+                {t('lastUpdated')}: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
               </div>
             </div>
           )}
