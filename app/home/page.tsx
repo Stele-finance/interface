@@ -29,12 +29,12 @@ const getFeatureCards = (t: any) => [
     description: t('seedMoneySystemDesc')
   },
   {
-    title: t('rewardDistributionSystem'),
+    title: t('rewardDistribution'),
     image: "/home/rewardTransactions.png",
     description: t('rewardDistributionSystemDesc')
   },
   {
-    title: t('governanceVotingSystem'),
+    title: t('governanceVoting'),
     image: "/home/createProposal.png",
     description: t('governanceVotingSystemDesc')
   },

@@ -288,80 +288,89 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
           {/* Header Loading */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-2">
-              <div className="h-8 bg-gray-700 rounded w-48 animate-pulse"></div>
-              <div className="h-5 bg-gray-700 rounded w-64 animate-pulse"></div>
-              <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
+              {/* Mobile: vertical layout, Desktop: horizontal layout - exactly like real header */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 sm:gap-4">
+                <div className="h-8 bg-gray-700 rounded w-24 animate-pulse"></div>
+                <div className="h-6 bg-gray-700 rounded w-48 animate-pulse"></div>
+              </div>
             </div>
           </div>
 
-          {/* Table Loading */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-6 bg-gray-700 rounded w-48 animate-pulse"></div>
-              <div className="h-6 bg-gray-700 rounded w-20 animate-pulse"></div>
-            </div>
-            
-            <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-700 bg-gray-900/80">
-                        <th className="text-left py-3 px-4 min-w-[120px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-4 min-w-[100px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-6 min-w-[120px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-6 min-w-[100px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-4 min-w-[140px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
-                        </th>
-                        <th className="text-left py-3 px-4 min-w-[140px] whitespace-nowrap">
-                          <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <tr key={i} className="border-0">
-                          <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
-                            <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          {/* Table Loading - matching exact structure */}
+          <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6 min-w-[120px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-8 animate-pulse"></div>
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8 min-w-[100px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-10 animate-pulse"></div>
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10 min-w-[120px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-12 animate-pulse"></div>
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6 min-w-[100px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">
+                        <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <tr key={i} className="hover:bg-gray-800/30 transition-colors cursor-pointer">
+                        {/* Type column - "1 Week" */}
+                        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+                          <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+                        </td>
+                        
+                        {/* Profit column - icon + percentage */}
+                        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <div className="h-3 w-3 bg-gray-700 animate-pulse"></div>
                             <div className="h-4 bg-gray-700 rounded w-16 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
-                            <div className="flex gap-2">
-                              <div className="h-6 bg-gray-700 rounded-full w-16 animate-pulse"></div>
-                              <div className="h-6 bg-gray-700 rounded-full w-14 animate-pulse"></div>
+                          </div>
+                        </td>
+                        
+                        {/* Status column - badge(s) */}
+                        <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 bg-gray-700 rounded-full w-16 animate-pulse"></div>
+                          </div>
+                        </td>
+                        
+                        {/* Challenge column - circular number badge */}
+                        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <div className="h-7 w-7 bg-gray-700 rounded animate-pulse"></div>
                             </div>
-                          </td>
-                          <td className="py-6 px-6 min-w-[100px] whitespace-nowrap">
-                            <div className="space-y-2">
-                              <div className="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
-                              <div className="h-3 bg-gray-700 rounded w-16 animate-pulse"></div>
-                            </div>
-                          </td>
-                          <td className="py-6 px-4 min-w-[140px] whitespace-nowrap">
-                            <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                          </td>
-                          <td className="py-6 px-4 min-w-[140px] whitespace-nowrap">
-                            <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                          </div>
+                        </td>
+                        
+                        {/* Start Date column */}
+                        <td className="py-6 px-4 text-gray-300 min-w-[140px] whitespace-nowrap">
+                          <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                        </td>
+                        
+                        {/* End Date column */}
+                        <td className="py-6 px-4 text-gray-300 min-w-[140px] whitespace-nowrap">
+                          <div className="h-4 bg-gray-700 rounded w-28 animate-pulse"></div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )

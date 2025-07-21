@@ -276,23 +276,24 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
 
   if (isLoading || weeklyIsLoading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="bg-muted border-gray-700/50 lg:col-span-2">
-          <CardHeader>
-            <div className="h-8 bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 bg-gray-700 rounded animate-pulse mt-2 w-2/3"></div>
+      <div className="mb-6">
+        <Card className="bg-transparent border-0 -mt-12">
+          <CardHeader className="pb-2 px-1 sm:px-6 md:-ml-2">
+            <div className="h-8 bg-gray-700 rounded animate-pulse mb-4"></div>
+            <div className="h-12 bg-gray-700 rounded animate-pulse w-1/3 mb-2"></div>
+            <div className="h-4 bg-gray-700 rounded animate-pulse w-1/2"></div>
           </CardHeader>
-          <CardContent>
-            <div className="h-80 bg-gray-700 rounded animate-pulse"></div>
-          </CardContent>
-        </Card>
-        <Card className="bg-muted border-gray-700/50 lg:col-span-1">
-          <CardHeader>
-            <div className="h-8 bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 bg-gray-700 rounded animate-pulse mt-2 w-2/3"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80 bg-gray-700 rounded animate-pulse"></div>
+          <CardContent className="px-1 sm:px-6 md:-ml-2">
+            <div className="h-80 bg-gray-700 rounded animate-pulse mb-4"></div>
+            {/* Daily/Weekly buttons skeleton */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50">
+                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse mr-1"></div>
+                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            {/* Separator */}
+            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 pt-2"></div>
           </CardContent>
         </Card>
       </div>

@@ -27,7 +27,7 @@ import { InvestorPageProps, RealTimePortfolio } from "./types"
 import { calculatePortfolioMetrics, getChallengeDetails, getTimeRemaining, getTokenExplorerUrl, getExplorerUrl, getExplorerName } from "./utils"
 
 // Import components
-import { MainLoadingState, ErrorState } from "./components/LoadingStates"
+import { ErrorState } from "./components/LoadingStates"
 import { PortfolioTab } from "./components/PortfolioTab"
 import { TransactionsTab } from "./components/TransactionsTab"
 import { RankingTab } from "./components/RankingTab"
@@ -230,10 +230,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const challengeDetails = getChallengeDetails(challengeData)
   const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
 
-  // Handle loading and error states
-  if (isLoadingInvestor || isLoadingChallenge || isLoadingTransactions) {
-    return <MainLoadingState challengeId={challengeId} />
-  }
+  // Handle loading and error states - removed main loading state for better UX
 
   // Handle errors by showing loading UI instead of 404
   if (investorError || tokensError || challengeError || transactionsError || !investorData?.investor) {    
