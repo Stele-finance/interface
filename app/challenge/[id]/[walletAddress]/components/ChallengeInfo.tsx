@@ -25,28 +25,65 @@ export function ChallengeInfo({
   const { t } = useLanguage()
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
+  const [showSeedMoneyTooltip, setShowSeedMoneyTooltip] = useState(false)
+  const [seedMoneyTooltipTimer, setSeedMoneyTooltipTimer] = useState<NodeJS.Timeout | null>(null)
 
-  // Handle click outside to close mobile tooltip
+  // Handle interactions to close mobile tooltips
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showMobileTooltip) {
+    const closeAllTooltips = () => {
+      if (showMobileTooltip || showSeedMoneyTooltip) {
         setShowMobileTooltip(false);
+        setShowSeedMoneyTooltip(false);
         // Clear timer when closing tooltip
         if (tooltipTimer) {
           clearTimeout(tooltipTimer);
           setTooltipTimer(null);
         }
+        if (seedMoneyTooltipTimer) {
+          clearTimeout(seedMoneyTooltipTimer);
+          setSeedMoneyTooltipTimer(null);
+        }
       }
     };
 
-    if (showMobileTooltip) {
+    const handleClickOutside = (event: MouseEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleScroll = () => {
+      closeAllTooltips();
+    };
+
+    const handleWheel = () => {
+      closeAllTooltips();
+    };
+
+    if (showMobileTooltip || showSeedMoneyTooltip) {
       document.addEventListener('click', handleClickOutside);
+      document.addEventListener('touchstart', handleTouchStart, { passive: true });
+      document.addEventListener('touchmove', handleTouchMove, { passive: true });
+      document.addEventListener('scroll', handleScroll, { passive: true });
+      document.addEventListener('wheel', handleWheel, { passive: true });
+      window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [showMobileTooltip, tooltipTimer]);
+  }, [showMobileTooltip, showSeedMoneyTooltip, tooltipTimer, seedMoneyTooltipTimer]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -54,8 +91,58 @@ export function ChallengeInfo({
       if (tooltipTimer) {
         clearTimeout(tooltipTimer);
       }
+      if (seedMoneyTooltipTimer) {
+        clearTimeout(seedMoneyTooltipTimer);
+      }
     };
-  }, [tooltipTimer]);
+  }, [tooltipTimer, seedMoneyTooltipTimer]);
+
+  // Helper function to handle tooltip click for mobile
+  const handleTooltipClick = (
+    e: React.MouseEvent,
+    tooltipType: 'progress' | 'seedmoney',
+    currentShow: boolean,
+    setShow: (show: boolean) => void,
+    currentTimer: NodeJS.Timeout | null,
+    setTimer: (timer: NodeJS.Timeout | null) => void
+  ) => {
+    e.stopPropagation();
+    
+    // Clear existing timer
+    if (currentTimer) {
+      clearTimeout(currentTimer);
+      setTimer(null);
+    }
+    
+    if (!currentShow) {
+      // Show tooltip
+      setShow(true);
+      
+      // Auto-close after 2 seconds on mobile
+      if (!window.matchMedia('(hover: hover)').matches) {
+        const timer = setTimeout(() => {
+          setShow(false);
+          setTimer(null);
+        }, 2000);
+        setTimer(timer);
+      }
+    } else {
+      // Hide tooltip
+      setShow(false);
+    }
+  };
+
+  // Helper function to handle tooltip hover for desktop
+  const handleTooltipHover = (
+    show: boolean,
+    tooltipType: 'progress' | 'seedmoney',
+    setShow: (show: boolean) => void
+  ) => {
+    // Only trigger on desktop (devices with hover capability)
+    if (window.matchMedia('(hover: hover)').matches) {
+      setShow(show);
+    }
+  };
 
   return (
     <Card className="bg-muted border-0 rounded-2xl">
@@ -74,9 +161,21 @@ export function ChallengeInfo({
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('seedMoney')}</span>
             <TooltipProvider>
-              <Tooltip>
+              <Tooltip open={showSeedMoneyTooltip}>
                 <TooltipTrigger asChild>
-                  <div className="text-3xl text-white">
+                  <div 
+                    className="text-3xl text-white cursor-pointer"
+                    onClick={(e) => handleTooltipClick(
+                      e, 
+                      'seedmoney', 
+                      showSeedMoneyTooltip, 
+                      setShowSeedMoneyTooltip, 
+                      seedMoneyTooltipTimer, 
+                      setSeedMoneyTooltipTimer
+                    )}
+                    onMouseEnter={() => handleTooltipHover(true, 'seedmoney', setShowSeedMoneyTooltip)}
+                    onMouseLeave={() => handleTooltipHover(false, 'seedmoney', setShowSeedMoneyTooltip)}
+                  >
                     {(() => {
                       // If we have challenge data and seedMoney is available
                       if (challengeData?.challenge?.seedMoney) {
@@ -127,44 +226,16 @@ export function ChallengeInfo({
                 <TooltipTrigger asChild>
                   <div 
                     className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      
-                      // Clear existing timer
-                      if (tooltipTimer) {
-                        clearTimeout(tooltipTimer);
-                        setTooltipTimer(null);
-                      }
-                      
-                      if (!showMobileTooltip) {
-                        // Show tooltip
-                        setShowMobileTooltip(true);
-                        
-                        // Auto-close after 4 seconds on mobile
-                        if (!window.matchMedia('(hover: hover)').matches) {
-                          const timer = setTimeout(() => {
-                            setShowMobileTooltip(false);
-                            setTooltipTimer(null);
-                          }, 4000);
-                          setTooltipTimer(timer);
-                        }
-                      } else {
-                        // Hide tooltip
-                        setShowMobileTooltip(false);
-                      }
-                    }}
-                    onMouseEnter={() => {
-                      // Only trigger on desktop (devices with hover capability)
-                      if (window.matchMedia('(hover: hover)').matches) {
-                        setShowMobileTooltip(true);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      // Only trigger on desktop (devices with hover capability)
-                      if (window.matchMedia('(hover: hover)').matches) {
-                        setShowMobileTooltip(false);
-                      }
-                    }}
+                    onClick={(e) => handleTooltipClick(
+                      e, 
+                      'progress', 
+                      showMobileTooltip, 
+                      setShowMobileTooltip, 
+                      tooltipTimer, 
+                      setTooltipTimer
+                    )}
+                    onMouseEnter={() => handleTooltipHover(true, 'progress', setShowMobileTooltip)}
+                    onMouseLeave={() => handleTooltipHover(false, 'progress', setShowMobileTooltip)}
                   >
                     <div 
                       className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"

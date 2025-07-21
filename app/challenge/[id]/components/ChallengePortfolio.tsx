@@ -230,6 +230,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  // Mobile tooltip state for Type and Status
+  const [showTypeTooltip, setShowTypeTooltip] = useState(false)
+  const [showStatusTooltip, setShowStatusTooltip] = useState(false)
+  const [typeTooltipTimer, setTypeTooltipTimer] = useState<NodeJS.Timeout | null>(null)
+  const [statusTooltipTimer, setStatusTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -285,6 +291,122 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork);
   const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
+
+  // Handle interactions to close mobile tooltips
+  useEffect(() => {
+    const closeAllTooltips = () => {
+      if (showTypeTooltip || showStatusTooltip) {
+        setShowTypeTooltip(false);
+        setShowStatusTooltip(false);
+        // Clear timers when closing tooltips
+        if (typeTooltipTimer) {
+          clearTimeout(typeTooltipTimer);
+          setTypeTooltipTimer(null);
+        }
+        if (statusTooltipTimer) {
+          clearTimeout(statusTooltipTimer);
+          setStatusTooltipTimer(null);
+        }
+      }
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      closeAllTooltips();
+    };
+
+    const handleScroll = () => {
+      closeAllTooltips();
+    };
+
+    const handleWheel = () => {
+      closeAllTooltips();
+    };
+
+    if (showTypeTooltip || showStatusTooltip) {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('touchstart', handleTouchStart, { passive: true });
+      document.addEventListener('touchmove', handleTouchMove, { passive: true });
+      document.addEventListener('scroll', handleScroll, { passive: true });
+      document.addEventListener('wheel', handleWheel, { passive: true });
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [showTypeTooltip, showStatusTooltip, typeTooltipTimer, statusTooltipTimer]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (typeTooltipTimer) {
+        clearTimeout(typeTooltipTimer);
+      }
+      if (statusTooltipTimer) {
+        clearTimeout(statusTooltipTimer);
+      }
+    };
+  }, [typeTooltipTimer, statusTooltipTimer]);
+
+  // Helper function to handle tooltip click for mobile
+  const handleTooltipClick = (
+    e: React.MouseEvent,
+    tooltipType: 'type' | 'status',
+    currentShow: boolean,
+    setShow: (show: boolean) => void,
+    currentTimer: NodeJS.Timeout | null,
+    setTimer: (timer: NodeJS.Timeout | null) => void
+  ) => {
+    e.stopPropagation();
+    
+    // Clear existing timer
+    if (currentTimer) {
+      clearTimeout(currentTimer);
+      setTimer(null);
+    }
+    
+    if (!currentShow) {
+      // Show tooltip
+      setShow(true);
+      
+      // Auto-close after 2 seconds on mobile
+      if (!window.matchMedia('(hover: hover)').matches) {
+        const timer = setTimeout(() => {
+          setShow(false);
+          setTimer(null);
+        }, 2000);
+        setTimer(timer);
+      }
+    } else {
+      // Hide tooltip
+      setShow(false);
+    }
+  };
+
+  // Helper function to handle tooltip hover for desktop
+  const handleTooltipHover = (
+    show: boolean,
+    tooltipType: 'type' | 'status',
+    setShow: (show: boolean) => void
+  ) => {
+    // Only trigger on desktop (devices with hover capability)
+    if (window.matchMedia('(hover: hover)').matches) {
+      setShow(show);
+    }
+  };
 
 
 
@@ -1336,9 +1458,21 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 <div className="space-y-2">
                   <span className="text-base text-gray-400">{t('type')}</span>
                   <TooltipProvider>
-                    <Tooltip>
+                    <Tooltip open={showTypeTooltip}>
                       <TooltipTrigger asChild>
-                        <div className="text-3xl text-white">
+                        <div 
+                          className="text-3xl text-white cursor-pointer"
+                          onClick={(e) => handleTooltipClick(
+                            e, 
+                            'type', 
+                            showTypeTooltip, 
+                            setShowTypeTooltip, 
+                            typeTooltipTimer, 
+                            setTypeTooltipTimer
+                          )}
+                          onMouseEnter={() => handleTooltipHover(true, 'type', setShowTypeTooltip)}
+                          onMouseLeave={() => handleTooltipHover(false, 'type', setShowTypeTooltip)}
+                        >
                           {challengeData?.challenge ? (() => {
                             const challengeType = challengeData.challenge.challengeType;
                             switch(challengeType) {
@@ -1394,23 +1528,35 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                       )}
                     </div>
                     <TooltipProvider>
-                      <Tooltip>
+                      <Tooltip open={showStatusTooltip}>
                         <TooltipTrigger asChild>
-                          <span className={`text-xl font-medium ${(() => {
-                            if (!challengeData?.challenge) return 'text-red-400';
-                            
-                            const challenge = challengeData.challenge;
-                            const endTime = new Date(parseInt(challenge.endTime) * 1000);
-                            const hasEnded = currentTime >= endTime;
-                            
-                            if (challenge.isActive && !hasEnded) {
-                              return 'text-green-400'; // active
-                            } else if (challenge.isActive && hasEnded) {
-                              return 'text-orange-400'; // pending
-                            } else {
-                              return 'text-gray-400'; // end
-                            }
-                          })()}`}>
+                          <span 
+                            className={`text-xl font-medium cursor-pointer ${(() => {
+                              if (!challengeData?.challenge) return 'text-red-400';
+                              
+                              const challenge = challengeData.challenge;
+                              const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                              const hasEnded = currentTime >= endTime;
+                              
+                              if (challenge.isActive && !hasEnded) {
+                                return 'text-green-400'; // active
+                              } else if (challenge.isActive && hasEnded) {
+                                return 'text-orange-400'; // pending
+                              } else {
+                                return 'text-gray-400'; // end
+                              }
+                            })()}`}
+                            onClick={(e) => handleTooltipClick(
+                              e,
+                              'status',
+                              showStatusTooltip,
+                              setShowStatusTooltip,
+                              statusTooltipTimer,
+                              setStatusTooltipTimer
+                            )}
+                            onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
+                            onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                          >
                             {(() => {
                               if (!challengeData?.challenge) return t('end');
                               
@@ -1505,12 +1651,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                 // Show tooltip
                                 setShowMobileTooltip(true);
                                 
-                                // Auto-close after 4 seconds on mobile
+                                // Auto-close after 2 seconds on mobile
                                 if (!window.matchMedia('(hover: hover)').matches) {
                                   const timer = setTimeout(() => {
                                     setShowMobileTooltip(false);
                                     setTooltipTimer(null);
-                                  }, 4000);
+                                  }, 2000);
                                   setTooltipTimer(timer);
                                 }
                               } else {
