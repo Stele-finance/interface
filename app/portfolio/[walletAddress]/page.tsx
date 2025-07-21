@@ -112,12 +112,22 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     const profitRatio = parseFloat(investor.profitRatio) || 0
     const isPositive = profitRatio >= 0
 
-    // Check if challenge is active based on challenge data
-    const isActive = useMemo(() => {
-      if (!challengeData?.challenge?.endTime) return false
+    // Check challenge status based on challenge data
+    const challengeStatus = useMemo(() => {
+      if (!challengeData?.challenge?.endTime) return 'end'
+      
+      const challenge = challengeData.challenge
       const currentTime = Math.floor(Date.now() / 1000)
-      const endTime = parseInt(challengeData.challenge.endTime)
-      return currentTime < endTime
+      const endTime = parseInt(challenge.endTime)
+      const hasEnded = currentTime >= endTime
+      
+      if (challenge.isActive && !hasEnded) {
+        return 'active'
+      } else if (challenge.isActive && hasEnded) {
+        return 'pending'
+      } else {
+        return 'end'
+      }
     }, [challengeData])
 
     const challengeType = challengeData?.challenge?.challengeType ?? parseInt(investor.challengeId) % 5
@@ -170,23 +180,41 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                 </Tooltip>
               </TooltipProvider>
             )}
-            {isActive ? (
-              <Badge 
-                variant="default"
-                className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap"
-              >
-                <Clock className="h-3 w-3 mr-1" />
-                {t('active')}
-              </Badge>
-            ) : (
-              <Badge 
-                variant="secondary"
-                className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
-              >
-                <CheckCircle className="h-3 w-3 mr-1" />
-                {t('finished')}
-              </Badge>
-            )}
+            {(() => {
+              switch (challengeStatus) {
+                case 'active':
+                  return (
+                    <Badge 
+                      variant="default"
+                      className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      {t('active')}
+                    </Badge>
+                  )
+                case 'pending':
+                  return (
+                    <Badge 
+                      variant="default"
+                      className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs whitespace-nowrap"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      {t('pending')}
+                    </Badge>
+                  )
+                case 'end':
+                default:
+                  return (
+                    <Badge 
+                      variant="secondary"
+                      className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {t('end')}
+                    </Badge>
+                  )
+              }
+            })()}
           </div>
         </td>
         <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">

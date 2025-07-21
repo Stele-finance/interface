@@ -192,7 +192,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     } else {
       return {
         status: 'end',
-        color: 'text-red-400',
+        color: 'text-gray-400',
         text: t('end')
       }
     }

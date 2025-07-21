@@ -20,7 +20,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, Clock, Trophy, Wallet } from "lucide-react"
+import { Users, Clock, Trophy, Wallet, CheckCircle } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -467,8 +467,8 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         )
       case "end":
         return (
-          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-blue-500/20 focus:bg-blue-500/20 transition-none">
-            <Trophy className="h-4 w-4" />
+          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
+            <CheckCircle className="h-3 w-3" />
             {t('end')}
           </Badge>
         )

@@ -96,22 +96,54 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-red-400">{t('end')}</span>
+                      <span className="text-xl text-gray-400">{t('end')}</span>
                     </>
                   )
                 }
-                // Otherwise show challenge active status
-                const isActive = challengeData?.challenge?.isActive
-                return (
-                  <>
-                    <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                      {networkIcon}
-                    </div>
-                    <span className={`text-xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
-                      {isActive ? t('active') : t('pending')}
-                    </span>
-                  </>
-                )
+                // Otherwise show challenge status based on time and isActive
+                if (!challengeData?.challenge) {
+                  return (
+                    <>
+                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
+                        {networkIcon}
+                      </div>
+                      <span className="text-xl text-gray-400">{t('end')}</span>
+                    </>
+                  )
+                }
+                
+                const challenge = challengeData.challenge
+                const endTime = new Date(parseInt(challenge.endTime) * 1000)
+                const hasEnded = new Date() >= endTime
+                
+                if (challenge.isActive && !hasEnded) {
+                  return (
+                    <>
+                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
+                        {networkIcon}
+                      </div>
+                      <span className="text-xl text-green-400">{t('active')}</span>
+                    </>
+                  )
+                } else if (challenge.isActive && hasEnded) {
+                  return (
+                    <>
+                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
+                        {networkIcon}
+                      </div>
+                      <span className="text-xl text-orange-400">{t('pending')}</span>
+                    </>
+                  )
+                } else {
+                  return (
+                    <>
+                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
+                        {networkIcon}
+                      </div>
+                      <span className="text-xl text-gray-400">{t('end')}</span>
+                    </>
+                  )
+                }
               })()}
             </div>
           </div>

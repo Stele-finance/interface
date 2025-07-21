@@ -1396,7 +1396,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                       } else if (challenge.isActive && hasEnded) {
                         return 'text-orange-400'; // pending
                       } else {
-                        return 'text-red-400'; // end
+                        return 'text-gray-400'; // end
                       }
                     })()}`}>
                       {(() => {
