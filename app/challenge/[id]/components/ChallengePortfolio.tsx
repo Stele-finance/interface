@@ -1335,19 +1335,28 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 {/* Type */}
                 <div className="space-y-2">
                   <span className="text-base text-gray-400">{t('type')}</span>
-                  <div className="text-3xl text-white">
-                    {challengeData?.challenge ? (() => {
-                      const challengeType = challengeData.challenge.challengeType;
-                      switch(challengeType) {
-                        case 0: return t('oneWeek');
-                        case 1: return t('oneMonth');
-                        case 2: return t('threeMonths');
-                        case 3: return t('sixMonths');
-                        case 4: return t('oneYear');
-                        default: return `Type ${challengeType}`;
-                      }
-                    })() : t('loading')}
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-3xl text-white">
+                          {challengeData?.challenge ? (() => {
+                            const challengeType = challengeData.challenge.challengeType;
+                            switch(challengeType) {
+                              case 0: return t('oneWeek');
+                              case 1: return t('oneMonth');
+                              case 2: return t('threeMonths');
+                              case 3: return t('sixMonths');
+                              case 4: return t('oneYear');
+                              default: return `Type ${challengeType}`;
+                            }
+                          })() : t('loading')}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">Challenge period</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
                 
                 {/* Status */}
@@ -1384,37 +1393,50 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         />
                       )}
                     </div>
-                    <span className={`text-xl font-medium ${(() => {
-                      if (!challengeData?.challenge) return 'text-red-400';
-                      
-                      const challenge = challengeData.challenge;
-                      const endTime = new Date(parseInt(challenge.endTime) * 1000);
-                      const hasEnded = currentTime >= endTime;
-                      
-                      if (challenge.isActive && !hasEnded) {
-                        return 'text-green-400'; // active
-                      } else if (challenge.isActive && hasEnded) {
-                        return 'text-orange-400'; // pending
-                      } else {
-                        return 'text-gray-400'; // end
-                      }
-                    })()}`}>
-                      {(() => {
-                        if (!challengeData?.challenge) return t('end');
-                        
-                        const challenge = challengeData.challenge;
-                        const endTime = new Date(parseInt(challenge.endTime) * 1000);
-                        const hasEnded = currentTime >= endTime;
-                        
-                        if (challenge.isActive && !hasEnded) {
-                          return t('active');
-                        } else if (challenge.isActive && hasEnded) {
-                          return t('pending');
-                        } else {
-                          return t('end');
-                        }
-                      })()}
-                    </span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className={`text-xl font-medium ${(() => {
+                            if (!challengeData?.challenge) return 'text-red-400';
+                            
+                            const challenge = challengeData.challenge;
+                            const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                            const hasEnded = currentTime >= endTime;
+                            
+                            if (challenge.isActive && !hasEnded) {
+                              return 'text-green-400'; // active
+                            } else if (challenge.isActive && hasEnded) {
+                              return 'text-orange-400'; // pending
+                            } else {
+                              return 'text-gray-400'; // end
+                            }
+                          })()}`}>
+                            {(() => {
+                              if (!challengeData?.challenge) return t('end');
+                              
+                              const challenge = challengeData.challenge;
+                              const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                              const hasEnded = currentTime >= endTime;
+                              
+                              if (challenge.isActive && !hasEnded) {
+                                return t('active');
+                              } else if (challenge.isActive && hasEnded) {
+                                return t('pending');
+                              } else {
+                                return t('end');
+                              }
+                            })()}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <div className="text-sm space-y-1">
+                            <p><strong>Active:</strong> Challenge in progress</p>
+                            <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                            <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useLanguage } from "@/lib/language-context"
 import { PortfolioMetrics, RealTimePortfolio } from "../types"
 import Image from "next/image"
@@ -32,25 +33,34 @@ export function PortfolioSummary({
           {/* Type */}
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('type')}</span>
-            <div className="text-3xl text-white">
-              {(() => {
-                const challengeType = challengeData?.challenge?.challengeType
-                switch (challengeType) {
-                  case 0:
-                    return t('oneWeek');
-                  case 1:
-                    return t('oneMonth');
-                  case 2:
-                    return t('threeMonths');
-                  case 3:
-                    return t('sixMonths');
-                  case 4:
-                    return t('oneYear');
-                  default:
-                    return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
-                }
-              })()}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="text-3xl text-white">
+                    {(() => {
+                      const challengeType = challengeData?.challenge?.challengeType
+                      switch (challengeType) {
+                        case 0:
+                          return t('oneWeek');
+                        case 1:
+                          return t('oneMonth');
+                        case 2:
+                          return t('threeMonths');
+                        case 3:
+                          return t('sixMonths');
+                        case 4:
+                          return t('oneYear');
+                        default:
+                          return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
+                      }
+                    })()}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm">Challenge period</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           
           {/* Status */}
@@ -96,7 +106,20 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-gray-400">{t('end')}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xl text-gray-400">{t('end')}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-sm space-y-1">
+                              <p><strong>Active:</strong> Challenge in progress</p>
+                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </>
                   )
                 }
@@ -107,7 +130,20 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-gray-400">{t('end')}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xl text-gray-400">{t('end')}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-sm space-y-1">
+                              <p><strong>Active:</strong> Challenge in progress</p>
+                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </>
                   )
                 }
@@ -122,7 +158,20 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-green-400">{t('active')}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xl text-green-400">{t('active')}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-sm space-y-1">
+                              <p><strong>Active:</strong> Challenge in progress</p>
+                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </>
                   )
                 } else if (challenge.isActive && hasEnded) {
@@ -131,7 +180,20 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-orange-400">{t('pending')}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xl text-orange-400">{t('pending')}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-sm space-y-1">
+                              <p><strong>Active:</strong> Challenge in progress</p>
+                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </>
                   )
                 } else {
@@ -140,7 +202,20 @@ export function PortfolioSummary({
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-gray-400">{t('end')}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xl text-gray-400">{t('end')}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-sm space-y-1">
+                              <p><strong>Active:</strong> Challenge in progress</p>
+                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
+                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </>
                   )
                 }
@@ -152,14 +227,23 @@ export function PortfolioSummary({
         {/* Portfolio Value */}
         <div className="space-y-2">
           <span className="text-base text-gray-400">{t('onChainValue')}</span>
-          <div className="flex items-baseline gap-1">
-            <div className="text-4xl text-white">
-              ${currentValue.toFixed(2)}
-            </div>
-            <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-              ({isPositive ? '+' : ''}{gainLossPercentage.toFixed(2)}%)
-            </div>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-baseline gap-1">
+                  <div className="text-4xl text-white">
+                    ${currentValue.toFixed(2)}
+                  </div>
+                  <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                    ({isPositive ? '+' : ''}{gainLossPercentage.toFixed(2)}%)
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm">Portfolio value stored on-chain</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {/* Real-time portfolio value */}
           {realTimePortfolio && (
             <div className="space-y-1">
@@ -169,10 +253,19 @@ export function PortfolioSummary({
                 const isRealTimePositive = realTimeGainLoss >= 0
                 
                 return (
-                  <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
-                    <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-                    {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className={`text-base flex items-center gap-2 ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
+                          {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">Real-time portfolio value not yet reflected on-chain</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )
               })()}
             </div>
