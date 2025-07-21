@@ -182,3 +182,70 @@ export function getNetworkLogo(network: 'ethereum' | 'arbitrum'): string {
 export function getWalletLogo(wallet: 'metamask' | 'phantom' | 'walletconnect'): string {
   return `/wallets/small/${wallet}.png`
 }
+
+// Map language code to locale string for date formatting
+export function getLocaleFromLanguage(language: string): string {
+  const localeMap: { [key: string]: string } = {
+    'en': 'en-US',
+    'zh-cn': 'zh-CN',
+    'zh-tw': 'zh-TW',
+    'es': 'es-ES',
+    'hi': 'hi-IN',
+    'ar': 'ar-SA',
+    'bn': 'bn-BD',
+    'pt': 'pt-BR',
+    'ru': 'ru-RU',
+    'jp': 'ja-JP',
+    'kr': 'ko-KR',
+    'da': 'da-DK',
+    'nl': 'nl-NL',
+    'id': 'id-ID',
+    'ms': 'ms-MY',
+    'hu': 'hu-HU',
+    'de': 'de-DE',
+    'el': 'el-GR',
+    'fi': 'fi-FI',
+    'fr': 'fr-FR',
+    'he': 'he-IL',
+    'it': 'it-IT',
+    'th': 'th-TH',
+    'vi': 'vi-VN'
+  }
+  
+  return localeMap[language] || 'en-US'
+}
+
+// Format date with current language locale
+export function formatDateWithLocale(date: Date, language: string, options?: Intl.DateTimeFormatOptions): string {
+  const locale = getLocaleFromLanguage(language)
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }
+  
+  return date.toLocaleString(locale, { ...defaultOptions, ...options })
+}
+
+// Format date for chart x-axis (month/day only)
+export function formatChartDate(date: Date, language: string): string {
+  const locale = getLocaleFromLanguage(language)
+  return date.toLocaleString(locale, {
+    month: 'numeric',
+    day: 'numeric'
+  })
+}
+
+// Format date without time (year/month/day only)
+export function formatDateOnly(date: Date, language: string): string {
+  const locale = getLocaleFromLanguage(language)
+  return date.toLocaleString(locale, {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+  })
+}

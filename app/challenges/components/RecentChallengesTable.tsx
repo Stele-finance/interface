@@ -16,9 +16,10 @@ import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
 import { useRecentChallenges, RecentChallenge } from "../hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
+import { formatDateWithLocale } from "@/lib/utils"
 
 export function RecentChallengesTable() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter()
   const { network } = useWallet()
   
@@ -98,7 +99,7 @@ export function RecentChallengesTable() {
 
   const formatDate = (timestamp: string): string => {
     const date = new Date(Number(timestamp) * 1000)
-    return date.toLocaleDateString('en-US', {
+    return formatDateWithLocale(date, language, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

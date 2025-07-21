@@ -383,100 +383,36 @@ export function Header() {
                 )}
               </Button>
             ) : (
-              // PC: Show dropdown menu
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
-                  >
-                    {getWalletIcon() ? (
-                      <Image 
-                        src={getWalletIcon()!} 
-                        alt="Connected Wallet"
-                        width={16}
-                        height={16}
-                        className="mr-2"
-                        style={{ width: 'auto', height: '16px' }}
-                      />
-                    ) : (
-                      <Image 
-                        src={getWalletLogo('walletconnect')} 
-                        alt="WalletConnect"
-                        width={16}
-                        height={16}
-                        className="mr-2"
-                        style={{ width: 'auto', height: '16px' }}
-                      />
-                    )}
-                    <span className="text-base">
-                      {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-muted border-gray-600">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <span className="text-base font-semibold">{name}</span>
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {isLoadingBalance ? t('loading') : `${balance} ${symbol}`}
-                      </span>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => {
-                    navigator.clipboard.writeText(walletAddress)
-                    toast({
-                      variant: "default",
-                      title: "✅ Address copied!",
-                      description: "Wallet address copied to clipboard",
-                      duration: 2000,
-                    })
-                  }}>
-                    {t('copyAddress')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={fetchBalance}>
-                    {t('refreshBalance')}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel>{t('switchNetwork')}</DropdownMenuLabel>
-                  {walletNetwork !== 'ethereum' && (
-                    <DropdownMenuItem onClick={() => switchWalletNetwork('ethereum')}>
-                      <div className="flex items-center gap-2">
-                        <Image 
-                          src={getNetworkLogo('ethereum')} 
-                          alt="Ethereum Mainnet"
-                          width={16}
-                          height={16}
-                          className="rounded-full"
-                          style={{ width: '16px', height: '16px' }}
-                        />
-                        <span>{t('ethereumMainnet')}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
-                  {walletNetwork !== 'arbitrum' && (
-                    <DropdownMenuItem onClick={() => switchWalletNetwork('arbitrum')}>
-                      <div className="flex items-center gap-2">
-                        <Image 
-                          src={getNetworkLogo('arbitrum')} 
-                          alt="Arbitrum One"
-                          width={16}
-                          height={16}
-                          className="rounded-full"
-                          style={{ width: '16px', height: '16px' }}
-                        />
-                        <span>Arbitrum</span>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleDisconnectWallet}>
-                    {t('disconnect')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              // PC: Open AppKit modal directly on click - same as mobile
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-primary border-gray-600 bg-muted/40 hover:bg-muted/60 font-medium px-4 sm:px-6 py-3 h-auto text-base sm:text-lg"
+                onClick={() => openWalletModal()}
+              >
+                {getWalletIcon() ? (
+                  <Image 
+                    src={getWalletIcon()!} 
+                    alt="Connected Wallet"
+                    width={16}
+                    height={16}
+                    className="mr-2"
+                    style={{ width: 'auto', height: '16px' }}
+                  />
+                ) : (
+                  <Image 
+                    src={getWalletLogo('walletconnect')} 
+                    alt="WalletConnect"
+                    width={16}
+                    height={16}
+                    className="mr-2"
+                    style={{ width: 'auto', height: '16px' }}
+                  />
+                )}
+                <span className="text-base">
+                  {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
+                </span>
+              </Button>
             )}
           </div>
         ) : (

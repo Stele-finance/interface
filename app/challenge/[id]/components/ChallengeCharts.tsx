@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
+import { formatDateWithLocale, formatChartDate } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
@@ -43,7 +44,7 @@ interface ChallengeChartsProps {
 }
 
 export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeChartsProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
   const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
@@ -74,11 +75,11 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           id: snapshot.id,
           investorCount: Number(snapshot.investorCount),
           rewardAmountUSD: Number(snapshot.rewardAmountUSD), // Convert from wei to USD
-          formattedDate: date.toLocaleDateString('en-US', { 
+          formattedDate: formatDateWithLocale(date, language, { 
             month: 'short', 
             day: 'numeric'
           }),
-          fullDate: date.toLocaleDateString('en-US', { 
+          fullDate: formatDateWithLocale(date, language, { 
             month: 'short', 
             day: 'numeric',
             year: 'numeric',
@@ -86,10 +87,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             minute: '2-digit',
             hour12: true
           }),
-          timeLabel: date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-          }),
+          timeLabel: formatChartDate(date, language),
           dateLabel: date.toISOString().split('T')[0] // YYYY-MM-DD format
         }
       })
@@ -250,7 +248,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
   const remainingTime = getRemainingTime()
 
   // Get current date for header
-  const currentDate = new Date().toLocaleDateString('en-US', { 
+  const currentDate = formatDateWithLocale(new Date(), language, { 
     month: 'short', 
     day: 'numeric',
     year: 'numeric',
