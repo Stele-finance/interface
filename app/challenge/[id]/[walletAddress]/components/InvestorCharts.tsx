@@ -583,7 +583,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 return (
                   <ReferenceDot
                     key={`ranking-dot-${ranking.rank}`}
-                    x={chartData.length - 1}
+                    x={lastDataPoint.timeLabel}
                     y={ranking.value}
                     r={9}
                     fill={ranking.color}
@@ -657,7 +657,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               return (
                 <ReferenceDot
                   key={`portfolio-ref-dot-${Date.now()}`}
-                  x={chartData.length - 1}
+                  x={lastDataPoint.timeLabel}
                   y={Math.max(displayValue, 0)} // Display at minimum 0 or above
                   shape={<PulsingDot />}
                 />
@@ -691,7 +691,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               return (
                 <ReferenceDot
                   key={`fallback-position-dot-${lastDataPoint.id}`}
-                  x={chartData.length - 1}
+                  x={lastDataPoint.timeLabel}
                   y={Math.max(lastDataPoint.currentUSD, 0)} // Display at minimum 0 or above
                   shape={<UserPositionDot />}
                 />

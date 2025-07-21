@@ -73,17 +73,26 @@ export function ChallengeInfo({
           {/* Seed Money */}
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('seedMoney')}</span>
-            <div className="text-3xl text-white">
-              {(() => {
-                // If we have challenge data and seedMoney is available
-                if (challengeData?.challenge?.seedMoney) {
-                  const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                  return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
-                }
-                // Default fallback
-                return '$0';
-              })()}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="text-3xl text-white">
+                    {(() => {
+                      // If we have challenge data and seedMoney is available
+                      if (challengeData?.challenge?.seedMoney) {
+                        const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
+                        return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
+                      }
+                      // Default fallback
+                      return '$0';
+                    })()}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm">Virtual seed money stored on-chain. Not actual tokens.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
