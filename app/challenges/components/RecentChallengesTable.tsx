@@ -54,19 +54,18 @@ export function RecentChallengesTable() {
   const getChallengeStatus = (challenge: RecentChallenge) => {
     const startTime = new Date(Number(challenge.startTime) * 1000)
     const endTime = new Date(Number(challenge.endTime) * 1000)
+    const hasEnded = currentTime >= endTime
     
-    if (currentTime < startTime) {
+    if (challenge.isActive && !hasEnded) {
+      return "active"
+    } else if (challenge.isActive && hasEnded) {
       return "pending"
+    } else {
+      return "end"
     }
-    
-    if (currentTime >= endTime || !challenge.isActive) {
-      return "finished"
-    }
-    
-    return "active"
   }
 
-  const getStatusBadge = (status: "active" | "pending" | "finished") => {
+  const getStatusBadge = (status: "active" | "pending" | "end") => {
     switch (status) {
       case "active":
         return (
@@ -76,15 +75,20 @@ export function RecentChallengesTable() {
           </Badge>
         )
       case "pending":
-        return <Badge variant="outline" className="border-gray-600 text-gray-300 whitespace-nowrap pointer-events-none hover:bg-background focus:bg-background transition-none">{t('pending')}</Badge>
-      case "finished":
+        return (
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-2 py-1 flex items-center gap-1 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
+            <Clock className="h-3 w-3" />
+            {t('pending')}
+          </Badge>
+        )
+      case "end":
         return (
           <Badge 
             variant="secondary"
             className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none"
           >
             <CheckCircle className="h-3 w-3 mr-1" />
-            {t('finished')}
+            {t('end')}
           </Badge>
         )
       default:

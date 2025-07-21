@@ -1384,8 +1384,36 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         />
                       )}
                     </div>
-                    <span className={`text-xl font-medium ${challengeData?.challenge?.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                      {challengeData?.challenge?.isActive ? t('active') : t('ended')}
+                    <span className={`text-xl font-medium ${(() => {
+                      if (!challengeData?.challenge) return 'text-red-400';
+                      
+                      const challenge = challengeData.challenge;
+                      const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                      const hasEnded = currentTime >= endTime;
+                      
+                      if (challenge.isActive && !hasEnded) {
+                        return 'text-green-400'; // active
+                      } else if (challenge.isActive && hasEnded) {
+                        return 'text-orange-400'; // pending
+                      } else {
+                        return 'text-gray-400'; // end
+                      }
+                    })()}`}>
+                      {(() => {
+                        if (!challengeData?.challenge) return t('end');
+                        
+                        const challenge = challengeData.challenge;
+                        const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                        const hasEnded = currentTime >= endTime;
+                        
+                        if (challenge.isActive && !hasEnded) {
+                          return t('active');
+                        } else if (challenge.isActive && hasEnded) {
+                          return t('pending');
+                        } else {
+                          return t('end');
+                        }
+                      })()}
                     </span>
                   </div>
                 </div>

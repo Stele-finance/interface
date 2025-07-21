@@ -20,7 +20,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, Clock, Trophy, Wallet } from "lucide-react"
+import { Users, Clock, Trophy, Wallet, CheckCircle } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -35,7 +35,7 @@ interface ChallengeCardProps {
   timeLeft: string
   prize: string
   progress: number
-  status: "active" | "pending" | "finished"
+  status: "active" | "pending" | "end"
   startTime: string
   endTime: string
   isCompleted: boolean
@@ -380,7 +380,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_week_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, data.activeChallenges.one_week_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_week_isCompleted ? "finished" : 
+      status: data.activeChallenges.one_week_isCompleted ? "end" : 
               isClient && currentTime > new Date(Number(data.activeChallenges.one_week_endTime) * 1000) ? "pending" : "active",
       startTime: data.activeChallenges.one_week_startTime,
       endTime: data.activeChallenges.one_week_endTime,
@@ -395,7 +395,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, data.activeChallenges.one_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_month_isCompleted ? "finished" : 
+      status: data.activeChallenges.one_month_isCompleted ? "end" : 
               isClient && currentTime > new Date(Number(data.activeChallenges.one_month_endTime) * 1000) ? "pending" : "active",
       startTime: data.activeChallenges.one_month_startTime,
       endTime: data.activeChallenges.one_month_endTime,
@@ -410,7 +410,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.three_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, data.activeChallenges.three_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.three_month_isCompleted ? "finished" : 
+      status: data.activeChallenges.three_month_isCompleted ? "end" : 
               isClient && currentTime > new Date(Number(data.activeChallenges.three_month_endTime) * 1000) ? "pending" : "active",
       startTime: data.activeChallenges.three_month_startTime,
       endTime: data.activeChallenges.three_month_endTime,
@@ -425,7 +425,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.six_month_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, data.activeChallenges.six_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.six_month_isCompleted ? "finished" : 
+      status: data.activeChallenges.six_month_isCompleted ? "end" : 
               isClient && currentTime > new Date(Number(data.activeChallenges.six_month_endTime) * 1000) ? "pending" : "active",
       startTime: data.activeChallenges.six_month_startTime,
       endTime: data.activeChallenges.six_month_endTime,
@@ -440,7 +440,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime, t)) : t('loading'),
       prize: `$${Number(data.activeChallenges.one_year_rewardAmountUSD).toFixed(2)}`,
       progress: isClient ? calculateProgress(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, data.activeChallenges.one_year_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_year_isCompleted ? "finished" : 
+      status: data.activeChallenges.one_year_isCompleted ? "end" : 
               isClient && currentTime > new Date(Number(data.activeChallenges.one_year_endTime) * 1000) ? "pending" : "active",
       startTime: data.activeChallenges.one_year_startTime,
       endTime: data.activeChallenges.one_year_endTime,
@@ -449,7 +449,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     }
   ] : defaultChallenges;
 
-  const getStatusBadge = (status: "active" | "pending" | "finished") => {
+  const getStatusBadge = (status: "active" | "pending" | "end") => {
     switch (status) {
       case "active":
         return (
@@ -465,11 +465,11 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             {t('pending')}
           </Badge>
         )
-      case "finished":
+      case "end":
         return (
-          <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-blue-500/20 focus:bg-blue-500/20 transition-none">
-            <Trophy className="h-4 w-4" />
-            {t('finished')}
+          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
+            <CheckCircle className="h-3 w-3" />
+            {t('end')}
           </Badge>
         )
       default:

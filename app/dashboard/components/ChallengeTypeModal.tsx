@@ -24,7 +24,7 @@ interface ChallengeTypeModalProps {
   isCreating: boolean;
   activeChallenges?: Array<{
     challengeType: number;
-    status: "active" | "pending" | "completed" | "finished";
+    status: "active" | "pending" | "completed" | "end";
   }>;
 }
 
