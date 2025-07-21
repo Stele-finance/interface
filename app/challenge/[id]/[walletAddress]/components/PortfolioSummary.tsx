@@ -89,14 +89,14 @@ export function PortfolioSummary({
                   />
                 );
 
-                // If investor is closed, show as Finished
+                // If investor is closed, show as End
                 if (investorData?.investor?.isRegistered === true) {
                   return (
                     <>
                       <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
                         {networkIcon}
                       </div>
-                      <span className="text-xl text-red-400">{t('finished')}</span>
+                      <span className="text-xl text-red-400">{t('end')}</span>
                     </>
                   )
                 }
@@ -108,7 +108,7 @@ export function PortfolioSummary({
                       {networkIcon}
                     </div>
                     <span className={`text-xl ${isActive ? 'text-green-400' : 'text-orange-400'}`}>
-                      {isActive ? t('active') : 'Pending reward'}
+                      {isActive ? t('active') : t('pending')}
                     </span>
                   </>
                 )

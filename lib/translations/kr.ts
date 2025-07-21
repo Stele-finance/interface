@@ -82,6 +82,7 @@ export const kr = {
   disconnect: "연결 해제",
   doc: "문서",
   duration: "기간",
+  end: "종료",
   endDate: "종료일",
   ended: "종료됨",
   ends: "종료",

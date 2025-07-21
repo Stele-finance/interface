@@ -167,9 +167,9 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
   const getChallengeStatus = () => {
     if (!challengeData?.challenge) {
       return {
-        status: 'finished',
+        status: 'end',
         color: 'text-red-400',
-        text: t('finished')
+        text: t('end')
       }
     }
 
@@ -185,15 +185,15 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
       }
     } else if (challenge.isActive && hasEnded) {
       return {
-        status: 'pending_reward',
+        status: 'pending',
         color: 'text-orange-400',
-        text: 'Pending reward'
+        text: t('pending')
       }
     } else {
       return {
-        status: 'finished',
+        status: 'end',
         color: 'text-red-400',
-        text: t('finished')
+        text: t('end')
       }
     }
   }

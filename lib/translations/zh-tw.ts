@@ -82,6 +82,7 @@ export const zhTw = {
   disconnect: "斷開連接",
   doc: "文檔",
   duration: "持續時間",
+  end: "結束",
   endDate: "結束日期",
   ended: "已結束",
   ends: "結束",

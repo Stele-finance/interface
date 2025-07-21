@@ -82,6 +82,7 @@ export const zhCn = {
   disconnect: "断开连接",
   doc: "文档",
   duration: "持续时间",
+  end: "结束",
   endDate: "结束日期",
   ended: "已结束",
   ends: "结束",

@@ -82,6 +82,7 @@ export const hi = {
   disconnect: "डिस्कनेक्ट करें",
   doc: "दस्तावेज़",
   duration: "अवधि",
+  end: "समाप्त",
   endDate: "अंतिम तिथि",
   ended: "समाप्त",
   ends: "समाप्त होता है",

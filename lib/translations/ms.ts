@@ -82,6 +82,7 @@ export const ms = {
   disconnect: "Putuskan",
   doc: "Dokumentasi",
   duration: "Tempoh",
+  end: "Tamat",
   endDate: "Tarikh Tamat",
   ended: "Tamat",
   ends: "Tamat",

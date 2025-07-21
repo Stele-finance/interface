@@ -82,6 +82,7 @@ export const he = {
   disconnect: "נתק",
   doc: "מסמך",
   duration: "משך זמן",
+  end: "סוף",
   endDate: "תאריך סיום",
   ended: "הסתיים",
   ends: "מסתיים",

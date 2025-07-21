@@ -82,6 +82,7 @@ export const fr = {
   disconnect: "Déconnecter",
   doc: "Document",
   duration: "Durée",
+  end: "Fin",
   endDate: "Date de Fin",
   ended: "Terminé",
   ends: "Se termine",

@@ -82,6 +82,7 @@ export const pt = {
   disconnect: "Desconectar",
   doc: "Documentação",
   duration: "Duração",
+  end: "Fim",
   endDate: "Data de Término",
   ended: "Terminado",
   ends: "Termina",
