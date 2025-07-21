@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils"
 // Feature explanation cards
 const getFeatureCards = (t: any) => [
   {
-    title: t('seedMoneySystem'),
+    title: t('seedMoney'),
     image: "/home/seedmoney.png",
     description: t('seedMoneySystemDesc')
   },
