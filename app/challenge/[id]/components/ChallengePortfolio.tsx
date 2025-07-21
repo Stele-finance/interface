@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
+import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ChallengeCharts } from "./ChallengeCharts"
@@ -39,7 +40,7 @@ interface ChallengePortfolioProps {
 
 // Ranking Section Component
 function RankingSection({ challengeId, network }: { challengeId: string; network: 'ethereum' | 'arbitrum' | null }) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter();
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, network);
   const [currentPage, setCurrentPage] = useState(1);
@@ -196,7 +197,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             <div className="pb-2">
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500">
-                  Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
+                  Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
                 </div>
               </div>
             </div>
@@ -204,7 +205,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
           {rankingData && totalPages <= 1 && (
             <div className="pb-2">
               <div className="text-xs text-gray-500 text-center">
-                Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
+                Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
               </div>
             </div>
           )}
@@ -215,7 +216,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
 }
 
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isJoining, setIsJoining] = useState(false);
@@ -1736,8 +1737,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   
                   {/* Time Info */}
                   <div className="flex justify-between text-sm text-gray-500">
-                    <span>Start: {new Date(parseInt(challengeData.challenge.startTime) * 1000).toLocaleDateString()}</span>
-                    <span>End: {new Date(parseInt(challengeData.challenge.endTime) * 1000).toLocaleDateString()}</span>
+                    <span>{t('start')}: {formatDateOnly(new Date(parseInt(challengeData.challenge.startTime) * 1000), language)}</span>
+                    <span>{t('end')}: {formatDateOnly(new Date(parseInt(challengeData.challenge.endTime) * 1000), language)}</span>
                   </div>
                 </div>
               )}

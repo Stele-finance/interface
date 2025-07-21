@@ -7,6 +7,7 @@ import { useActiveChallengesWeeklySnapshots } from '../hooks/useActiveChallenges
 import { Users, DollarSign, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
+import { formatDateWithLocale, formatChartDate } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +31,7 @@ interface DashboardChartsProps {
 }
 
 export function DashboardCharts({ network }: DashboardChartsProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
@@ -55,11 +56,11 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         id: snapshot.id,
         totalParticipants: Number(snapshot.totalParticipants),
         totalRewards: Number(snapshot.totalRewards),
-        formattedDate: actualDate.toLocaleDateString('en-US', { 
+        formattedDate: formatDateWithLocale(actualDate, language, { 
           month: 'short', 
           day: 'numeric'
         }),
-        fullDate: actualDate.toLocaleDateString('en-US', { 
+        fullDate: formatDateWithLocale(actualDate, language, { 
           month: 'short', 
           day: 'numeric',
           year: 'numeric',
@@ -67,10 +68,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           minute: '2-digit',
           hour12: true
         }),
-        timeLabel: actualDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        }),
+        timeLabel: formatChartDate(actualDate, language),
         dateLabel: actualDate.toISOString().split('T')[0]
       }
     })
@@ -86,11 +84,11 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         id: snapshot.id,
         totalParticipants: Number(snapshot.totalParticipants),
         totalRewards: Number(snapshot.totalRewards),
-        formattedDate: actualDate.toLocaleDateString('en-US', { 
+        formattedDate: formatDateWithLocale(actualDate, language, { 
           month: 'short', 
           day: 'numeric'
         }),
-        fullDate: actualDate.toLocaleDateString('en-US', { 
+        fullDate: formatDateWithLocale(actualDate, language, { 
           month: 'short', 
           day: 'numeric',
           year: 'numeric',
@@ -98,10 +96,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           minute: '2-digit',
           hour12: true
         }),
-        timeLabel: actualDate.toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric'
-        }),
+        timeLabel: formatChartDate(actualDate, language),
         dateLabel: actualDate.toISOString().split('T')[0]
       }
     })

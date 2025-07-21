@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useLanguage } from "@/lib/language-context"
+import { formatDateOnly } from "@/lib/utils"
 import { ChallengeDetails, TimeRemaining } from "../types"
 import { getTimeRemaining } from "../utils"
 
@@ -22,7 +23,7 @@ export function ChallengeInfo({
   isClient, 
   currentTime 
 }: ChallengeInfoProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [showSeedMoneyTooltip, setShowSeedMoneyTooltip] = useState(false)
@@ -269,8 +270,8 @@ export function ChallengeInfo({
           
           {/* Time Info */}
           <div className="flex justify-between text-sm text-gray-500">
-            <span>{t('start')}: {challengeDetails?.startTime.toLocaleDateString() || 'N/A'}</span>
-            <span>End: {challengeDetails?.endTime.toLocaleDateString() || 'N/A'}</span>
+            <span>{t('start')}: {challengeDetails?.startTime ? formatDateOnly(challengeDetails.startTime, language) : 'N/A'}</span>
+            <span>{t('end')}: {challengeDetails?.endTime ? formatDateOnly(challengeDetails.endTime, language) : 'N/A'}</span>
           </div>
         </div>
       </CardContent>

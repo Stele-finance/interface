@@ -8,6 +8,7 @@ import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
+import { formatDateWithLocale, formatChartDate } from '@/lib/utils'
 
 interface RealTimePortfolio {
   totalValue: number
@@ -28,7 +29,7 @@ interface InvestorChartsProps {
 }
 
 export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily', actionButtons }: InvestorChartsProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
   const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 30, network)
   const { data: challengeData } = useChallenge(challengeId, network)
@@ -54,22 +55,17 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           currentUSD: parseFloat(snapshot.currentUSD) || 0,
           seedMoneyUSD: Number(snapshot.seedMoneyUSD),
           profitRatio: Number(snapshot.profitRatio),
-          formattedDate: interval === 'weekly' 
-            ? date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-              })
-            : date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-              }),
+          formattedDate: formatDateWithLocale(date, language, { 
+            month: 'short', 
+            day: 'numeric'
+          }),
           fullDate: interval === 'weekly'
-            ? date.toLocaleDateString('en-US', { 
+            ? formatDateWithLocale(date, language, { 
                 month: 'short', 
                 day: 'numeric',
                 year: 'numeric'
               })
-            : date.toLocaleDateString('en-US', { 
+            : formatDateWithLocale(date, language, { 
                 month: 'short', 
                 day: 'numeric',
                 year: 'numeric',
@@ -77,15 +73,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 minute: '2-digit',
                 hour12: true
               }),
-          timeLabel: interval === 'weekly'
-            ? date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-              })
-            : date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-              }),
+          timeLabel: formatChartDate(date, language),
                     dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           isRealTime: false
         }
@@ -102,11 +90,11 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         currentUSD: realTimePortfolio.totalValue,
         seedMoneyUSD: seedMoney,
         profitRatio: seedMoney > 0 ? ((realTimePortfolio.totalValue - seedMoney) / seedMoney) : 0,
-        formattedDate: currentDate.toLocaleDateString('en-US', { 
+        formattedDate: formatDateWithLocale(currentDate, language, { 
           month: 'short', 
           day: 'numeric'
         }),
-        fullDate: `${currentDate.toLocaleDateString('en-US', { 
+        fullDate: `${formatDateWithLocale(currentDate, language, { 
           month: 'short', 
           day: 'numeric',
           year: 'numeric',
@@ -114,10 +102,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           minute: '2-digit',
           hour12: true
         })} (Live)`,
-        timeLabel: currentDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        }),
+        timeLabel: formatChartDate(currentDate, language),
         dateLabel: currentDate.toISOString().split('T')[0],
         isRealTime: true
       }
@@ -255,7 +240,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   }, [chartData, rankingData])
 
   // Get current date for header
-  const currentDate = new Date().toLocaleDateString('en-US', { 
+  const currentDate = formatDateWithLocale(new Date(), language, { 
     month: 'short', 
     day: 'numeric',
     year: 'numeric',

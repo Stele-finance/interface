@@ -5,6 +5,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Loader2, Trophy } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
+import { formatDateWithLocale } from "@/lib/utils"
 
 interface RankingTabProps {
   rankingData: any
@@ -21,7 +22,7 @@ export function RankingTab({
   challengeId, 
   walletAddress 
 }: RankingTabProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter()
   const [rankingCurrentPage, setRankingCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -224,7 +225,7 @@ export function RankingTab({
           {rankingData && (
             <div className="border-t border-gray-700">
               <div className="mt-2 mb-2 text-xs text-gray-500 text-center">
-                Last updated: {new Date(parseInt(rankingData.updatedAtTimestamp) * 1000).toLocaleString()}
+                Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
               </div>
             </div>
           )}

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
+import { cn, formatDateWithLocale } from "@/lib/utils"
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -31,7 +31,7 @@ interface PortfolioPageProps {
 
 export default function PortfolioPage({ params }: PortfolioPageProps) {
   const { walletAddress } = use(params)
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { network } = useWallet()
   const router = useRouter()
   
@@ -78,7 +78,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
   }
 
   const formatDate = (timestamp: string) => {
-    return new Date(Number(timestamp) * 1000).toLocaleDateString('en-US', {
+    return formatDateWithLocale(new Date(Number(timestamp) * 1000), language, {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -87,11 +87,10 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
   const formatDateTime = (timestamp: string) => {
     const date = new Date(Number(timestamp) * 1000)
-    return date.toLocaleDateString('en-US', {
+    return formatDateWithLocale(date, language, {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
-    }) + ' ' + date.toLocaleTimeString('en-US', {
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
