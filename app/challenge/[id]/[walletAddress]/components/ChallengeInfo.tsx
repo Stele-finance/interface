@@ -98,7 +98,7 @@ export function ChallengeInfo({
     };
   }, [tooltipTimer, seedMoneyTooltipTimer]);
 
-  // Helper function to handle tooltip click for mobile
+  // Helper function to handle tooltip click for mobile and desktop
   const handleTooltipClick = (
     e: React.MouseEvent,
     tooltipType: 'progress' | 'seedmoney',
@@ -119,7 +119,7 @@ export function ChallengeInfo({
       // Show tooltip
       setShow(true);
       
-      // Auto-close after 2 seconds on mobile
+      // Auto-close after 2 seconds only for mobile
       if (!window.matchMedia('(hover: hover)').matches) {
         const timer = setTimeout(() => {
           setShow(false);
@@ -133,17 +133,25 @@ export function ChallengeInfo({
     }
   };
 
-  // Helper function to handle tooltip hover for desktop
-  const handleTooltipHover = (
-    show: boolean,
-    tooltipType: 'progress' | 'seedmoney',
-    setShow: (show: boolean) => void
+  // Helper function to handle mouse leave for desktop
+  const handleMouseLeave = (
+    setShow: (show: boolean) => void,
+    currentTimer: NodeJS.Timeout | null,
+    setTimer: (timer: NodeJS.Timeout | null) => void
   ) => {
     // Only trigger on desktop (devices with hover capability)
     if (window.matchMedia('(hover: hover)').matches) {
-      setShow(show);
+      // Clear any existing timer
+      if (currentTimer) {
+        clearTimeout(currentTimer);
+        setTimer(null);
+      }
+      // Hide tooltip immediately on mouse leave
+      setShow(false);
     }
   };
+
+  // Note: Using click-only approach for both desktop and mobile to prevent flickering issues
 
   return (
     <Card className="bg-muted border-0 rounded-2xl">
@@ -164,7 +172,7 @@ export function ChallengeInfo({
             <TooltipProvider>
               <Tooltip open={showSeedMoneyTooltip}>
                 <TooltipTrigger asChild>
-                  <div 
+                                    <div 
                     className="text-3xl text-white cursor-pointer"
                     onClick={(e) => handleTooltipClick(
                       e, 
@@ -174,8 +182,7 @@ export function ChallengeInfo({
                       seedMoneyTooltipTimer, 
                       setSeedMoneyTooltipTimer
                     )}
-                    onMouseEnter={() => handleTooltipHover(true, 'seedmoney', setShowSeedMoneyTooltip)}
-                    onMouseLeave={() => handleTooltipHover(false, 'seedmoney', setShowSeedMoneyTooltip)}
+                    onMouseLeave={() => handleMouseLeave(setShowSeedMoneyTooltip, seedMoneyTooltipTimer, setSeedMoneyTooltipTimer)}
                   >
                     {(() => {
                       // If we have challenge data and seedMoney is available
@@ -189,7 +196,7 @@ export function ChallengeInfo({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-sm">Virtual seed money stored on-chain. Not actual tokens.</p>
+                  <p className="text-sm">{t('tooltipSeedMoney')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -225,7 +232,7 @@ export function ChallengeInfo({
             <TooltipProvider>
               <Tooltip open={showMobileTooltip}>
                 <TooltipTrigger asChild>
-                  <div 
+                                    <div 
                     className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
                     onClick={(e) => handleTooltipClick(
                       e, 
@@ -235,8 +242,7 @@ export function ChallengeInfo({
                       tooltipTimer, 
                       setTooltipTimer
                     )}
-                    onMouseEnter={() => handleTooltipHover(true, 'progress', setShowMobileTooltip)}
-                    onMouseLeave={() => handleTooltipHover(false, 'progress', setShowMobileTooltip)}
+                    onMouseLeave={() => handleMouseLeave(setShowMobileTooltip, tooltipTimer, setTooltipTimer)}
                   >
                     <div 
                       className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"

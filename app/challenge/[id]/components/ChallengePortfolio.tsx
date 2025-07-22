@@ -362,7 +362,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     };
   }, [typeTooltipTimer, statusTooltipTimer]);
 
-  // Helper function to handle tooltip click for mobile
+  // Helper function to handle tooltip click for mobile and desktop
   const handleTooltipClick = (
     e: React.MouseEvent,
     tooltipType: 'type' | 'status',
@@ -383,7 +383,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       // Show tooltip
       setShow(true);
       
-      // Auto-close after 2 seconds on mobile
+      // Auto-close after 2 seconds only for mobile
       if (!window.matchMedia('(hover: hover)').matches) {
         const timer = setTimeout(() => {
           setShow(false);
@@ -397,17 +397,25 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     }
   };
 
-  // Helper function to handle tooltip hover for desktop
-  const handleTooltipHover = (
-    show: boolean,
-    tooltipType: 'type' | 'status',
-    setShow: (show: boolean) => void
+  // Helper function to handle mouse leave for desktop
+  const handleMouseLeave = (
+    setShow: (show: boolean) => void,
+    currentTimer: NodeJS.Timeout | null,
+    setTimer: (timer: NodeJS.Timeout | null) => void
   ) => {
     // Only trigger on desktop (devices with hover capability)
     if (window.matchMedia('(hover: hover)').matches) {
-      setShow(show);
+      // Clear any existing timer
+      if (currentTimer) {
+        clearTimeout(currentTimer);
+        setTimer(null);
+      }
+      // Hide tooltip immediately on mouse leave
+      setShow(false);
     }
   };
+
+  // Note: Using click-only approach for both desktop and mobile to prevent flickering issues
 
 
 
@@ -1461,7 +1469,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   <TooltipProvider>
                     <Tooltip open={showTypeTooltip}>
                       <TooltipTrigger asChild>
-                        <div 
+                                                <div 
                           className="text-3xl text-white cursor-pointer"
                           onClick={(e) => handleTooltipClick(
                             e, 
@@ -1471,8 +1479,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                             typeTooltipTimer, 
                             setTypeTooltipTimer
                           )}
-                          onMouseEnter={() => handleTooltipHover(true, 'type', setShowTypeTooltip)}
-                          onMouseLeave={() => handleTooltipHover(false, 'type', setShowTypeTooltip)}
+                          onMouseLeave={() => handleMouseLeave(setShowTypeTooltip, typeTooltipTimer, setTypeTooltipTimer)}
                         >
                           {challengeData?.challenge ? (() => {
                             const challengeType = challengeData.challenge.challengeType;
@@ -1488,7 +1495,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p className="text-sm">Challenge period</p>
+                        <p className="text-sm">{t('tooltipChallengePeriod')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -1531,7 +1538,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     <TooltipProvider>
                       <Tooltip open={showStatusTooltip}>
                         <TooltipTrigger asChild>
-                          <span 
+                                                    <span 
                             className={`text-xl font-medium cursor-pointer ${(() => {
                               if (!challengeData?.challenge) return 'text-red-400';
                               
@@ -1555,8 +1562,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                               statusTooltipTimer,
                               setStatusTooltipTimer
                             )}
-                            onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                            onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                            onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                           >
                             {(() => {
                               if (!challengeData?.challenge) return t('end');
@@ -1577,9 +1583,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                         </TooltipTrigger>
                         <TooltipContent>
                           <div className="text-sm space-y-1">
-                            <p><strong>Active:</strong> Challenge in progress</p>
-                            <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                            <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                            <p>{t('tooltipStatusActive')}</p>
+                            <p>{t('tooltipStatusPending')}</p>
+                            <p>{t('tooltipStatusEnd')}</p>
                           </div>
                         </TooltipContent>
                       </Tooltip>

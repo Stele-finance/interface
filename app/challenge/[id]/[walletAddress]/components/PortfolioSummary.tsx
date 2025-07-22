@@ -120,7 +120,7 @@ export function PortfolioSummary({
     };
   }, [typeTooltipTimer, statusTooltipTimer, onChainTooltipTimer, liveTooltipTimer]);
 
-  // Helper function to handle tooltip click for mobile
+  // Helper function to handle tooltip click for both mobile and desktop
   const handleTooltipClick = (
     e: React.MouseEvent,
     tooltipType: 'type' | 'status' | 'onchain' | 'live',
@@ -141,12 +141,12 @@ export function PortfolioSummary({
       // Show tooltip
       setShow(true);
       
-      // Auto-close after 2 seconds on mobile
+      // Auto-close after 3 seconds only for mobile
       if (!window.matchMedia('(hover: hover)').matches) {
         const timer = setTimeout(() => {
           setShow(false);
           setTimer(null);
-        }, 2000);
+        }, 3000);
         setTimer(timer);
       }
     } else {
@@ -155,17 +155,25 @@ export function PortfolioSummary({
     }
   };
 
-  // Helper function to handle tooltip hover for desktop
-  const handleTooltipHover = (
-    show: boolean,
-    tooltipType: 'type' | 'status' | 'onchain' | 'live',
-    setShow: (show: boolean) => void
+  // Helper function to handle mouse leave for desktop
+  const handleMouseLeave = (
+    setShow: (show: boolean) => void,
+    currentTimer: NodeJS.Timeout | null,
+    setTimer: (timer: NodeJS.Timeout | null) => void
   ) => {
     // Only trigger on desktop (devices with hover capability)
     if (window.matchMedia('(hover: hover)').matches) {
-      setShow(show);
+      // Clear any existing timer
+      if (currentTimer) {
+        clearTimeout(currentTimer);
+        setTimer(null);
+      }
+      // Hide tooltip immediately on mouse leave
+      setShow(false);
     }
   };
+
+  // Note: Using click-only approach for both desktop and mobile to prevent flickering issues
 
   return (
     <Card className="bg-muted border-0 rounded-2xl">
@@ -188,8 +196,7 @@ export function PortfolioSummary({
                       typeTooltipTimer, 
                       setTypeTooltipTimer
                     )}
-                    onMouseEnter={() => handleTooltipHover(true, 'type', setShowTypeTooltip)}
-                    onMouseLeave={() => handleTooltipHover(false, 'type', setShowTypeTooltip)}
+                    onMouseLeave={() => handleMouseLeave(setShowTypeTooltip, typeTooltipTimer, setTypeTooltipTimer)}
                   >
                     {(() => {
                       const challengeType = challengeData?.challenge?.challengeType
@@ -211,7 +218,7 @@ export function PortfolioSummary({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-sm">Challenge period</p>
+                  <p className="text-sm">{t('tooltipChallengePeriod')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -222,7 +229,6 @@ export function PortfolioSummary({
             <span className="text-base text-gray-400">{t('status')}</span>
             <div className="flex items-center gap-2">
               {(() => {
-                // Always show network icon regardless of status
                 const networkIcon = network === 'ethereum' ? (
                   <Image 
                     src="/networks/small/ethereum.png" 
@@ -273,17 +279,16 @@ export function PortfolioSummary({
                                 statusTooltipTimer,
                                 setStatusTooltipTimer
                               )}
-                              onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                              onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                             >
                               {t('end')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm space-y-1">
-                              <p><strong>Active:</strong> Challenge in progress</p>
-                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                              <p>{t('tooltipStatusActive')}</p>
+                              <p>{t('tooltipStatusPending')}</p>
+                              <p>{t('tooltipStatusEnd')}</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -311,17 +316,16 @@ export function PortfolioSummary({
                                 statusTooltipTimer,
                                 setStatusTooltipTimer
                               )}
-                              onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                              onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                             >
                               {t('end')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm space-y-1">
-                              <p><strong>Active:</strong> Challenge in progress</p>
-                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                              <p>{t('tooltipStatusActive')}</p>
+                              <p>{t('tooltipStatusPending')}</p>
+                              <p>{t('tooltipStatusEnd')}</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -353,17 +357,16 @@ export function PortfolioSummary({
                                 statusTooltipTimer,
                                 setStatusTooltipTimer
                               )}
-                              onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                              onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                             >
                               {t('active')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm space-y-1">
-                              <p><strong>Active:</strong> Challenge in progress</p>
-                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                              <p>{t('tooltipStatusActive')}</p>
+                              <p>{t('tooltipStatusPending')}</p>
+                              <p>{t('tooltipStatusEnd')}</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -389,17 +392,16 @@ export function PortfolioSummary({
                                 statusTooltipTimer,
                                 setStatusTooltipTimer
                               )}
-                              onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                              onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                             >
                               {t('pending')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm space-y-1">
-                              <p><strong>Active:</strong> Challenge in progress</p>
-                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                              <p>{t('tooltipStatusActive')}</p>
+                              <p>{t('tooltipStatusPending')}</p>
+                              <p>{t('tooltipStatusEnd')}</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -425,17 +427,16 @@ export function PortfolioSummary({
                                 statusTooltipTimer,
                                 setStatusTooltipTimer
                               )}
-                              onMouseEnter={() => handleTooltipHover(true, 'status', setShowStatusTooltip)}
-                              onMouseLeave={() => handleTooltipHover(false, 'status', setShowStatusTooltip)}
+                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
                             >
                               {t('end')}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm space-y-1">
-                              <p><strong>Active:</strong> Challenge in progress</p>
-                              <p><strong>Pending:</strong> Challenge period ends, waiting for reward distribution</p>
-                              <p><strong>End:</strong> Challenge reward distribution completed. Completely closed</p>
+                              <p>{t('tooltipStatusActive')}</p>
+                              <p>{t('tooltipStatusPending')}</p>
+                              <p>{t('tooltipStatusEnd')}</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -464,8 +465,7 @@ export function PortfolioSummary({
                     onChainTooltipTimer, 
                     setOnChainTooltipTimer
                   )}
-                  onMouseEnter={() => handleTooltipHover(true, 'onchain', setShowOnChainTooltip)}
-                  onMouseLeave={() => handleTooltipHover(false, 'onchain', setShowOnChainTooltip)}
+                  onMouseLeave={() => handleMouseLeave(setShowOnChainTooltip, onChainTooltipTimer, setOnChainTooltipTimer)}
                 >
                   <div className="text-4xl text-white">
                     ${currentValue.toFixed(2)}
@@ -476,7 +476,7 @@ export function PortfolioSummary({
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm">Portfolio value stored on-chain</p>
+                <p className="text-sm">{t('tooltipOnChainValue')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -502,26 +502,19 @@ export function PortfolioSummary({
                             liveTooltipTimer, 
                             setLiveTooltipTimer
                           )}
-                          onMouseEnter={() => handleTooltipHover(true, 'live', setShowLiveTooltip)}
-                          onMouseLeave={() => handleTooltipHover(false, 'live', setShowLiveTooltip)}
+                          onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
                         >
                           <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
                           {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p className="text-sm">Real-time portfolio value not yet reflected on-chain</p>
+                        <p className="text-sm">{t('tooltipLiveValue')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )
               })()}
-            </div>
-          )}
-          {isLoadingUniswap && (
-            <div className="text-sm text-gray-500 flex items-center gap-1">
-              <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-              {t('loadingLivePrices')}
             </div>
           )}
         </div>
