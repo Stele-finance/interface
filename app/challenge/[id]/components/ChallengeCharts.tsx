@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
-import { formatDateWithLocale, formatChartDate } from "@/lib/utils"
+import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
@@ -87,8 +87,12 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             minute: '2-digit',
             hour12: true
           }),
-          timeLabel: formatChartDate(date, language),
-          dateLabel: date.toISOString().split('T')[0] // YYYY-MM-DD format
+          dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
+          timeLabel: (() => {
+            // Extract month/day from dateLabel to avoid timezone issues
+            const [year, month, day] = date.toISOString().split('T')[0].split('-')
+            return `${parseInt(month)}/${parseInt(day)}`
+          })(),
         }
       })
       .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)

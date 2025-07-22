@@ -82,6 +82,7 @@ export const ar = {
   disconnect: "قطع الاتصال",
   doc: "التوثيق",
   duration: "المدة",
+  empty: "فارغ",
   end: "انتهاء",
   endDate: "تاريخ الانتهاء",
   ended: "انتهى",

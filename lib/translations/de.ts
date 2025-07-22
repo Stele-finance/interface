@@ -82,6 +82,7 @@ export const de = {
   disconnect: "Trennen",
   doc: "Dokument",
   duration: "Dauer",
+  empty: "Leer",
   end: "Ende",
   endDate: "Enddatum",
   ended: "Beendet",

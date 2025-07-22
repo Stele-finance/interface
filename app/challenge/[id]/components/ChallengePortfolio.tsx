@@ -105,7 +105,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl text-gray-100">Ranking</h2>
+        <h2 className="text-3xl text-gray-100">{t('ranking')}</h2>
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
             <Button
@@ -167,7 +167,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
                       <div>
                         <div className="font-medium text-white">
                           {isEmptySlot ? (
-                            <span className="text-gray-500 italic">Empty</span>
+                            <span className="text-gray-500 italic">{t('empty')}</span>
                           ) : (
                             formattedAddress
                           )}
@@ -197,7 +197,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
             <div className="pb-2">
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500">
-                  Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
+                  {t('lastUpdated')}: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
                 </div>
               </div>
             </div>
@@ -205,7 +205,7 @@ function RankingSection({ challengeId, network }: { challengeId: string; network
           {rankingData && totalPages <= 1 && (
             <div className="pb-2">
               <div className="text-xs text-gray-500 text-center">
-                Last updated: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
+                {t('lastUpdated')}: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
               </div>
             </div>
           )}
@@ -1137,10 +1137,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Time</th>
-                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
-                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">Wallet</th>
-                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">Value</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">{t('time')}</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('type')}</th>
+                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">{t('wallet')}</th>
+                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">{t('value')}</th>
                           </tr>
                         </thead>
                         <tbody>

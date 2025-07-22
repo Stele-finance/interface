@@ -168,7 +168,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   <TooltipTrigger>
                     <Badge 
                       variant="default"
-                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs whitespace-nowrap"
+                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs whitespace-nowrap hover:bg-blue-500/20 hover:text-blue-400 hover:border-blue-500/30"
                     >
                       <UserCheck className="h-3 w-3" />
                     </Badge>
@@ -185,7 +185,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   return (
                     <Badge 
                       variant="default"
-                      className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap"
+                      className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap hover:bg-green-500/20 hover:text-green-400 hover:border-green-500/30"
                     >
                       <Clock className="h-3 w-3 mr-1" />
                       {t('active')}
@@ -195,7 +195,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   return (
                     <Badge 
                       variant="default"
-                      className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs whitespace-nowrap"
+                      className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs whitespace-nowrap hover:bg-orange-500/20 hover:text-orange-400 hover:border-orange-500/30"
                     >
                       <Clock className="h-3 w-3 mr-1" />
                       {t('pending')}
@@ -206,7 +206,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
                   return (
                     <Badge 
                       variant="secondary"
-                      className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap"
+                      className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs whitespace-nowrap hover:bg-gray-500/20 hover:text-gray-400 hover:border-gray-500/30"
                     >
                       <CheckCircle className="h-3 w-3 mr-1" />
                       {t('end')}
@@ -219,7 +219,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-3">
             <div>
-              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
                 {investor.challengeId}
               </Badge>
             </div>

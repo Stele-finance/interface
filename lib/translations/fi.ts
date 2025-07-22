@@ -82,6 +82,7 @@ export const fi = {
   disconnect: "Katkaise Yhteys",
   doc: "Asiakirja",
   duration: "Kesto",
+  empty: "Tyhjä",
   end: "Loppu",
   endDate: "Päättymispäivä",
   ended: "Päättynyt",

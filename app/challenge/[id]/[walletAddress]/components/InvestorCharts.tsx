@@ -8,7 +8,7 @@ import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
-import { formatDateWithLocale, formatChartDate } from '@/lib/utils'
+import { formatDateWithLocale } from '@/lib/utils'
 
 interface RealTimePortfolio {
   totalValue: number
@@ -48,9 +48,11 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     const processedData = selectedData
       .map((snapshot, index) => {
         const date = new Date(Number(snapshot.timestamp) * 1000)
+        const timestamp = Number(snapshot.timestamp)
         
         return {
           id: `${snapshot.id}-${index}`,
+          timestamp, // Add timestamp for proper sorting
           // USD values are already in USD format from subgraph
           currentUSD: parseFloat(snapshot.currentUSD) || 0,
           seedMoneyUSD: Number(snapshot.seedMoneyUSD),
@@ -73,12 +75,16 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 minute: '2-digit',
                 hour12: true
               }),
-          timeLabel: formatChartDate(date, language),
-                    dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
+          dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
+          timeLabel: (() => {
+            // Extract month/day from dateLabel to avoid timezone issues
+            const [year, month, day] = date.toISOString().split('T')[0].split('-')
+            return `${parseInt(month)}/${parseInt(day)}`
+          })(),
           isRealTime: false
         }
       })
-      .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)
+      .sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp (ascending)
 
     // Add real-time data point if available (only for daily interval)
     if (interval === 'daily' && realTimePortfolio && realTimePortfolio.totalValue > 0) {
@@ -87,6 +93,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       
       const realTimeDataPoint = {
         id: `realtime-${realTimePortfolio.timestamp}-${Date.now()}`,
+        timestamp: realTimePortfolio.timestamp,
         currentUSD: realTimePortfolio.totalValue,
         seedMoneyUSD: seedMoney,
         profitRatio: seedMoney > 0 ? ((realTimePortfolio.totalValue - seedMoney) / seedMoney) : 0,
@@ -102,14 +109,26 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           minute: '2-digit',
           hour12: true
         })} (Live)`,
-        timeLabel: formatChartDate(currentDate, language),
         dateLabel: currentDate.toISOString().split('T')[0],
+        timeLabel: (() => {
+          // Extract month/day from dateLabel to avoid timezone issues
+          const [year, month, day] = currentDate.toISOString().split('T')[0].split('-')
+          return `${parseInt(month)}/${parseInt(day)}`
+        })(),
         isRealTime: true
       }
       
               // Add real-time point to the end of the chart
         processedData.push(realTimeDataPoint)
     }
+
+    console.log('📊 Chart Data Debug:', {
+      totalDataPoints: processedData.length,
+      timeLabels: processedData.map(d => d.timeLabel),
+      dates: processedData.map(d => d.dateLabel),
+      values: processedData.map(d => d.currentUSD),
+      fullDates: processedData.map(d => d.fullDate)
+    })
 
     return processedData
   }, [data, weeklyData, interval, realTimePortfolio, investorData])
@@ -526,6 +545,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               axisLine={false}
               tickLine={false}
               interval="preserveStartEnd"
+              minTickGap={30}
             />
             <YAxis 
               orientation="left"
