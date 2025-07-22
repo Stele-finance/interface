@@ -7,7 +7,7 @@ import { useActiveChallengesWeeklySnapshots } from '../hooks/useActiveChallenges
 import { Users, DollarSign, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
-import { formatDateWithLocale, formatChartDate } from '@/lib/utils'
+import { formatDateWithLocale } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,8 +68,12 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           minute: '2-digit',
           hour12: true
         }),
-        timeLabel: formatChartDate(actualDate, language),
-        dateLabel: actualDate.toISOString().split('T')[0]
+        dateLabel: actualDate.toISOString().split('T')[0],
+        timeLabel: (() => {
+          // Extract month/day from dateLabel to avoid timezone issues
+          const [year, month, day] = actualDate.toISOString().split('T')[0].split('-')
+          return `${parseInt(month)}/${parseInt(day)}`
+        })()
       }
     })
   }, [dailyData])
@@ -96,8 +100,12 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           minute: '2-digit',
           hour12: true
         }),
-        timeLabel: formatChartDate(actualDate, language),
-        dateLabel: actualDate.toISOString().split('T')[0]
+        dateLabel: actualDate.toISOString().split('T')[0],
+        timeLabel: (() => {
+          // Extract month/day from dateLabel to avoid timezone issues
+          const [year, month, day] = actualDate.toISOString().split('T')[0].split('-')
+          return `${parseInt(month)}/${parseInt(day)}`
+        })()
       }
     })
   }, [weeklyData])
