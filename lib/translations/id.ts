@@ -43,6 +43,7 @@ export const id = {
   commandPaletteDescription: "Palet perintah untuk mencari dan memilih opsi",
   completed: "Selesai",
   confirm: "Konfirmasi",
+  currentRankings: "Peringkat saat ini:",
   connectedWallet: "Wallet Terhubung",
   connecting: "Menghubungkan...",
   connectToAccess: "Hubungkan wallet Anda untuk mengakses dashboard portfolio",
@@ -144,6 +145,7 @@ export const id = {
   loading: "Memuat...",
   loadingBlockInfo: "Memuat info blok...",
   loadingData: "Memuat data...",
+  loadingChallengeData: "Memuat data tantangan...",
   loadingGovernanceConfig: "Memuat konfigurasi governance...",
   loadingInvestorData: "Memuat data investor",
   loadingLatestProposals: "Memuat proposal terbaru dan hasil voting...",
@@ -368,5 +370,9 @@ export const id = {
   weekly: "Mingguan",
   youCancelledNetworkSwitch: "Anda membatalkan permintaan pergantian jaringan.",
   youHaveAlreadyVoted: "Anda sudah voting pada proposal ini",
-  youNeedToDelegate: "Anda perlu mendelegasikan token Anda untuk berpartisipasi dalam governance"
+  youNeedToDelegate: "Anda perlu mendelegasikan token Anda untuk berpartisipasi dalam governance",
+  yourPosition: "Posisi Anda",
+  yourPositionActive: "Posisi Anda (aktif)",
+  yourPositionLive: "Posisi Anda (langsung)",
+  yourPositionRegistered: "Posisi Anda (terdaftar)"
 } as const; 

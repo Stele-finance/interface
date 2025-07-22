@@ -43,6 +43,7 @@ export const he = {
   commandPaletteDescription: "פלטת פקודות לחיפוש ובחירת אפשרויות",
   completed: "הושלם",
   confirm: "אישור",
+  currentRankings: "דירוגים נוכחיים:",
   connectedWallet: "ארנק מחובר",
   connecting: "מתחבר...",
   connectToAccess: "חבר את הארנק שלך כדי לגשת לדשבורד הפורטפוליו",
@@ -144,6 +145,7 @@ export const he = {
   loading: "טוען...",
   loadingBlockInfo: "טוען מידע על בלוק...",
   loadingData: "טוען נתונים...",
+  loadingChallengeData: "טוען נתוני אתגר...",
   loadingGovernanceConfig: "טוען הגדרות ממשל...",
   loadingInvestorData: "טוען נתוני משקיע",
   loadingLatestProposals: "טוען הצעות אחרונות ותוצאות הצבעה...",
@@ -368,5 +370,9 @@ export const he = {
   weekly: "שבועי",
   youCancelledNetworkSwitch: "ביטלת את בקשת החלפת הרשת.",
   youHaveAlreadyVoted: "כבר הצבעת על ההצעה הזו",
-  youNeedToDelegate: "עליך להעביר את הטוקנים שלך כדי להשתתף בממשל"
+  youNeedToDelegate: "עליך להעביר את הטוקנים שלך כדי להשתתף בממשל",
+  yourPosition: "המיקום שלך",
+  yourPositionActive: "המיקום שלך (פעיל)",
+  yourPositionLive: "המיקום שלך (בזמן אמת)",
+  yourPositionRegistered: "המיקום שלך (רשום)"
 } as const; 

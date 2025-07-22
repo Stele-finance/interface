@@ -43,6 +43,7 @@ export const ru = {
   commandPaletteDescription: "Палитра команд для поиска и выбора опций",
   completed: "Завершено",
   confirm: "Подтвердить",
+  currentRankings: "Текущие рейтинги:",
   connectedWallet: "Подключенный Кошелек",
   connecting: "Подключение...",
   connectToAccess: "Подключите кошелек для доступа к панели портфолио",
@@ -144,6 +145,7 @@ export const ru = {
   loading: "Загрузка...",
   loadingBlockInfo: "Загрузка информации о блоке...",
   loadingData: "Загрузка данных...",
+  loadingChallengeData: "Загрузка данных вызова...",
   loadingGovernanceConfig: "Загрузка конфигурации управления...",
   loadingInvestorData: "Загрузка данных инвестора",
   loadingLatestProposals: "Загрузка последних предложений и результатов голосования...",
@@ -368,5 +370,9 @@ export const ru = {
   weekly: "Еженедельно",
   youCancelledNetworkSwitch: "Вы отменили запрос на переключение сети.",
   youHaveAlreadyVoted: "Вы уже проголосовали по этому предложению",
-  youNeedToDelegate: "Вам нужно делегировать ваши токены для участия в управлении"
+  youNeedToDelegate: "Вам нужно делегировать ваши токены для участия в управлении",
+  yourPosition: "Ваша позиция",
+  yourPositionActive: "Ваша позиция (активна)",
+  yourPositionLive: "Ваша позиция (в реальном времени)",
+  yourPositionRegistered: "Ваша позиция (зарегистрирована)"
 } as const; 

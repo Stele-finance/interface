@@ -43,6 +43,7 @@ export const fi = {
   commandPaletteDescription: "Komentopaletti valintojen hakemiseen ja valitsemiseen",
   completed: "Valmis",
   confirm: "Vahvista",
+  currentRankings: "Nykyiset sijoitukset:",
   connectedWallet: "Yhdistetty Lompakko",
   connecting: "Yhdistetään...",
   connectToAccess: "Yhdistä lompakkosi päästäksesi portfolion hallintapaneeliin",
@@ -144,6 +145,7 @@ export const fi = {
   loading: "Ladataan...",
   loadingBlockInfo: "Ladataan lohkotietoja...",
   loadingData: "Ladataan Tietoja...",
+  loadingChallengeData: "Ladataan haasteen tietoja...",
   loadingGovernanceConfig: "Ladataan hallintokonfiguraatiota...",
   loadingInvestorData: "Ladataan sijoittajatietoja",
   loadingLatestProposals: "Ladataan viimeisimpiä ehdotuksia ja äänestystuloksia...",
@@ -368,5 +370,9 @@ export const fi = {
   weekly: "Viikoittain",
   youCancelledNetworkSwitch: "Peruutit verkon vaihto-pyynnön.",
   youHaveAlreadyVoted: "Olet jo äänestänyt tästä ehdotuksesta",
-  youNeedToDelegate: "Sinun täytyy delegoida tokenisi osallistuaksesi hallintoon"
+  youNeedToDelegate: "Sinun täytyy delegoida tokenisi osallistuaksesi hallintoon",
+  yourPosition: "Sinun asemasi",
+  yourPositionActive: "Sinun asemasi (aktiivinen)",
+  yourPositionLive: "Sinun asemasi (live)",
+  yourPositionRegistered: "Sinun asemasi (rekisteröity)"
 } as const; 

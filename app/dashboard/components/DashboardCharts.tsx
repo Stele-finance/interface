@@ -200,7 +200,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
                   <DropdownMenuItem onClick={() => setChartType('rewards')}>
                     <DollarSign className="h-4 w-4 mr-2" />
                     {t('rewards')}
@@ -357,7 +357,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600">
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
                 <DropdownMenuItem onClick={() => setChartType('rewards')}>
                   <DollarSign className="h-4 w-4 mr-2" />
                   {t('rewards')}

@@ -43,6 +43,7 @@ export const ar = {
   commandPaletteDescription: "لوحة الأوامر للبحث واختيار الخيارات",
   completed: "مكتمل",
   confirm: "تأكيد",
+  currentRankings: "التصنيفات الحالية:",
   connectedWallet: "المحفظة المتصلة",
   connecting: "جاري الاتصال...",
   connectToAccess: "اربط محفظتك للوصول إلى لوحة تحكم المحفظة",
@@ -144,6 +145,7 @@ export const ar = {
   loading: "جاري التحميل...",
   loadingBlockInfo: "تحميل معلومات الكتلة...",
   loadingData: "تحميل البيانات...",
+  loadingChallengeData: "تحميل بيانات التحدي...",
   loadingGovernanceConfig: "تحميل إعدادات الحوكمة...",
   loadingInvestorData: "تحميل بيانات المستثمر",
   loadingLatestProposals: "تحميل أحدث المقترحات ونتائج التصويت...",
@@ -368,5 +370,9 @@ export const ar = {
   weekly: "أسبوعي",
   youCancelledNetworkSwitch: "ألغيت طلب تبديل الشبكة.",
   youHaveAlreadyVoted: "لقد صوتت بالفعل على هذا المقترح",
-  youNeedToDelegate: "تحتاج إلى تفويض رموزك للمشاركة في الحوكمة"
+  youNeedToDelegate: "تحتاج إلى تفويض رموزك للمشاركة في الحوكمة",
+  yourPosition: "موقعك",
+  yourPositionActive: "موقعك (نشط)",
+  yourPositionLive: "موقعك (مباشر)",
+  yourPositionRegistered: "موقعك (مسجل)"
 } as const; 

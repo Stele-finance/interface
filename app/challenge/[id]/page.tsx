@@ -29,7 +29,7 @@ function ChallengeContent({ challengeId }: { challengeId: string }) {
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
-          <div className="text-white text-lg font-medium">Loading challenge data...</div>
+          <div className="text-white text-lg font-medium">{t('loadingChallengeData')}</div>
         </div>
       </div>
     )

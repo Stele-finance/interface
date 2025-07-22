@@ -43,6 +43,7 @@ export const hu = {
   commandPaletteDescription: "Parancspaletta opciók keresésére és kiválasztására",
   completed: "Befejezett",
   confirm: "Megerősítés",
+  currentRankings: "Jelenlegi rangsor:",
   connectedWallet: "Csatlakoztatott tárca",
   connecting: "Csatlakozás...",
   connectToAccess: "Csatlakoztassa tárcáját a portfólió irányítópult eléréséhez",
@@ -144,6 +145,7 @@ export const hu = {
   loading: "Betöltés...",
   loadingBlockInfo: "Blokk információ betöltése...",
   loadingData: "Adatok betöltése...",
+  loadingChallengeData: "Kihívás adatok betöltése...",
   loadingGovernanceConfig: "Irányítási konfiguráció betöltése...",
   loadingInvestorData: "Befektető adatok betöltése",
   loadingLatestProposals: "Legújabb javaslatok és szavazási eredmények betöltése...",
@@ -368,5 +370,9 @@ export const hu = {
   weekly: "Heti",
   youCancelledNetworkSwitch: "Törölte a hálózatváltási kérelmet.",
   youHaveAlreadyVoted: "Már szavazott erre a javaslatra",
-  youNeedToDelegate: "Delegálnia kell tokeneit az irányításban való részvételhez"
+  youNeedToDelegate: "Delegálnia kell tokeneit az irányításban való részvételhez",
+  yourPosition: "Az Ön pozíciója",
+  yourPositionActive: "Az Ön pozíciója (aktív)",
+  yourPositionLive: "Az Ön pozíciója (élő)",
+  yourPositionRegistered: "Az Ön pozíciója (regisztrált)"
 } as const; 

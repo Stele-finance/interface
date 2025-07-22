@@ -43,6 +43,7 @@ export const es = {
   commandPaletteDescription: "Paleta de comandos para buscar y seleccionar opciones",
   completed: "Completado",
   confirm: "Confirmar",
+  currentRankings: "Rankings actuales:",
   connectedWallet: "Billetera Conectada",
   connecting: "Conectando...",
   connectToAccess: "Conecte su billetera para acceder al panel de cartera",
@@ -144,6 +145,7 @@ export const es = {
   loading: "Cargando...",
   loadingBlockInfo: "Cargando información del bloque...",
   loadingData: "Cargando datos...",
+  loadingChallengeData: "Cargando datos del desafío...",
   loadingGovernanceConfig: "Cargando configuración de gobernanza...",
   loadingInvestorData: "Cargando datos del inversor",
   loadingLatestProposals: "Cargando últimas propuestas y resultados de votación...",
@@ -368,5 +370,9 @@ export const es = {
   weekly: "Semanal",
   youCancelledNetworkSwitch: "Canceló la solicitud de cambio de red.",
   youHaveAlreadyVoted: "Ya ha votado en esta propuesta",
-  youNeedToDelegate: "Necesita delegar sus tokens para participar en la gobernanza"
+  youNeedToDelegate: "Necesita delegar sus tokens para participar en la gobernanza",
+  yourPosition: "Tu posición",
+  yourPositionActive: "Tu posición (activa)",
+  yourPositionLive: "Tu posición (en vivo)",
+  yourPositionRegistered: "Tu posición (registrada)"
 } as const; 

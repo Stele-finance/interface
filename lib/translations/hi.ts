@@ -43,6 +43,7 @@ export const hi = {
   commandPaletteDescription: "विकल्पों को खोजने और चुनने के लिए कमांड पैलेट",
   completed: "पूर्ण",
   confirm: "पुष्टि करें",
+  currentRankings: "वर्तमान रैंकिंग:",
   connectedWallet: "कनेक्टेड Wallet",
   connecting: "कनेक्ट हो रहा है...",
   connectToAccess: "अपने पोर्टफोलियो डैशबोर्ड तक पहुंचने के लिए अपना wallet कनेक्ट करें",
@@ -144,6 +145,7 @@ export const hi = {
   loading: "लोड हो रहा है...",
   loadingBlockInfo: "ब्लॉक जानकारी लोड हो रही है...",
   loadingData: "डेटा लोड हो रहा है...",
+  loadingChallengeData: "चुनौती डेटा लोड हो रहा है...",
   loadingGovernanceConfig: "गवर्नेंस कॉन्फ़िगरेशन लोड हो रही है...",
   loadingInvestorData: "निवेशक डेटा लोड हो रहा है",
   loadingLatestProposals: "नवीनतम प्रस्ताव और वोट परिणाम लोड हो रहे हैं...",
@@ -368,5 +370,9 @@ export const hi = {
   weekly: "साप्ताहिक",
   youCancelledNetworkSwitch: "आपने नेटवर्क स्विच अनुरोध रद्द कर दिया।",
   youHaveAlreadyVoted: "आपने पहले से ही इस प्रस्ताव पर वोट दिया है",
-  youNeedToDelegate: "गवर्नेंस में भाग लेने के लिए आपको अपने टोकन प्रतिनिधित्व करने होंगे"
+  youNeedToDelegate: "गवर्नेंस में भाग लेने के लिए आपको अपने टोकन प्रतिनिधित्व करने होंगे",
+  yourPosition: "आपकी स्थिति",
+  yourPositionActive: "आपकी स्थिति (सक्रिय)",
+  yourPositionLive: "आपकी स्थिति (लाइव)",
+  yourPositionRegistered: "आपकी स्थिति (पंजीकृत)"
 } as const; 

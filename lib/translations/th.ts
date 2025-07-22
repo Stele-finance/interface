@@ -43,6 +43,7 @@ export const th = {
   commandPaletteDescription: "พาเลทคำสั่งสำหรับค้นหาและเลือกตัวเลือก",
   completed: "เสร็จสิ้น",
   confirm: "ยืนยัน",
+  currentRankings: "อันดับปัจจุบัน:",
   connectedWallet: "กระเป๋าเงินที่เชื่อมต่อ",
   connecting: "กำลังเชื่อมต่อ...",
   connectToAccess: "เชื่อมต่อกระเป๋าเงินของคุณเพื่อเข้าถึงแดชบอร์ดพอร์ตโฟลิโอ",
@@ -144,6 +145,7 @@ export const th = {
   loading: "กำลังโหลด...",
   loadingBlockInfo: "กำลังโหลดข้อมูลบล็อก...",
   loadingData: "กำลังโหลดข้อมูล...",
+  loadingChallengeData: "กำลังโหลดข้อมูลความท้าทาย...",
   loadingGovernanceConfig: "กำลังโหลดการกำหนดค่าธรรมาภิบาล...",
   loadingInvestorData: "กำลังโหลดข้อมูลนักลงทุน",
   loadingLatestProposals: "กำลังโหลดข้อเสนอล่าสุดและผลการโหวต...",
@@ -368,5 +370,9 @@ export const th = {
   weekly: "รายสัปดาห์",
   youCancelledNetworkSwitch: "คุณยกเลิกคำขอเปลี่ยนเครือข่าย",
   youHaveAlreadyVoted: "คุณได้โหวตข้อเสนอนี้แล้ว",
-  youNeedToDelegate: "คุณต้องมอบหมายโทเค็นของคุณเพื่อเข้าร่วมธรรมาภิบาล"
+  youNeedToDelegate: "คุณต้องมอบหมายโทเค็นของคุณเพื่อเข้าร่วมธรรมาภิบาล",
+  yourPosition: "ตำแหน่งของคุณ",
+  yourPositionActive: "ตำแหน่งของคุณ (ใช้งานอยู่)",
+  yourPositionLive: "ตำแหน่งของคุณ (สด)",
+  yourPositionRegistered: "ตำแหน่งของคุณ (ลงทะเบียนแล้ว)"
 } as const; 

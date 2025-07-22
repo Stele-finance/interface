@@ -43,6 +43,7 @@ export const vi = {
   commandPaletteDescription: "Bảng lệnh để tìm kiếm và chọn tùy chọn",
   completed: "Hoàn thành",
   confirm: "Xác nhận",
+  currentRankings: "Bảng xếp hạng hiện tại:",
   connectedWallet: "Ví đã kết nối",
   connecting: "Đang kết nối...",
   connectToAccess: "Kết nối ví của bạn để truy cập bảng điều khiển danh mục đầu tư",
@@ -144,6 +145,7 @@ export const vi = {
   loading: "Đang tải...",
   loadingBlockInfo: "Đang tải thông tin khối...",
   loadingData: "Đang tải dữ liệu...",
+  loadingChallengeData: "Đang tải dữ liệu thách thức...",
   loadingGovernanceConfig: "Đang tải cấu hình quản trị...",
   loadingInvestorData: "Đang tải dữ liệu nhà đầu tư",
   loadingLatestProposals: "Đang tải đề xuất mới nhất và kết quả bỏ phiếu...",
@@ -368,5 +370,9 @@ export const vi = {
   weekly: "Hàng tuần",
   youCancelledNetworkSwitch: "Bạn đã hủy yêu cầu chuyển đổi mạng.",
   youHaveAlreadyVoted: "Bạn đã bỏ phiếu cho đề xuất này rồi",
-  youNeedToDelegate: "Bạn cần ủy quyền token của mình để tham gia quản trị"
+  youNeedToDelegate: "Bạn cần ủy quyền token của mình để tham gia quản trị",
+  yourPosition: "Vị trí của bạn",
+  yourPositionActive: "Vị trí của bạn (hoạt động)",
+  yourPositionLive: "Vị trí của bạn (trực tiếp)",
+  yourPositionRegistered: "Vị trí của bạn (đã đăng ký)"
 } as const; 
