@@ -43,6 +43,7 @@ export const el = {
   commandPaletteDescription: "Παλέτα εντολών για αναζήτηση και επιλογή επιλογών",
   completed: "Ολοκληρώθηκε",
   confirm: "Επιβεβαίωση",
+  currentRankings: "Τρέχουσες κατατάξεις:",
   connectedWallet: "Συνδεδεμένο Wallet",
   connecting: "Σύνδεση...",
   connectToAccess: "Συνδέστε το wallet σας για πρόσβαση στον πίνακα ελέγχου χαρτοφυλακίου",
@@ -144,6 +145,7 @@ export const el = {
   loading: "Φόρτωση...",
   loadingBlockInfo: "Φόρτωση πληροφοριών μπλοκ...",
   loadingData: "Φόρτωση Δεδομένων...",
+  loadingChallengeData: "Φόρτωση δεδομένων πρόκλησης...",
   loadingGovernanceConfig: "Φόρτωση διαμόρφωσης διακυβέρνησης...",
   loadingInvestorData: "Φόρτωση δεδομένων επενδυτή",
   loadingLatestProposals: "Φόρτωση τελευταίων προτάσεων και αποτελεσμάτων ψηφοφορίας...",
@@ -368,5 +370,9 @@ export const el = {
   weekly: "Εβδομαδιαία",
   youCancelledNetworkSwitch: "Ακυρώσατε το αίτημα αλλαγής δικτύου.",
   youHaveAlreadyVoted: "Έχετε ήδη ψηφίσει σε αυτή την πρόταση",
-  youNeedToDelegate: "Πρέπει να εκχωρήσετε τα tokens σας για να συμμετάσχετε στη διακυβέρνηση"
+  youNeedToDelegate: "Πρέπει να εκχωρήσετε τα tokens σας για να συμμετάσχετε στη διακυβέρνηση",
+  yourPosition: "Η θέση σας",
+  yourPositionActive: "Η θέση σας (ενεργή)",
+  yourPositionLive: "Η θέση σας (ζωντανή)",
+  yourPositionRegistered: "Η θέση σας (εγγεγραμμένη)"
 } as const; 

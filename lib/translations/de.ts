@@ -43,6 +43,7 @@ export const de = {
   commandPaletteDescription: "Befehlspalette zum Suchen und Auswählen von Optionen",
   completed: "Abgeschlossen",
   confirm: "Bestätigen",
+  currentRankings: "Aktuelle Rangliste:",
   connectedWallet: "Verbundene Wallet",
   connecting: "Verbinden...",
   connectToAccess: "Verbinden Sie Ihre Wallet, um auf Ihr Portfolio-Dashboard zuzugreifen",
@@ -144,6 +145,7 @@ export const de = {
   loading: "Laden...",
   loadingBlockInfo: "Blockinformationen laden...",
   loadingData: "Daten Laden...",
+  loadingChallengeData: "Challenge-Daten Laden...",
   loadingGovernanceConfig: "Governance-Konfiguration laden...",
   loadingInvestorData: "Investordaten Werden Geladen",
   loadingLatestProposals: "Neueste Vorschläge und Abstimmungsergebnisse laden...",
@@ -368,5 +370,9 @@ export const de = {
   weekly: "Wöchentlich",
   youCancelledNetworkSwitch: "Sie haben die Netzwerk-Wechsel-Anfrage abgebrochen.",
   youHaveAlreadyVoted: "Sie haben bereits bei diesem Vorschlag abgestimmt",
-  youNeedToDelegate: "Sie müssen Ihre Token delegieren, um an der Governance teilzunehmen"
+  youNeedToDelegate: "Sie müssen Ihre Token delegieren, um an der Governance teilzunehmen",
+  yourPosition: "Ihre Position",
+  yourPositionActive: "Ihre Position (aktiv)",
+  yourPositionLive: "Ihre Position (live)",
+  yourPositionRegistered: "Ihre Position (registriert)"
 } as const; 

@@ -489,7 +489,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
-              <p className="text-gray-400">Loading challenge data...</p>
+              <p className="text-gray-400">{t('loadingChallengeData')}</p>
             </div>
           </CardContent>
         </Card>

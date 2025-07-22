@@ -251,7 +251,7 @@ export function Header() {
   const walletIcon = getWalletIcon();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
+    <header className="sticky top-0 z-50 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
       <div className="flex items-center">
         <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
           <Image 
@@ -309,7 +309,7 @@ export function Header() {
                 {t('challenges')}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-36 bg-muted/80 border-gray-600">
+            <DropdownMenuContent align="start" className="w-36 bg-muted/80 border-gray-600 z-[60]">
                <DropdownMenuItem asChild>
                  <Link href="/portfolio" className="cursor-pointer">
                    {t('myPortfolio')}
@@ -488,7 +488,7 @@ export function Header() {
               <Menu className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600">
+          <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600 z-[60]">
             <DropdownMenuItem asChild>
               <Link 
                 href="https://github.com/Stele-finance/interface"
@@ -530,12 +530,12 @@ export function Header() {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-[60]"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
           {/* Menu Panel */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-muted border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
+          <div className="fixed bottom-0 left-0 right-0 z-[70] bg-muted border-t border-border rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[60vh]">
             <div className="p-4 pb-4">
               {/* Handle Bar */}
               <div className="w-12 h-1 bg-gray-400 rounded-full mx-auto mb-4"></div>

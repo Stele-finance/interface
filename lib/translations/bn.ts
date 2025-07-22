@@ -43,6 +43,7 @@ export const bn = {
   commandPaletteDescription: "বিকল্প অনুসন্ধান এবং নির্বাচনের জন্য কমান্ড প্যালেট",
   completed: "সম্পূর্ণ",
   confirm: "নিশ্চিত করুন",
+  currentRankings: "বর্তমান র‍্যাঙ্কিং:",
   connectedWallet: "সংযুক্ত ওয়ালেট",
   connecting: "সংযোগ করা হচ্ছে...",
   connectToAccess: "পোর্টফোলিও ড্যাশবোর্ড অ্যাক্সেস করতে আপনার ওয়ালেট সংযুক্ত করুন",
@@ -144,6 +145,7 @@ export const bn = {
   loading: "লোড হচ্ছে...",
   loadingBlockInfo: "ব্লক তথ্য লোড করা হচ্ছে...",
   loadingData: "ডেটা লোড করা হচ্ছে...",
+  loadingChallengeData: "চ্যালেঞ্জ ডেটা লোড করা হচ্ছে...",
   loadingGovernanceConfig: "গভর্নেন্স কনফিগারেশন লোড করা হচ্ছে...",
   loadingInvestorData: "বিনিয়োগকারীর ডেটা লোড করা হচ্ছে",
   loadingLatestProposals: "সর্বশেষ প্রস্তাব এবং ভোটের ফলাফল লোড করা হচ্ছে...",
@@ -368,5 +370,9 @@ export const bn = {
   weekly: "সাপ্তাহিক",
   youCancelledNetworkSwitch: "আপনি নেটওয়ার্ক স্যুইচের অনুরোধ বাতিল করেছেন।",
   youHaveAlreadyVoted: "আপনি ইতিমধ্যে এই প্রস্তাবে ভোট দিয়েছেন",
-  youNeedToDelegate: "গভর্নেন্সে অংশগ্রহণ করতে আপনাকে আপনার টোকেন প্রতিনিধিত্ব করতে হবে"
+  youNeedToDelegate: "গভর্নেন্সে অংশগ্রহণ করতে আপনাকে আপনার টোকেন প্রতিনিধিত্ব করতে হবে",
+  yourPosition: "আপনার অবস্থান",
+  yourPositionActive: "আপনার অবস্থান (সক্রিয়)",
+  yourPositionLive: "আপনার অবস্থান (লাইভ)",
+  yourPositionRegistered: "আপনার অবস্থান (নিবন্ধিত)"
 } as const; 

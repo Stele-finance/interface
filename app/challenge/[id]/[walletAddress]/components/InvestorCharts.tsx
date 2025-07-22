@@ -298,7 +298,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           {/* Show ranking information for real-time data or registered users on last data point */}
           {shouldShowRanking && rankingData && rankingData.length > 0 && (
             <div className="border-t border-gray-600 pt-2 mt-2">
-              <p className="text-gray-300 text-xs font-medium mb-2">Current Rankings:</p>
+              <p className="text-gray-300 text-xs font-medium mb-2">{t('currentRankings')}</p>
               <div className="space-y-1">
                 {rankingData.map((ranking) => (
                   <div key={ranking.rank} className="flex items-center gap-3">
@@ -351,7 +351,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     <div className={`w-3 h-3 rounded-full border border-white flex items-center justify-center ${isRealTime ? 'bg-green-400' : isRegistered ? 'bg-blue-400' : 'bg-orange-400'}`}>
                     </div>
                     <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : isRegistered ? 'text-blue-400' : 'text-orange-400'}`}>
-                      {isRealTime ? 'Your Position (Live)' : isRegistered ? 'Your Position (Registered)' : 'Your Position (Active)'}
+                      {isRealTime ? t('yourPositionLive') : isRegistered ? t('yourPositionRegistered') : t('yourPositionActive')}
                     </span>
                   </div>
                   <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : isRegistered ? 'text-blue-400' : 'text-orange-400'}`}>

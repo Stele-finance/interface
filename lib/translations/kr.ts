@@ -43,6 +43,7 @@ export const kr = {
   commandPaletteDescription: "옵션 검색 및 선택을 위한 명령 팔레트",
   completed: "완료됨",
   confirm: "확인",
+  currentRankings: "현재 랭킹:",
   connectedWallet: "연결된 지갑",
   connecting: "연결 중...",
   connectToAccess: "포트폴리오 대시보드에 액세스하려면 지갑을 연결하세요",
@@ -144,6 +145,7 @@ export const kr = {
   loading: "로딩 중...",
   loadingBlockInfo: "블록 정보 로딩 중...",
   loadingData: "데이터 로딩 중...",
+  loadingChallengeData: "챌린지 데이터 로딩 중...",
   loadingGovernanceConfig: "거버넌스 설정 로딩 중...",
   loadingInvestorData: "투자자 데이터 로딩 중",
   loadingLatestProposals: "최신 제안 및 투표 결과 로딩 중...",
@@ -368,5 +370,9 @@ export const kr = {
   weekly: "1주",
   youCancelledNetworkSwitch: "네트워크 전환 요청을 취소했습니다.",
   youHaveAlreadyVoted: "이미 이 제안에 투표하셨습니다",
-  youNeedToDelegate: "거버넌스에 참여하려면 토큰을 위임해야 합니다"
+  youNeedToDelegate: "거버넌스에 참여하려면 토큰을 위임해야 합니다",
+  yourPosition: "내 포지션",
+  yourPositionActive: "내 포지션 (활성)",
+  yourPositionLive: "내 포지션 (실시간)",
+  yourPositionRegistered: "내 포지션 (등록됨)"
 } as const; 

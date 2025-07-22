@@ -43,6 +43,7 @@ export const jp = {
   commandPaletteDescription: "オプションの検索と選択のためのコマンドパレット",
   completed: "完了",
   confirm: "確認",
+  currentRankings: "現在のランキング:",
   connectedWallet: "接続されたウォレット",
   connecting: "接続中...",
   connectToAccess: "ポートフォリオダッシュボードにアクセスするためにウォレットを接続してください",
@@ -144,6 +145,7 @@ export const jp = {
   loading: "読み込み中...",
   loadingBlockInfo: "ブロック情報を読み込み中...",
   loadingData: "データを読み込み中...",
+  loadingChallengeData: "チャレンジデータを読み込み中...",
   loadingGovernanceConfig: "ガバナンス設定を読み込み中...",
   loadingInvestorData: "投資家データを読み込み中",
   loadingLatestProposals: "最新の提案と投票結果を読み込み中...",
@@ -368,5 +370,9 @@ export const jp = {
   weekly: "週次",
   youCancelledNetworkSwitch: "ネットワーク切り替えリクエストをキャンセルしました。",
   youHaveAlreadyVoted: "この提案にはすでに投票しています",
-  youNeedToDelegate: "ガバナンスに参加するにはトークンを委任する必要があります"
+  youNeedToDelegate: "ガバナンスに参加するにはトークンを委任する必要があります",
+  yourPosition: "あなたのポジション",
+  yourPositionActive: "あなたのポジション（アクティブ）",
+  yourPositionLive: "あなたのポジション（ライブ）",
+  yourPositionRegistered: "あなたのポジション（登録済み）"
 } as const; 

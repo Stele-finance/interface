@@ -43,6 +43,7 @@ export const zhTw = {
   commandPaletteDescription: "用於搜索和選擇選項的命令面板",
   completed: "已完成",
   confirm: "確認",
+  currentRankings: "目前排名:",
   connectedWallet: "已連接錢包",
   connecting: "連接中...",
   connectToAccess: "連接您的錢包以訪問投資組合儀表板",
@@ -144,6 +145,7 @@ export const zhTw = {
   loading: "載入中...",
   loadingBlockInfo: "載入區塊信息中...",
   loadingData: "載入數據中...",
+  loadingChallengeData: "載入挑戰數據中...",
   loadingGovernanceConfig: "載入治理配置中...",
   loadingInvestorData: "載入投資者數據中",
   loadingLatestProposals: "載入最新提案和投票結果中...",
@@ -368,5 +370,9 @@ export const zhTw = {
   weekly: "每週",
   youCancelledNetworkSwitch: "您取消了網路切換請求。",
   youHaveAlreadyVoted: "您已對此提案投票",
-  youNeedToDelegate: "您需要委託您的代幣以參與治理"
+  youNeedToDelegate: "您需要委託您的代幣以參與治理",
+  yourPosition: "您的位置",
+  yourPositionActive: "您的位置（活躍）",
+  yourPositionLive: "您的位置（即時）",
+  yourPositionRegistered: "您的位置（已註冊）"
 } as const; 

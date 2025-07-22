@@ -43,6 +43,7 @@ export const nl = {
   commandPaletteDescription: "Commandopalet om opties te zoeken en selecteren",
   completed: "Voltooid",
   confirm: "Bevestigen",
+  currentRankings: "Huidige ranglijst:",
   connectedWallet: "Verbonden Wallet",
   connecting: "Verbinden...",
   connectToAccess: "Verbind uw wallet om toegang te krijgen tot het portfolio dashboard",
@@ -144,6 +145,7 @@ export const nl = {
   loading: "Laden...",
   loadingBlockInfo: "Blokinformatie laden...",
   loadingData: "Gegevens laden...",
+  loadingChallengeData: "Challenge-gegevens laden...",
   loadingGovernanceConfig: "Governance configuratie laden...",
   loadingInvestorData: "Investeerder gegevens laden",
   loadingLatestProposals: "Laatste voorstellen en stemresultaten laden...",
@@ -368,5 +370,9 @@ export const nl = {
   weekly: "Wekelijks",
   youCancelledNetworkSwitch: "U heeft het netwerkwissel verzoek geannuleerd.",
   youHaveAlreadyVoted: "U heeft al gestemd op dit voorstel",
-  youNeedToDelegate: "U moet uw tokens delegeren om deel te nemen aan governance"
+  youNeedToDelegate: "U moet uw tokens delegeren om deel te nemen aan governance",
+  yourPosition: "Uw positie",
+  yourPositionActive: "Uw positie (actief)",
+  yourPositionLive: "Uw positie (live)",
+  yourPositionRegistered: "Uw positie (geregistreerd)"
 } as const; 

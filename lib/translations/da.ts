@@ -43,6 +43,7 @@ export const da = {
   commandPaletteDescription: "Kommando palet til søgning og valg af muligheder",
   completed: "Færdig",
   confirm: "Bekræft",
+  currentRankings: "Nuværende rangeringer:",
   connectedWallet: "Tilsluttet Wallet",
   connecting: "Tilslutter...",
   connectToAccess: "Tilslut din wallet for at få adgang til portfolio dashboard",
@@ -144,6 +145,7 @@ export const da = {
   loading: "Indlæser...",
   loadingBlockInfo: "Indlæser blok information...",
   loadingData: "Indlæser data...",
+  loadingChallengeData: "Indlæser udfordringsdata...",
   loadingGovernanceConfig: "Indlæser governance konfiguration...",
   loadingInvestorData: "Indlæser investor data",
   loadingLatestProposals: "Indlæser seneste forslag og stemme resultater...",
@@ -368,5 +370,9 @@ export const da = {
   weekly: "Ugentlig",
   youCancelledNetworkSwitch: "Du annullerede netværk skift anmodningen.",
   youHaveAlreadyVoted: "Du har allerede stemt på dette forslag",
-  youNeedToDelegate: "Du skal delegere dine tokens for at deltage i governance"
+  youNeedToDelegate: "Du skal delegere dine tokens for at deltage i governance",
+  yourPosition: "Din position",
+  yourPositionActive: "Din position (aktiv)",
+  yourPositionLive: "Din position (live)",
+  yourPositionRegistered: "Din position (registreret)"
 } as const; 

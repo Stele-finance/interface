@@ -43,6 +43,7 @@ export const ms = {
   commandPaletteDescription: "Palet arahan untuk mencari dan memilih pilihan",
   completed: "Selesai",
   confirm: "Sahkan",
+  currentRankings: "Kedudukan semasa:",
   connectedWallet: "Dompet Tersambung",
   connecting: "Menyambung...",
   connectToAccess: "Sambungkan dompet anda untuk mengakses papan pemuka portfolio",
@@ -144,6 +145,7 @@ export const ms = {
   loading: "Memuatkan...",
   loadingBlockInfo: "Memuatkan maklumat blok...",
   loadingData: "Memuatkan data...",
+  loadingChallengeData: "Memuatkan data cabaran...",
   loadingGovernanceConfig: "Memuatkan konfigurasi tadbir urus...",
   loadingInvestorData: "Memuatkan data pelabur",
   loadingLatestProposals: "Memuatkan cadangan terkini dan keputusan mengundi...",
@@ -368,5 +370,9 @@ export const ms = {
   weekly: "Mingguan",
   youCancelledNetworkSwitch: "Anda membatalkan permintaan pertukaran rangkaian.",
   youHaveAlreadyVoted: "Anda sudah mengundi pada cadangan ini",
-  youNeedToDelegate: "Anda perlu mewakilkan token anda untuk mengambil bahagian dalam tadbir urus"
+  youNeedToDelegate: "Anda perlu mewakilkan token anda untuk mengambil bahagian dalam tadbir urus",
+  yourPosition: "Kedudukan anda",
+  yourPositionActive: "Kedudukan anda (aktif)",
+  yourPositionLive: "Kedudukan anda (langsung)",
+  yourPositionRegistered: "Kedudukan anda (berdaftar)"
 } as const; 

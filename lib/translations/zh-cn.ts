@@ -43,6 +43,7 @@ export const zhCn = {
   commandPaletteDescription: "用于搜索和选择选项的命令面板",
   completed: "已完成",
   confirm: "确认",
+  currentRankings: "当前排名:",
   connectedWallet: "已连接钱包",
   connecting: "连接中...",
   connectToAccess: "连接您的钱包以访问投资组合仪表板",
@@ -144,6 +145,7 @@ export const zhCn = {
   loading: "加载中...",
   loadingBlockInfo: "正在加载区块信息...",
   loadingData: "正在加载数据...",
+  loadingChallengeData: "正在加载挑战数据...",
   loadingGovernanceConfig: "正在加载治理配置...",
   loadingInvestorData: "正在加载投资者数据",
   loadingLatestProposals: "正在加载最新提案和投票结果...",
@@ -368,5 +370,9 @@ export const zhCn = {
   weekly: "每周",
   youCancelledNetworkSwitch: "您取消了网络切换请求。",
   youHaveAlreadyVoted: "您已对此提案投票",
-  youNeedToDelegate: "您需要委托您的代币以参与治理"
+  youNeedToDelegate: "您需要委托您的代币以参与治理",
+  yourPosition: "您的位置",
+  yourPositionActive: "您的位置（活跃）",
+  yourPositionLive: "您的位置（实时）",
+  yourPositionRegistered: "您的位置（已注册）"
 } as const; 

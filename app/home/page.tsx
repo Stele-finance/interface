@@ -134,7 +134,7 @@ export default function HomePage() {
               </h1>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-50">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
               <div 
                 className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center justify-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
                 onClick={handleGetStarted}
