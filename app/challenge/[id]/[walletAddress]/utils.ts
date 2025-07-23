@@ -125,7 +125,7 @@ export const getTransactionTypeText = (type: string, t: (key: string) => string)
     case 'reward':
       return t('rewards')
     case 'airdrop':
-      return t('airdrop')
+      return t('steleBonus')
     default:
       return type
   }
