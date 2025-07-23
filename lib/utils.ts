@@ -112,6 +112,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9': 'aave',
         '0xc944E90C64B2c07662A292be6244BDf05Cda44a7': 'grt',
         '0xd533a949740bb3306d119cc777fa900ba034cd52': 'crv',
+        '0x71c24377e7f24b6d822C9dad967eBC77C04667b5': 'stl',
       },
       arbitrum: {
         '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc',
@@ -123,6 +124,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
         '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196': 'aave',
         '0x9623063377AD1B27544C965cCd7342f7EA7e88C7': 'grt',
         '0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978': 'crv',
+        '0x5763a0523A672d7c88127e10533bA78853454510': 'stl',
       }
     }
     
@@ -163,6 +165,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
     'LINK': 'link',
     'AAVE': 'aave',
     'GRT': 'grt',
+    'STL': 'stl',
   }
   
   const symbolLogo = symbolMap[addressOrSymbol.toUpperCase()]

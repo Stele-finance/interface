@@ -1,6 +1,7 @@
 export const da = {
   abstain: "Undlad",
   abstainVotes: "Undladende Stemmer",
+  airdrop: "Airdrop",
   active: "Aktiv",
   activeChallenges: "Udfordringer",
   address: "Adresse",

@@ -1,6 +1,7 @@
 export const zhTw = {
   abstain: "棄權",
   abstainVotes: "棄權票",
+  airdrop: "空投",
   active: "活躍",
   activeChallenges: "挑戰",
   address: "地址",

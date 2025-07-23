@@ -476,9 +476,11 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       case 'swap':
         return 'text-green-400'
       case 'register':
-        return 'text-orange-400'
+        return 'text-pink-400'
       case 'reward':
         return 'text-yellow-400'
+      case 'airdrop':
+        return 'text-orange-400'
       default:
         return 'text-gray-400'
     }
@@ -497,6 +499,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
         return t('register')
       case 'reward':
         return t('rewards')
+      case 'airdrop':
+        return t('airdrop')
       default:
         return type
     }
@@ -1257,6 +1261,30 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                       }
                                       return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
                                     })()
+                                  ) : transaction.type === 'airdrop' ? (
+                                    <div className="flex items-center gap-2 justify-end">
+                                      <div className="relative flex-shrink-0">
+                                        <Image 
+                                          src="/tokens/small/stl.png" 
+                                          alt="STL Token"
+                                          width={20}
+                                          height={20}
+                                          className="rounded-full"
+                                        />
+                                        {subgraphNetwork === 'arbitrum' && (
+                                          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                            <Image 
+                                              src="/networks/small/arbitrum.png" 
+                                              alt="Arbitrum"
+                                              width={12}
+                                              height={12}
+                                              className="w-full h-full object-contain"
+                                            />
+                                          </div>
+                                        )}
+                                      </div>
+                                      <span className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</span>
+                                    </div>
                                   ) : transaction.type === 'join' || transaction.type === 'register' ? (
                                     <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
                                   ) : (

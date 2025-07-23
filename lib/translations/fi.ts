@@ -1,6 +1,7 @@
 export const fi = {
   abstain: "Pidättäytyminen",
   abstainVotes: "Pidättäytyminen",
+  airdrop: "Airdrop",
   active: "Aktiivinen",
   activeChallenges: "Haaste",
   address: "Osoite",

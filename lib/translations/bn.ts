@@ -1,6 +1,7 @@
 export const bn = {
   abstain: "বিরত থাকা",
   abstainVotes: "বিরত ভোট",
+  airdrop: "এয়ারড্রপ",
   active: "সক্রিয়",
   activeChallenges: "চ্যালেঞ্জ",
   address: "ঠিকানা",

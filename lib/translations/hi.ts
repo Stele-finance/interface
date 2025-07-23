@@ -1,6 +1,7 @@
 export const hi = {
   abstain: "परहेज़",
   abstainVotes: "परहेज़",
+  airdrop: "एयरड्रॉप",
   active: "सक्रिय",
   activeChallenges: "चुनौती",
   address: "पता",

@@ -1,6 +1,7 @@
 export const ar = {
   abstain: "امتناع",
   abstainVotes: "أصوات الامتناع",
+  airdrop: "إنزال جوي",
   active: "نشط",
   activeChallenges: "التحديات",
   address: "العنوان",

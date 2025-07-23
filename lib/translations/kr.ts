@@ -1,6 +1,7 @@
 export const kr = {
   abstain: "기권",
   abstainVotes: "기권",
+  airdrop: "에어드랍",
   active: "활성",
   activeChallenges: "챌린지",
   address: "주소",

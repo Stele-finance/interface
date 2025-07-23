@@ -1,6 +1,7 @@
 export const he = {
   abstain: "הימנעות",
   abstainVotes: "הימנעות",
+  airdrop: "אירדרופ",
   active: "פעיל",
   activeChallenges: "אתגר",
   address: "כתובת",

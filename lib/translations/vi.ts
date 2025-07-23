@@ -1,6 +1,7 @@
 export const vi = {
   abstain: "Bỏ phiếu trắng",
   abstainVotes: "Bỏ phiếu trắng",
+  airdrop: "Airdrop",
   active: "Hoạt động",
   activeChallenges: "Thử thách",
   address: "Địa chỉ",

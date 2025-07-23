@@ -1,6 +1,7 @@
 export const ms = {
   abstain: "Berkecuali",
   abstainVotes: "Undi Berkecuali",
+  airdrop: "Airdrop",
   active: "Aktif",
   activeChallenges: "Cabaran",
   address: "Alamat",
