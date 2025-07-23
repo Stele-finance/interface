@@ -27,6 +27,7 @@ export const bn = {
   challengeAlreadyActive: "চ্যালেঞ্জ ইতিমধ্যে সক্রিয়",
   challengeDetails: "চ্যালেঞ্জের বিবরণ",
   challengeId: "চ্যালেঞ্জ আইডি",
+  challengeCreatedSuccessfully: "চ্যালেঞ্জ সফলভাবে তৈরি হয়েছে!",
   challengeJoined: "চ্যালেঞ্জে যোগ দেওয়া হয়েছে",
   challengeProgress: "চ্যালেঞ্জের অগ্রগতি",
   challengeProgressDesc: "বিনিয়োগের কার্যক্রম ট্র্যাক করুন এবং অন্যান্য বিনিয়োগকারীদের সাথে প্রতিযোগিতা করুন।",

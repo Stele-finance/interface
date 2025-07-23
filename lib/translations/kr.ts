@@ -27,6 +27,7 @@ export const kr = {
   challengeAlreadyActive: "챌린지가 이미 활성화됨",
   challengeDetails: "챌린지 세부사항",
   challengeId: "챌린지 ID",
+  challengeCreatedSuccessfully: "챌린지가 성공적으로 생성되었습니다!",
   challengeJoined: "챌린지 참가됨",
   challengeProgress: "챌린지 진행 상황",
   challengeProgressDesc: "투자 성과를 추적하고 다른 투자자들과 실시간으로 경쟁하세요.",

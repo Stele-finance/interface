@@ -27,6 +27,7 @@ export const it = {
   challengeAlreadyActive: "Sfida Già Attiva",
   challengeDetails: "Dettagli della Sfida",
   challengeId: "ID Sfida",
+  challengeCreatedSuccessfully: "Sfida creata con successo!",
   challengeJoined: "Sfida Partecipata",
   challengeProgress: "Progresso della Sfida",
   challengeProgressDesc: "Monitora le performance degli investimenti e competi con altri investitori in tempo reale.",

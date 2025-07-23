@@ -27,6 +27,7 @@ export const fi = {
   challengeAlreadyActive: "Haaste On Jo Aktiivinen",
   challengeDetails: "Haasteen Yksityiskohdat",
   challengeId: "Haasteen ID",
+  challengeCreatedSuccessfully: "Haaste luotu onnistuneesti!",
   challengeJoined: "Haasteeseen Liitytty",
   challengeProgress: "Haasteen Edistyminen",
   challengeProgressDesc: "Seuraa sijoitusten suorituskykyä ja kilpaile muiden sijoittajien kanssa reaaliajassa.",

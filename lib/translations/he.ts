@@ -27,6 +27,7 @@ export const he = {
   challengeAlreadyActive: "האתגר כבר פעיל",
   challengeDetails: "פרטי האתגר",
   challengeId: "מזהה האתגר",
+  challengeCreatedSuccessfully: "אתגר נוצר בהצלחה!",
   challengeJoined: "הצטרפות לאתגר",
   challengeProgress: "התקדמות האתגר",
   challengeProgressDesc: "עקוב אחר ביצועי ההשקעות והתחרה עם משקיעים אחרים בזמן אמת.",

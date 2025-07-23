@@ -27,6 +27,7 @@ export const es = {
   challengeAlreadyActive: "Desafío Ya Activo",
   challengeDetails: "Detalles del Desafío",
   challengeId: "ID del Desafío",
+  challengeCreatedSuccessfully: "¡Desafío creado con éxito!",
   challengeJoined: "Desafío Unido",
   challengeProgress: "Progreso del Desafío",
   challengeProgressDesc: "Rastrea el rendimiento de las inversiones y compite con otros inversores en tiempo real.",

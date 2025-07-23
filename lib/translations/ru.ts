@@ -27,6 +27,7 @@ export const ru = {
   challengeAlreadyActive: "Вызов Уже Активен",
   challengeDetails: "Детали Вызова",
   challengeId: "ID Вызова",
+  challengeCreatedSuccessfully: "Вызов успешно создан!",
   challengeJoined: "Присоединился к Вызову",
   challengeProgress: "Прогресс Вызова",
   challengeProgressDesc: "Отслеживайте инвестиционную производительность и соревнуйтесь с другими инвесторами в режиме реального времени.",

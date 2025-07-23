@@ -27,6 +27,7 @@ export const nl = {
   challengeAlreadyActive: "Uitdaging Al Actief",
   challengeDetails: "Uitdaging Details",
   challengeId: "Uitdaging ID",
+  challengeCreatedSuccessfully: "Uitdaging succesvol aangemaakt!",
   challengeJoined: "Uitdaging Aangesloten",
   challengeProgress: "Uitdaging Voortgang",
   challengeProgressDesc: "Volg investeringsprestaties en concurreer met andere investeerders in real-time.",

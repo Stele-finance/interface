@@ -27,6 +27,7 @@ export const el = {
   challengeAlreadyActive: "Η Πρόκληση είναι ήδη Ενεργή",
   challengeDetails: "Λεπτομέρειες Πρόκλησης",
   challengeId: "ID Πρόκλησης",
+  challengeCreatedSuccessfully: "Η πρόκληση δημιουργήθηκε με επιτυχία!",
   challengeJoined: "Συμμετοχή σε Πρόκληση",
   challengeProgress: "Πρόοδος Πρόκλησης",
   challengeProgressDesc: "Παρακολουθήστε την επενδυτική απόδοση και ανταγωνιστείτε με άλλους επενδυτές σε πραγματικό χρόνο.",

@@ -27,6 +27,7 @@ export const fr = {
   challengeAlreadyActive: "Défi Déjà Actif",
   challengeDetails: "Détails du Défi",
   challengeId: "ID du Défi",
+  challengeCreatedSuccessfully: "Défi créé avec succès !",
   challengeJoined: "Défi Rejoint",
   challengeProgress: "Progrès du Défi",
   challengeProgressDesc: "Suivez les performances d'investissement et concurrencez avec d'autres investisseurs en temps réel.",

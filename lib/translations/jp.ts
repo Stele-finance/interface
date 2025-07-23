@@ -27,6 +27,7 @@ export const jp = {
   challengeAlreadyActive: "チャレンジが既にアクティブです",
   challengeDetails: "チャレンジの詳細",
   challengeId: "チャレンジID",
+  challengeCreatedSuccessfully: "チャレンジの作成に成功しました！",
   challengeJoined: "チャレンジに参加しました",
   challengeProgress: "チャレンジの進捗",
   challengeProgressDesc: "投資パフォーマンスを追跡し、他の投資家とリアルタイムで競争しましょう。",

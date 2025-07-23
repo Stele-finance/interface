@@ -27,6 +27,7 @@ export const da = {
   challengeAlreadyActive: "Udfordring Allerede Aktiv",
   challengeDetails: "Udfordring Detaljer",
   challengeId: "Udfordring ID",
+  challengeCreatedSuccessfully: "Udfordring oprettet med succes!",
   challengeJoined: "Udfordring Tilmeldt",
   challengeProgress: "Udfordringsforløb",
   challengeProgressDesc: "Spor investeringsresultater og konkurrér med andre investorer i realtid.",

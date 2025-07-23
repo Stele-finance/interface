@@ -27,6 +27,7 @@ export const vi = {
   challengeAlreadyActive: "Thử thách đã hoạt động",
   challengeDetails: "Chi tiết thử thách",
   challengeId: "ID thử thách",
+  challengeCreatedSuccessfully: "Tạo thử thách thành công!",
   challengeJoined: "Đã tham gia thử thách",
   challengeProgress: "Tiến độ thử thách",
   challengeProgressDesc: "Theo dõi hiệu suất đầu tư và cạnh tranh với các nhà đầu tư khác theo thời gian thực.",

@@ -27,6 +27,7 @@ export const en = {
   challengeAlreadyActive: "Challenge Already Active",
   challengeDetails: "Challenge Details",
   challengeId: "Challenge ID",
+  challengeCreatedSuccessfully: "Challenge created successfully!",
   challengeJoined: "Challenge Joined",
   challengeProgress: "Challenge Progress",
   challengeProgressDesc: "Track investment performance and compete with other investors in real-time.",

@@ -27,6 +27,7 @@ export const hi = {
   challengeAlreadyActive: "चुनौती पहले से सक्रिय है",
   challengeDetails: "चुनौती विवरण",
   challengeId: "चुनौती ID",
+  challengeCreatedSuccessfully: "चुनौती सफलतापूर्वक बनाई गई!",
   challengeJoined: "चुनौती में शामिल हुए",
   challengeProgress: "चुनौती प्रगति",
   challengeProgressDesc: "निवेश प्रदर्शन को ट्रैक करें और वास्तविक समय में अन्य निवेशकों के साथ प्रतिस्पर्धा करें।",
