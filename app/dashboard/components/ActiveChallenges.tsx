@@ -508,8 +508,8 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
-            <div className="text-white text-lg font-medium">Challenge created successfully!</div>
-            <div className="text-gray-300 text-sm">Refreshing data...</div>
+            <div className="text-white text-lg font-medium">{t('challengeCreatedSuccessfully')}</div>
+            <div className="text-gray-300 text-sm">{t('refreshingData')}</div>
           </div>
         </div>
       )}

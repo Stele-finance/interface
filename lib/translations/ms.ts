@@ -27,6 +27,7 @@ export const ms = {
   challengeAlreadyActive: "Cabaran Sudah Aktif",
   challengeDetails: "Butiran Cabaran",
   challengeId: "ID Cabaran",
+  challengeCreatedSuccessfully: "Cabaran berjaya dicipta!",
   challengeJoined: "Cabaran Disertai",
   challengeProgress: "Kemajuan Cabaran",
   challengeProgressDesc: "Jejaki prestasi pelaburan dan bersaing dengan pelabur lain secara masa nyata.",

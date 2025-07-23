@@ -27,6 +27,7 @@ export const id = {
   challengeAlreadyActive: "Tantangan Sudah Aktif",
   challengeDetails: "Detail Tantangan",
   challengeId: "ID Tantangan",
+  challengeCreatedSuccessfully: "Tantangan berhasil dibuat!",
   challengeJoined: "Tantangan Diikuti",
   challengeProgress: "Progres Tantangan",
   challengeProgressDesc: "Lacak kinerja investasi dan bersaing dengan investor lain secara real-time.",

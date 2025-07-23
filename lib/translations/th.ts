@@ -27,6 +27,7 @@ export const th = {
   challengeAlreadyActive: "ความท้าทายเปิดใช้งานแล้ว",
   challengeDetails: "รายละเอียดความท้าทาย",
   challengeId: "รหัสความท้าทาย",
+  challengeCreatedSuccessfully: "สร้างความท้าทายสำเร็จ!",
   challengeJoined: "เข้าร่วมความท้าทายแล้ว",
   challengeProgress: "ความคืบหน้าความท้าทาย",
   challengeProgressDesc: "ติดตามผลการลงทุนและแข่งขันกับนักลงทุนอื่นๆ แบบเรียลไทม์",

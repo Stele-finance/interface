@@ -27,6 +27,7 @@ export const zhCn = {
   challengeAlreadyActive: "挑战已激活",
   challengeDetails: "挑战详情",
   challengeId: "挑战ID",
+  challengeCreatedSuccessfully: "挑战创建成功！",
   challengeJoined: "已加入挑战",
   challengeProgress: "挑战进度",
   challengeProgressDesc: "实时跟踪投资表现并与其他投资者竞争。",

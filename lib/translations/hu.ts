@@ -27,6 +27,7 @@ export const hu = {
   challengeAlreadyActive: "A kihívás már aktív",
   challengeDetails: "Kihívás részletei",
   challengeId: "Kihívás azonosító",
+  challengeCreatedSuccessfully: "Kihívás sikeresen létrehozva!",
   challengeJoined: "Csatlakozott a kihíváshoz",
   challengeProgress: "Kihívás előrehaladás",
   challengeProgressDesc: "Kövesse nyomon a befektetési teljesítményt és versenyezzen más befektetőkkel valós időben.",

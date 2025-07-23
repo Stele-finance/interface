@@ -27,6 +27,7 @@ export const ar = {
   challengeAlreadyActive: "التحدي نشط بالفعل",
   challengeDetails: "تفاصيل التحدي",
   challengeId: "معرف التحدي",
+  challengeCreatedSuccessfully: "تم إنشاء التحدي بنجاح!",
   challengeJoined: "انضم للتحدي",
   challengeProgress: "تقدم التحدي",
   challengeProgressDesc: "تتبع أداء الاستثمار وتنافس مع المستثمرين الآخرين في الوقت الفعلي.",
