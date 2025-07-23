@@ -251,7 +251,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
               <ResponsiveContainer width="100%" height={280} className="sm:h-80">
                 <AreaChart 
                   data={currentChartData} 
-                  margin={{ top: 20, right: 5, left: -10, bottom: 20 }}
+                  margin={{ top: 20, right: 5, left: 5, bottom: 20 }}
                   onMouseMove={(state: any) => {
                     if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                       if (chartType === 'participants') {
@@ -296,7 +296,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     tick={{ fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
-                    width={25}
+                    width={35}
                     tickFormatter={(value) => {
                       if (chartType === 'participants') {
                         if (value >= 1000000) {

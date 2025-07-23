@@ -642,7 +642,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart 
               data={chartData} 
-              margin={{ top: 20, right: 10, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 10, left: 5, bottom: 0 }}
               onMouseMove={(state: any) => {
                 if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
                   setActiveIndexRewards(state.activeTooltipIndex)
@@ -673,7 +673,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 tick={{ fill: '#9CA3AF' }}
                 axisLine={false}
                 tickLine={false}
-                width={25}
+                width={35}
                 tickFormatter={(value) => {
                   if (value >= 1000000) {
                     return `$${(value / 1000000).toFixed(1)}M`
