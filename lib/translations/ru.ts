@@ -1,6 +1,7 @@
 export const ru = {
   abstain: "Воздержаться",
   abstainVotes: "Голоса за Воздержание",
+  airdrop: "Аирдроп",
   active: "Активные",
   activeChallenges: "Вызовы",
   address: "Адрес",

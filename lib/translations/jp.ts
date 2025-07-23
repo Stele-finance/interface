@@ -1,6 +1,7 @@
 export const jp = {
   abstain: "棄権",
   abstainVotes: "棄権",
+  airdrop: "エアドロップ",
   active: "アクティブ",
   activeChallenges: "チャレンジ",
   address: "アドレス",

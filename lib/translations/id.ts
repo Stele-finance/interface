@@ -1,6 +1,7 @@
 export const id = {
   abstain: "Abstain",
   abstainVotes: "Suara Abstain",
+  airdrop: "Airdrop",
   active: "Aktif",
   activeChallenges: "Tantangan",
   address: "Alamat",

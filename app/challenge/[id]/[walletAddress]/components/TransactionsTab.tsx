@@ -164,6 +164,30 @@ export function TransactionsTab({
                           }
                           return <p className="text-sm md:text-base font-medium text-gray-100 truncate">{transaction.amount || '-'}</p>
                         })()
+                      ) : transaction.type === 'airdrop' ? (
+                        <div className="flex items-center gap-2 justify-end">
+                          <div className="relative flex-shrink-0">
+                            <Image 
+                              src="/tokens/small/stl.png" 
+                              alt="STL Token"
+                              width={20}
+                              height={20}
+                              className="rounded-full"
+                            />
+                            {subgraphNetwork === 'arbitrum' && (
+                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-transparent rounded-full">
+                                <Image 
+                                  src="/networks/small/arbitrum.png" 
+                                  alt="Arbitrum"
+                                  width={12}
+                                  height={12}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">{transaction.amount || '-'}</span>
+                        </div>
                       ) : transaction.type === 'join' || transaction.type === 'register' ? (
                         <p className="text-sm md:text-base font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</p>
                       ) : (

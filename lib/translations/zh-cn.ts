@@ -1,6 +1,7 @@
 export const zhCn = {
   abstain: "弃权",
   abstainVotes: "弃权票",
+  airdrop: "空投",
   active: "活跃",
   activeChallenges: "挑战",
   address: "地址",

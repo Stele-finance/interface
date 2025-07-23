@@ -1,6 +1,7 @@
 export const de = {
   abstain: "Enthaltung",
   abstainVotes: "Enthaltung",
+  airdrop: "Airdrop",
   active: "Aktiv",
   activeChallenges: "Herausforderung",
   address: "Adresse",

@@ -1,6 +1,7 @@
 export const th = {
   abstain: "งดออกเสียง",
   abstainVotes: "คะแนนงดออกเสียง",
+  airdrop: "แอร์ดรอป",
   active: "กำลังดำเนินการ",
   activeChallenges: "ความท้าทาย",
   address: "ที่อยู่",

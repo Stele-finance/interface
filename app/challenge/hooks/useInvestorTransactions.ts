@@ -78,11 +78,28 @@ const GET_INVESTOR_TRANSACTIONS_QUERY = `
       blockTimestamp
       transactionHash
     }
+    steleTokenBonuses(
+      where: { 
+        challengeId: $challengeId,
+        user: $userAddress
+      }
+      orderBy: blockTimestamp
+      orderDirection: desc
+      first: 50
+    ) {
+      id
+      challengeId
+      user
+      action
+      amount
+      blockTimestamp
+      transactionHash
+    }
   }
 `
 
 export interface InvestorTransactionData {
-  type: 'join' | 'swap' | 'register' | 'reward'
+  type: 'join' | 'swap' | 'register' | 'reward' | 'airdrop'
   id: string
   challengeId: string
   user: string
@@ -136,6 +153,15 @@ interface GraphQLResponse {
     challengeId: string
     user: string
     rewardAmount: string
+    blockTimestamp: string
+    transactionHash: string
+  }>
+  steleTokenBonuses?: Array<{
+    id: string
+    challengeId: string
+    user: string
+    action: string
+    amount: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -239,6 +265,25 @@ export function useInvestorTransactions(challengeId: string, walletAddress: stri
               details: `Rewarded → ${userAddress}`,
               timestamp: parseInt(reward.blockTimestamp),
               transactionHash: reward.transactionHash,
+            })
+          })
+        }
+
+        // Process steleTokenBonuses
+        if (data.steleTokenBonuses && Array.isArray(data.steleTokenBonuses)) {
+          data.steleTokenBonuses.forEach((steleBonus) => {
+            const bonusValue = parseFloat(ethers.formatUnits(steleBonus.amount, 18)); // Stele token has 18 decimals
+            const userAddress = `${steleBonus.user.slice(0, 6)}...${steleBonus.user.slice(-4)}`;
+
+            allTransactions.push({
+              type: 'airdrop',
+              id: steleBonus.id,
+              challengeId: steleBonus.challengeId,
+              user: steleBonus.user,
+              amount: `${bonusValue.toFixed(4)}`,
+              details: `${steleBonus.action} → ${userAddress}`,
+              timestamp: parseInt(steleBonus.blockTimestamp),
+              transactionHash: steleBonus.transactionHash,
             })
           })
         }

@@ -248,6 +248,7 @@ export const kr = {
   rewardDistribution: "보상 분배",
   rewardDistributionSystemDesc: "챌린지가 끝나고 참가자들의 순위가 결정되면, 상위 1-5위 사용자에게 미리 정해진 비율에 따라 총 참가비를 분배해 보상으로 받습니다. 챌린지 참가자들의 참가비는 챌린지 보상에 사용됩니다.",
   rewards: "보상",
+  airdrop: "에어드롭",
   score: "점수",
   secondPlaceDesc: "2위에 대한 보상 비율",
   secondPlaceLabel: "2위 (%)",

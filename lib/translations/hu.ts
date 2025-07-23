@@ -1,6 +1,7 @@
 export const hu = {
   abstain: "Tartózkodás",
   abstainVotes: "Tartózkodó szavazatok",
+  airdrop: "Airdrop",
   active: "Aktív",
   activeChallenges: "Kihívás",
   address: "Cím",

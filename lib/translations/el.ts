@@ -1,6 +1,7 @@
 export const el = {
   abstain: "Αποχή",
   abstainVotes: "Αποχή",
+  airdrop: "Αεροσκάφη",
   active: "Ενεργό",
   activeChallenges: "Πρόκληση",
   address: "Διεύθυνση",

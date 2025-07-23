@@ -101,9 +101,11 @@ export const getTransactionTypeColor = (type: string) => {
     case 'swap':
       return 'text-green-400'
     case 'register':
-      return 'text-orange-400'
+      return 'text-pink-400'
     case 'reward':
       return 'text-yellow-400'
+    case 'airdrop':
+      return 'text-orange-400'
     default:
       return 'text-gray-400'
   }
@@ -122,6 +124,8 @@ export const getTransactionTypeText = (type: string, t: (key: string) => string)
       return t('register')
     case 'reward':
       return t('rewards')
+    case 'airdrop':
+      return t('airdrop')
     default:
       return type
   }

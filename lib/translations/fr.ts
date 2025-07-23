@@ -1,6 +1,7 @@
 export const fr = {
   abstain: "S'abstenir",
   abstainVotes: "Abstention",
+  airdrop: "Airdrop",
   active: "Actif",
   activeChallenges: "Défi",
   address: "Adresse",
