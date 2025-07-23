@@ -500,7 +500,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       case 'reward':
         return t('rewards')
       case 'airdrop':
-        return (t as any)('airdrop')
+        return t('airdrop')
       default:
         return type
     }

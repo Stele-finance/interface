@@ -1,6 +1,7 @@
 export const en = {
   abstain: "Abstain",
   abstainVotes: "Abstain",
+  airdrop: "Airdrop",
   active: "Active",
   activeChallenges: "Challenge",
   address: "Address",
@@ -246,7 +247,6 @@ export const en = {
   rewardDistribution: "Reward Distribution",
   rewardDistributionSystemDesc: "When a challenge ends and participants' rankings are determined, the top 1-5 users receive distributed total entry fees as rewards according to predetermined ratios.",
   rewards: "Rewards",
-  steleBonus: "Airdrop",
   score: "Score",
   secondPlaceDesc: "Reward percentage for second place",
   secondPlaceLabel: "Second Place (%)",
