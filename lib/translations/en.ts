@@ -374,5 +374,7 @@ export const en = {
   yourPosition: "Your Position",
   yourPositionActive: "Your Position (Active)",
   yourPositionLive: "Your Position (Live)",
-  yourPositionRegistered: "Your Position (Registered)"
+  yourPositionRegistered: "Your Position (Registered)",
+  joinRequestSuccessful: "Join request successful!",
+  refreshingData: "Refreshing data..."
 } as const; 
