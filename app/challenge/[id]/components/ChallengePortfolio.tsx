@@ -1189,18 +1189,18 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     })()}
                   </>
                 ) : (
-                                     <div className="text-center py-8 text-gray-400">
-                     <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                     <p>No transactions found for this challenge</p>
-                   </div>
-                 )}
-               </div>
-             </CardContent>
-           </Card>
+                  <div className="text-center py-8 text-gray-400">
+                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No transactions found for this challenge</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
            </TabsContent>
          </Tabs>
-         </div>
-       </div>
+          </div>
+        </div>
 
         {/* Right Column: Challenge Info + Ranking */}
         <div className="space-y-6">
