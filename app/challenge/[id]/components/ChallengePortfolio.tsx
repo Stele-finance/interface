@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Trophy, DollarSign, Plus } from "lucide-react"
+import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
@@ -32,7 +32,9 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useAppKitProvider } from '@reown/appkit/react'
 import { getTokenLogo } from "@/lib/utils"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Wallet } from "lucide-react"
+import { InvestorsTab } from "./InvestorsTab"
 
 interface ChallengePortfolioProps {
   challengeId: string
@@ -237,6 +239,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [showStatusTooltip, setShowStatusTooltip] = useState(false)
   const [typeTooltipTimer, setTypeTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [statusTooltipTimer, setStatusTooltipTimer] = useState<NodeJS.Timeout | null>(null)
+  const [activeTab, setActiveTab] = useState("investors")
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -1128,7 +1131,27 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           {/* Transactions Section */}
           <div>
           <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
-          <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden md:mr-16">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="investors" className="flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
+                {t('investor')}
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                {t('transactions')}
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="investors" className="space-y-0">
+              <InvestorsTab 
+                challengeId={challengeId}
+                subgraphNetwork={subgraphNetwork}
+              />
+            </TabsContent>
+
+            <TabsContent value="transactions" className="space-y-0">
+              <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 {isLoadingTransactions ? (
@@ -1340,16 +1363,18 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                     })()}
                   </>
                 ) : (
-                  <div className="text-center py-8 text-gray-400">
-                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No transactions found for this challenge</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          </div>
-        </div>
+                                     <div className="text-center py-8 text-gray-400">
+                     <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                     <p>No transactions found for this challenge</p>
+                   </div>
+                 )}
+               </div>
+             </CardContent>
+           </Card>
+           </TabsContent>
+         </Tabs>
+         </div>
+       </div>
 
         {/* Right Column: Challenge Info + Ranking */}
         <div className="space-y-6">

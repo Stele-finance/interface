@@ -1,13 +1,16 @@
 import React, { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { Loader2, Receipt, Activity, ArrowRight } from "lucide-react"
+import { Loader2, Receipt, Activity, ArrowRight, Users } from "lucide-react"
 import { getTokenLogo } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import { formatRelativeTime, getTransactionTypeColor, getTransactionTypeText, formatUserAddress, getExplorerUrl, getSwapDetails } from "../utils"
+import { InvestorsTab } from "../../components/InvestorsTab"
 import Image from "next/image"
 
 interface TransactionsTabProps {
+  challengeId: string
   investorTransactions: any[]
   isLoadingTransactions: boolean
   transactionsError: any
@@ -16,6 +19,7 @@ interface TransactionsTabProps {
 }
 
 export function TransactionsTab({ 
+  challengeId,
   investorTransactions, 
   isLoadingTransactions, 
   transactionsError, 
@@ -24,12 +28,26 @@ export function TransactionsTab({
 }: TransactionsTabProps) {
   const { t } = useLanguage()
   const [currentPage, setCurrentPage] = useState(1)
+  const [activeSubTab, setActiveSubTab] = useState("transactions")
   const itemsPerPage = 5
   const maxPages = 5
 
   return (
-    <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
-      <CardContent className="p-0">
+    <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="space-y-4">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="transactions" className="flex items-center gap-2">
+          <Activity className="h-4 w-4" />
+          {t('transactions')}
+        </TabsTrigger>
+        <TabsTrigger value="investors" className="flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          Investors
+        </TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="transactions" className="space-y-0">
+        <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
         {isLoadingTransactions ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
@@ -250,7 +268,16 @@ export function TransactionsTab({
             <p className="text-sm mt-2">Transaction history will appear here once you start trading</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="investors" className="space-y-0">
+        <InvestorsTab 
+          challengeId={challengeId}
+          subgraphNetwork={subgraphNetwork}
+        />
+      </TabsContent>
+    </Tabs>
   )
 } 
