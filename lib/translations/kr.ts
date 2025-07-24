@@ -183,6 +183,7 @@ export const kr = {
   networkSwitchFailed: "네트워크 전환 실패",
   networkSwitched: "네트워크 전환됨",
   next: "다음",
+  no: "아니오",
   noActiveProposalsFound: "활성 제안을 찾을 수 없습니다.",
   noChallengesFound: "챌린지를 찾을 수 없습니다",
   noChallengesFoundPortfolio: "챌린지를 찾을 수 없습니다",
@@ -385,5 +386,6 @@ export const kr = {
   yourPosition: "내 포지션",
   yourPositionActive: "내 포지션 (활성)",
   yourPositionLive: "내 포지션 (실시간)",
-  yourPositionRegistered: "내 포지션 (등록됨)"
+  yourPositionRegistered: "내 포지션 (등록됨)",
+  yes: "예"
 } as const; 

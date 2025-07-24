@@ -183,6 +183,7 @@ export const pt = {
   networkSwitchFailed: "Mudança de Rede Falhou",
   networkSwitched: "Rede Mudada",
   next: "Próximo",
+  no: "Não",
   noActiveProposalsFound: "Nenhuma proposta ativa encontrada.",
   noChallengesFound: "Nenhum desafio encontrado",
   noChallengesFoundPortfolio: "Nenhum desafio encontrado",
@@ -385,5 +386,6 @@ export const pt = {
   yourPosition: "Sua posição",
   yourPositionActive: "Sua posição (ativa)",
   yourPositionLive: "Sua posição (ao vivo)",
-  yourPositionRegistered: "Sua posição (registrada)"
+  yourPositionRegistered: "Sua posição (registrada)",
+  yes: "Sim"
 } as const; 

@@ -183,6 +183,7 @@ export const he = {
   networkSwitchFailed: "החלפת רשת נכשלה",
   networkSwitched: "רשת הוחלפה",
   next: "הבא",
+  no: "לא",
   noActiveProposalsFound: "לא נמצאו הצעות פעילות.",
   noChallengesFound: "לא נמצאו אתגרים",
   noChallengesFoundPortfolio: "לא נמצאו אתגרים",
@@ -385,5 +386,6 @@ export const he = {
   yourPosition: "המיקום שלך",
   yourPositionActive: "המיקום שלך (פעיל)",
   yourPositionLive: "המיקום שלך (בזמן אמת)",
-  yourPositionRegistered: "המיקום שלך (רשום)"
+  yourPositionRegistered: "המיקום שלך (רשום)",
+  yes: "כן"
 } as const; 

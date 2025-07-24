@@ -183,6 +183,7 @@ export const jp = {
   networkSwitchFailed: "ネットワーク切り替えに失敗しました",
   networkSwitched: "ネットワークが切り替わりました",
   next: "次へ",
+  no: "いいえ",
   noActiveProposalsFound: "アクティブな提案が見つかりません。",
   noChallengesFound: "チャレンジが見つかりません",
   noChallengesFoundPortfolio: "チャレンジが見つかりません",
@@ -385,5 +386,6 @@ export const jp = {
   yourPosition: "あなたのポジション",
   yourPositionActive: "あなたのポジション（アクティブ）",
   yourPositionLive: "あなたのポジション（ライブ）",
-  yourPositionRegistered: "あなたのポジション（登録済み）"
+  yourPositionRegistered: "あなたのポジション（登録済み）",
+  yes: "はい"
 } as const; 

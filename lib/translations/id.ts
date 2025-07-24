@@ -183,6 +183,7 @@ export const id = {
   networkSwitchFailed: "Pergantian Jaringan Gagal",
   networkSwitched: "Jaringan Diganti",
   next: "Berikutnya",
+  no: "Tidak",
   noActiveProposalsFound: "Tidak ada proposal aktif ditemukan.",
   noChallengesFound: "Tidak ada tantangan ditemukan",
   noChallengesFoundPortfolio: "Tidak ada tantangan ditemukan",
@@ -385,5 +386,6 @@ export const id = {
   yourPosition: "Posisi Anda",
   yourPositionActive: "Posisi Anda (aktif)",
   yourPositionLive: "Posisi Anda (langsung)",
-  yourPositionRegistered: "Posisi Anda (terdaftar)"
+  yourPositionRegistered: "Posisi Anda (terdaftar)",
+  yes: "Ya"
 } as const; 

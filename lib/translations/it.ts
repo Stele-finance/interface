@@ -183,6 +183,7 @@ export const it = {
   networkSwitchFailed: "Cambio di Rete Fallito",
   networkSwitched: "Rete Cambiata",
   next: "Successivo",
+  no: "No",
   noActiveProposalsFound: "Nessuna proposta attiva trovata.",
   noChallengesFound: "Nessuna sfida trovata",
   noChallengesFoundPortfolio: "Nessuna sfida trovata",
@@ -385,5 +386,6 @@ export const it = {
   yourPosition: "La tua posizione",
   yourPositionActive: "La tua posizione (attiva)",
   yourPositionLive: "La tua posizione (live)",
-  yourPositionRegistered: "La tua posizione (registrata)"
+  yourPositionRegistered: "La tua posizione (registrata)",
+  yes: "Sì"
 } as const; 

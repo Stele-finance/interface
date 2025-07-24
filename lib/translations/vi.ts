@@ -183,6 +183,7 @@ export const vi = {
   networkSwitchFailed: "Chuyển đổi mạng thất bại",
   networkSwitched: "Đã chuyển đổi mạng",
   next: "Tiếp theo",
+  no: "Không",
   noActiveProposalsFound: "Không tìm thấy đề xuất đang hoạt động.",
   noChallengesFound: "Không tìm thấy thử thách",
   noChallengesFoundPortfolio: "Không tìm thấy thử thách",
@@ -385,5 +386,6 @@ export const vi = {
   yourPosition: "Vị trí của bạn",
   yourPositionActive: "Vị trí của bạn (hoạt động)",
   yourPositionLive: "Vị trí của bạn (trực tiếp)",
-  yourPositionRegistered: "Vị trí của bạn (đã đăng ký)"
+  yourPositionRegistered: "Vị trí của bạn (đã đăng ký)",
+  yes: "Có"
 } as const; 

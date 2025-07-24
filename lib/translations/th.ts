@@ -183,6 +183,7 @@ export const th = {
   networkSwitchFailed: "การเปลี่ยนเครือข่ายล้มเหลว",
   networkSwitched: "เปลี่ยนเครือข่ายแล้ว",
   next: "ถัดไป",
+  no: "ไม่",
   noActiveProposalsFound: "ไม่พบข้อเสนอที่กำลังดำเนินการ",
   noChallengesFound: "ไม่พบความท้าทาย",
   noChallengesFoundPortfolio: "ไม่พบความท้าทาย",
@@ -385,5 +386,6 @@ export const th = {
   yourPosition: "ตำแหน่งของคุณ",
   yourPositionActive: "ตำแหน่งของคุณ (ใช้งานอยู่)",
   yourPositionLive: "ตำแหน่งของคุณ (สด)",
-  yourPositionRegistered: "ตำแหน่งของคุณ (ลงทะเบียนแล้ว)"
+  yourPositionRegistered: "ตำแหน่งของคุณ (ลงทะเบียนแล้ว)",
+  yes: "ใช่"
 } as const; 

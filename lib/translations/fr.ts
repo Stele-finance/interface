@@ -183,6 +183,7 @@ export const fr = {
   networkSwitchFailed: "Changement de Réseau Échoué",
   networkSwitched: "Réseau Changé",
   next: "Suivant",
+  no: "Non",
   noActiveProposalsFound: "Aucune proposition active trouvée.",
   noChallengesFound: "Aucun défi trouvé",
   noChallengesFoundPortfolio: "Aucun Défi Trouvé",
@@ -385,5 +386,6 @@ export const fr = {
   yourPosition: "Votre position",
   yourPositionActive: "Votre position (active)",
   yourPositionLive: "Votre position (en direct)",
-  yourPositionRegistered: "Votre position (enregistrée)"
+  yourPositionRegistered: "Votre position (enregistrée)",
+  yes: "Oui"
 } as const; 

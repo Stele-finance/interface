@@ -183,6 +183,7 @@ export const bn = {
   networkSwitchFailed: "নেটওয়ার্ক স্যুইচ ব্যর্থ",
   networkSwitched: "নেটওয়ার্ক স্যুইচ করা হয়েছে",
   next: "পরবর্তী",
+  no: "না",
   noActiveProposalsFound: "কোনো সক্রিয় প্রস্তাব পাওয়া যায়নি।",
   noChallengesFound: "কোনো চ্যালেঞ্জ পাওয়া যায়নি",
   noChallengesFoundPortfolio: "কোনো চ্যালেঞ্জ পাওয়া যায়নি",
@@ -385,5 +386,6 @@ export const bn = {
   yourPosition: "আপনার অবস্থান",
   yourPositionActive: "আপনার অবস্থান (সক্রিয়)",
   yourPositionLive: "আপনার অবস্থান (লাইভ)",
-  yourPositionRegistered: "আপনার অবস্থান (নিবন্ধিত)"
+  yourPositionRegistered: "আপনার অবস্থান (নিবন্ধিত)",
+  yes: "হ্যাঁ"
 } as const; 

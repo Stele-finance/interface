@@ -183,6 +183,7 @@ export const hi = {
   networkSwitchFailed: "नेटवर्क स्विच असफल",
   networkSwitched: "नेटवर्क स्विच किया गया",
   next: "अगला",
+  no: "नहीं",
   noActiveProposalsFound: "कोई सक्रिय प्रस्ताव नहीं मिला।",
   noChallengesFound: "कोई चुनौती नहीं मिली",
   noChallengesFoundPortfolio: "कोई चुनौती नहीं मिली",
@@ -385,5 +386,6 @@ export const hi = {
   yourPosition: "आपकी स्थिति",
   yourPositionActive: "आपकी स्थिति (सक्रिय)",
   yourPositionLive: "आपकी स्थिति (लाइव)",
-  yourPositionRegistered: "आपकी स्थिति (पंजीकृत)"
+  yourPositionRegistered: "आपकी स्थिति (पंजीकृत)",
+  yes: "हाँ"
 } as const; 

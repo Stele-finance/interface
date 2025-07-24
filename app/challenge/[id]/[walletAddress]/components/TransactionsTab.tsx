@@ -8,6 +8,7 @@ import { formatRelativeTime, getTransactionTypeColor, getTransactionTypeText, fo
 import Image from "next/image"
 
 interface TransactionsTabProps {
+  challengeId: string
   investorTransactions: any[]
   isLoadingTransactions: boolean
   transactionsError: any
@@ -16,6 +17,7 @@ interface TransactionsTabProps {
 }
 
 export function TransactionsTab({ 
+  challengeId,
   investorTransactions, 
   isLoadingTransactions, 
   transactionsError, 

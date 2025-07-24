@@ -183,6 +183,7 @@ export const ar = {
   networkSwitchFailed: "فشل تبديل الشبكة",
   networkSwitched: "تم تبديل الشبكة",
   next: "التالي",
+  no: "لا",
   noActiveProposalsFound: "لم يتم العثور على مقترحات نشطة.",
   noChallengesFound: "لم يتم العثور على تحديات",
   noChallengesFoundPortfolio: "لم يتم العثور على تحديات",
@@ -385,5 +386,6 @@ export const ar = {
   yourPosition: "موقعك",
   yourPositionActive: "موقعك (نشط)",
   yourPositionLive: "موقعك (مباشر)",
-  yourPositionRegistered: "موقعك (مسجل)"
+  yourPositionRegistered: "موقعك (مسجل)",
+  yes: "نعم"
 } as const; 
