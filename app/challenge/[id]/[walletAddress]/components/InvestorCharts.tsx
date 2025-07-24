@@ -122,14 +122,6 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         processedData.push(realTimeDataPoint)
     }
 
-    console.log('📊 Chart Data Debug:', {
-      totalDataPoints: processedData.length,
-      timeLabels: processedData.map(d => d.timeLabel),
-      dates: processedData.map(d => d.dateLabel),
-      values: processedData.map(d => d.currentUSD),
-      fullDates: processedData.map(d => d.fullDate)
-    })
-
     return processedData
   }, [data, weeklyData, interval, realTimePortfolio, investorData])
 
