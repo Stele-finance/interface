@@ -10,11 +10,12 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
-import { useWallet } from '@/app/hooks/useWallet'
-import { DollarSign, Plus, User, Loader2, Wallet } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { toast } from "@/components/ui/use-toast"
 
 interface ChallengeChartsProps {
   challengeId: string
@@ -260,6 +261,34 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     minute: '2-digit',
     hour12: true
   })
+
+  // Share functionality
+  const handleCopyLink = async () => {
+    try {
+      const currentUrl = window.location.href
+      await navigator.clipboard.writeText(currentUrl)
+      toast({
+        title: t('linkCopied'),
+        description: t('challengeLinkCopiedToClipboard'),
+      })
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+      toast({
+        title: t('copyFailed'),
+        description: t('unableToCopyLinkToClipboard'),
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleShareToTwitter = () => {
+    const currentUrl = window.location.href
+    const tweetText = t('shareToTwitterTemplate')
+      .replace('{challengeId}', challengeId)
+      .replace('${totalPrize}', currentRewardAmount.toLocaleString())
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(currentUrl)}`
+    window.open(twitterUrl, '_blank')
+  }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -615,13 +644,35 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
             </div>
             
-            {/* Second row: $3 amount + Hidden buttons for mobile (will be shown in float) */}
+            {/* Second row: $3 amount + Share button */}
             <div className="flex items-baseline justify-between gap-3 mt-2">
               <CardTitle className="text-4xl font-bold text-gray-100">
                 ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </CardTitle>
               
-              {/* Mobile buttons are now hidden - they will be shown in float */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                    <Copy className="mr-2 h-4 w-4" />
+                    {t('copyLink')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                    <Image 
+                      src="/x.png" 
+                      alt="X (Twitter)"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                    />
+                    {t('shareToTwitter')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           
@@ -635,6 +686,30 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               <CardTitle className="text-4xl font-bold text-gray-100">
               ${currentRewardAmount >= 1000000 ? `${(currentRewardAmount / 1000000).toFixed(1)}M` : currentRewardAmount >= 1000 ? `${(currentRewardAmount / 1000).toFixed(1)}K` : currentRewardAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </CardTitle>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                    <Copy className="mr-2 h-4 w-4" />
+                    {t('copyLink')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                    <Image 
+                      src="/x.png" 
+                      alt="X (Twitter)"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                    />
+                    {t('shareToTwitter')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
