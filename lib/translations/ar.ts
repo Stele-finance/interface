@@ -26,6 +26,7 @@ export const ar = {
   castYourVote: "أدلِ بصوتك",
   challenge: "التحدي",
   challengeAlreadyActive: "التحدي نشط بالفعل",
+  challengeLinkCopiedToClipboard: "تم نسخ رابط التحدي إلى الحافظة.",
   challengeDetails: "تفاصيل التحدي",
   challengeId: "معرف التحدي",
   challengeCreatedSuccessfully: "تم إنشاء التحدي بنجاح!",
@@ -52,6 +53,8 @@ export const ar = {
   connectWallet: "ربط",
   connectWalletToViewBalance: "اربط محفظتك لعرض أرصدة الرموز والتصويت على المقترحات",
   copyAddress: "نسخ العنوان",
+  copyFailed: "فشل في النسخ",
+  copyLink: "نسخ الرابط",
   create: "إنشاء",
   createChallenge: "جديد",
   createNewChallenge: "إنشاء تحدي جديد",
@@ -143,6 +146,7 @@ export const ar = {
   joining: "جاري الانضمام...",
   language: "اللغة",
   lastUpdated: "آخر تحديث",
+  linkCopied: "تم نسخ الرابط!",
   live: "مباشر",
   liveUniswapV3: "مباشر (Uniswap V3)",
   loading: "جاري التحميل...",
@@ -281,6 +285,8 @@ export const ar = {
   showing: "عرض",
   sixMonths: "6 أشهر",
   sixMonthsChallenge: "6 أشهر",
+  shareToTwitter: "مشاركة على تويتر",
+  shareToTwitterTemplate: "اطلع على التحدي {challengeId} في Stele Finance! 💰 إجمالي الجائزة: ${totalPrize}",
   solana: "Solana",
   start: "ابدأ",
   startDate: "تاريخ البداية",
@@ -343,6 +349,7 @@ export const ar = {
   type: "النوع",
   uniswapWallet: "محفظة Uniswap",
   uniswapWalletDesc: "يبدأ جميع المستخدمين الاستثمار التجريبي بنفس الأموال الأولية. فقط رسوم الدخول ورسوم غاز Ethereum مطلوبة.",
+  unableToCopyLinkToClipboard: "غير قادر على نسخ الرابط إلى الحافظة.",
   unknown: "غير معروف",
   updated: "محدث",
   user: "المستخدم",
