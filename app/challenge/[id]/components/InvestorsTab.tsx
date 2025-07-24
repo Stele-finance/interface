@@ -5,7 +5,7 @@ import { Loader2, Users, Trophy } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useChallengeInvestors, ChallengeInvestorData } from "../../hooks/useChallengeInvestors"
 import { useRouter } from "next/navigation"
-import { formatDateWithLocale } from "@/lib/utils"
+import { formatDateOnly } from "@/lib/utils"
 
 interface InvestorsTabProps {
   challengeId: string
@@ -25,11 +25,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork }: InvestorsTabProps
   // Helper function to format date
   const formatDate = (timestamp: string) => {
     const date = new Date(Number(timestamp) * 1000)
-    return formatDateWithLocale(date, language, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+    return formatDateOnly(date, language)
   }
 
   // Helper function to format USD value
