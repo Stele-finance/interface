@@ -183,6 +183,7 @@ export const nl = {
   networkSwitchFailed: "Netwerk Wissel Mislukt",
   networkSwitched: "Netwerk Gewisseld",
   next: "Volgende",
+  no: "Nee",
   noActiveProposalsFound: "Geen actieve voorstellen gevonden.",
   noChallengesFound: "Geen uitdagingen gevonden",
   noChallengesFoundPortfolio: "Geen uitdagingen gevonden",
@@ -385,5 +386,6 @@ export const nl = {
   yourPosition: "Uw positie",
   yourPositionActive: "Uw positie (actief)",
   yourPositionLive: "Uw positie (live)",
-  yourPositionRegistered: "Uw positie (geregistreerd)"
+  yourPositionRegistered: "Uw positie (geregistreerd)",
+  yes: "Ja"
 } as const; 

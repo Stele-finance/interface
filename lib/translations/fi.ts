@@ -183,6 +183,7 @@ export const fi = {
   networkSwitchFailed: "Verkon Vaihto Epäonnistui",
   networkSwitched: "Verkko Vaihdettu",
   next: "Seuraava",
+  no: "Ei",
   noActiveProposalsFound: "Aktiivisia ehdotuksia ei löytynyt.",
   noChallengesFound: "Haasteita ei löytynyt",
   noChallengesFoundPortfolio: "Haasteita Ei Löytynyt",
@@ -385,5 +386,6 @@ export const fi = {
   yourPosition: "Sinun asemasi",
   yourPositionActive: "Sinun asemasi (aktiivinen)",
   yourPositionLive: "Sinun asemasi (live)",
-  yourPositionRegistered: "Sinun asemasi (rekisteröity)"
+  yourPositionRegistered: "Sinun asemasi (rekisteröity)",
+  yes: "Kyllä"
 } as const; 

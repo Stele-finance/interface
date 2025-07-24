@@ -183,6 +183,7 @@ export const hu = {
   networkSwitchFailed: "Hálózatváltás Sikertelen",
   networkSwitched: "Hálózat Átváltva",
   next: "Következő",
+  no: "Nem",
   noActiveProposalsFound: "Nem találhatók aktív javaslatok.",
   noChallengesFound: "Nem találhatók kihívások",
   noChallengesFoundPortfolio: "Nem találhatók kihívások",
@@ -385,5 +386,6 @@ export const hu = {
   yourPosition: "Az Ön pozíciója",
   yourPositionActive: "Az Ön pozíciója (aktív)",
   yourPositionLive: "Az Ön pozíciója (élő)",
-  yourPositionRegistered: "Az Ön pozíciója (regisztrált)"
+  yourPositionRegistered: "Az Ön pozíciója (regisztrált)",
+  yes: "Igen"
 } as const; 

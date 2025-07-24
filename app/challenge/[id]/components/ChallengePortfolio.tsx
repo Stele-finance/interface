@@ -35,187 +35,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Wallet } from "lucide-react"
 import { InvestorsTab } from "./InvestorsTab"
+import { RankingSection } from "./RankingSection"
 
 interface ChallengePortfolioProps {
   challengeId: string
 }
 
-// Ranking Section Component
-function RankingSection({ challengeId, network }: { challengeId: string; network: 'ethereum' | 'arbitrum' | null }) {
-  const { t, language } = useLanguage()
-  const router = useRouter();
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, network);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
-  const formatAddress = (address: string) => {
-    // Check if address is empty or zero address
-    if (!address || address === '0x0000000000000000000000000000000000000000' || address.toLowerCase() === '0x0000000000000000000000000000000000000000') {
-      return '';
-    }
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  const formatScore = (score: string) => {
-    try {
-      const scoreValue = parseFloat(score);
-      return scoreValue.toFixed(2);
-    } catch {
-      return '0.00';
-    }
-  };
-
-  const formatProfitRatio = (profitRatio: string, userAddress: string) => {
-    // Check if address is empty or zero address
-    if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
-      return '0.0%';
-    }
-    
-    // Convert profit ratio to percentage
-    const ratioValue = parseFloat(profitRatio);
-    return `${ratioValue.toFixed(4)}%`;
-  };
-
-  const getRankIcon = (rank: number) => {
-    if (rank <= 5) {
-      const emojis = ['🥇', '🥈', '🥉', '🏅', '🎖️'];
-      return <span className="text-3xl">{emojis[rank - 1]}</span>;
-    } else {
-      return <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">{rank}</div>;
-    }
-  };
-
-  const getRankColor = (rank: number) => {
-    return 'bg-transparent border-transparent text-gray-100 hover:bg-gray-800/20';
-  };
-
-  const handleUserClick = (userAddress: string) => {
-    // Check if address is empty or zero address
-    if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
-      return;
-    }
-    router.push(`/challenge/${challengeId}/${userAddress}`);
-  };
-
-  // Calculate pagination
-  const totalUsers = rankingData?.topUsers?.length || 0;
-  const totalPages = Math.ceil(totalUsers / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = rankingData?.topUsers?.slice(startIndex, endIndex) || [];
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl text-gray-100">{t('ranking')}</h2>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
-            >
-              <ArrowLeftRight className="h-4 w-4 rotate-180" />
-            </Button>
-            <span className="text-sm text-gray-400">
-              {currentPage} / {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
-            >
-              <ArrowLeftRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
-      <Card className="bg-transparent border-transparent">
-        <CardContent className="p-0">
-          <div className="space-y-0">
-            {isLoadingRanking ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                <span className="ml-2 text-gray-400">{t('loadingRankings')}</span>
-              </div>
-            ) : rankingError ? (
-              <div className="text-center py-8 text-red-400">
-                <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="font-medium">{t('errorLoadingRankings')}</p>
-                <p className="text-sm text-gray-500 mt-2">{rankingError.message}</p>
-              </div>
-            ) : rankingData && rankingData.topUsers.length > 0 ? (
-              currentUsers.map((user, index) => {
-                const rank = startIndex + index + 1;
-                const profitRatio = rankingData.profitRatios[startIndex + index];
-                const score = rankingData.scores[startIndex + index];
-                const formattedAddress = formatAddress(user);
-                const isEmptySlot = !formattedAddress;
-
-                return (
-                  <div 
-                    key={`${user}-${rank}`} 
-                    className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${
-                      isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
-                    }`}
-                    onClick={() => !isEmptySlot && handleUserClick(user)}
-                  >
-                    <div className="flex items-center gap-4">
-                      {getRankIcon(rank)}
-                      <div>
-                        <div className="font-medium text-white">
-                          {isEmptySlot ? (
-                            <span className="text-gray-500 italic">{t('empty')}</span>
-                          ) : (
-                            formattedAddress
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-lg text-white">${formatScore(score || '0')}</div>
-                      <div className={`text-sm font-medium ${
-                        parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                        {parseFloat(profitRatio) >= 0 ? '+' : ''}{formatProfitRatio(profitRatio, user)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>{t('noRankingDataFound')}</p>
-                <p className="text-sm mt-1">{t('rankingsWillAppear')}</p>
-              </div>
-            )}
-          </div>
-          {rankingData && totalPages > 1 && (
-            <div className="pb-2">
-              <div className="flex justify-between items-center">
-                <div className="text-xs text-gray-500">
-                  {t('lastUpdated')}: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
-                </div>
-              </div>
-            </div>
-          )}
-          {rankingData && totalPages <= 1 && (
-            <div className="pb-2">
-              <div className="text-xs text-gray-500 text-center">
-                {t('lastUpdated')}: {formatDateWithLocale(new Date(parseInt(rankingData.updatedAtTimestamp) * 1000), language)}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { t, language } = useLanguage()
@@ -1172,10 +998,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">{t('time')}</th>
-                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('type')}</th>
-                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400">{t('wallet')}</th>
-                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400">{t('value')}</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('time')}</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('type')}</th>
+                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
+                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1195,17 +1021,17 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                   window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
                                 }}
                               >
-                                <td className="py-6 pl-6 pr-4">
+                                <td className="py-6 pl-6 pr-4 whitespace-nowrap">
                                   <div className="text-sm text-gray-400">
                                     {formatRelativeTime(transaction.timestamp)}
                                   </div>
                                 </td>
-                                <td className="py-6 px-4">
+                                <td className="py-6 px-4 whitespace-nowrap">
                                   <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
                                     {getTransactionTypeText(transaction.type)}
                                   </div>
                                 </td>
-                                <td className="py-6 px-4">
+                                <td className="py-6 px-4 whitespace-nowrap">
                                   <div className="text-gray-300 text-sm">
                                     {transaction.type === 'reward' ? formatUserAddress(transaction.user) : formatUserAddress(transaction.user)}
                                   </div>
@@ -1282,10 +1108,10 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                           </div>
                                         )
                                       }
-                                      return <div className="font-medium text-gray-100">{transaction.amount || '-'}</div>
+                                      return <div className="font-medium text-gray-100 whitespace-nowrap">{transaction.amount || '-'}</div>
                                     })()
                                   ) : transaction.type === 'airdrop' ? (
-                                    <div className="flex items-center gap-2 justify-end">
+                                    <div className="flex items-center gap-2 justify-end whitespace-nowrap">
                                       <div className="relative flex-shrink-0">
                                         <Image 
                                           src="/tokens/small/stl.png" 
@@ -1309,9 +1135,9 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                       <span className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</span>
                                     </div>
                                   ) : transaction.type === 'join' || transaction.type === 'register' ? (
-                                    <div className="font-medium text-gray-100 truncate">{formatUserAddress(transaction.user)}</div>
+                                    <div className="font-medium text-gray-100 truncate whitespace-nowrap">{formatUserAddress(transaction.user)}</div>
                                   ) : (
-                                    <div className="font-medium text-gray-100 truncate">{transaction.amount || '-'}</div>
+                                    <div className="font-medium text-gray-100 truncate whitespace-nowrap">{transaction.amount || '-'}</div>
                                   )}
                                     </div>
                                   </td>

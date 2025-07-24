@@ -183,6 +183,7 @@ export const da = {
   networkSwitchFailed: "Netværk Skift Fejlet",
   networkSwitched: "Netværk Skiftet",
   next: "Næste",
+  no: "Nej",
   noActiveProposalsFound: "Ingen aktive forslag fundet.",
   noChallengesFound: "Ingen udfordringer fundet",
   noChallengesFoundPortfolio: "Ingen udfordringer fundet",
@@ -385,5 +386,6 @@ export const da = {
   yourPosition: "Din position",
   yourPositionActive: "Din position (aktiv)",
   yourPositionLive: "Din position (live)",
-  yourPositionRegistered: "Din position (registreret)"
+  yourPositionRegistered: "Din position (registreret)",
+  yes: "Ja"
 } as const; 

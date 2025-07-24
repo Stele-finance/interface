@@ -183,6 +183,7 @@ export const zhCn = {
   networkSwitchFailed: "网络切换失败",
   networkSwitched: "网络已切换",
   next: "下一步",
+  no: "否",
   noActiveProposalsFound: "未找到活跃提案。",
   noChallengesFound: "未找到挑战",
   noChallengesFoundPortfolio: "未找到挑战",
@@ -385,5 +386,6 @@ export const zhCn = {
   yourPosition: "您的位置",
   yourPositionActive: "您的位置（活跃）",
   yourPositionLive: "您的位置（实时）",
-  yourPositionRegistered: "您的位置（已注册）"
+  yourPositionRegistered: "您的位置（已注册）",
+  yes: "是"
 } as const; 

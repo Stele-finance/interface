@@ -183,6 +183,7 @@ export const el = {
   networkSwitchFailed: "Η Αλλαγή Δικτύου Απέτυχε",
   networkSwitched: "Το Δίκτυο Αλλάχθηκε",
   next: "Επόμενο",
+  no: "Όχι",
   noActiveProposalsFound: "Δε βρέθηκαν ενεργές προτάσεις.",
   noChallengesFound: "Δε βρέθηκαν προκλήσεις",
   noChallengesFoundPortfolio: "Δε Βρέθηκαν Προκλήσεις",
@@ -385,5 +386,6 @@ export const el = {
   yourPosition: "Η θέση σας",
   yourPositionActive: "Η θέση σας (ενεργή)",
   yourPositionLive: "Η θέση σας (ζωντανή)",
-  yourPositionRegistered: "Η θέση σας (εγγεγραμμένη)"
+  yourPositionRegistered: "Η θέση σας (εγγεγραμμένη)",
+  yes: "Ναι"
 } as const; 

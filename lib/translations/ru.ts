@@ -183,6 +183,7 @@ export const ru = {
   networkSwitchFailed: "Переключение Сети Не Удалось",
   networkSwitched: "Сеть Переключена",
   next: "Далее",
+  no: "Нет",
   noActiveProposalsFound: "Активных предложений не найдено.",
   noChallengesFound: "Вызовы не найдены",
   noChallengesFoundPortfolio: "Вызовы не найдены",
@@ -385,5 +386,6 @@ export const ru = {
   yourPosition: "Ваша позиция",
   yourPositionActive: "Ваша позиция (активна)",
   yourPositionLive: "Ваша позиция (в реальном времени)",
-  yourPositionRegistered: "Ваша позиция (зарегистрирована)"
+  yourPositionRegistered: "Ваша позиция (зарегистрирована)",
+  yes: "Да"
 } as const; 

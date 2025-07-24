@@ -183,6 +183,7 @@ export const ms = {
   networkSwitchFailed: "Pertukaran Rangkaian Gagal",
   networkSwitched: "Rangkaian Ditukar",
   next: "Seterusnya",
+  no: "Tidak",
   noActiveProposalsFound: "Tiada cadangan aktif dijumpai.",
   noChallengesFound: "Tiada cabaran dijumpai",
   noChallengesFoundPortfolio: "Tiada cabaran dijumpai",
@@ -385,5 +386,6 @@ export const ms = {
   yourPosition: "Kedudukan anda",
   yourPositionActive: "Kedudukan anda (aktif)",
   yourPositionLive: "Kedudukan anda (langsung)",
-  yourPositionRegistered: "Kedudukan anda (berdaftar)"
+  yourPositionRegistered: "Kedudukan anda (berdaftar)",
+  yes: "Ya"
 } as const; 

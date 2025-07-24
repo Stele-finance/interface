@@ -143,6 +143,7 @@ export const en = {
   join: "Join",
   joinChallenge: "Join Challenge",
   joining: "Joining...",
+  joinRequestSuccessful: "Join request successful!",
   language: "Language",
   lastUpdated: "Last Updated",
   linkCopied: "Link copied!",
@@ -182,6 +183,7 @@ export const en = {
   networkSwitchFailed: "Network Switch Failed",
   networkSwitched: "Network Switched",
   next: "Next",
+  no: "No",
   noActiveProposalsFound: "No active proposals found.",
   noChallengesFound: "No challenges found",
   noChallengesFoundPortfolio: "No Challenges Found",
@@ -242,6 +244,7 @@ export const en = {
   redirecting: "Redirecting...",
   refresh: "Refresh",
   refreshBalance: "Refresh Balance",
+  refreshingData: "Refreshing data...",
   register: "Register",
   registered: "Registered",
   registering: "Registering...",
@@ -384,6 +387,5 @@ export const en = {
   yourPositionActive: "Your Position (Active)",
   yourPositionLive: "Your Position (Live)",
   yourPositionRegistered: "Your Position (Registered)",
-  joinRequestSuccessful: "Join request successful!",
-  refreshingData: "Refreshing data..."
+  yes: "Yes",
 } as const; 

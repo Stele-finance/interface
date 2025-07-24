@@ -2,7 +2,7 @@
 
 import React, { useState, use, useEffect, useCallback } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, BarChart3, Activity, Trophy, Loader2 } from "lucide-react"
+import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
 import { AssetSwap } from "../../../swap/components/AssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
@@ -12,7 +12,6 @@ import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
-import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -30,10 +29,11 @@ import { calculatePortfolioMetrics, getChallengeDetails, getTimeRemaining, getTo
 import { ErrorState } from "./components/LoadingStates"
 import { PortfolioTab } from "./components/PortfolioTab"
 import { TransactionsTab } from "./components/TransactionsTab"
-import { RankingTab } from "./components/RankingTab"
 import { PortfolioSummary } from "./components/PortfolioSummary"
 import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
+import { RankingSection } from "../components/RankingSection"
+import { InvestorsTab } from "../components/InvestorsTab"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
@@ -52,7 +52,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
-  const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
   const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
@@ -332,13 +331,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <BarChart3 className="h-4 w-4" />
                   {t('portfolio')}
                 </TabsTrigger>
+                <TabsTrigger value="investors" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  {t('investor')}
+                </TabsTrigger>
                 <TabsTrigger value="transactions" className="flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   {t('transactions')}
-                </TabsTrigger>
-                <TabsTrigger value="ranking" className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4" />
-                  {t('ranking')}
                 </TabsTrigger>
               </TabsList>
                 
@@ -352,22 +351,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 />
               </TabsContent>
 
-                            <TabsContent value="transactions" className="space-y-4">
+              <TabsContent value="investors" className="space-y-4">
+                <InvestorsTab 
+                  challengeId={challengeId}
+                  subgraphNetwork={subgraphNetwork}
+                />
+              </TabsContent>
+
+              <TabsContent value="transactions" className="space-y-4">
                 <TransactionsTab 
+                  challengeId={challengeId}
                   investorTransactions={investorTransactions}
                   isLoadingTransactions={isLoadingTransactions}
                   transactionsError={transactionsError}
                   subgraphNetwork={subgraphNetwork}
-                  walletAddress={walletAddress}
-                />
-              </TabsContent>
-
-              <TabsContent value="ranking" className="space-y-4">
-                <RankingTab 
-                  rankingData={rankingData}
-                  isLoadingRanking={isLoadingRanking}
-                  rankingError={rankingError}
-                  challengeId={challengeId}
                   walletAddress={walletAddress}
                 />
               </TabsContent>
@@ -445,6 +442,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 timeRemaining={timeRemaining}
                 isClient={isClient}
                 currentTime={currentTime}
+              />
+
+              {/* Ranking Section */}
+              <RankingSection 
+                challengeId={challengeId}
+                network={subgraphNetwork}
               />
                       </div>
                     </div>
