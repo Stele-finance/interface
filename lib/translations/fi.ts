@@ -131,6 +131,7 @@ export const fi = {
   governanceActionVote: "Hallintotoiminto",
   governanceVoting: "Hallinnon Äänestys",
   governanceVotingSystemDesc: "Tukee hallinnon äänestyssysteemiä. Sijoituskelpoiset tokenit, osallistumismaksut, portfolio token -rajat, palkinnon jakotavat, siemenpääoman määrät jne. voidaan päättää hallinto-äänestyksen kautta.",
+  hallOfFame: "Kunniagalleria",
   holdings: "Omistukset",
   hours: "tuntia",
   hourShort: "t",

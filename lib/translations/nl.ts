@@ -131,6 +131,7 @@ export const nl = {
   governanceActionVote: "Governance Actie",
   governanceVoting: "Governance Stemming",
   governanceVotingSystemDesc: "Ondersteunt governance stemming systeem. Investeerbare tokens, toegangstarieven, portfolio token limieten, beloning distributie methoden, startgeld bedragen, enz. kunnen worden beslist door governance stemming.",
+  hallOfFame: "Hall of Fame",
   holdings: "Bezittingen",
   hours: "uren",
   hourShort: "u",

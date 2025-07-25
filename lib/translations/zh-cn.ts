@@ -131,6 +131,7 @@ export const zhCn = {
   governanceActionVote: "治理操作",
   governanceVoting: "治理投票",
   governanceVotingSystemDesc: "支持治理投票系统。可投资代币、参与费、投资组合代币限制、奖励分配方法、种子资金金额等可通过治理投票决定。",
+  hallOfFame: "名人堂",
   holdings: "持有量",
   hours: "小时",
   hourShort: "时",

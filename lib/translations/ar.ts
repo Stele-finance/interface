@@ -131,6 +131,7 @@ export const ar = {
   governanceActionVote: "إجراء الحوكمة",
   governanceVoting: "التصويت الحاكم",
   governanceVotingSystemDesc: "يدعم نظام التصويت الحاكم. يمكن تحديد الرموز القابلة للاستثمار ورسوم الدخول وحدود رموز المحفظة وطرق توزيع المكافآت ومبالغ الأموال الأولية من خلال التصويت الحاكم.",
+  hallOfFame: "قاعة المشاهير",
   holdings: "الحيازات",
   hours: "ساعات",
   hourShort: "س",

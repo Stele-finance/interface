@@ -131,6 +131,7 @@ export const he = {
   governanceActionVote: "פעולת ממשל",
   governanceVoting: "הצבעת ממשל",
   governanceVotingSystemDesc: "תומכת במערכת הצבעת ממשל. טוקנים ניתנים להשקעה, דמי כניסה, גבולות טוקן פורטפוליו, שיטות חלוקת פרסים, סכומי כסף זרע וכו' יכולים להיקבע באמצעות הצבעת ממשל.",
+  hallOfFame: "היכל התהילה",
   holdings: "החזקות",
   hours: "שעות",
   hourShort: "ש",

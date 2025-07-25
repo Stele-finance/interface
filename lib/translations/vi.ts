@@ -131,6 +131,7 @@ export const vi = {
   governanceActionVote: "Hành động quản trị",
   governanceVoting: "Bỏ Phiếu Quản Trị",
   governanceVotingSystemDesc: "Hỗ trợ hệ thống bỏ phiếu quản trị. Token có thể đầu tư, phí tham gia, giới hạn token danh mục đầu tư, phương pháp phân phối phần thưởng, số tiền khởi tạo, v.v. có thể được quyết định thông qua bỏ phiếu quản trị.",
+  hallOfFame: "Đại sảnh danh vọng",
   holdings: "Nắm giữ",
   hours: "giờ",
   hourShort: "g",

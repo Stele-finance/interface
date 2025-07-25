@@ -131,6 +131,7 @@ export const jp = {
   governanceActionVote: "ガバナンスアクション",
   governanceVoting: "ガバナンス投票",
   governanceVotingSystemDesc: "ガバナンス投票システムをサポートします。投資可能トークン、参加料、ポートフォリオトークン制限、報酬分配方法、シードマネー金額などは、ガバナンス投票を通じて決定できます。",
+  hallOfFame: "殿堂",
   holdings: "保有",
   hours: "時間",
   hourShort: "時",

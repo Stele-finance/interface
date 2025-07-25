@@ -131,6 +131,7 @@ export const it = {
   governanceActionVote: "Azione di Governance",
   governanceVoting: "Votazione di Governance",
   governanceVotingSystemDesc: "Supporta il sistema di votazione di governance. I token investibili, le tariffe di ingresso, i limiti dei token del portafoglio, i metodi di distribuzione delle ricompense, gli importi del denaro iniziale, ecc. possono essere decisi attraverso la votazione di governance.",
+  hallOfFame: "Hall of Fame",
   holdings: "Possedimenti",
   hours: "ore",
   hourShort: "o",
