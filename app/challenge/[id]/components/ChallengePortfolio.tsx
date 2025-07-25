@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus } from "lucide-react"
+import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
@@ -967,7 +967,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="investors" className="flex items-center gap-2">
-                <Trophy className="h-4 w-4" />
+                <Users className="h-4 w-4" />
                 {t('investor')}
               </TabsTrigger>
               <TabsTrigger value="transactions" className="flex items-center gap-2">
@@ -1347,80 +1347,59 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
           {/* Challenge Info Card */}
           <Card className="bg-muted border-0 rounded-2xl h-fit">
             <CardContent className="p-8 space-y-10">
-              {/* Row 1: Type and Status */}
+              {/* Row 1: Network and Status */}
               <div className="grid grid-cols-2 gap-6">
-                {/* Type */}
+                {/* Network */}
                 <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('type')}</span>
-                  <TooltipProvider>
-                    <Tooltip open={showTypeTooltip}>
-                      <TooltipTrigger asChild>
-                                                <div 
-                          className="text-3xl text-white cursor-pointer"
-                          onClick={(e) => handleTooltipClick(
-                            e, 
-                            'type', 
-                            showTypeTooltip, 
-                            setShowTypeTooltip, 
-                            typeTooltipTimer, 
-                            setTypeTooltipTimer
-                          )}
-                          onMouseLeave={() => handleMouseLeave(setShowTypeTooltip, typeTooltipTimer, setTypeTooltipTimer)}
-                        >
-                          {challengeData?.challenge ? (() => {
-                            const challengeType = challengeData.challenge.challengeType;
-                            switch(challengeType) {
-                              case 0: return t('oneWeek');
-                              case 1: return t('oneMonth');
-                              case 2: return t('threeMonths');
-                              case 3: return t('sixMonths');
-                              case 4: return t('oneYear');
-                              default: return `Type ${challengeType}`;
-                            }
-                          })() : t('loading')}
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm">{t('tooltipChallengePeriod')}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <span className="text-base text-gray-400">{t('network')}</span>
+                                     <div className="flex items-center gap-3">
+                     {subgraphNetwork === 'ethereum' ? (
+                       <>
+                         <Image 
+                           src="/networks/small/ethereum.png" 
+                           alt="Ethereum Mainnet"
+                           width={24}
+                           height={24}
+                           className="rounded-full"
+                           style={{ width: '24px', height: '24px' }}
+                         />
+                         <span className="text-xl text-white">Mainnet</span>
+                       </>
+                     ) : subgraphNetwork === 'arbitrum' ? (
+                       <>
+                         <Image 
+                           src="/networks/small/arbitrum.png" 
+                           alt="Arbitrum One"
+                           width={24}
+                           height={24}
+                           className="rounded-full"
+                           style={{ width: '24px', height: '24px' }}
+                         />
+                         <span className="text-xl text-white">Arbitrum</span>
+                       </>
+                     ) : (
+                       <>
+                         <Image 
+                           src="/networks/small/ethereum.png" 
+                           alt="Ethereum Mainnet"
+                           width={24}
+                           height={24}
+                           className="rounded-full"
+                           style={{ width: '24px', height: '24px' }}
+                         />
+                         <span className="text-xl text-white">Mainnet</span>
+                       </>
+                     )}
+                   </div>
                 </div>
                 
                 {/* Status */}
-                <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('status')}</span>
+                <div className="space-y-2 ml-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                      {subgraphNetwork === 'ethereum' ? (
-                        <Image 
-                          src="/networks/small/ethereum.png" 
-                          alt="Ethereum Mainnet"
-                          width={24}
-                          height={24}
-                          className="rounded-full"
-                          style={{ width: '24px', height: '24px' }}
-                        />
-                      ) : subgraphNetwork === 'arbitrum' ? (
-                        <Image 
-                          src="/networks/small/arbitrum.png" 
-                          alt="Arbitrum One"
-                          width={24}
-                          height={24}
-                          className="rounded-full"
-                          style={{ width: '24px', height: '24px' }}
-                        />
-                      ) : (
-                        <Image 
-                          src="/networks/small/ethereum.png" 
-                          alt="Ethereum Mainnet"
-                          width={24}
-                          height={24}
-                          className="rounded-full"
-                          style={{ width: '24px', height: '24px' }}
-                        />
-                      )}
-                    </div>
+                    <Trophy className="w-4 h-4 text-yellow-500" />
+                    <span className="text-base text-gray-400">{t('status')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <TooltipProvider>
                       <Tooltip open={showStatusTooltip}>
                         <TooltipTrigger asChild>
@@ -1480,157 +1459,176 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 </div>
               </div>
 
-              {/* Row 2: Total Prize and Users */}
+              {/* Row 2: Seed Money and Users */}
               <div className="grid grid-cols-2 gap-6">
-                {/* Total Prize */}
+                {/* Seed Money */}
                 <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('totalPrize')}</span>
+                  <span className="text-base text-gray-400">{t('seedMoney')}</span>
                   <div className="text-4xl text-white">
-                    ${challengeData?.challenge ? (() => {
-                      const totalPrize = parseInt(challengeData.challenge.rewardAmountUSD);
-                      return totalPrize >= 1000000 
-                        ? `${(totalPrize / 1000000).toFixed(1)}M` 
-                        : totalPrize >= 1000 
-                        ? `${(totalPrize / 1000).toFixed(1)}K` 
-                        : totalPrize.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-                    })() : '0'}
+                    {(() => {
+                      // If we have challenge data and seedMoney is available
+                      if (challengeData?.challenge?.seedMoney) {
+                        const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
+                        return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
+                      }
+                      // Default fallback
+                      return '$0';
+                    })()}
                   </div>
                 </div>
 
                 {/* Users */}
-                <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('users')}</span>
+                <div className="space-y-2 ml-6">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <span className="text-base text-gray-400">{t('investor')}</span>
+                  </div>
                   <div className="text-4xl text-white">
                     {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
                   </div>
                 </div>
               </div>
 
-              {/* Row 3: Progress */}
+              {/* Row 3: Challenge Type & Progress */}
               {challengeData?.challenge && (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-base text-gray-400">{t('progress')}</span>
-                    <span className="text-base font-medium text-gray-300">
-                      {(() => {
-                        const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                        const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                        const currentTime = new Date();
-                        const totalDuration = endTime.getTime() - startTime.getTime();
-                        const elapsed = currentTime.getTime() - startTime.getTime();
-                        const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                        return Math.round(progress);
-                      })()}%
-                    </span>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="relative">
-                    <TooltipProvider>
-                      <Tooltip open={showMobileTooltip}>
-                        <TooltipTrigger asChild>
-                          <div 
-                            className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              
-                              // Clear existing timer
-                              if (tooltipTimer) {
-                                clearTimeout(tooltipTimer);
-                                setTooltipTimer(null);
-                              }
-                              
-                              if (!showMobileTooltip) {
-                                // Show tooltip
-                                setShowMobileTooltip(true);
-                                
-                                // Auto-close after 2 seconds on mobile
-                                if (!window.matchMedia('(hover: hover)').matches) {
-                                  const timer = setTimeout(() => {
-                                    setShowMobileTooltip(false);
-                                    setTooltipTimer(null);
-                                  }, 2000);
-                                  setTooltipTimer(timer);
-                                }
-                              } else {
-                                // Hide tooltip
-                                setShowMobileTooltip(false);
-                              }
-                            }}
-                            onMouseEnter={() => {
-                              // Only trigger on desktop (devices with hover capability)
-                              if (window.matchMedia('(hover: hover)').matches) {
-                                setShowMobileTooltip(true);
-                              }
-                            }}
-                            onMouseLeave={() => {
-                              // Only trigger on desktop (devices with hover capability)
-                              if (window.matchMedia('(hover: hover)').matches) {
-                                setShowMobileTooltip(false);
-                              }
-                            }}
-                          >
+                  {/* Progress */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg text-gray-400">
+                        {(() => {
+                          const challengeType = challengeData.challenge.challengeType;
+                          switch(challengeType) {
+                            case 0: return t('oneWeek');
+                            case 1: return t('oneMonth');
+                            case 2: return t('threeMonths');
+                            case 3: return t('sixMonths');
+                            case 4: return t('oneYear');
+                            default: return `Type ${challengeType}`;
+                          }
+                        })()}
+                      </span>
+                      <span className="text-base font-medium text-gray-300">
+                        {(() => {
+                          const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                          const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                          const currentTime = new Date();
+                          const totalDuration = endTime.getTime() - startTime.getTime();
+                          const elapsed = currentTime.getTime() - startTime.getTime();
+                          const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                          return Math.round(progress);
+                        })()}%
+                      </span>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="relative">
+                      <TooltipProvider>
+                        <Tooltip open={showMobileTooltip}>
+                          <TooltipTrigger asChild>
                             <div 
-                              className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                              style={{ 
-                                width: `${(() => {
-                                  const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                                  const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                                  const currentTime = new Date();
-                                  const totalDuration = endTime.getTime() - startTime.getTime();
-                                  const elapsed = currentTime.getTime() - startTime.getTime();
-                                  const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                                  return Math.round(progress);
-                                })()}%` 
+                              className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                
+                                // Clear existing timer
+                                if (tooltipTimer) {
+                                  clearTimeout(tooltipTimer);
+                                  setTooltipTimer(null);
+                                }
+                                
+                                if (!showMobileTooltip) {
+                                  // Show tooltip
+                                  setShowMobileTooltip(true);
+                                  
+                                  // Auto-close after 2 seconds on mobile
+                                  if (!window.matchMedia('(hover: hover)').matches) {
+                                    const timer = setTimeout(() => {
+                                      setShowMobileTooltip(false);
+                                      setTooltipTimer(null);
+                                    }, 2000);
+                                    setTooltipTimer(timer);
+                                  }
+                                } else {
+                                  // Hide tooltip
+                                  setShowMobileTooltip(false);
+                                }
                               }}
-                            ></div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-sm font-medium">
-                            {(() => {
-                              const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
-                              const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
-                              const currentTime = new Date();
-                              const remainingMs = endTime.getTime() - currentTime.getTime();
-                              
-                              if (remainingMs <= 0) return t('ended');
-                              
-                              const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
-                              const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                              const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                              const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
-                              
-                              if (days > 30) {
-                                const months = Math.floor(days / 30);
-                                const remainingDays = days % 30;
-                                return `${months} ${t('months')} ${remainingDays} ${t('days')}`;
-                              }
-                              
-                              if (days > 0) {
-                                return `${days} ${t('days')} ${hours} ${t('hours')}`;
-                              }
-                              
-                              if (hours > 0) {
-                                return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
-                              }
-                              
-                              if (minutes > 0) {
-                                return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
-                              }
-                              
-                              return `${seconds} ${t('seconds')}`;
-                            })()}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                              onMouseEnter={() => {
+                                // Only trigger on desktop (devices with hover capability)
+                                if (window.matchMedia('(hover: hover)').matches) {
+                                  setShowMobileTooltip(true);
+                                }
+                              }}
+                              onMouseLeave={() => {
+                                // Only trigger on desktop (devices with hover capability)
+                                if (window.matchMedia('(hover: hover)').matches) {
+                                  setShowMobileTooltip(false);
+                                }
+                              }}
+                            >
+                              <div 
+                                className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                                style={{ 
+                                  width: `${(() => {
+                                    const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                                    const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                                    const currentTime = new Date();
+                                    const totalDuration = endTime.getTime() - startTime.getTime();
+                                    const elapsed = currentTime.getTime() - startTime.getTime();
+                                    const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+                                    return Math.round(progress);
+                                  })()}%` 
+                                }}
+                              ></div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-sm font-medium">
+                              {(() => {
+                                const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
+                                const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+                                const currentTime = new Date();
+                                const remainingMs = endTime.getTime() - currentTime.getTime();
+                                
+                                if (remainingMs <= 0) return t('ended');
+                                
+                                const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+                                const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                                
+                                if (days > 30) {
+                                  const months = Math.floor(days / 30);
+                                  const remainingDays = days % 30;
+                                  return `${months} ${t('months')} ${remainingDays} ${t('days')}`;
+                                }
+                                
+                                if (days > 0) {
+                                  return `${days} ${t('days')} ${hours} ${t('hours')}`;
+                                }
+                                
+                                if (hours > 0) {
+                                  return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`;
+                                }
+                                
+                                if (minutes > 0) {
+                                  return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
+                                }
+                                
+                                return `${seconds} ${t('seconds')}`;
+                              })()}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                   </div>
                   
                   {/* Time Info */}
                   <div className="flex justify-between text-sm text-gray-500">
-                    <span>{t('start')}: {formatDateOnly(new Date(parseInt(challengeData.challenge.startTime) * 1000), language)}</span>
-                    <span>{t('end')}: {formatDateOnly(new Date(parseInt(challengeData.challenge.endTime) * 1000), language)}</span>
+                    <span>{formatDateOnly(new Date(parseInt(challengeData.challenge.startTime) * 1000), language)}</span>
+                    <span>{formatDateOnly(new Date(parseInt(challengeData.challenge.endTime) * 1000), language)}</span>
                   </div>
                 </div>
               )}

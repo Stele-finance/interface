@@ -10,7 +10,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
-import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -679,7 +679,10 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           {/* Desktop layout */}
           <div className="hidden md:block md:mr-6">
             <div className="mb-4">
-              <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
+              <div className="flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
+              </div>
             </div>
               
             <div className="flex items-baseline justify-between gap-3 mt-2">
