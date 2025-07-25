@@ -193,6 +193,8 @@ export const zhCn = {
   noCompletedProposalsFound: "未找到已完成的提案。",
   noDataAvailable: "无可用数据",
   noInvestableTokensFound: "未找到可投资代币",
+  noInvestorsFound: "此挑战未找到投资者",
+  noInvestorsFoundDescription: "一旦参与者加入，投资者排名将在此显示",
   noPortfolioData: "无投资组合数据可用",
   noProposalsFound: "未找到提案。",
   noRankingDataFound: "未找到排名数据",

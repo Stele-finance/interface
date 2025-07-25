@@ -193,6 +193,8 @@ export const es = {
   noCompletedProposalsFound: "No se encontraron propuestas completadas.",
   noDataAvailable: "No hay datos disponibles",
   noInvestableTokensFound: "No se encontraron tokens invertibles",
+  noInvestorsFound: "No se encontraron inversores para este desafío",
+  noInvestorsFoundDescription: "Las clasificaciones de inversores aparecerán aquí una vez que se unan los participantes",
   noPortfolioData: "No hay datos de cartera disponibles",
   noProposalsFound: "No se encontraron propuestas.",
   noRankingDataFound: "No se encontraron datos de clasificación",

@@ -193,6 +193,8 @@ export const zhTw = {
   noCompletedProposalsFound: "未找到已完成的提案。",
   noDataAvailable: "無數據可用",
   noInvestableTokensFound: "未找到可投資代幣",
+  noInvestorsFound: "此挑戰未找到投資者",
+  noInvestorsFoundDescription: "一旦參與者加入，投資者排名將在此顯示",
   noPortfolioData: "無投資組合數據可用",
   noProposalsFound: "未找到提案。",
   noRankingDataFound: "未找到排名數據",

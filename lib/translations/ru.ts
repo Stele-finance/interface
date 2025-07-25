@@ -193,6 +193,8 @@ export const ru = {
   noCompletedProposalsFound: "Завершенных предложений не найдено.",
   noDataAvailable: "Данные недоступны",
   noInvestableTokensFound: "Инвестиционные токены не найдены",
+  noInvestorsFound: "Инвесторы для этого вызова не найдены",
+  noInvestorsFoundDescription: "Рейтинги инвесторов появятся здесь, как только присоединятся участники",
   noPortfolioData: "Данные портфолио недоступны",
   noProposalsFound: "Предложения не найдены.",
   noRankingDataFound: "Данные рейтинга не найдены",

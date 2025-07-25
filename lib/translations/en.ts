@@ -194,6 +194,8 @@ export const en = {
   noCompletedProposalsFound: "No completed proposals found.",
   noDataAvailable: "No data available",
   noInvestableTokensFound: "No investable tokens found",
+  noInvestorsFound: "No investors found for this challenge",
+  noInvestorsFoundDescription: "Investor rankings will appear here once participants join",
   noPortfolioData: "No portfolio data available",
   noProposalsFound: "No proposals found.",
   noRankingDataFound: "No ranking data found",

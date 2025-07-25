@@ -193,6 +193,8 @@ export const de = {
   noCompletedProposalsFound: "Keine abgeschlossenen Vorschläge gefunden.",
   noDataAvailable: "Keine Daten verfügbar",
   noInvestableTokensFound: "Keine investierbaren Token gefunden",
+  noInvestorsFound: "Keine Investoren für diese Herausforderung gefunden",
+  noInvestorsFoundDescription: "Investorenrankings werden hier angezeigt, sobald Teilnehmer beitreten",
   noPortfolioData: "Keine Portfolio-Daten verfügbar",
   noProposalsFound: "Keine Vorschläge gefunden.",
   noRankingDataFound: "Keine Ranking-Daten gefunden",

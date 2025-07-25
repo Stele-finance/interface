@@ -193,6 +193,8 @@ export const nl = {
   noCompletedProposalsFound: "Geen voltooide voorstellen gevonden.",
   noDataAvailable: "Geen gegevens beschikbaar",
   noInvestableTokensFound: "Geen investeerbare tokens gevonden",
+  noInvestorsFound: "Geen investeerders gevonden voor deze uitdaging",
+  noInvestorsFoundDescription: "Investeerder rankings zullen hier verschijnen zodra deelnemers zich aansluiten",
   noPortfolioData: "Geen portfolio gegevens beschikbaar",
   noProposalsFound: "Geen voorstellen gevonden.",
   noRankingDataFound: "Geen ranglijst gegevens gevonden",

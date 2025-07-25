@@ -193,6 +193,8 @@ export const th = {
   noCompletedProposalsFound: "ไม่พบข้อเสนอที่เสร็จสิ้น",
   noDataAvailable: "ไม่มีข้อมูล",
   noInvestableTokensFound: "ไม่พบโทเค็นที่สามารถลงทุนได้",
+  noInvestorsFound: "ไม่พบนักลงทุนสำหรับความท้าทายนี้",
+  noInvestorsFoundDescription: "การจัดอันดับนักลงทุนจะปรากฏที่นี่เมื่อมีผู้เข้าร่วม",
   noPortfolioData: "ไม่มีข้อมูลพอร์ตโฟลิโอ",
   noProposalsFound: "ไม่พบข้อเสนอ",
   noRankingDataFound: "ไม่พบข้อมูลอันดับ",

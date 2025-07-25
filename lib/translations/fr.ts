@@ -193,6 +193,8 @@ export const fr = {
   noCompletedProposalsFound: "Aucune proposition terminée trouvée.",
   noDataAvailable: "Aucune donnée disponible",
   noInvestableTokensFound: "Aucun token investissable trouvé",
+  noInvestorsFound: "Aucun investisseur trouvé pour ce défi",
+  noInvestorsFoundDescription: "Les classements des investisseurs apparaîtront ici une fois que les participants se joindront",
   noPortfolioData: "Aucune donnée de portefeuille disponible",
   noProposalsFound: "Aucune proposition trouvée.",
   noRankingDataFound: "Aucune donnée de classement trouvée",

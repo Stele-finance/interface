@@ -194,6 +194,8 @@ export const kr = {
   noCompletedProposalsFound: "완료된 제안을 찾을 수 없습니다.",
   noDataAvailable: "사용 가능한 데이터 없음",
   noInvestableTokensFound: "투자 가능한 토큰을 찾을 수 없습니다",
+  noInvestorsFound: "이 챌린지에서 투자자를 찾을 수 없습니다",
+  noInvestorsFoundDescription: "참가자가 가입하면 투자자 순위가 여기에 표시됩니다",
   noPortfolioData: "포트폴리오 데이터 없음",
   noProposalsFound: "제안을 찾을 수 없습니다.",
   noRankingDataFound: "순위 데이터를 찾을 수 없습니다",

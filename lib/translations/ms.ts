@@ -193,6 +193,8 @@ export const ms = {
   noCompletedProposalsFound: "Tiada cadangan selesai dijumpai.",
   noDataAvailable: "Tiada data tersedia",
   noInvestableTokensFound: "Tiada token pelaburan dijumpai",
+  noInvestorsFound: "Tiada pelabur dijumpai untuk cabaran ini",
+  noInvestorsFoundDescription: "Kedudukan pelabur akan muncul di sini sebaik sahaja peserta menyertai",
   noPortfolioData: "Tiada data portfolio tersedia",
   noProposalsFound: "Tiada cadangan dijumpai.",
   noRankingDataFound: "Tiada data kedudukan dijumpai",

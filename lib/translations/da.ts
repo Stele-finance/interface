@@ -193,6 +193,8 @@ export const da = {
   noCompletedProposalsFound: "Ingen færdige forslag fundet.",
   noDataAvailable: "Ingen data tilgængelig",
   noInvestableTokensFound: "Ingen investerbare tokens fundet",
+  noInvestorsFound: "Ingen investorer fundet for denne udfordring",
+  noInvestorsFoundDescription: "Investor rangeringer vil vises her, når deltagere tilslutter sig",
   noPortfolioData: "Ingen portfolio data tilgængelig",
   noProposalsFound: "Ingen forslag fundet.",
   noRankingDataFound: "Ingen rangering data fundet",

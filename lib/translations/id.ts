@@ -193,6 +193,8 @@ export const id = {
   noCompletedProposalsFound: "Tidak ada proposal selesai ditemukan.",
   noDataAvailable: "Tidak ada data tersedia",
   noInvestableTokensFound: "Tidak ada token investasi ditemukan",
+  noInvestorsFound: "Tidak ada investor ditemukan untuk tantangan ini",
+  noInvestorsFoundDescription: "Peringkat investor akan muncul di sini setelah peserta bergabung",
   noPortfolioData: "Tidak ada data portfolio tersedia",
   noProposalsFound: "Tidak ada proposal ditemukan.",
   noRankingDataFound: "Tidak ada data peringkat ditemukan",

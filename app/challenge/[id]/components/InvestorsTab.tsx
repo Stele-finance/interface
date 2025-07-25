@@ -136,8 +136,8 @@ export function InvestorsTab({ challengeId, subgraphNetwork }: InvestorsTabProps
         ) : (
           <div className="text-center py-8 text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No investors found for this challenge</p>
-            <p className="text-sm mt-2">Investor rankings will appear here once participants join</p>
+            <p>{t('noInvestorsFound')}</p>
+            <p className="text-sm mt-2">{t('noInvestorsFoundDescription')}</p>
           </div>
         )}
       </CardContent>

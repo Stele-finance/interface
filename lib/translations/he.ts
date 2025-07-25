@@ -193,6 +193,8 @@ export const he = {
   noCompletedProposalsFound: "לא נמצאו הצעות שהושלמו.",
   noDataAvailable: "אין נתונים זמינים",
   noInvestableTokensFound: "לא נמצאו טוקנים להשקעה",
+  noInvestorsFound: "לא נמצאו משקיעים לאתגר זה",
+  noInvestorsFoundDescription: "דירוגי המשקיעים יופיעו כאן ברגע שמשתתפים יצטרפו",
   noPortfolioData: "אין נתוני פורטפוליו זמינים",
   noProposalsFound: "לא נמצאו הצעות.",
   noRankingDataFound: "לא נמצאו נתוני דירוג",

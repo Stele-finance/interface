@@ -193,6 +193,8 @@ export const hi = {
   noCompletedProposalsFound: "कोई पूर्ण प्रस्ताव नहीं मिला।",
   noDataAvailable: "कोई डेटा उपलब्ध नहीं",
   noInvestableTokensFound: "कोई निवेश योग्य टोकन नहीं मिला",
+  noInvestorsFound: "इस चुनौती के लिए कोई निवेशक नहीं मिले",
+  noInvestorsFoundDescription: "प्रतिभागियों के शामिल होने पर निवेशक रैंकिंग यहाँ दिखाई जाएगी",
   noPortfolioData: "कोई पोर्टफोलियो डेटा उपलब्ध नहीं",
   noProposalsFound: "कोई प्रस्ताव नहीं मिला।",
   noRankingDataFound: "कोई रैंकिंग डेटा नहीं मिला",
