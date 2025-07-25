@@ -193,6 +193,8 @@ export const el = {
   noCompletedProposalsFound: "Δε βρέθηκαν ολοκληρωμένες προτάσεις.",
   noDataAvailable: "Δεν υπάρχουν διαθέσιμα δεδομένα",
   noInvestableTokensFound: "Δε βρέθηκαν επενδυτικά tokens",
+  noInvestorsFound: "Δε βρέθηκαν επενδυτές για αυτή την πρόκληση",
+  noInvestorsFoundDescription: "Οι κατατάξεις επενδυτών θα εμφανιστούν εδώ μόλις συμμετάσχουν συμμετέχοντες",
   noPortfolioData: "Δεν υπάρχουν διαθέσιμα δεδομένα χαρτοφυλακίου",
   noProposalsFound: "Δε βρέθηκαν προτάσεις.",
   noRankingDataFound: "Δε βρέθηκαν δεδομένα κατάταξης",

@@ -193,6 +193,8 @@ export const fi = {
   noCompletedProposalsFound: "Valmistuneita ehdotuksia ei löytynyt.",
   noDataAvailable: "Tietoja ei saatavilla",
   noInvestableTokensFound: "Sijoituskelpoisia tokeneja ei löytynyt",
+  noInvestorsFound: "Sijoittajia ei löytynyt tälle haasteelle",
+  noInvestorsFoundDescription: "Sijoittajien sijoitukset ilmestyvät tänne kun osallistujat liittyvät",
   noPortfolioData: "Portfolio-tietoja ei saatavilla",
   noProposalsFound: "Ehdotuksia ei löytynyt.",
   noRankingDataFound: "Sijoitustietoja ei löytynyt",

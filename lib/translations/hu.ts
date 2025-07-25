@@ -193,6 +193,8 @@ export const hu = {
   noCompletedProposalsFound: "Nem találhatók befejezett javaslatok.",
   noDataAvailable: "Nincsenek elérhető adatok",
   noInvestableTokensFound: "Nem találhatók befektethető tokenek",
+  noInvestorsFound: "Ehhez a kihíváshoz nem találhatók befektetők",
+  noInvestorsFoundDescription: "A befektetői rangsorok itt jelennek meg, amint csatlakoznak a résztvevők",
   noPortfolioData: "Nincsenek elérhető portfólió adatok",
   noProposalsFound: "Nem találhatók javaslatok.",
   noRankingDataFound: "Nem találhatók ranglista adatok",

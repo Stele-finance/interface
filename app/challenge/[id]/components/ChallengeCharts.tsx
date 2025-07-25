@@ -641,7 +641,10 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           <div className="block md:hidden">
             {/* First row: Challenge title only */}
             <div className="mb-4">
-              <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
+              <div className="flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
+              </div>
             </div>
             
             {/* Second row: $3 amount + Share button */}

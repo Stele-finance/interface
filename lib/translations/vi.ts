@@ -193,6 +193,8 @@ export const vi = {
   noCompletedProposalsFound: "Không tìm thấy đề xuất đã hoàn thành.",
   noDataAvailable: "Không có dữ liệu",
   noInvestableTokensFound: "Không tìm thấy token có thể đầu tư",
+  noInvestorsFound: "Không tìm thấy nhà đầu tư cho thử thách này",
+  noInvestorsFoundDescription: "Bảng xếp hạng nhà đầu tư sẽ xuất hiện ở đây khi có người tham gia",
   noPortfolioData: "Không có dữ liệu danh mục đầu tư",
   noProposalsFound: "Không tìm thấy đề xuất.",
   noRankingDataFound: "Không tìm thấy dữ liệu xếp hạng",

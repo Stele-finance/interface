@@ -193,6 +193,8 @@ export const bn = {
   noCompletedProposalsFound: "কোনো সম্পূর্ণ প্রস্তাব পাওয়া যায়নি।",
   noDataAvailable: "কোনো ডেটা উপলব্ধ নেই",
   noInvestableTokensFound: "কোনো বিনিয়োগযোগ্য টোকেন পাওয়া যায়নি",
+  noInvestorsFound: "এই চ্যালেঞ্জের জন্য কোনো বিনিয়োগকারী পাওয়া যায়নি",
+  noInvestorsFoundDescription: "অংশগ্রহণকারীরা যোগ দিলে বিনিয়োগকারীদের র‍্যাঙ্কিং এখানে প্রদর্শিত হবে",
   noPortfolioData: "কোনো পোর্টফোলিও ডেটা উপলব্ধ নেই",
   noProposalsFound: "কোনো প্রস্তাব পাওয়া যায়নি।",
   noRankingDataFound: "কোনো র‍্যাঙ্কিং ডেটা পাওয়া যায়নি",

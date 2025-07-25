@@ -193,6 +193,8 @@ export const jp = {
   noCompletedProposalsFound: "完了した提案が見つかりません。",
   noDataAvailable: "データがありません",
   noInvestableTokensFound: "投資可能トークンが見つかりません",
+  noInvestorsFound: "このチャレンジで投資家が見つかりません",
+  noInvestorsFoundDescription: "参加者が参加すると、投資家ランキングがここに表示されます",
   noPortfolioData: "ポートフォリオデータがありません",
   noProposalsFound: "提案が見つかりません。",
   noRankingDataFound: "ランキングデータが見つかりません",

@@ -193,6 +193,8 @@ export const pt = {
   noCompletedProposalsFound: "Nenhuma proposta concluída encontrada.",
   noDataAvailable: "Nenhum dado disponível",
   noInvestableTokensFound: "Nenhum token investível encontrado",
+  noInvestorsFound: "Nenhum investidor encontrado para este desafio",
+  noInvestorsFoundDescription: "As classificações dos investidores aparecerão aqui uma vez que os participantes se juntem",
   noPortfolioData: "Nenhum dado de portfólio disponível",
   noProposalsFound: "Nenhuma proposta encontrada.",
   noRankingDataFound: "Nenhum dado de classificação encontrado",
