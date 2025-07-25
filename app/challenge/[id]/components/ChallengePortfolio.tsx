@@ -30,6 +30,7 @@ import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppKitProvider } from '@reown/appkit/react'
+import { useUSDCBalance } from "@/app/hooks/useUSDCBalance"
 import { getTokenLogo } from "@/lib/utils"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -78,6 +79,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+
+  // Get USDC balance using Etherscan API
+  const { data: usdcBalance, isLoading: isLoadingUSDCBalance, error: usdcBalanceError } = useUSDCBalance(
+    connectedAddress,
+    subgraphNetwork
+  );
 
   // Wallet connection modal state
   const [walletSelectOpen, setWalletSelectOpen] = useState(false);
@@ -1643,14 +1650,52 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
             <AlertDialogDescription>
               Are you sure you want to join this challenge?
             </AlertDialogDescription>
-            <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+            <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-300">Entry Fee:</span>
                 <span className="text-lg font-bold text-white">
                   ${isLoadingEntryFee ? 'Loading...' : entryFee || '0'} USDC
                 </span>
               </div>
-
+              
+              <div className="border-t border-gray-600/50 pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">{t('yourUSDCBalance')}:</span>
+                  <span className="text-lg font-semibold text-white">
+                    {isLoadingUSDCBalance ? (
+                      <div className="flex items-center">
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        Loading...
+                      </div>
+                    ) : usdcBalanceError ? (
+                      <span className="text-yellow-400 text-sm">
+                        {usdcBalanceError.message?.includes('API key') ? t('balanceUnavailable') : t('balanceCheckFailed')}
+                      </span>
+                    ) : (
+                      usdcBalance?.formatted || '0.00 USDC'
+                    )}
+                  </span>
+                </div>
+                                 {!isLoadingUSDCBalance && !usdcBalanceError && usdcBalance && entryFee && (
+                   <div className="mt-2 text-xs text-gray-400">
+                     {parseFloat(usdcBalance.balance) >= parseFloat(entryFee || '0') ? (
+                       <span className="text-green-400">✓ {t('sufficientBalance')}</span>
+                     ) : (
+                       <span className="text-red-400">⚠ {t('insufficientBalance')}</span>
+                     )}
+                   </div>
+                 )}
+                 {usdcBalanceError && (
+                   <div className="mt-2 text-xs text-gray-400">
+                     <span className="text-yellow-400">
+                       {usdcBalanceError.message?.includes('API key') ? 
+                         `⚠ ${t('balanceUnavailable')}` : 
+                         `⚠ ${t('balanceCheckFailed')}`
+                       }
+                     </span>
+                   </div>
+                 )}
+              </div>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
