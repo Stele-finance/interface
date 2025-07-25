@@ -15,6 +15,8 @@ export const jp = {
   back: "戻る",
   backToProposals: "提案に戻る",
   balance: "残高",
+  balanceUnavailable: "残高が利用できません",
+  balanceCheckFailed: "残高確認に失敗しました",
   becomeLegend: "伝説になる",
   browserExtension: "ブラウザ拡張機能",
   browseChallenges: "チャレンジを閲覧",
@@ -300,6 +302,7 @@ export const jp = {
   submittingProposal: "送信中...",
   submittingVote: "投票送信中...",
   submitVote: "投票を送信",
+  sufficientBalance: "残高十分",
   success: "成功",
   succeeded: "成功",
   successfullyJoinedChallenge: "チャレンジに正常に参加しました！",
@@ -387,5 +390,6 @@ export const jp = {
   yourPositionActive: "あなたのポジション（アクティブ）",
   yourPositionLive: "あなたのポジション（ライブ）",
   yourPositionRegistered: "あなたのポジション（登録済み）",
+  yourUSDCBalance: "あなたのUSDC残高",
   yes: "はい"
 } as const; 

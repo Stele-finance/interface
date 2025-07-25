@@ -15,6 +15,8 @@ export const id = {
   back: "Kembali",
   backToProposals: "Kembali ke Proposal",
   balance: "Saldo",
+  balanceUnavailable: "Saldo tidak tersedia",
+  balanceCheckFailed: "Pemeriksaan saldo gagal",
   becomeLegend: "Menjadi Legenda",
   browserExtension: "Ekstensi Browser",
   browseChallenges: "Jelajahi Tantangan",
@@ -300,6 +302,7 @@ export const id = {
   submittingProposal: "Mengirim...",
   submittingVote: "Mengirim suara...",
   submitVote: "Kirim Suara",
+  sufficientBalance: "Saldo mencukupi",
   success: "Berhasil",
   succeeded: "Berhasil",
   successfullyJoinedChallenge: "Anda berhasil bergabung dengan tantangan!",
@@ -387,5 +390,6 @@ export const id = {
   yourPositionActive: "Posisi Anda (aktif)",
   yourPositionLive: "Posisi Anda (langsung)",
   yourPositionRegistered: "Posisi Anda (terdaftar)",
+  yourUSDCBalance: "Saldo USDC Anda",
   yes: "Ya"
 } as const; 

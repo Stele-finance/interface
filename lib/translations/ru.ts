@@ -15,6 +15,8 @@ export const ru = {
   back: "Назад",
   backToProposals: "Вернуться к Предложениям",
   balance: "Баланс",
+  balanceUnavailable: "Баланс недоступен",
+  balanceCheckFailed: "Проверка баланса не удалась",
   becomeLegend: "Стать Легендой",
   browserExtension: "Расширение Браузера",
   browseChallenges: "Обзор Вызовов",
@@ -300,6 +302,7 @@ export const ru = {
   submittingProposal: "Отправка...",
   submittingVote: "Отправка голоса...",
   submitVote: "Отправить Голос",
+  sufficientBalance: "Достаточно баланса",
   success: "Успех",
   succeeded: "Успешно",
   successfullyJoinedChallenge: "Вы успешно присоединились к вызову!",
@@ -387,5 +390,6 @@ export const ru = {
   yourPositionActive: "Ваша позиция (активна)",
   yourPositionLive: "Ваша позиция (в реальном времени)",
   yourPositionRegistered: "Ваша позиция (зарегистрирована)",
+  yourUSDCBalance: "Ваш баланс USDC",
   yes: "Да"
 } as const; 

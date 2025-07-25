@@ -15,6 +15,8 @@ export const hu = {
   back: "Vissza",
   backToProposals: "Vissza a javaslatokhoz",
   balance: "Egyenleg",
+  balanceUnavailable: "Egyenleg nem elérhető",
+  balanceCheckFailed: "Egyenleg ellenőrzése sikertelen",
   becomeLegend: "Legyél legenda",
   browserExtension: "Böngésző Kiterjesztés",
   browseChallenges: "Kihívások böngészése",
@@ -300,6 +302,7 @@ export const hu = {
   submittingProposal: "Benyújtás...",
   submittingVote: "Szavazat beküldése...",
   submitVote: "Szavazat beküldése",
+  sufficientBalance: "Elegendő egyenleg",
   success: "Siker",
   succeeded: "Sikeres",
   successfullyJoinedChallenge: "Sikeresen csatlakozott a kihíváshoz!",
@@ -387,5 +390,6 @@ export const hu = {
   yourPositionActive: "Az Ön pozíciója (aktív)",
   yourPositionLive: "Az Ön pozíciója (élő)",
   yourPositionRegistered: "Az Ön pozíciója (regisztrált)",
+  yourUSDCBalance: "Az Ön USDC egyenlege",
   yes: "Igen"
 } as const; 

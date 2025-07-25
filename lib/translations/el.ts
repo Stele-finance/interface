@@ -15,6 +15,8 @@ export const el = {
   back: "Πίσω",
   backToProposals: "Πίσω στις Προτάσεις",
   balance: "Υπόλοιπο",
+  balanceUnavailable: "Το υπόλοιπο δεν είναι διαθέσιμο",
+  balanceCheckFailed: "Η επαλήθευση υπολοίπου απέτυχε",
   becomeLegend: "Γίνε Θρύλος",
   browserExtension: "Επέκταση Περιηγητή",
   browseChallenges: "Περιήγηση Προκλήσεων",
@@ -300,6 +302,7 @@ export const el = {
   submittingProposal: "Υποβολή...",
   submittingVote: "Υποβολή Ψήφου...",
   submitVote: "Υποβολή Ψήφου",
+  sufficientBalance: "Επαρκές υπόλοιπο",
   success: "Επιτυχία",
   succeeded: "Επιτυχία",
   successfullyJoinedChallenge: "Συμμετείχατε επιτυχώς στην πρόκληση!",
@@ -387,5 +390,6 @@ export const el = {
   yourPositionActive: "Η θέση σας (ενεργή)",
   yourPositionLive: "Η θέση σας (ζωντανή)",
   yourPositionRegistered: "Η θέση σας (εγγεγραμμένη)",
+  yourUSDCBalance: "Το υπόλοιπο USDC σας",
   yes: "Ναι"
 } as const; 

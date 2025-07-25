@@ -15,6 +15,8 @@ export const nl = {
   back: "Terug",
   backToProposals: "Terug naar Voorstellen",
   balance: "Saldo",
+  balanceUnavailable: "Saldo niet beschikbaar",
+  balanceCheckFailed: "Saldo controle mislukt",
   becomeLegend: "Word Een Legende",
   browserExtension: "Browser Extensie",
   browseChallenges: "Bladeren door Uitdagingen",
@@ -300,6 +302,7 @@ export const nl = {
   submittingProposal: "Indienen...",
   submittingVote: "Stem indienen...",
   submitVote: "Stem Indienen",
+  sufficientBalance: "Voldoende saldo",
   success: "Succes",
   succeeded: "Geslaagd",
   successfullyJoinedChallenge: "U heeft zich succesvol aangesloten bij de uitdaging!",
@@ -387,5 +390,6 @@ export const nl = {
   yourPositionActive: "Uw positie (actief)",
   yourPositionLive: "Uw positie (live)",
   yourPositionRegistered: "Uw positie (geregistreerd)",
+  yourUSDCBalance: "Uw USDC saldo",
   yes: "Ja"
 } as const; 

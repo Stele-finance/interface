@@ -15,6 +15,8 @@ export const da = {
   back: "Tilbage",
   backToProposals: "Tilbage til Forslag",
   balance: "Saldo",
+  balanceUnavailable: "Saldo ikke tilgængelig",
+  balanceCheckFailed: "Saldo kontrol mislykkedes",
   becomeLegend: "Bliv en legende",
   browserExtension: "Browser Udvidelse",
   browseChallenges: "Gennemse Udfordringer",
@@ -300,6 +302,7 @@ export const da = {
   submittingProposal: "Indsender...",
   submittingVote: "Indsender stemme...",
   submitVote: "Indsend Stemme",
+  sufficientBalance: "Tilstrækkelig saldo",
   success: "Succes",
   succeeded: "Lykkedes",
   successfullyJoinedChallenge: "Du har succesfuldt tilmeldt dig udfordringen!",
@@ -387,5 +390,6 @@ export const da = {
   yourPositionActive: "Din position (aktiv)",
   yourPositionLive: "Din position (live)",
   yourPositionRegistered: "Din position (registreret)",
+  yourUSDCBalance: "Din USDC saldo",
   yes: "Ja"
 } as const; 

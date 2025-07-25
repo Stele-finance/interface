@@ -15,6 +15,8 @@ export const en = {
   back: "Back",
   backToProposals: "Back to Proposals",
   balance: "Balance",
+  balanceUnavailable: "Balance unavailable",
+  balanceCheckFailed: "Balance check failed",
   becomeLegend: "Become a Legend",
   browserExtension: "Browser Extension",
   browseChallenges: "Browse Challenges",
@@ -137,6 +139,7 @@ export const en = {
   insufficientFundsGas: "Insufficient funds for gas fees",
   insufficientVotingPower: "Insufficient Voting Power",
   invalidAmount: "Invalid Amount",
+  sufficientBalance: "Sufficient balance",
   invalidAmountFormat: "Invalid amount format",
   investableTokens: "Tokens",
   investor: "Investor",
@@ -387,5 +390,6 @@ export const en = {
   yourPositionActive: "Your Position (Active)",
   yourPositionLive: "Your Position (Live)",
   yourPositionRegistered: "Your Position (Registered)",
+  yourUSDCBalance: "Your USDC Balance",
   yes: "Yes",
 } as const; 

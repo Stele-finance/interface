@@ -15,6 +15,8 @@ export const zhTw = {
   back: "返回",
   backToProposals: "返回提案",
   balance: "餘額",
+  balanceUnavailable: "餘額無法獲取",
+  balanceCheckFailed: "餘額檢查失敗",
   becomeLegend: "成為傳奇",
   browserExtension: "瀏覽器擴充功能",
   browseChallenges: "瀏覽挑戰",
@@ -300,6 +302,7 @@ export const zhTw = {
   submittingProposal: "提交中...",
   submittingVote: "提交投票中...",
   submitVote: "提交投票",
+  sufficientBalance: "餘額充足",
   success: "成功",
   succeeded: "成功",
   successfullyJoinedChallenge: "您已成功加入挑戰！",
@@ -387,5 +390,6 @@ export const zhTw = {
   yourPositionActive: "您的位置（活躍）",
   yourPositionLive: "您的位置（即時）",
   yourPositionRegistered: "您的位置（已註冊）",
+  yourUSDCBalance: "您的USDC餘額",
   yes: "是"
 } as const; 

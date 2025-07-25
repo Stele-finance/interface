@@ -358,7 +358,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 />
               </TabsContent>
 
-              <TabsContent value="transactions" className="space-y-4">
+                            <TabsContent value="transactions" className="space-y-4">
                 <TransactionsTab 
                   challengeId={challengeId}
                   investorTransactions={investorTransactions}

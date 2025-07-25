@@ -15,6 +15,8 @@ export const hi = {
   back: "वापस",
   backToProposals: "प्रस्तावों पर वापस",
   balance: "शेष राशि",
+  balanceUnavailable: "शेष राशि उपलब्ध नहीं",
+  balanceCheckFailed: "शेष राशि जांच असफल",
   becomeLegend: "किंवदंती बनें",
   browserExtension: "ब्राउज़र एक्सटेंशन",
   browseChallenges: "चुनौतियां ब्राउज़ करें",
@@ -300,6 +302,7 @@ export const hi = {
   submittingProposal: "सबमिट कर रहे हैं...",
   submittingVote: "वोट सबमिट कर रहे हैं...",
   submitVote: "वोट सबमिट करें",
+  sufficientBalance: "पर्याप्त शेष राशि",
   success: "सफलता",
   succeeded: "सफल",
   successfullyJoinedChallenge: "आपने सफलतापूर्वक चुनौती में शामिल हो गए हैं!",
@@ -387,5 +390,6 @@ export const hi = {
   yourPositionActive: "आपकी स्थिति (सक्रिय)",
   yourPositionLive: "आपकी स्थिति (लाइव)",
   yourPositionRegistered: "आपकी स्थिति (पंजीकृत)",
+  yourUSDCBalance: "आपकी USDC शेष राशि",
   yes: "हाँ"
 } as const; 

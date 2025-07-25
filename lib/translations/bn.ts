@@ -15,6 +15,8 @@ export const bn = {
   back: "ফিরে যান",
   backToProposals: "প্রস্তাবে ফিরে যান",
   balance: "ব্যালেন্স",
+  balanceUnavailable: "ব্যালেন্স উপলব্ধ নেই",
+  balanceCheckFailed: "ব্যালেন্স চেক ব্যর্থ",
   becomeLegend: "কিংবদন্তি হন",
   browserExtension: "ব্রাউজার এক্সটেনশন",
   browseChallenges: "চ্যালেঞ্জ ব্রাউজ করুন",
@@ -300,6 +302,7 @@ export const bn = {
   submittingProposal: "জমা দেওয়া হচ্ছে...",
   submittingVote: "ভোট জমা দেওয়া হচ্ছে...",
   submitVote: "ভোট জমা দিন",
+  sufficientBalance: "পর্যাপ্ত ব্যালেন্স",
   success: "সফল",
   succeeded: "সফল হয়েছে",
   successfullyJoinedChallenge: "আপনি সফলভাবে চ্যালেঞ্জে যোগ দিয়েছেন!",
@@ -387,5 +390,6 @@ export const bn = {
   yourPositionActive: "আপনার অবস্থান (সক্রিয়)",
   yourPositionLive: "আপনার অবস্থান (লাইভ)",
   yourPositionRegistered: "আপনার অবস্থান (নিবন্ধিত)",
+  yourUSDCBalance: "আপনার USDC ব্যালেন্স",
   yes: "হ্যাঁ"
 } as const; 

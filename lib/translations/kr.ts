@@ -15,6 +15,8 @@ export const kr = {
   back: "뒤로",
   backToProposals: "제안으로 돌아가기",
   balance: "잔액",
+  balanceUnavailable: "잔액 조회 불가",
+  balanceCheckFailed: "잔액 확인 실패",
   becomeLegend: "전설이 되어보세요",
   browserExtension: "브라우저 확장 프로그램",
   browseChallenges: "챌린지 둘러보기",
@@ -138,6 +140,7 @@ export const kr = {
   insufficientVotingPower: "투표권 부족",
   invalidAmount: "잘못된 수량",
   invalidAmountFormat: "잘못된 수량 형식입니다",
+  sufficientBalance: "잔액 충분",
   investableTokens: "토큰",
   investor: "투자자",
   join: "참가",
@@ -387,5 +390,6 @@ export const kr = {
   yourPositionActive: "내 포지션 (활성)",
   yourPositionLive: "내 포지션 (실시간)",
   yourPositionRegistered: "내 포지션 (등록됨)",
+  yourUSDCBalance: "USDC 잔액",
   yes: "예"
 } as const; 
