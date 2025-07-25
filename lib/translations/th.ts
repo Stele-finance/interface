@@ -15,6 +15,8 @@ export const th = {
   back: "กลับ",
   backToProposals: "กลับไปที่ข้อเสนอ",
   balance: "ยอดคงเหลือ",
+  balanceUnavailable: "ยอดคงเหลือไม่พร้อมใช้งาน",
+  balanceCheckFailed: "ตรวจสอบยอดคงเหลือไม่สำเร็จ",
   becomeLegend: "เป็นตำนาน",
   browserExtension: "ส่วนขยายเบราว์เซอร์",
   browseChallenges: "เรียกดูความท้าทาย",
@@ -300,6 +302,7 @@ export const th = {
   submittingProposal: "กำลังส่ง...",
   submittingVote: "กำลังส่งคะแนนโหวต...",
   submitVote: "ส่งคะแนนโหวต",
+  sufficientBalance: "ยอดคงเหลือเพียงพอ",
   success: "สำเร็จ",
   succeeded: "สำเร็จ",
   successfullyJoinedChallenge: "คุณเข้าร่วมความท้าทายสำเร็จแล้ว!",
@@ -387,5 +390,6 @@ export const th = {
   yourPositionActive: "ตำแหน่งของคุณ (ใช้งานอยู่)",
   yourPositionLive: "ตำแหน่งของคุณ (สด)",
   yourPositionRegistered: "ตำแหน่งของคุณ (ลงทะเบียนแล้ว)",
+  yourUSDCBalance: "ยอดคงเหลือ USDC ของคุณ",
   yes: "ใช่"
 } as const; 

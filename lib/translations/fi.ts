@@ -15,6 +15,8 @@ export const fi = {
   back: "Takaisin",
   backToProposals: "Takaisin Ehdotuksiin",
   balance: "Saldo",
+  balanceUnavailable: "Saldo ei saatavilla",
+  balanceCheckFailed: "Saldon tarkistus epäonnistui",
   becomeLegend: "Tule Legendaksi",
   browserExtension: "Selainlaajennus",
   browseChallenges: "Selaa Haasteita",
@@ -300,6 +302,7 @@ export const fi = {
   submittingProposal: "Lähetetään...",
   submittingVote: "Lähetetään Ääni...",
   submitVote: "Lähetä Ääni",
+  sufficientBalance: "Riittävä saldo",
   success: "Onnistui",
   succeeded: "Onnistui",
   successfullyJoinedChallenge: "Olet onnistuneesti liittynyt haasteeseen!",
@@ -387,5 +390,6 @@ export const fi = {
   yourPositionActive: "Sinun asemasi (aktiivinen)",
   yourPositionLive: "Sinun asemasi (live)",
   yourPositionRegistered: "Sinun asemasi (rekisteröity)",
+  yourUSDCBalance: "Sinun USDC saldosi",
   yes: "Kyllä"
 } as const; 

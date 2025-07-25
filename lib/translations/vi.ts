@@ -15,6 +15,8 @@ export const vi = {
   back: "Trở lại",
   backToProposals: "Trở lại đề xuất",
   balance: "Số dư",
+  balanceUnavailable: "Số dư không khả dụng",
+  balanceCheckFailed: "Kiểm tra số dư thất bại",
   becomeLegend: "Trở Thành Huyền Thoại",
   browserExtension: "Tiện ích trình duyệt",
   browseChallenges: "Duyệt thử thách",
@@ -300,6 +302,7 @@ export const vi = {
   submittingProposal: "Đang gửi...",
   submittingVote: "Đang gửi phiếu bầu...",
   submitVote: "Gửi phiếu bầu",
+  sufficientBalance: "Số dư đủ",
   success: "Thành công",
   succeeded: "Thành công",
   successfullyJoinedChallenge: "Bạn đã tham gia thử thách thành công!",
@@ -387,5 +390,6 @@ export const vi = {
   yourPositionActive: "Vị trí của bạn (hoạt động)",
   yourPositionLive: "Vị trí của bạn (trực tiếp)",
   yourPositionRegistered: "Vị trí của bạn (đã đăng ký)",
+  yourUSDCBalance: "Số dư USDC của bạn",
   yes: "Có"
 } as const; 

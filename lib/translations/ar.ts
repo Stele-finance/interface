@@ -15,6 +15,8 @@ export const ar = {
   back: "العودة",
   backToProposals: "العودة إلى المقترحات",
   balance: "الرصيد",
+  balanceUnavailable: "الرصيد غير متوفر",
+  balanceCheckFailed: "فشل فحص الرصيد",
   becomeLegend: "كن أسطورة",
   browserExtension: "إضافة المتصفح",
   browseChallenges: "تصفح التحديات",
@@ -300,6 +302,7 @@ export const ar = {
   submittingProposal: "إرسال...",
   submittingVote: "إرسال الصوت...",
   submitVote: "إرسال الصوت",
+  sufficientBalance: "رصيد كافٍ",
   success: "نجح",
   succeeded: "نجح",
   successfullyJoinedChallenge: "انضممت بنجاح للتحدي!",
@@ -387,5 +390,6 @@ export const ar = {
   yourPositionActive: "موقعك (نشط)",
   yourPositionLive: "موقعك (مباشر)",
   yourPositionRegistered: "موقعك (مسجل)",
+  yourUSDCBalance: "رصيد USDC الخاص بك",
   yes: "نعم"
 } as const; 

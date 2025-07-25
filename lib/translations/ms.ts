@@ -15,6 +15,8 @@ export const ms = {
   back: "Kembali",
   backToProposals: "Kembali ke Cadangan",
   balance: "Baki",
+  balanceUnavailable: "Baki tidak tersedia",
+  balanceCheckFailed: "Pemeriksaan baki gagal",
   becomeLegend: "Menjadi Legenda",
   browserExtension: "Sambungan Pelayar",
   browseChallenges: "Lihat Cabaran",
@@ -300,6 +302,7 @@ export const ms = {
   submittingProposal: "Menghantar...",
   submittingVote: "Menghantar undi...",
   submitVote: "Hantar Undi",
+  sufficientBalance: "Baki mencukupi",
   success: "Berjaya",
   succeeded: "Berjaya",
   successfullyJoinedChallenge: "Anda berjaya menyertai cabaran!",
@@ -387,5 +390,6 @@ export const ms = {
   yourPositionActive: "Kedudukan anda (aktif)",
   yourPositionLive: "Kedudukan anda (langsung)",
   yourPositionRegistered: "Kedudukan anda (berdaftar)",
+  yourUSDCBalance: "Baki USDC anda",
   yes: "Ya"
 } as const; 

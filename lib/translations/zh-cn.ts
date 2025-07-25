@@ -15,6 +15,8 @@ export const zhCn = {
   back: "返回",
   backToProposals: "返回提案",
   balance: "余额",
+  balanceUnavailable: "余额不可用",
+  balanceCheckFailed: "余额检查失败",
   becomeLegend: "成为传奇",
   browserExtension: "浏览器扩展",
   browseChallenges: "浏览挑战",
@@ -300,6 +302,7 @@ export const zhCn = {
   submittingProposal: "正在提交...",
   submittingVote: "正在提交投票...",
   submitVote: "提交投票",
+  sufficientBalance: "余额充足",
   success: "成功",
   succeeded: "成功",
   successfullyJoinedChallenge: "您已成功加入挑战！",
@@ -387,5 +390,6 @@ export const zhCn = {
   yourPositionActive: "您的位置（活跃）",
   yourPositionLive: "您的位置（实时）",
   yourPositionRegistered: "您的位置（已注册）",
+  yourUSDCBalance: "您的USDC余额",
   yes: "是"
 } as const; 

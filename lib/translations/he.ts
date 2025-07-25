@@ -15,6 +15,8 @@ export const he = {
   back: "חזרה",
   backToProposals: "חזרה להצעות",
   balance: "יתרה",
+  balanceUnavailable: "יתרה לא זמינה",
+  balanceCheckFailed: "בדיקת יתרה נכשלה",
   becomeLegend: "הפוך לאגדה",
   browserExtension: "הרחבת דפדפן",
   browseChallenges: "עיון באתגרים",
@@ -300,6 +302,7 @@ export const he = {
   submittingProposal: "שולח...",
   submittingVote: "שולח הצבעה...",
   submitVote: "שלח הצבעה",
+  sufficientBalance: "יתרה מספקת",
   success: "הצלחה",
   succeeded: "הצליח",
   successfullyJoinedChallenge: "הצטרפת בהצלחה לאתגר!",
@@ -387,5 +390,6 @@ export const he = {
   yourPositionActive: "המיקום שלך (פעיל)",
   yourPositionLive: "המיקום שלך (בזמן אמת)",
   yourPositionRegistered: "המיקום שלך (רשום)",
+  yourUSDCBalance: "יתרת USDC שלך",
   yes: "כן"
 } as const; 

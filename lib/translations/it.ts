@@ -15,6 +15,8 @@ export const it = {
   back: "Indietro",
   backToProposals: "Torna alle Proposte",
   balance: "Saldo",
+  balanceUnavailable: "Saldo non disponibile",
+  balanceCheckFailed: "Controllo saldo fallito",
   becomeLegend: "Diventa una Leggenda",
   browserExtension: "Estensione del Browser",
   browseChallenges: "Esplora Sfide",
@@ -300,6 +302,7 @@ export const it = {
   submittingProposal: "Inviando...",
   submittingVote: "Inviando voto...",
   submitVote: "Invia Voto",
+  sufficientBalance: "Saldo sufficiente",
   success: "Successo",
   succeeded: "Riuscito",
   successfullyJoinedChallenge: "Ti sei unito con successo alla sfida!",
@@ -387,5 +390,6 @@ export const it = {
   yourPositionActive: "La tua posizione (attiva)",
   yourPositionLive: "La tua posizione (live)",
   yourPositionRegistered: "La tua posizione (registrata)",
+  yourUSDCBalance: "Il tuo saldo USDC",
   yes: "Sì"
 } as const; 
