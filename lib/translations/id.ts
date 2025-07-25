@@ -131,6 +131,7 @@ export const id = {
   governanceActionVote: "Aksi Governance",
   governanceVoting: "Voting Governance",
   governanceVotingSystemDesc: "Mendukung sistem voting governance. Token yang dapat diinvestasikan, biaya masuk, batas token portfolio, metode distribusi hadiah, jumlah uang modal, dll. dapat diputuskan melalui voting governance.",
+  hallOfFame: "Hall of Fame",
   holdings: "Kepemilikan",
   hours: "jam",
   hourShort: "j",

@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { User } from "lucide-react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '../../../hooks/useInvestorSnapshots'
 import { useInvestorWeeklySnapshots } from '../../../hooks/useInvestorWeeklySnapshots'
@@ -403,18 +404,21 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           {/* First row: Address, Action Buttons, and Registered status */}
           <div className="flex items-center justify-between gap-4 mb-1">
             <div className="flex items-center gap-4">
-              <h3 
-                className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
-                onClick={() => {
-                  const explorerUrl = network === 'arbitrum' 
-                    ? `https://arbiscan.io/address/${investor}`
-                    : `https://etherscan.io/address/${investor}`
-                  window.open(explorerUrl, '_blank')
-                }}
-                title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
-              >
-                {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
-              </h3>
+              <div className="flex items-center gap-3">
+                <User className="w-6 h-6 text-blue-500" />
+                <h3 
+                  className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                  onClick={() => {
+                    const explorerUrl = network === 'arbitrum' 
+                      ? `https://arbiscan.io/address/${investor}`
+                      : `https://etherscan.io/address/${investor}`
+                    window.open(explorerUrl, '_blank')
+                  }}
+                  title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+                >
+                  {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
+                </h3>
+              </div>
             </div>
             
             {/* Action Buttons and Registered status */}
@@ -463,18 +467,21 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         {/* First row: Address, Action Buttons, and Registered status */}
         <div className="flex items-center justify-between gap-4 mb-1">
           <div className="flex items-center gap-4">
-            <h3 
-              className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
-              onClick={() => {
-                const explorerUrl = network === 'arbitrum' 
-                  ? `https://arbiscan.io/address/${investor}`
-                  : `https://etherscan.io/address/${investor}`
-                window.open(explorerUrl, '_blank')
-              }}
-              title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
-            >
-              {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
-            </h3>
+            <div className="flex items-center gap-3">
+              <User className="w-6 h-6 text-blue-500" />
+              <h3 
+                className="text-2xl sm:text-3xl text-gray-100 cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                onClick={() => {
+                  const explorerUrl = network === 'arbitrum' 
+                    ? `https://arbiscan.io/address/${investor}`
+                    : `https://etherscan.io/address/${investor}`
+                  window.open(explorerUrl, '_blank')
+                }}
+                title={`View on ${network === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
+              >
+                {`${investor.slice(0, 6)}...${investor.slice(-4)}`}
+              </h3>
+            </div>
           </div>
           
           {/* Action Buttons and Registered status */}

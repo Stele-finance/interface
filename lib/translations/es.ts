@@ -131,6 +131,7 @@ export const es = {
   governanceActionVote: "Acción de Gobernanza",
   governanceVoting: "Votación de Gobernanza",
   governanceVotingSystemDesc: "Soporta sistema de votación de gobernanza. Los tokens invertibles, tarifas de entrada, límites de tokens de cartera, métodos de distribución de recompensas, cantidades de dinero inicial, etc. pueden decidirse a través de votación de gobernanza.",
+  hallOfFame: "Salón de la Fama",
   holdings: "Tenencias",
   hours: "horas",
   hourShort: "h",

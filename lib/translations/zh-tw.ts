@@ -131,6 +131,7 @@ export const zhTw = {
   governanceActionVote: "治理動作",
   governanceVoting: "治理投票",
   governanceVotingSystemDesc: "支援治理投票系統。可投資代幣、參與費、投資組合代幣限制、獎勵分配方法、種子資金金額等可透過治理投票決定。",
+  hallOfFame: "名人堂",
   holdings: "持有",
   hours: "小時",
   hourShort: "時",

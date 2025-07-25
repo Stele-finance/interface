@@ -131,6 +131,7 @@ export const da = {
   governanceActionVote: "Governance Handling",
   governanceVoting: "Governance Afstemning",
   governanceVotingSystemDesc: "Understøtter governance afstemningssystem. Investerbare tokens, adgangsgebyrer, portefølje token grænser, belønningsfordelingsmetoder, seed money beløb osv. kan bestemmes gennem governance afstemning.",
+  hallOfFame: "Hall of Fame",
   holdings: "Beholdninger",
   hours: "timer",
   hourShort: "t",

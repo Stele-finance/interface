@@ -131,6 +131,7 @@ export const en = {
   governanceActionVote: "Governance Action",
   governanceVoting: "Governance Voting",
   governanceVotingSystemDesc: "Supports governance voting system. Investable tokens, entry fees, portfolio token limits, reward distribution methods, seed money amounts, etc. can be decided through governance voting.",
+  hallOfFame: "Hall of Fame",
   holdings: "Holdings",
   hours: "hours",
   hourShort: "h",

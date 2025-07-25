@@ -131,6 +131,7 @@ export const ms = {
   governanceActionVote: "Tindakan Tadbir Urus",
   governanceVoting: "Pengundian Tadbir Urus",
   governanceVotingSystemDesc: "Menyokong sistem pengundian tadbir urus. Token boleh dilabur, yuran kemasukan, had token portfolio, kaedah pengagihan ganjaran, jumlah wang modal, dll. boleh diputuskan melalui pengundian tadbir urus.",
+  hallOfFame: "Dewan Kemasyhuran",
   holdings: "Pegangan",
   hours: "jam",
   hourShort: "j",

@@ -131,6 +131,7 @@ export const hu = {
   governanceActionVote: "Irányítási művelet",
   governanceVoting: "Irányítási Szavazás",
   governanceVotingSystemDesc: "Támogatja az irányítási szavazási rendszert. A befektethető tokenek, belépési díjak, portfólió token korlátok, jutalom elosztási módszerek, kezdő tőke összegek stb. irányítási szavazással dönthetők el.",
+  hallOfFame: "Hírességek Csarnoka",
   holdings: "Birtoklások",
   hours: "óra",
   hourShort: "ó",

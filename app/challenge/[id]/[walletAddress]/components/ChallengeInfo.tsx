@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language-context"
 import { formatDateOnly } from "@/lib/utils"
 import { ChallengeDetails, TimeRemaining } from "../types"
 import { getTimeRemaining } from "../utils"
+import { Trophy } from "lucide-react"
 
 interface ChallengeInfoProps {
   challengeId: string
@@ -161,8 +162,11 @@ export function ChallengeInfo({
           {/* Challenge ID */}
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('challenge')}</span>
-            <div className="text-3xl text-white">
-              {challengeId}
+            <div className="flex items-center gap-2">
+              <Trophy className="w-6 h-6 text-yellow-400" />
+              <div className="text-3xl text-white">
+                {challengeId}
+              </div>
             </div>
           </div>
 
@@ -203,81 +207,104 @@ export function ChallengeInfo({
           </div>
         </div>
 
-        {/* Progress */}
+        {/* Challenge Type & Progress */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-base text-gray-400">{t('progress')}</span>
-            <span className="text-base font-medium text-gray-300">
-              {(() => {
-                if (!challengeDetails || !isClient) return '0%';
-                
-                const startTime = challengeDetails.startTime.getTime();
-                const endTime = challengeDetails.endTime.getTime();
-                const now = currentTime.getTime();
-                
-                if (now < startTime) return '0%';
-                if (now >= endTime) return '100%';
-                
-                const totalDuration = endTime - startTime;
-                const elapsed = now - startTime;
-                const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                
-                return `${progress.toFixed(0)}%`;
-              })()}
-            </span>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="relative">
-            <TooltipProvider>
-              <Tooltip open={showMobileTooltip}>
-                <TooltipTrigger asChild>
-                                    <div 
-                    className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
-                    onClick={(e) => handleTooltipClick(
-                      e, 
-                      'progress', 
-                      showMobileTooltip, 
-                      setShowMobileTooltip, 
-                      tooltipTimer, 
-                      setTooltipTimer
-                    )}
-                    onMouseLeave={() => handleMouseLeave(setShowMobileTooltip, tooltipTimer, setTooltipTimer)}
-                  >
+          {/* Progress */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="text-center">
+                <span className="text-lg text-gray-400">
+                  {(() => {
+                    const challengeType = challengeData?.challenge?.challengeType;
+                    switch (challengeType) {
+                      case 0:
+                        return t('oneWeek');
+                      case 1:
+                        return t('oneMonth');
+                      case 2:
+                        return t('threeMonths');
+                      case 3:
+                        return t('sixMonths');
+                      case 4:
+                        return t('oneYear');
+                      default:
+                        return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
+                    }
+                  })()}
+                </span>
+              </div>
+              <span className="text-base font-medium text-gray-300">
+                {(() => {
+                  if (!challengeDetails || !isClient) return '0%';
+                  
+                  const startTime = challengeDetails.startTime.getTime();
+                  const endTime = challengeDetails.endTime.getTime();
+                  const now = currentTime.getTime();
+                  
+                  if (now < startTime) return '0%';
+                  if (now >= endTime) return '100%';
+                  
+                  const totalDuration = endTime - startTime;
+                  const elapsed = now - startTime;
+                  const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                  
+                  return `${progress.toFixed(0)}%`;
+                })()}
+              </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="relative">
+              <TooltipProvider>
+                <Tooltip open={showMobileTooltip}>
+                  <TooltipTrigger asChild>
                     <div 
-                      className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                      style={{ 
-                        width: `${(() => {
-                          if (!challengeDetails || !isClient) return 0;
-                          
-                          const startTime = challengeDetails.startTime.getTime();
-                          const endTime = challengeDetails.endTime.getTime();
-                          const now = currentTime.getTime();
-                          
-                          if (now < startTime) return 0;
-                          if (now >= endTime) return 100;
-                          
-                          const totalDuration = endTime - startTime;
-                          const elapsed = now - startTime;
-                          const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                          
-                          return progress;
-                        })()}%` 
-                      }}
-                    ></div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm font-medium">{timeRemaining.text}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                      className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
+                      onClick={(e) => handleTooltipClick(
+                        e, 
+                        'progress', 
+                        showMobileTooltip, 
+                        setShowMobileTooltip, 
+                        tooltipTimer, 
+                        setTooltipTimer
+                      )}
+                      onMouseLeave={() => handleMouseLeave(setShowMobileTooltip, tooltipTimer, setTooltipTimer)}
+                    >
+                      <div 
+                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
+                        style={{ 
+                          width: `${(() => {
+                            if (!challengeDetails || !isClient) return 0;
+                            
+                            const startTime = challengeDetails.startTime.getTime();
+                            const endTime = challengeDetails.endTime.getTime();
+                            const now = currentTime.getTime();
+                            
+                            if (now < startTime) return 0;
+                            if (now >= endTime) return 100;
+                            
+                            const totalDuration = endTime - startTime;
+                            const elapsed = now - startTime;
+                            const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                            
+                            return progress;
+                          })()}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm font-medium">{timeRemaining.text}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           
           {/* Time Info */}
           <div className="flex justify-between text-sm text-gray-500">
-            <span>{t('start')}: {challengeDetails?.startTime ? formatDateOnly(challengeDetails.startTime, language) : 'N/A'}</span>
-            <span>{t('end')}: {challengeDetails?.endTime ? formatDateOnly(challengeDetails.endTime, language) : 'N/A'}</span>
+            <span>{challengeDetails?.startTime ? formatDateOnly(challengeDetails.startTime, language) : 'N/A'}</span>
+            <span>{challengeDetails?.endTime ? formatDateOnly(challengeDetails.endTime, language) : 'N/A'}</span>
           </div>
         </div>
       </CardContent>

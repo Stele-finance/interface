@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useLanguage } from "@/lib/language-context"
 import { PortfolioMetrics, RealTimePortfolio } from "../types"
 import Image from "next/image"
+import { User } from "lucide-react"
 
 interface PortfolioSummaryProps {
   portfolioMetrics: PortfolioMetrics
@@ -180,271 +181,62 @@ export function PortfolioSummary({
       <CardContent className="p-8 space-y-8">
         {/* Row 1: Type and Status */}
         <div className="grid grid-cols-2 gap-6">
-          {/* Type */}
+          {/* Network */}
           <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('type')}</span>
-            <TooltipProvider>
-              <Tooltip open={showTypeTooltip}>
-                <TooltipTrigger asChild>
-                  <div 
-                    className="text-3xl text-white cursor-pointer"
-                    onClick={(e) => handleTooltipClick(
-                      e, 
-                      'type', 
-                      showTypeTooltip, 
-                      setShowTypeTooltip, 
-                      typeTooltipTimer, 
-                      setTypeTooltipTimer
-                    )}
-                    onMouseLeave={() => handleMouseLeave(setShowTypeTooltip, typeTooltipTimer, setTypeTooltipTimer)}
-                  >
-                    {(() => {
-                      const challengeType = challengeData?.challenge?.challengeType
-                      switch (challengeType) {
-                        case 0:
-                          return t('oneWeek');
-                        case 1:
-                          return t('oneMonth');
-                        case 2:
-                          return t('threeMonths');
-                        case 3:
-                          return t('sixMonths');
-                        case 4:
-                          return t('oneYear');
-                        default:
-                          return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
-                      }
-                    })()}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm">{t('tooltipChallengePeriod')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <span className="text-base text-gray-400">{t('network')}</span>
+              <div className="flex items-center gap-3">
+               {network === 'ethereum' ? (
+                 <>
+                   <Image 
+                     src="/networks/small/ethereum.png" 
+                     alt="Ethereum Mainnet"
+                     width={24}
+                     height={24}
+                     className="rounded-full"
+                     style={{ width: '24px', height: '24px' }}
+                   />
+                   <span className="text-xl text-white">Mainnet</span>
+                 </>
+               ) : network === 'arbitrum' ? (
+                 <>
+                   <Image 
+                     src="/networks/small/arbitrum.png" 
+                     alt="Arbitrum One"
+                     width={24}
+                     height={24}
+                     className="rounded-full"
+                     style={{ width: '24px', height: '24px' }}
+                   />
+                   <span className="text-xl text-white">Arbitrum</span>
+                 </>
+               ) : (
+                 <>
+                   <Image 
+                     src="/networks/small/ethereum.png" 
+                     alt="Ethereum Mainnet"
+                     width={24}
+                     height={24}
+                     className="rounded-full"
+                     style={{ width: '24px', height: '24px' }}
+                   />
+                   <span className="text-xl text-white">Mainnet</span>
+                 </>
+               )}
+             </div>
           </div>
           
-          {/* Status */}
-          <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('status')}</span>
+          {/* Register */}
+          <div className="space-y-2 ml-6">
             <div className="flex items-center gap-2">
-              {(() => {
-                const networkIcon = network === 'ethereum' ? (
-                  <Image 
-                    src="/networks/small/ethereum.png" 
-                    alt="Ethereum Mainnet"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                    style={{ width: '24px', height: '24px' }}
-                  />
-                ) : network === 'arbitrum' ? (
-                  <Image 
-                    src="/networks/small/arbitrum.png" 
-                    alt="Arbitrum One"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                    style={{ width: '24px', height: '24px' }}
-                  />
-                ) : (
-                  // Default to Ethereum icon if network is not recognized
-                  <Image 
-                    src="/networks/small/ethereum.png" 
-                    alt="Ethereum Mainnet"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                    style={{ width: '24px', height: '24px' }}
-                  />
-                );
-
-                // If investor is closed, show as End
-                if (investorData?.investor?.isRegistered === true) {
-                  return (
-                    <>
-                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                        {networkIcon}
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip open={showStatusTooltip}>
-                          <TooltipTrigger asChild>
-                            <span 
-                              className="text-xl text-gray-400 cursor-pointer"
-                              onClick={(e) => handleTooltipClick(
-                                e,
-                                'status',
-                                showStatusTooltip,
-                                setShowStatusTooltip,
-                                statusTooltipTimer,
-                                setStatusTooltipTimer
-                              )}
-                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                            >
-                              {t('end')}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm space-y-1">
-                              <p>{t('tooltipStatusActive')}</p>
-                              <p>{t('tooltipStatusPending')}</p>
-                              <p>{t('tooltipStatusEnd')}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </>
-                  )
-                }
-                // Otherwise show challenge status based on time and isActive
-                if (!challengeData?.challenge) {
-                  return (
-                    <>
-                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                        {networkIcon}
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip open={showStatusTooltip}>
-                          <TooltipTrigger asChild>
-                            <span 
-                              className="text-xl text-gray-400 cursor-pointer"
-                              onClick={(e) => handleTooltipClick(
-                                e,
-                                'status',
-                                showStatusTooltip,
-                                setShowStatusTooltip,
-                                statusTooltipTimer,
-                                setStatusTooltipTimer
-                              )}
-                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                            >
-                              {t('end')}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm space-y-1">
-                              <p>{t('tooltipStatusActive')}</p>
-                              <p>{t('tooltipStatusPending')}</p>
-                              <p>{t('tooltipStatusEnd')}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </>
-                  )
-                }
-                
-                const challenge = challengeData.challenge
-                const endTime = new Date(parseInt(challenge.endTime) * 1000)
-                const hasEnded = new Date() >= endTime
-                
-                if (challenge.isActive && !hasEnded) {
-                  return (
-                    <>
-                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                        {networkIcon}
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip open={showStatusTooltip}>
-                          <TooltipTrigger asChild>
-                            <span 
-                              className="text-xl text-green-400 cursor-pointer"
-                              onClick={(e) => handleTooltipClick(
-                                e,
-                                'status',
-                                showStatusTooltip,
-                                setShowStatusTooltip,
-                                statusTooltipTimer,
-                                setStatusTooltipTimer
-                              )}
-                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                            >
-                              {t('active')}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm space-y-1">
-                              <p>{t('tooltipStatusActive')}</p>
-                              <p>{t('tooltipStatusPending')}</p>
-                              <p>{t('tooltipStatusEnd')}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </>
-                  )
-                } else if (challenge.isActive && hasEnded) {
-                  return (
-                    <>
-                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                        {networkIcon}
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip open={showStatusTooltip}>
-                          <TooltipTrigger asChild>
-                            <span 
-                              className="text-xl text-orange-400 cursor-pointer"
-                              onClick={(e) => handleTooltipClick(
-                                e,
-                                'status',
-                                showStatusTooltip,
-                                setShowStatusTooltip,
-                                statusTooltipTimer,
-                                setStatusTooltipTimer
-                              )}
-                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                            >
-                              {t('pending')}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm space-y-1">
-                              <p>{t('tooltipStatusActive')}</p>
-                              <p>{t('tooltipStatusPending')}</p>
-                              <p>{t('tooltipStatusEnd')}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </>
-                  )
-                } else {
-                  return (
-                    <>
-                      <div className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center">
-                        {networkIcon}
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip open={showStatusTooltip}>
-                          <TooltipTrigger asChild>
-                            <span 
-                              className="text-xl text-gray-400 cursor-pointer"
-                              onClick={(e) => handleTooltipClick(
-                                e,
-                                'status',
-                                showStatusTooltip,
-                                setShowStatusTooltip,
-                                statusTooltipTimer,
-                                setStatusTooltipTimer
-                              )}
-                              onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                            >
-                              {t('end')}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm space-y-1">
-                              <p>{t('tooltipStatusActive')}</p>
-                              <p>{t('tooltipStatusPending')}</p>
-                              <p>{t('tooltipStatusEnd')}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </>
-                  )
-                }
-              })()}
+              <User className="w-4 h-4 text-blue-500" />
+              <span className="text-base text-gray-400">{t('register')}</span>
+            </div>
+            <div className="flex items-right gap-2 ml-4">
+              <span 
+                className={`text-xl font-medium ${investorData?.investor?.isRegistered === true ? 'text-green-400' : 'text-gray-400'}`}
+              >
+                {investorData?.investor?.isRegistered === true ? t('yes') : t('no')}
+              </span>
             </div>
           </div>
         </div>

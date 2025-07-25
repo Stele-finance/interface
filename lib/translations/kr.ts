@@ -131,6 +131,7 @@ export const kr = {
   governanceActionVote: "거버넌스 액션",
   governanceVoting: "거버넌스 투표",
   governanceVotingSystemDesc: "거버넌스 투표 시스템을 지원합니다. 투자 가능한 토큰, 참가비, 포트폴리오 토큰 한도, 보상 분배 방법, 시드머니 금액 등을 거버넌스 투표를 통해 결정할 수 있습니다.",
+  hallOfFame: "명예의 전당",
   holdings: "보유량",
   hours: "시간",
   hourShort: "시",

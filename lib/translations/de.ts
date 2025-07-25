@@ -131,6 +131,7 @@ export const de = {
   governanceActionVote: "Governance-Aktion",
   governanceVoting: "Governance-Abstimmung",
   governanceVotingSystemDesc: "Unterstützt Governance-Abstimmungssystem. Investierbare Token, Eintrittsgebühren, Portfolio-Token-Grenzen, Belohnungsverteilungsmethoden, Startkapitalbeträge usw. können durch Governance-Abstimmung bestimmt werden.",
+  hallOfFame: "Ruhmeshalle",
   holdings: "Bestände",
   hours: "Stunden",
   hourShort: "St",

@@ -131,6 +131,7 @@ export const fr = {
   governanceActionVote: "Action de Gouvernance",
   governanceVoting: "Vote de Gouvernance",
   governanceVotingSystemDesc: "Supporte le système de vote de gouvernance. Les tokens investissables, les frais d'entrée, les limites de tokens de portefeuille, les méthodes de distribution de récompenses, les montants de capital de départ, etc. peuvent être décidés par vote de gouvernance.",
+  hallOfFame: "Panthéon",
   holdings: "Avoirs",
   hours: "heures",
   hourShort: "h",
