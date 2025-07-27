@@ -356,12 +356,12 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       {joinButton.isGettingRewards ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Claiming...
+                          {joinButton.t('claiming')}
                         </>
                       ) : (
                         <>
                           <DollarSign className="mr-2 h-4 w-4" />
-                          Get Rewards
+                          {joinButton.t('getRewards')}
                         </>
                       )}
                     </Button>
@@ -544,12 +544,12 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       {joinButton.isGettingRewards ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Claiming...
+                          {joinButton.t('claiming')}
                         </>
                       ) : (
                         <>
                           <DollarSign className="mr-2 h-5 w-5" />
-                          Get Rewards
+                          {joinButton.t('getRewards')}
                         </>
                       )}
                     </Button>
@@ -904,12 +904,12 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       {joinButton.isGettingRewards ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Claiming...
+                          {joinButton.t('claiming')}
                         </>
                       ) : (
                         <>
                           <DollarSign className="mr-2 h-5 w-5" />
-                          Get Rewards
+                          {joinButton.t('getRewards')}
                         </>
                       )}
                     </Button>
