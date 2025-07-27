@@ -869,8 +869,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       const rewardExplorerUrl = getExplorerUrl(chainId, tx.hash);
       
       toast({
-        title: "Transaction Submitted",
-        description: "Your reward claim transaction has been sent to the network.",
+        title: t('transactionSubmitted'),
+        description: t('rewardClaimTransactionSent'),
         action: (
           <ToastAction altText={`View on ${rewardExplorerName}`} onClick={() => window.open(rewardExplorerUrl, '_blank')}>
             View on {rewardExplorerName}
@@ -883,8 +883,8 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       
       // Show toast notification for transaction confirmed
       toast({
-        title: "Rewards Claimed!",
-        description: "Your challenge rewards have been successfully claimed!",
+        title: t('rewardClaimed'),
+        description: t('rewardsClaimedSuccessfully'),
         action: (
           <ToastAction altText={`View on ${rewardExplorerName}`} onClick={() => window.open(rewardExplorerUrl, '_blank')}>
             View on {rewardExplorerName}
@@ -899,16 +899,16 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
         toast({
           variant: "default",
-          title: "Request Cancelled",
-          description: "Reward claim request was cancelled by user",
+          title: t('requestCancelled'),
+          description: t('rewardClaimCancelled'),
         });
       } else {
         // Show toast notification for error
-        toast({
-          variant: "destructive",
-          title: "Error Claiming Rewards",
-          description: error.message || "An unknown error occurred",
-        });
+                  toast({
+            variant: "destructive",
+            title: t('errorClaimingRewards'),
+            description: error.message || t('unknownError'),
+          });
       }
       
     } finally {
@@ -1275,12 +1275,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                          {isGettingRewards ? (
                            <>
                              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                             Claiming...
+                             {t('claiming')}
                            </>
                          ) : (
                            <>
                              <DollarSign className="mr-1 h-4 w-4" />
-                             Get Rewards
+                             {t('getRewards')}
                            </>
                          )}
                        </Button>
