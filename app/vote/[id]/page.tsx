@@ -1211,13 +1211,13 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               {/* Status message when not in voting period */}
               {proposalState !== 1 && proposalState !== null && (
                 <div className="text-center py-4 text-gray-400">
-                  {proposalState === 0 && "Voting period has not started yet"}
-                  {proposalState === 2 && "This proposal has been canceled"}
-                  {proposalState === 3 && "This proposal was defeated"}
-                  {proposalState === 4 && "Voting has ended - proposal succeeded and is ready to be queued"}
-                  {proposalState === 5 && "Proposal is queued and ready for execution"}
-                  {proposalState === 6 && "This proposal has expired"}
-                  {proposalState === 7 && "This proposal has been executed"}
+                  {proposalState === 0 && t('proposalVotingNotStarted')}
+                  {proposalState === 2 && t('proposalCanceled')}
+                  {proposalState === 3 && t('proposalDefeated')}
+                  {proposalState === 4 && t('proposalSucceededReadyToQueue')}
+                  {proposalState === 5 && t('proposalQueuedReadyForExecution')}
+                  {proposalState === 6 && t('proposalExpired')}
+                  {proposalState === 7 && t('proposalExecuted')}
                 </div>
               )}
             </CardContent>
