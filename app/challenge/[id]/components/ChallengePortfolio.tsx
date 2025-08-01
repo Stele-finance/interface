@@ -963,7 +963,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
           {/* Transactions Section */}
           <div>
-          <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="investors" className="flex items-center gap-2">
