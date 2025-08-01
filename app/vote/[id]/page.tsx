@@ -39,6 +39,7 @@ import { ClientOnly } from "@/components/ClientOnly"
 // Import separated components and utilities
 import { VoteOption } from "./components"
 import { openScanSite } from "./utils"
+import { StatusBadge as StatusBadgeComponent } from "../components"
 
 interface ProposalDetailPageProps {
   params: Promise<{
@@ -1052,7 +1053,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
                     </span>
                   </CardDescription>
                 </div>
-                <StatusBadge status={proposal.status} />
+                <StatusBadgeComponent proposal={{...proposal, proposalId: proposal.id, status: proposal.status as any}} t={t} />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
