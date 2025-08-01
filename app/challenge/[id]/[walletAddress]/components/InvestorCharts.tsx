@@ -1,7 +1,10 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { User, Share2, Copy } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { toast } from "@/components/ui/use-toast"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '../../../hooks/useInvestorSnapshots'
 import { useInvestorWeeklySnapshots } from '../../../hooks/useInvestorWeeklySnapshots'
@@ -10,6 +13,7 @@ import { useRanking } from '@/app/hooks/useRanking'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
 import { formatDateWithLocale } from '@/lib/utils'
+import Image from 'next/image'
 
 interface RealTimePortfolio {
   totalValue: number
@@ -181,6 +185,37 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   }
 
   const metrics = getInvestorMetrics()
+
+  // Share functionality
+  const handleCopyLink = async () => {
+    try {
+      const currentUrl = window.location.href
+      await navigator.clipboard.writeText(currentUrl)
+      toast({
+        title: t('linkCopied'),
+        description: "Investor page link copied to clipboard",
+      })
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+      toast({
+        variant: "destructive",
+        title: t('copyFailed'),
+        description: "Unable to copy link to clipboard",
+      })
+    }
+  }
+
+  const handleShareToTwitter = () => {
+    const currentUrl = window.location.href
+    const portfolioValue = (currentPortfolioValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    const performanceSign = (metrics?.isPositive || false) ? '▲' : '▼'
+    const performancePercent = Math.abs(metrics?.gainLossPercentage || 0).toFixed(2)
+    const userAddress = `${investor.slice(0, 6)}...${investor.slice(-4)}`
+    
+    const tweetText = `Check out User ${userAddress} in Challenge ${challengeId} on Stele Finance! Investors achieved the following investment returns: $${portfolioValue} ${performanceSign} ${performancePercent}%`
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(currentUrl)}`
+    window.open(twitterUrl, '_blank')
+  }
 
     // Process real ranking data from the same source as Ranking tab
   const rankingData = useMemo(() => {
@@ -448,8 +483,31 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                 <span className="text-sm font-medium text-gray-400">0.00%</span>
               </div>
             </div>
-              
-
+            
+            {/* Share Button */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+                <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                  <Copy className="mr-2 h-4 w-4" />
+                  {t('copyLink')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                  <Image 
+                    src="/x.png" 
+                    alt="X (Twitter)"
+                    width={16}
+                    height={16}
+                    className="mr-2"
+                  />
+                  {t('shareToTwitter')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardHeader>
         <CardContent className="px-2 sm:px-6 pt-0 pb-2 sm:pb-4">
@@ -515,6 +573,31 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               </span>
             </div>
           </div>
+          
+          {/* Share Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+              <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                <Copy className="mr-2 h-4 w-4" />
+                {t('copyLink')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                <Image 
+                  src="/x.png" 
+                  alt="X (Twitter)"
+                  width={16}
+                  height={16}
+                  className="mr-2"
+                />
+                {t('shareToTwitter')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardHeader>
       <CardContent className="px-0 sm:px-0 md:mr-6 pt-0 pb-0 sm:pb-0 -ml-4">

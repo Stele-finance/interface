@@ -58,6 +58,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshProgress, setRefreshProgress] = useState(0);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showGetRewardsModal, setShowGetRewardsModal] = useState(false);
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null);
   
@@ -791,8 +792,14 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
     }
   };
 
-  // Handle Get Rewards
-  const handleGetRewards = async () => {
+  // Handle Get Rewards button click - show confirmation modal
+  const handleGetRewardsClick = () => {
+    setShowGetRewardsModal(true);
+  };
+
+  // Handle actual get rewards after confirmation
+  const handleConfirmGetRewards = async () => {
+    setShowGetRewardsModal(false);
     setIsGettingRewards(true);
     
     try {
@@ -950,7 +957,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               entryFee,
               handleJoinChallenge,
               handleNavigateToAccount,
-              handleGetRewards,
+              handleGetRewards: handleGetRewardsClick,
               t,
               // Wallet connection props
               isConnected,
@@ -963,7 +970,6 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
 
           {/* Transactions Section */}
           <div>
-          <h2 className="text-3xl text-gray-100 mb-6">{t('transactions')}</h2>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="investors" className="flex items-center gap-2">
@@ -1268,7 +1274,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                        <Button 
                          variant="outline" 
                          size="lg" 
-                         onClick={handleGetRewards}
+                         onClick={handleGetRewardsClick}
                          disabled={isGettingRewards}
                          className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-sm"
                        >
@@ -1715,6 +1721,52 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                 </>
               ) : (
                 'Confirm Join'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Get Rewards Confirmation Modal */}
+      <AlertDialog open={showGetRewardsModal} onOpenChange={setShowGetRewardsModal}>
+        <AlertDialogContent className="bg-muted border-gray-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('getRewards')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to claim your rewards from this challenge?
+            </AlertDialogDescription>
+            <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-300">{t('challenge')}:</span>
+                <span className="text-lg font-bold text-white">{challengeId}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-300">{t('address')}:</span>
+                <span className="text-lg font-semibold text-white font-mono">
+                  {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'Not connected'}
+                </span>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => setShowGetRewardsModal(false)}
+              className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+            >
+              {t('cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmGetRewards}
+              disabled={isGettingRewards}
+              className="bg-orange-500 hover:bg-orange-600"
+            >
+              {isGettingRewards ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('claiming')}...
+                </>
+              ) : (
+                t('getRewards')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
