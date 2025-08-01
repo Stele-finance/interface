@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { TrendingUp, TrendingDown, Loader2 } from "lucide-react"
 import { useTotalRanking } from "../hooks/useTotalRanking"
 import { cn } from "@/lib/utils"
@@ -17,6 +19,10 @@ interface TotalRankingProps {
 export function TotalRanking({ className, network }: TotalRankingProps) {
   const { t } = useLanguage()
   const router = useRouter()
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
+  const maxPages = 10
+  
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   const { data: rankingData, isLoading, error } = useTotalRanking(subgraphNetwork)
@@ -48,8 +54,6 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   const handleRowClick = (challengeId: string, walletAddress: string) => {
     router.push(`/challenge/${challengeId}/${walletAddress}`)
   }
-
-
 
   if (isLoading) {
     return (
@@ -105,8 +109,8 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
             <p className="text-gray-400">{t('noRankingDataFound')}</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {/* Top 5 Rankings */}
+          <>
+            {/* Rankings Table */}
             <div className="rounded-2xl overflow-hidden overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -118,47 +122,96 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {rankings.slice(0, 5).map((ranking, index) => {
-                    const profitRatio = parseFloat(ranking.profitRatio)
-                    const isPositive = profitRatio >= 0
-                    
-                    return (
-                      <TableRow 
-                        key={ranking.id} 
-                        className="hover:bg-gray-800/30 border-0 cursor-pointer transition-colors"
-                        onClick={() => handleRowClick(ranking.challengeId, ranking.user)}
-                      >
-                        <TableCell className="font-medium text-gray-100 text-base px-6 py-6 min-w-[80px] whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <span>#{index + 1}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-6 min-w-[120px] whitespace-nowrap">
-                          <span className="text-sm text-gray-300 font-mono">
-                            {formatAddress(ranking.user)}
-                          </span>
-                        </TableCell>
-                        <TableCell className="px-6 py-6 min-w-[100px] whitespace-nowrap">
-                          <div className={cn(
-                            "flex items-center gap-1 font-medium text-base whitespace-nowrap",
-                            isPositive ? "text-green-400" : "text-red-400"
-                          )}>
-                            {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                            {formatProfitRatio(ranking.profitRatio)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 pl-8 py-6 min-w-[100px] whitespace-nowrap">
-                          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                            {getChallengeType(ranking.challengeId)}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
+                  {(() => {
+                    // Calculate pagination
+                    const totalRankings = Math.min(rankings.length, maxPages * itemsPerPage);
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = Math.min(startIndex + itemsPerPage, totalRankings);
+                    const paginatedRankings = rankings.slice(startIndex, endIndex);
+
+                    return paginatedRankings.map((ranking, index) => {
+                      const profitRatio = parseFloat(ranking.profitRatio)
+                      const isPositive = profitRatio >= 0
+                      const actualRank = startIndex + index + 1
+                      
+                      return (
+                        <TableRow 
+                          key={ranking.id} 
+                          className="hover:bg-gray-800/30 border-0 cursor-pointer transition-colors"
+                          onClick={() => handleRowClick(ranking.challengeId, ranking.user)}
+                        >
+                          <TableCell className="font-medium text-gray-100 text-base px-6 py-6 min-w-[80px] whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <span>#{actualRank}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-6 min-w-[120px] whitespace-nowrap">
+                            <span className="text-sm text-gray-300 font-mono">
+                              {formatAddress(ranking.user)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="px-6 py-6 min-w-[100px] whitespace-nowrap">
+                            <div className={cn(
+                              "flex items-center gap-1 font-medium text-base whitespace-nowrap",
+                              isPositive ? "text-green-400" : "text-red-400"
+                            )}>
+                              {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                              {formatProfitRatio(ranking.profitRatio)}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 pl-8 py-6 min-w-[100px] whitespace-nowrap">
+                            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                              {getChallengeType(ranking.challengeId)}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    });
+                  })()}
                 </TableBody>
               </Table>
             </div>
-          </div>
+            
+            {/* Pagination - outside scrollable area, fixed at bottom */}
+            {(() => {
+              const totalRankings = Math.min(rankings.length, maxPages * itemsPerPage);
+              const totalPages = Math.min(Math.ceil(totalRankings / itemsPerPage), maxPages);
+              
+              return totalPages > 1 && (
+                <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer hover:bg-gray-700"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              );
+            })()}
+          </>
         )}
       </CardContent>
     </Card>
