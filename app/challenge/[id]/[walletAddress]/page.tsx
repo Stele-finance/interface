@@ -34,6 +34,7 @@ import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
 import { InvestorsTab } from "../components/InvestorsTab"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
@@ -68,6 +69,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isSwapMode, setIsSwapMode] = useState(false)
   const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
 
   // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -126,8 +128,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     window.open(getTokenExplorerUrl(tokenAddress, subgraphNetwork), '_blank')
   }
 
-  // Handle Register function
-  const handleRegister = async () => {
+  // Handle Register button click - show confirmation modal
+  const handleRegisterClick = () => {
+    setShowRegisterModal(true)
+  }
+
+  // Handle actual registration after confirmation
+  const handleConfirmRegister = async () => {
+    setShowRegisterModal(false)
     setIsRegistering(true);
     
     try {
@@ -223,6 +231,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       setIsRegistering(false);
     }
   };
+
+  // Handle cancel registration
+  const handleCancelRegister = () => {
+    setShowRegisterModal(false)
+  }
 
   // Computed values
   const portfolioMetrics = investorData?.investor ? calculatePortfolioMetrics(investorData.investor) : null
@@ -386,7 +399,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                     isRegistering={isRegistering}
                     isAssetSwapping={isAssetSwapping}
                     onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
-                    onRegister={handleRegister}
+                    onRegister={handleRegisterClick}
                   />
                    
                    {/* Desktop Registered status - Show on desktop, hide on mobile */}
@@ -454,6 +467,38 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       </div>
       </div>
     </div>
+
+      {/* Registration Confirmation Modal */}
+      <AlertDialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('register')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to register for this challenge?
+              <br />
+              <br />
+              <span className="font-medium text-orange-400">
+                {t('challenge')}: {challengeId}
+              </span>
+              <br />
+              <span className="font-medium text-blue-400">
+                {t('address')}: {walletAddress}
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelRegister}>
+              {t('cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmRegister}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              {t('register')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 } 
