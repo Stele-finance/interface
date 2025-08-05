@@ -219,6 +219,7 @@ export const es = {
   pending: "Pendiente",
   pendingQueue: "Cola Pendiente",
   performance: "Rendimiento",
+  period: "Período",
   perToken: "por token",
   phantomWalletNotConnected: "Billetera Phantom No Conectada",
   phantomWalletNotInstalled: "La billetera Phantom no está instalada o el soporte de Ethereum no está habilitado",

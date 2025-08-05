@@ -219,6 +219,7 @@ export const hi = {
   pending: "लंबित",
   pendingQueue: "लंबित कतार",
   performance: "प्रदर्शन",
+  period: "अवधि",
   perToken: "प्रति टोकन",
   phantomWalletNotConnected: "Phantom वॉलेट कनेक्ट नहीं है",
   phantomWalletNotInstalled: "Phantom वॉलेट इंस्टॉल नहीं है या Ethereum समर्थन सक्षम नहीं है",

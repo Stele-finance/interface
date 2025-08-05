@@ -219,6 +219,7 @@ export const el = {
   pending: "Εκκρεμεί",
   pendingQueue: "Εκκρεμής Ουρά",
   performance: "Απόδοση",
+  period: "Περίοδος",
   perToken: "ανά token",
   phantomWalletNotConnected: "Phantom Wallet Δεν Είναι Συνδεδεμένο",
   phantomWalletNotInstalled: "Το Phantom wallet δεν είναι εγκατεστημένο ή η υποστήριξη Ethereum δεν είναι ενεργοποιημένη",

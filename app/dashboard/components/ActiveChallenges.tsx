@@ -577,12 +577,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</TableHead>
+                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('period')}</TableHead>
                   <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
                   <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
                   <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">{t('progress')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">{t('challenge')}</TableHead>
                   <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">{t('challenge')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -647,16 +647,16 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                         <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(challenge.progress)}%</span>
                       </div>
                     </TableCell>
-                    <TableCell className="pr-6 py-6 min-w-[80px]">
-                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                        {challenge.challengeId}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="py-6 min-w-[80px]">
                       <div className="flex items-center gap-2 text-gray-300 text-base whitespace-nowrap">
                         <Users className="h-4 w-4" />
                         <span>{challenge.participants}</span>
                       </div>
+                    </TableCell>
+                    <TableCell className="pr-6 py-6 min-w-[80px]">
+                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                        {challenge.challengeId}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}

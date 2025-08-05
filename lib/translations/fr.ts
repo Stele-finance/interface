@@ -219,6 +219,7 @@ export const fr = {
   pending: "En Attente",
   pendingQueue: "File d'Attente",
   performance: "Performance",
+  period: "Période",
   perToken: "par token",
   phantomWalletNotConnected: "Portefeuille Phantom Non Connecté",
   phantomWalletNotInstalled: "Le portefeuille Phantom n'est pas installé ou le support Ethereum n'est pas activé",

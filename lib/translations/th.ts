@@ -219,6 +219,7 @@ export const th = {
   pending: "รอดำเนินการ",
   pendingQueue: "คิวรอดำเนินการ",
   performance: "ประสิทธิภาพ",
+  period: "ระยะเวลา",
   perToken: "ต่อโทเค็น",
   phantomWalletNotConnected: "Phantom Wallet ไม่ได้เชื่อมต่อ",
   phantomWalletNotInstalled: "ไม่ได้ติดตั้ง Phantom Wallet หรือไม่ได้เปิดใช้งานการรองรับ Ethereum",

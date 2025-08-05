@@ -219,6 +219,7 @@ export const bn = {
   pending: "মুলতুবি",
   pendingQueue: "মুলতুবি সারি",
   performance: "পারফরম্যান্স",
+  period: "সময়কাল",
   perToken: "প্রতি টোকেন",
   phantomWalletNotConnected: "Phantom ওয়ালেট সংযুক্ত নেই",
   phantomWalletNotInstalled: "Phantom ওয়ালেট ইনস্টল করা নেই বা Ethereum সমর্থন সক্ষম নেই",

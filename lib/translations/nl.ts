@@ -219,6 +219,7 @@ export const nl = {
   pending: "In Behandeling",
   pendingQueue: "Wachtrij In Behandeling",
   performance: "Prestatie",
+  period: "Periode",
   perToken: "per token",
   phantomWalletNotConnected: "Phantom Wallet Niet Verbonden",
   phantomWalletNotInstalled: "Phantom Wallet is niet geïnstalleerd of Ethereum ondersteuning is niet ingeschakeld",

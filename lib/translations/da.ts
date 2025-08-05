@@ -219,6 +219,7 @@ export const da = {
   pending: "Afventende",
   pendingQueue: "Afventende Kø",
   performance: "Præstation",
+  period: "Periode",
   perToken: "per token",
   phantomWalletNotConnected: "Phantom Wallet Ikke Tilsluttet",
   phantomWalletNotInstalled: "Phantom wallet er ikke installeret eller Ethereum support er ikke aktiveret",
