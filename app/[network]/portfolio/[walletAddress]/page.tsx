@@ -25,12 +25,13 @@ import { USDC_DECIMALS } from "@/lib/constants"
 
 interface PortfolioPageProps {
   params: Promise<{
+    network: string
     walletAddress: string
   }>
 }
 
 export default function PortfolioPage({ params }: PortfolioPageProps) {
-  const { walletAddress } = use(params)
+  const { network: routeNetwork, walletAddress } = use(params)
   const { t, language } = useLanguage()
   const { network } = useWallet()
   const router = useRouter()
@@ -133,7 +134,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     const challengeTitle = getChallengeTitle(challengeType)
 
     const handleRowClick = () => {
-      router.push(`/${subgraphNetwork}/challenge/${investor.challengeId}/${walletAddress}`)
+      router.push(`/${routeNetwork}/challenge/${investor.challengeId}/${walletAddress}`)
     }
 
     return (

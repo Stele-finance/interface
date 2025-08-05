@@ -596,7 +596,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                     }`}
                     onClick={() => {
                       if (challenge.challengeId && challenge.challengeId !== "") {
-                        router.push(`/challenge/${challenge.challengeId}`)
+                        router.push(`/${network}/challenge/${challenge.challengeId}`)
                       }
                     }}
                   >

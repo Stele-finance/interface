@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,10 +19,17 @@ import { getWalletLogo } from "@/lib/utils"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import Image from "next/image"
 
-export default function PortfolioPage() {
+interface PortfolioPageProps {
+  params: Promise<{
+    network: string
+  }>
+}
+
+export default function PortfolioPage({ params }: PortfolioPageProps) {
+  const { network: routeNetwork } = use(params)
   const { t } = useLanguage()
   const router = useRouter()
-  const { address, isConnected, connectWallet, network } = useWallet()
+  const { address, isConnected, connectWallet } = useWallet()
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const isMobile = useIsMobile()
@@ -30,11 +37,9 @@ export default function PortfolioPage() {
   useEffect(() => {
     // If wallet is already connected, redirect to portfolio page with network
     if (isConnected && address) {
-      // Get current network or default to ethereum
-      const targetNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-      router.push(`/${targetNetwork}/portfolio/${address}`)
+      router.push(`/${routeNetwork}/portfolio/${address}`)
     }
-  }, [isConnected, address, router, network])
+  }, [isConnected, address, router, routeNetwork])
 
   const handleConnectWallet = async () => {
     try {

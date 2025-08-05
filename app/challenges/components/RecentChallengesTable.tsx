@@ -183,7 +183,7 @@ export function RecentChallengesTable() {
                     <TableRow 
                       key={challenge.id} 
                       className="border-0 hover:bg-gray-800/50 cursor-pointer transition-colors"
-                      onClick={() => router.push(`/challenge/${challenge.challengeId}`)}
+                      onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
                     >
                       <TableCell className="pl-6 py-6 min-w-[80px]">
                         <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
