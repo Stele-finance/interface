@@ -220,6 +220,7 @@ export const en = {
   pending: "Pending",
   pendingQueue: "Pending Queue",
   performance: "Performance",
+  period: "Period",
   perToken: "per token",
   phantomWalletNotConnected: "Phantom Wallet Not Connected",
   phantomWalletNotInstalled: "Phantom wallet is not installed or Ethereum support is not enabled",

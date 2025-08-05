@@ -220,6 +220,7 @@ export const kr = {
   pending: "대기 중",
   pendingQueue: "대기 큐",
   performance: "성과",
+  period: "기간",
   perToken: "토큰당",
   phantomWalletNotConnected: "Phantom 지갑이 연결되지 않음",
   phantomWalletNotInstalled: "Phantom 지갑이 설치되지 않았거나 이더리움 지원이 활성화되지 않음",

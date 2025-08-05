@@ -219,6 +219,7 @@ export const vi = {
   pending: "Đang chờ",
   pendingQueue: "Hàng đợi chờ",
   performance: "Hiệu suất",
+  period: "Thời kỳ",
   perToken: "mỗi token",
   phantomWalletNotConnected: "Ví Phantom chưa kết nối",
   phantomWalletNotInstalled: "Ví Phantom chưa được cài đặt hoặc hỗ trợ Ethereum chưa được kích hoạt",

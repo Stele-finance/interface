@@ -219,6 +219,7 @@ export const pt = {
   pending: "Pendente",
   pendingQueue: "Fila Pendente",
   performance: "Desempenho",
+  period: "Período",
   perToken: "por token",
   phantomWalletNotConnected: "Carteira Phantom Não Conectada",
   phantomWalletNotInstalled: "A carteira Phantom não está instalada ou o suporte Ethereum não está habilitado",

@@ -219,6 +219,7 @@ export const zhCn = {
   pending: "待处理",
   pendingQueue: "待处理队列",
   performance: "表现",
+  period: "期间",
   perToken: "每个代币",
   phantomWalletNotConnected: "Phantom钱包未连接",
   phantomWalletNotInstalled: "Phantom钱包未安装或未启用以太坊支持",

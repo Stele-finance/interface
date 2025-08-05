@@ -219,6 +219,7 @@ export const jp = {
   pending: "保留中",
   pendingQueue: "保留キュー",
   performance: "パフォーマンス",
+  period: "期間",
   perToken: "トークンあたり",
   phantomWalletNotConnected: "Phantomウォレットが接続されていません",
   phantomWalletNotInstalled: "Phantomウォレットがインストールされていないか、Ethereumサポートが有効になっていません",

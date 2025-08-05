@@ -219,6 +219,7 @@ export const zhTw = {
   pending: "待處理",
   pendingQueue: "待處理隊列",
   performance: "表現",
+  period: "期間",
   perToken: "每代幣",
   phantomWalletNotConnected: "Phantom 錢包未連接",
   phantomWalletNotInstalled: "Phantom 錢包未安裝或未啟用以太坊支持",

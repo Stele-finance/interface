@@ -219,6 +219,7 @@ export const ms = {
   pending: "Tertunda",
   pendingQueue: "Barisan Tertunda",
   performance: "Prestasi",
+  period: "Tempoh",
   perToken: "setiap token",
   phantomWalletNotConnected: "Dompet Phantom Tidak Tersambung",
   phantomWalletNotInstalled: "Dompet Phantom tidak dipasang atau sokongan Ethereum tidak diaktifkan",

@@ -219,6 +219,7 @@ export const fi = {
   pending: "Odottaa",
   pendingQueue: "Odottava Jono",
   performance: "Suorituskyky",
+  period: "Jakso",
   perToken: "per token",
   phantomWalletNotConnected: "Phantom Lompakko Ei Yhdistetty",
   phantomWalletNotInstalled: "Phantom lompakkoa ei ole asennettu tai Ethereum-tuki ei ole käytössä",

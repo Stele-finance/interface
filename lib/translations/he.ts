@@ -219,6 +219,7 @@ export const he = {
   pending: "בהמתנה",
   pendingQueue: "תור המתנה",
   performance: "ביצועים",
+  period: "תקופה",
   perToken: "לכל טוקן",
   phantomWalletNotConnected: "Phantom Wallet לא מחובר",
   phantomWalletNotInstalled: "Phantom wallet לא מותקן או התמיכה ב-Ethereum לא מופעלת",

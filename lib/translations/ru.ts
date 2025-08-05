@@ -219,6 +219,7 @@ export const ru = {
   pending: "В Ожидании",
   pendingQueue: "Очередь Ожидания",
   performance: "Производительность",
+  period: "Период",
   perToken: "за токен",
   phantomWalletNotConnected: "Кошелек Phantom Не Подключен",
   phantomWalletNotInstalled: "Кошелек Phantom не установлен или поддержка Ethereum не включена",

@@ -219,6 +219,7 @@ export const id = {
   pending: "Tertunda",
   pendingQueue: "Antrian Tertunda",
   performance: "Kinerja",
+  period: "Periode",
   perToken: "per token",
   phantomWalletNotConnected: "Phantom Wallet Tidak Terhubung",
   phantomWalletNotInstalled: "Phantom wallet tidak terpasang atau dukungan Ethereum tidak diaktifkan",

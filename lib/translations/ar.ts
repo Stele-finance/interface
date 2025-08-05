@@ -219,6 +219,7 @@ export const ar = {
   pending: "معلق",
   pendingQueue: "طابور المعلق",
   performance: "الأداء",
+  period: "فترة",
   perToken: "لكل رمز",
   phantomWalletNotConnected: "محفظة Phantom غير متصلة",
   phantomWalletNotInstalled: "محفظة Phantom غير مثبتة أو دعم إيثريوم غير مفعل",

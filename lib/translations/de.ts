@@ -219,6 +219,7 @@ export const de = {
   pending: "Ausstehend",
   pendingQueue: "Warteschlange",
   performance: "Leistung",
+  period: "Zeitraum",
   perToken: "pro Token",
   phantomWalletNotConnected: "Phantom Wallet Nicht Verbunden",
   phantomWalletNotInstalled: "Phantom Wallet ist nicht installiert oder Ethereum-Unterstützung ist nicht aktiviert",

@@ -219,6 +219,7 @@ export const hu = {
   pending: "Függőben",
   pendingQueue: "Várakozási sor",
   performance: "Teljesítmény",
+  period: "Időszak",
   perToken: "tokenenként",
   phantomWalletNotConnected: "Phantom tárca nincs csatlakoztatva",
   phantomWalletNotInstalled: "A Phantom tárca nincs telepítve vagy az Ethereum támogatás nincs engedélyezve",
