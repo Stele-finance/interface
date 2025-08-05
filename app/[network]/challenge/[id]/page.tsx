@@ -11,12 +11,12 @@ import { ArrowLeft } from 'lucide-react'
 
 interface ChallengePageProps {
   params: Promise<{
+    network: string
     id: string
   }>
 }
 
-function ChallengeContent({ challengeId }: { challengeId: string }) {
-  const { network } = useWallet()
+function ChallengeContent({ challengeId, network }: { challengeId: string; network: string }) {
   const router = useRouter()
   const { t } = useLanguage()
   
@@ -74,18 +74,18 @@ function ChallengeContent({ challengeId }: { challengeId: string }) {
       </div>
       
       {/* Challenge Portfolio Component */}
-      <ChallengePortfolio challengeId={challengeId} />
+      <ChallengePortfolio challengeId={challengeId} network={network} />
     </div>
   )
 }
 
 export default function ChallengePage({ params }: ChallengePageProps) {
-  const { id } = use(params)
+  const { network, id } = use(params)
   
   return (
     <div className="container mx-auto p-2 py-12">
       <div className="max-w-6xl mx-auto space-y-4">
-        <ChallengeContent challengeId={id} />
+        <ChallengeContent challengeId={id} network={network} />
       </div>
     </div>
   )

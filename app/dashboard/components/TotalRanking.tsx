@@ -52,7 +52,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
 
   // Handle row click to navigate to investor page
   const handleRowClick = (challengeId: string, walletAddress: string) => {
-    router.push(`/challenge/${challengeId}/${walletAddress}`)
+    router.push(`/${subgraphNetwork}/challenge/${challengeId}/${walletAddress}`)
   }
 
   if (isLoading) {

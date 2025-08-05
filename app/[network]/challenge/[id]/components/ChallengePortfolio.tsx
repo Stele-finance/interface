@@ -41,6 +41,7 @@ import { RankingSection } from "./RankingSection"
 
 interface ChallengePortfolioProps {
   challengeId: string
+  network?: string
 }
 
 
