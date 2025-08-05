@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import { ethers } from "ethers"
 import {
   getRPCUrl
@@ -66,6 +67,7 @@ export function Header() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   
   // Track previous network and wallet address for detecting changes
   const prevNetworkRef = useRef<string | null>(null)
@@ -79,6 +81,12 @@ export function Header() {
     }
     return null
   }
+
+  // Set mounted state for Portal
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // Force re-render when wallet provider changes
   useEffect(() => {}, [walletProvider, isConnected, walletType])
@@ -526,7 +534,7 @@ export function Header() {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
+      {isMobileMenuOpen && isMounted && createPortal(
         <>
           {/* Backdrop */}
           <div 
@@ -644,7 +652,8 @@ export function Header() {
                <div className="h-2"></div>
              </div>
            </div>
-        </>
+        </>,
+        document.body
       )}
     </header>
   )

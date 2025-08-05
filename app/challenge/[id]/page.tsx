@@ -1,6 +1,7 @@
 "use client"
 
 import { use } from "react"
+import { createPortal } from "react-dom"
 import { ChallengePortfolio } from "./components/ChallengePortfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useWallet } from '@/app/hooks/useWallet'
@@ -26,7 +27,7 @@ function ChallengeContent({ challengeId }: { challengeId: string }) {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
           <div className="text-white text-lg font-medium">{t('loadingChallengeData')}</div>

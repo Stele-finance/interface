@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { ethers } from "ethers"
 import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
@@ -69,6 +70,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const [typeTooltipTimer, setTypeTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [statusTooltipTimer, setStatusTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [activeTab, setActiveTab] = useState("investors")
+  const [isMounted, setIsMounted] = useState(false)
   const itemsPerPage = 5;
   const maxPages = 5;
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
@@ -130,6 +132,12 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork);
   const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
+
+  // Set mounted state for Portal
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // Handle interactions to close mobile tooltips
   useEffect(() => {
@@ -927,14 +935,15 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   return (
     <div className="space-y-4">
       {/* Refreshing Spinner Overlay */}
-      {isRefreshing && (
+      {isRefreshing && isMounted && createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
             <div className="text-white text-lg font-medium">{t('joinRequestSuccessful')}</div>
             <div className="text-gray-300 text-sm">{t('refreshingData')}</div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       
       {/* Two-Column Layout like Investor Page */}

@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import { ethers } from "ethers"
 import { toast } from "@/components/ui/use-toast"
@@ -123,6 +124,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [walletSelectOpen, setWalletSelectOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   // Use wallet hook to get current wallet info
   const { walletType, network, getProvider, isConnected, connectWallet } = useWallet();
@@ -144,6 +146,12 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     if (timeLeft === "Ended") return t('ended')
     return timeLeft
   }
+
+  // Set mounted state for Portal
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // Ensure client-side rendering for time calculations
   useEffect(() => {
@@ -504,14 +512,15 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   return (
     <>
       {/* Refreshing Spinner Overlay */}
-      {isRefreshing && (
+      {isRefreshing && isMounted && createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
             <div className="text-white text-lg font-medium">{t('challengeCreatedSuccessfully')}</div>
             <div className="text-gray-300 text-sm">{t('refreshingData')}</div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="space-y-4 mt-8">

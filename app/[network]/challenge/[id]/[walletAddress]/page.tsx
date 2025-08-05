@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, use, useEffect, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
 import { AssetSwap } from "../../../../swap/components/AssetSwap"
@@ -70,6 +71,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -106,6 +108,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
   // Remove useCallback for immediate reaction (same as Portfolio tab)
   const realTimePortfolio = calculateRealTimePortfolioValue()
+
+  // Set mounted state for Portal
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // Ensure client-side rendering for time calculations
   useEffect(() => {
@@ -254,7 +262,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   return (
     <>
       {/* Loading Overlay */}
-      {isRefreshing && (
+      {isRefreshing && isMounted && createPortal(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
           {/* Simple Rotating Spinner */}
           <div className="w-16 h-16">
@@ -279,7 +287,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               />
             </svg>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-4">
@@ -419,7 +428,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               )}
               
               {/* Mobile version - floating */}
-              {isSwapMode && (
+              {isSwapMode && isMounted && createPortal(
                 <div className="fixed inset-0 z-50 md:hidden">
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSwapMode(false)} />
                   <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
@@ -432,7 +441,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
               
               {/* Portfolio Summary (always visible) */}
