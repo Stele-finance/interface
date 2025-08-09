@@ -2,16 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
 import { useRecentChallenges, RecentChallenge } from "../hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
@@ -27,6 +21,9 @@ export function RecentChallengesTable() {
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   const { data, isLoading, error } = useRecentChallenges(subgraphNetwork)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+  const maxPages = 5
 
   // Update time every second for accurate status calculation
   useEffect(() => {
@@ -150,82 +147,131 @@ export function RecentChallengesTable() {
       <h2 className="text-3xl text-gray-100">
         {t('totalChallenges')}
       </h2>
-      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-            <TableHeader>
-              <TableRow className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                <TableHead className="text-gray-300 pl-6 min-w-[80px] whitespace-nowrap">{t('challenge')}</TableHead>
-                <TableHead className="text-gray-300 pl-8 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
-                <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
-                <TableHead className="text-gray-300 pl-10 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
-                <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</TableHead>
-                <TableHead className="text-gray-300 pl-20 min-w-[140px] whitespace-nowrap">{t('startDate')}</TableHead>
-                <TableHead className="text-gray-300 pl-16 min-w-[140px] whitespace-nowrap">{t('endDate')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.challenges.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    <div className="flex flex-col items-center gap-2">
-                      <Trophy className="h-8 w-8 text-gray-500" />
-                      <p className="text-gray-400">{t('noChallengesFound')}</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.challenges
-                  .sort((a, b) => Number(b.endTime) - Number(a.endTime)) // Sort by end date descending (newest first)
-                  .map((challenge) => {
-                  return (
-                    <TableRow 
-                      key={challenge.id} 
-                      className="border-0 hover:bg-gray-800/50 cursor-pointer transition-colors"
-                      onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
-                    >
-                      <TableCell className="pl-6 py-6 min-w-[80px]">
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                          {challenge.challengeId}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium text-yellow-400 pl-8 py-6 min-w-[80px] whitespace-nowrap">
-                        {formatUSDAmount(challenge.rewardAmountUSD)}
-                      </TableCell>
-                      <TableCell className="py-6 min-w-[100px]">
-                        {getStatusBadge(getChallengeStatus(challenge))}
-                      </TableCell>
-                      <TableCell className="pl-10 py-6 min-w-[80px]">
-                        <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
-                          <Users className="h-4 w-4 text-gray-400" />
-                          {challenge.investorCounter}
-                        </div>
-                      </TableCell>
-                      <TableCell className="pl-6 py-6 min-w-[120px] whitespace-nowrap">
-                        <span className="font-medium text-gray-100 text-base whitespace-nowrap">
-                          {getChallengeTypeName(challenge.challengeType)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="pl-10 py-6 min-w-[140px] whitespace-nowrap">
-                        <div className="flex items-center gap-1 text-sm text-gray-400">
-                          {formatDate(challenge.startTime)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="pl-4 py-6 min-w-[140px] whitespace-nowrap">
-                        <div className="flex items-center gap-1 text-sm text-gray-400">
-                          {formatDate(challenge.endTime)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+          {data.challenges.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <Trophy className="h-8 w-8 text-gray-500" />
+                <p className="text-gray-400">{t('noChallengesFound')}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <div className="min-w-[500px]">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('challenge')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('prize')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('status')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('users')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('period')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('startDate')}</th>
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('endDate')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        // Calculate pagination
+                        const sortedChallenges = data.challenges.sort((a, b) => Number(b.endTime) - Number(a.endTime))
+                        const totalChallenges = Math.min(sortedChallenges.length, maxPages * itemsPerPage);
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = Math.min(startIndex + itemsPerPage, totalChallenges);
+                        const paginatedChallenges = sortedChallenges.slice(startIndex, endIndex);
+
+                        return paginatedChallenges.map((challenge) => (
+                          <tr 
+                            key={challenge.id} 
+                            className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                            onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
+                          >
+                            <td className="py-6 pl-6 pr-4">
+                              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                                {challenge.challengeId}
+                              </Badge>
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="font-medium text-yellow-400 whitespace-nowrap">
+                                {formatUSDAmount(challenge.rewardAmountUSD)}
+                              </div>
+                            </td>
+                            <td className="py-6 px-4">
+                              {getStatusBadge(getChallengeStatus(challenge))}
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
+                                <Users className="h-4 w-4 text-gray-400" />
+                                {challenge.investorCounter}
+                              </div>
+                            </td>
+                            <td className="py-6 px-4">
+                              <span className="font-medium text-gray-100 text-base whitespace-nowrap">
+                                {getChallengeTypeName(challenge.challengeType)}
+                              </span>
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="text-sm text-gray-400 whitespace-nowrap">
+                                {formatDate(challenge.startTime)}
+                              </div>
+                            </td>
+                            <td className="py-6 px-6">
+                              <div className="text-left text-sm text-gray-400 whitespace-nowrap">
+                                {formatDate(challenge.endTime)}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Pagination - outside scrollable area, fixed at bottom */}
+              {(() => {
+                const totalChallenges = Math.min(data.challenges.length, maxPages * itemsPerPage);
+                const totalPages = Math.min(Math.ceil(totalChallenges / itemsPerPage), maxPages);
+                
+                return totalPages > 1 && (
+                  <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer hover:bg-gray-700"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                );
+              })()}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 } 
