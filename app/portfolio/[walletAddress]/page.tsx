@@ -1,11 +1,12 @@
 "use client"
 
 import { notFound, useRouter } from "next/navigation"
-import { useMemo, use } from "react"
+import { useMemo, use, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { cn, formatDateWithLocale } from "@/lib/utils"
 import { 
   TrendingUp, 
@@ -141,23 +142,13 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
         className="hover:bg-gray-800/30 transition-colors cursor-pointer" 
         onClick={handleRowClick}
       >
-        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
-          <span className="font-medium text-gray-100">
-            {challengeTitle}
-          </span>
-        </td>
-        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
-          <div className="flex items-center gap-1">
-            {isPositive ? 
-              <TrendingUp className="h-3 w-3 text-emerald-400" /> : 
-              <TrendingDown className="h-3 w-3 text-red-400" />
-            }
-            <span className={cn(
-              "font-medium",
-              isPositive ? "text-emerald-400" : "text-red-400"
-            )}>
-              {formatPercentage(profitRatio)}
-            </span>
+        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
+          <div className="flex items-center gap-3">
+            <div>
+              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
+                {investor.challengeId}
+              </Badge>
+            </div>
           </div>
         </td>
         <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
@@ -216,14 +207,24 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
             })()}
           </div>
         </td>
-        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
-          <div className="flex items-center gap-3">
-            <div>
-              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
-                {investor.challengeId}
-              </Badge>
-            </div>
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          <div className="flex items-center gap-1">
+            {isPositive ? 
+              <TrendingUp className="h-3 w-3 text-emerald-400" /> : 
+              <TrendingDown className="h-3 w-3 text-red-400" />
+            }
+            <span className={cn(
+              "font-medium",
+              isPositive ? "text-emerald-400" : "text-red-400"
+            )}>
+              {formatPercentage(profitRatio)}
+            </span>
           </div>
+        </td>
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+          <span className="font-medium text-gray-100">
+            {challengeTitle}
+          </span>
         </td>
         <td className="py-6 px-4 text-gray-300 min-w-[140px] whitespace-nowrap">
           <div>
@@ -247,31 +248,87 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
 
   // Challenge Section Component - simplified to show all challenges in one table
   const ChallengeTable = ({ challenges, title }: { challenges: any[], title: string }) => {
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const maxPages = 5
+
     if (challenges.length === 0) return null
 
     return (
       <div>
-        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+        <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-6 min-w-[120px] whitespace-nowrap">{t('type')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-8 min-w-[100px] whitespace-nowrap">{t('profit')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-10 min-w-[120px] whitespace-nowrap">{t('status')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 pl-6 min-w-[100px] whitespace-nowrap">{t('challenge')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">{t('startDate')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 pl-10 min-w-[140px] whitespace-nowrap">{t('endDate')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {challenges.map((investor) => (
-                    <ChallengeRow key={investor.id} investor={investor} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div className="overflow-x-auto">
+                <div className="min-w-[500px]">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('challenge')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('status')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profit')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('period')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('startDate')}</th>
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('endDate')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        // Calculate pagination
+                        const totalChallenges = Math.min(challenges.length, maxPages * itemsPerPage);
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = Math.min(startIndex + itemsPerPage, totalChallenges);
+                        const paginatedChallenges = challenges.slice(startIndex, endIndex);
+
+                        return paginatedChallenges.map((investor) => (
+                          <ChallengeRow key={investor.id} investor={investor} />
+                        ))
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Pagination - outside scrollable area, fixed at bottom */}
+              {(() => {
+                const totalChallenges = Math.min(challenges.length, maxPages * itemsPerPage);
+                const totalPages = Math.min(Math.ceil(totalChallenges / itemsPerPage), maxPages);
+                
+                return totalPages > 1 && (
+                  <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer hover:bg-gray-700"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                );
+              })()}
+            </>
           </CardContent>
         </Card>
       </div>
@@ -389,7 +446,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
           <div className="space-y-2">
             {/* Mobile: vertical layout, Desktop: horizontal layout */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 sm:gap-4">
-              <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('portfolio')}</h1>
+              <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('myPortfolio')}</h1>
               <p 
                 className="text-lg sm:text-xl text-gray-400 font-mono whitespace-nowrap cursor-pointer hover:text-blue-400 transition-colors duration-200"
                 onClick={() => {
