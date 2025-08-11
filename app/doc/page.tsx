@@ -202,6 +202,7 @@ export default function DocPage() {
                                   width={32}
                                   height={32}
                                   className="w-full h-full object-cover"
+                                  style={{ width: "auto", height: "auto" }}
                                 />
                               </div>
                               <div>
@@ -221,6 +222,7 @@ export default function DocPage() {
                                   width={32}
                                   height={32}
                                   className="w-full h-full object-cover"
+                                  style={{ width: "auto", height: "auto" }}
                                 />
                               </div>
                               <div>

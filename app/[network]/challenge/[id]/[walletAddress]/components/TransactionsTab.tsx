@@ -122,7 +122,7 @@ export function TransactionsTab({
                                           width={10}
                                           height={10}
                                           className="rounded-full"
-                                          style={{ width: '10px', height: '10px' }}
+                                          style={{ width: 'auto', height: 'auto' }}
                                         />
                                       </div>
                                     )}
@@ -154,7 +154,7 @@ export function TransactionsTab({
                                           width={10}
                                           height={10}
                                           className="rounded-full"
-                                          style={{ width: '10px', height: '10px' }}
+                                          style={{ width: 'auto', height: 'auto' }}
                                         />
                                       </div>
                                     )}
@@ -184,6 +184,7 @@ export function TransactionsTab({
                                   width={12}
                                   height={12}
                                   className="w-full h-full object-contain"
+                                  style={{ width: 'auto', height: 'auto' }}
                                 />
                               </div>
                             )}

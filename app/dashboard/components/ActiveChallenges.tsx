@@ -622,7 +622,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                                 width={12}
                                 height={12}
                                 className="rounded-full"
-                                style={{ width: '12px', height: '12px' }}
+                                style={{ width: 'auto', height: 'auto' }}
                               />
                             </div>
                           )}

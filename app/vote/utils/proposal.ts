@@ -189,12 +189,6 @@ export const processStatusBasedProposalData = (
       // This reduces API dependency and prevents rate limiting
       votingPeriodBlocks = knownConfig.votingPeriod
       votingDelayBlocks = knownConfig.votingDelay
-      
-      if (isLoadingGovernanceConfig) {
-        console.log(`Using known config for ${network} while governance config loads`)
-      } else {
-        console.log(`Using known config for ${network} (governance API unavailable)`)
-      }
     }
     
     // Convert blocks to milliseconds using network-specific block time
