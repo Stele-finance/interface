@@ -11,7 +11,7 @@ export const ARBITRUM_CHAIN_CONFIG = {
   rpcUrls: ['https://arb1.arbitrum.io/rpc'],
   blockExplorerUrls: ['https://arbiscan.io']
 };
-export const ARBITRUM_BLOCK_TIME_MS = 1; // ~1 second per block
+
 
 // Ethereum Mainnet Information
 export const ETHEREUM_CHAIN_ID = '0x1'; // Ethereum mainnet chain ID (hexadecimal)
@@ -27,6 +27,19 @@ export const ETHEREUM_CHAIN_CONFIG = {
   blockExplorerUrls: ['https://etherscan.io']
 };
 export const ETHEREUM_BLOCK_TIME_MS = 12; // ~12 seconds per block
+export const ARBITRUM_BLOCK_TIME_MS = 0.25; // ~0.25 seconds per block (250ms)
+
+// Known governance configurations (as fallbacks when API fails)
+export const KNOWN_GOVERNANCE_CONFIGS = {
+  ethereum: {
+    votingPeriod: 50400, // ~7 days at 12 sec/block
+    votingDelay: 3600,   // ~12 hours at 12 sec/block
+  },
+  arbitrum: {
+    votingPeriod: 2400000, // ~7 days at 0.25 sec/block  
+    votingDelay: 3600,     // ~0.25 hours at 0.25 sec/block
+  }
+} as const
 
 // Network-specific Contract Addresses
 const NETWORK_CONTRACTS = {
@@ -63,6 +76,38 @@ const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
   }
 } as const;
+
+// Helper function to get network-specific block time
+export const getBlockTimeSeconds = (network: string): number => {
+  switch (network) {
+    case 'arbitrum':
+      return ARBITRUM_BLOCK_TIME_MS
+    case 'ethereum':
+    default:
+      return ETHEREUM_BLOCK_TIME_MS
+  }
+}
+
+// Helper function to convert voting period from one network to another
+export const convertVotingPeriodToNetwork = (
+  votingPeriodBlocks: number,
+  fromNetwork: string,
+  toNetwork: string
+): number => {
+  if (fromNetwork === toNetwork) {
+    return votingPeriodBlocks
+  }
+
+  // Convert to seconds first (assuming the voting period is designed for the source network)
+  const fromBlockTime = getBlockTimeSeconds(fromNetwork)
+  const totalSeconds = votingPeriodBlocks * fromBlockTime
+
+  // Convert to target network blocks
+  const toBlockTime = getBlockTimeSeconds(toNetwork)
+  const convertedBlocks = Math.round(totalSeconds / toBlockTime)
+
+  return convertedBlocks
+}
 
 // Helper functions to get network-specific configurations
 export const getChainId = (network: 'ethereum' | 'arbitrum' | null): string => {

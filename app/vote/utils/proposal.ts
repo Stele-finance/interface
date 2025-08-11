@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { Proposal, BlockInfo } from "../components/types"
-import { STELE_DECIMALS } from "@/lib/constants"
+import { STELE_DECIMALS, getBlockTimeSeconds, convertVotingPeriodToNetwork, KNOWN_GOVERNANCE_CONFIGS } from "@/lib/constants"
 
 // Parse proposal details from description
 export const parseProposalDetails = (description: string) => {
@@ -32,19 +32,23 @@ export const getProposalStatus = (voteStart: string, voteEnd: string): 'active' 
   }
 }
 
-// Calculate timestamp for any block number based on Ethereum mainnet block info
-export const calculateBlockTimestamp = (targetBlockNumber: string, currentBlockInfo: BlockInfo | null): number => {
+// Calculate timestamp for any block number based on current block info
+export const calculateBlockTimestamp = (
+  targetBlockNumber: string, 
+  currentBlockInfo: BlockInfo | null, 
+  network: string = 'ethereum'
+): number => {
   if (!currentBlockInfo) {
-    console.warn('No current Ethereum block info available for timestamp calculation')
+    console.warn('No current block info available for timestamp calculation')
     return Date.now() / 1000 // Return current time as fallback
   }
   
   const targetBlock = parseInt(targetBlockNumber)
   const blockDifference = targetBlock - currentBlockInfo.blockNumber
   
-  // Always use Ethereum mainnet block time (12 seconds) since Governor uses Ethereum blocks
-  const ETHEREUM_BLOCK_TIME_SECONDS = 12
-  const estimatedTimestamp = currentBlockInfo.timestamp + (blockDifference * ETHEREUM_BLOCK_TIME_SECONDS)
+  // Use network-specific block time
+  const BLOCK_TIME_SECONDS = getBlockTimeSeconds(network)
+  const estimatedTimestamp = currentBlockInfo.timestamp + (blockDifference * BLOCK_TIME_SECONDS)
   return estimatedTimestamp
 }
 
@@ -53,7 +57,8 @@ export const processProposalData = (
   proposalData: any, 
   voteResultsData: any,
   currentBlockInfo: BlockInfo | null,
-  forceStatus?: 'pending' | 'active' | 'pending_queue' | 'queued' | 'executed' | 'canceled' | 'defeated'
+  forceStatus?: 'pending' | 'active' | 'pending_queue' | 'queued' | 'executed' | 'canceled' | 'defeated',
+  network: string = 'ethereum'
 ): Proposal => {
   const details = parseProposalDetails(proposalData.description)
   
@@ -76,8 +81,8 @@ export const processProposalData = (
     startTimestamp = parseInt(proposalData.startTimestamp)
     endTimestamp = parseInt(proposalData.endTimestamp)
   } else if (proposalData.voteStart && proposalData.voteEnd) {
-    startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo)
-    endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo)
+    startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, network)
+    endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, network)
   } else {
     // Fallback to current time
     const now = Date.now() / 1000
@@ -139,7 +144,9 @@ export const processProposalData = (
 export const processStatusBasedProposalData = (
   proposalData: any,
   currentBlockInfo: BlockInfo | null,
-  governanceConfig?: any
+  governanceConfig?: any,
+  network: string = 'ethereum',
+  isLoadingGovernanceConfig: boolean = false
 ): Proposal => {
   const details = parseProposalDetails(proposalData.description)
   
@@ -160,20 +167,40 @@ export const processStatusBasedProposalData = (
   
   if (proposalData.voteStart && proposalData.voteEnd && currentBlockInfo) {
     // Use actual voting period from blockchain data
-    const startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo)
-    const endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo)
+    const startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, network)
+    const endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, network)
     startTime = new Date(startTimestamp * 1000)
     endTime = new Date(endTimestamp * 1000)
   } else {
     // Fallback to estimated periods based on status and timestamps
-    // Use actual governance config if available, otherwise use default estimates
-    const votingPeriodBlocks = governanceConfig?.votingPeriod || 21600 // Default: ~3 days at 12 sec/block
-    const votingDelayBlocks = governanceConfig?.votingDelay || 7200 // Default: ~1 day at 12 sec/block
+    // Prefer actual governance config from contract, only use defaults as last resort
+    let votingPeriodBlocks: number
+    let votingDelayBlocks: number
     
-    // Convert blocks to milliseconds using Ethereum block time since Governor uses Ethereum blocks
-    const ETHEREUM_BLOCK_TIME_MS = 12 * 1000 // 12 seconds per block
-    const votingPeriodMs = votingPeriodBlocks * ETHEREUM_BLOCK_TIME_MS
-    const votingDelayMs = votingDelayBlocks * ETHEREUM_BLOCK_TIME_MS
+    // Get known config for the network
+    const knownConfig = KNOWN_GOVERNANCE_CONFIGS[network as keyof typeof KNOWN_GOVERNANCE_CONFIGS] || KNOWN_GOVERNANCE_CONFIGS.ethereum
+    
+    if (governanceConfig?.votingPeriod && governanceConfig?.votingDelay) {
+      // Use actual governance config from contract (preferred)
+      votingPeriodBlocks = governanceConfig.votingPeriod
+      votingDelayBlocks = governanceConfig.votingDelay
+    } else {
+      // Use known configurations (whether loading or failed)
+      // This reduces API dependency and prevents rate limiting
+      votingPeriodBlocks = knownConfig.votingPeriod
+      votingDelayBlocks = knownConfig.votingDelay
+      
+      if (isLoadingGovernanceConfig) {
+        console.log(`Using known config for ${network} while governance config loads`)
+      } else {
+        console.log(`Using known config for ${network} (governance API unavailable)`)
+      }
+    }
+    
+    // Convert blocks to milliseconds using network-specific block time
+    const BLOCK_TIME_MS = getBlockTimeSeconds(network) * 1000
+    const votingPeriodMs = votingPeriodBlocks * BLOCK_TIME_MS
+    const votingDelayMs = votingDelayBlocks * BLOCK_TIME_MS
     
     if (proposalData.status === 'PENDING') {
       // For pending proposals, voting hasn't started yet

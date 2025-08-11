@@ -8,7 +8,7 @@ import {
   ScanSiteInfo,
   TimelineItem
 } from "../components/types"
-import { STELE_DECIMALS } from "@/lib/constants"
+import { STELE_DECIMALS, getBlockTimeSeconds } from "@/lib/constants"
 
 // Helper function to get scan site URL based on network
 export const getScanSiteUrl = (network: NetworkType | null): string => {
@@ -124,18 +124,19 @@ export const calculateProposalTimestamps = (
   startBlock: string,
   endBlock: string,
   currentBlockNumber?: number,
-  currentBlockTimestamp?: number
+  currentBlockTimestamp?: number,
+  network: NetworkType | null = 'ethereum'
 ): ProposalTimestamps => {
-  // Default Ethereum block time (12 seconds per block)
-  const ETHEREUM_BLOCK_TIME_SECONDS = 12
+  // Get network-specific block time
+  const BLOCK_TIME_SECONDS = getBlockTimeSeconds(network || 'ethereum')
   
   // If we have current block info, calculate based on block differences
   if (currentBlockNumber && currentBlockTimestamp) {
     const startBlockDiff = parseInt(startBlock) - currentBlockNumber
     const endBlockDiff = parseInt(endBlock) - currentBlockNumber
     
-    const startTimestamp = currentBlockTimestamp + (startBlockDiff * ETHEREUM_BLOCK_TIME_SECONDS)
-    const endTimestamp = currentBlockTimestamp + (endBlockDiff * ETHEREUM_BLOCK_TIME_SECONDS)
+    const startTimestamp = currentBlockTimestamp + (startBlockDiff * BLOCK_TIME_SECONDS)
+    const endTimestamp = currentBlockTimestamp + (endBlockDiff * BLOCK_TIME_SECONDS)
     
     return {
       startTime: new Date(startTimestamp * 1000),
@@ -149,8 +150,8 @@ export const calculateProposalTimestamps = (
   const startBlockDiff = parseInt(startBlock) - estimatedCurrentBlock
   const endBlockDiff = parseInt(endBlock) - estimatedCurrentBlock
   
-  const startTimestamp = now + (startBlockDiff * ETHEREUM_BLOCK_TIME_SECONDS)
-  const endTimestamp = now + (endBlockDiff * ETHEREUM_BLOCK_TIME_SECONDS)
+  const startTimestamp = now + (startBlockDiff * BLOCK_TIME_SECONDS)
+  const endTimestamp = now + (endBlockDiff * BLOCK_TIME_SECONDS)
   
   return {
     startTime: new Date(startTimestamp * 1000),

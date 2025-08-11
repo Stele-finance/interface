@@ -11,15 +11,16 @@ interface GovernanceConfig {
   quorumDenominator: number
 }
 
-export const useGovernanceConfig = () => {
+export const useGovernanceConfig = (network: 'ethereum' | 'arbitrum' = 'ethereum', enabled: boolean = true) => {
   const { data: config, isLoading, error, refetch } = useQuery<GovernanceConfig>({
-    queryKey: ['governanceConfig'],
+    queryKey: ['governanceConfig', network],
+    enabled: enabled, // Allow disabling the query
     queryFn: async () => {
-      // Add delay to prevent overwhelming RPC
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 1500 + 1000))
+      // Add small fixed delay to prevent overwhelming RPC
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Use ethereum as default network for governance
-      const defaultNetwork = 'ethereum'
+      // Use the specified network for governance
+      const defaultNetwork = network
       const rpcUrl = getRPCUrl(defaultNetwork)
         
       const provider = new ethers.JsonRpcProvider(rpcUrl)
@@ -50,12 +51,14 @@ export const useGovernanceConfig = () => {
 
       return governanceConfig
     },
-    staleTime: 15 * 60 * 1000, // Governance config rarely changes - keep fresh for 15 minutes
-    refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
+    staleTime: 24 * 60 * 60 * 1000, // Governance config rarely changes - keep fresh for 24 hours
+    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+    refetchInterval: false, // Disable automatic refetching
     retry: 1, // Reduce retry attempts
-    retryDelay: (attemptIndex) => Math.min(3000 * 2 ** attemptIndex, 60000), // Longer delay between retries
+    retryDelay: (attemptIndex) => Math.min(5000 * 2 ** attemptIndex, 30000), // Longer delay between retries
     refetchOnWindowFocus: false, // Disable refetch on window focus
     refetchOnMount: false, // Only refetch if data is stale
+    refetchOnReconnect: false, // Disable refetch on reconnect
   })
 
   return {

@@ -510,7 +510,7 @@ export function Header() {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link 
-                href="#"
+                href="/doc"
                 className="cursor-pointer"
               >
                 <FileText className="mr-2 h-4 w-4" />
@@ -623,7 +623,7 @@ export function Header() {
                 </Link>
                 
                 <Link 
-                  href="#"
+                  href="/doc"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
