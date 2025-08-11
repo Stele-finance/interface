@@ -49,14 +49,24 @@ export default function VotePage() {
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [mountTimestamp, setMountTimestamp] = useState(Date.now())
   
-  // Fetch governance configuration from smart contract
-  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig()
+  // Filter network for subgraph usage (exclude solana)
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  // Fetch governance configuration from smart contract (temporarily disabled to prevent rate limiting)
+  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false)
+  
+  // Debug: Log governance config when it loads
+  useEffect(() => {
+    if (governanceConfig && !isLoadingGovernanceConfig) {
+      //console.log(`Governance config loaded for ${subgraphNetwork}:`, governanceConfig)
+    }
+    if (governanceConfigError) {
+      console.error(`Failed to load governance config for ${subgraphNetwork}:`, governanceConfigError)
+    }
+  }, [governanceConfig, isLoadingGovernanceConfig, governanceConfigError, subgraphNetwork])
   
   // Get current block number with global caching
   const { data: blockInfo, isLoading: isLoadingBlockNumber } = useBlockNumber()
-
-  // Filter network for subgraph usage (exclude solana)
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
 
   // Get wallet token info with global caching (use network-specific token)
   const { data: walletTokenInfo, isLoading: isLoadingWalletTokenInfo, refetch: refetchWalletTokenInfo } = useWalletTokenInfo(address, subgraphNetwork)
@@ -162,7 +172,7 @@ export default function VotePage() {
   const processedProposals = useMemo(() => {
     if (shouldFetchAll && allProposalsByStatus?.proposals && allProposalsByStatus.proposals.length > 0) {
       return allProposalsByStatus.proposals.map((proposal: any) => 
-        processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig))
+        processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig, subgraphNetwork, isLoadingGovernanceConfig))
     }
     return []
   }, [shouldFetchAll, allProposalsByStatus?.proposals, currentBlockInfo, governanceConfig])
@@ -170,7 +180,7 @@ export default function VotePage() {
   const processedActiveProposals = useMemo(() => {
     if (shouldFetchActive && actionableProposals?.proposals && actionableProposals.proposals.length > 0) {
       return actionableProposals.proposals
-        .map((proposal: any) => processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig))
+        .map((proposal: any) => processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig, subgraphNetwork))
         .filter((proposal: any) => {
           const visibleStatuses = ['pending', 'active', 'pending_queue', 'queued', 'executed', 'defeated']
           return visibleStatuses.includes(proposal.status)
@@ -182,7 +192,7 @@ export default function VotePage() {
   const processedCompletedProposals = useMemo(() => {
     if (shouldFetchCompleted && completedProposalsByStatus?.proposals && completedProposalsByStatus.proposals.length > 0) {
       return completedProposalsByStatus.proposals
-        .map((proposal: any) => processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig))
+        .map((proposal: any) => processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig, subgraphNetwork))
         .filter((proposal: any) => proposal.status === 'executed')
     }
     return []

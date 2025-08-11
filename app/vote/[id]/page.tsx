@@ -138,9 +138,31 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     const cachedTokenBalance = searchParams.get('tokenBalance') || '0'
     const cachedDelegatedTo = searchParams.get('delegatedTo') || ''
 
-    // Parse dates
-    const startTime = startTimeStr ? new Date(startTimeStr) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    const endTime = endTimeStr ? new Date(endTimeStr) : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    // Parse dates - if from URL params, use them; otherwise calculate based on subgraph data
+    let startTime: Date
+    let endTime: Date
+    
+    if (startTimeStr && endTimeStr) {
+      // Use provided timestamps from URL
+      startTime = new Date(startTimeStr)
+      endTime = new Date(endTimeStr)
+    } else if (subgraphProposal?.voteStart && subgraphProposal?.voteEnd && blockInfo) {
+      // Calculate from blockchain data using network-specific block time
+      const { calculateProposalTimestamps } = require('./utils/proposal-detail')
+      const timestamps = calculateProposalTimestamps(
+        subgraphProposal.voteStart,
+        subgraphProposal.voteEnd,
+        blockInfo.blockNumber,
+        blockInfo.timestamp,
+        subgraphNetwork
+      )
+      startTime = timestamps.startTime
+      endTime = timestamps.endTime
+    } else {
+      // Fallback to default periods
+      startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      endTime = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    }
 
     // Parse vote counts (use subgraph data if available, otherwise use URL params)
     const votesFor = voteResult ? parseFloat(ethers.formatUnits(voteResult.forVotes, STELE_DECIMALS)) : 
