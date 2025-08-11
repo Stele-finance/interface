@@ -1091,6 +1091,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                                       width={12}
                                                       height={12}
                                                       className="w-full h-full object-contain"
+                                                      style={{ width: 'auto', height: 'auto' }}
                                                     />
                                                   </div>
                                                 )}
@@ -1121,6 +1122,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                                                       width={12}
                                                       height={12}
                                                       className="w-full h-full object-contain"
+                                                      style={{ width: 'auto', height: 'auto' }}
                                                     />
                                                   </div>
                                                 )}
@@ -1376,7 +1378,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                            width={24}
                            height={24}
                            className="rounded-full"
-                           style={{ width: '24px', height: '24px' }}
+                           style={{ width: 'auto', height: 'auto' }}
                          />
                          <span className="text-xl text-white">Mainnet</span>
                        </>
@@ -1388,7 +1390,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                            width={24}
                            height={24}
                            className="rounded-full"
-                           style={{ width: '24px', height: '24px' }}
+                           style={{ width: 'auto', height: 'auto' }}
                          />
                          <span className="text-xl text-white">Arbitrum</span>
                        </>
@@ -1400,7 +1402,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                            width={24}
                            height={24}
                            className="rounded-full"
-                           style={{ width: '24px', height: '24px' }}
+                           style={{ width: 'auto', height: 'auto' }}
                          />
                          <span className="text-xl text-white">Mainnet</span>
                        </>

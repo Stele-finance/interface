@@ -90,7 +90,7 @@ export function PortfolioTab({
                                   width={14}
                                   height={14}
                                   className="rounded-full"
-                                  style={{ width: '14px', height: '14px' }}
+                                  style={{ width: 'auto', height: 'auto' }}
                                 />
                               </div>
                             )}

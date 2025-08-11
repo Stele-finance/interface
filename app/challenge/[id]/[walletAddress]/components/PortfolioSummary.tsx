@@ -193,7 +193,7 @@ export function PortfolioSummary({
                      width={24}
                      height={24}
                      className="rounded-full"
-                     style={{ width: '24px', height: '24px' }}
+                     style={{ width: 'auto', height: 'auto' }}
                    />
                    <span className="text-xl text-white">Mainnet</span>
                  </>
@@ -205,7 +205,7 @@ export function PortfolioSummary({
                      width={24}
                      height={24}
                      className="rounded-full"
-                     style={{ width: '24px', height: '24px' }}
+                     style={{ width: 'auto', height: 'auto' }}
                    />
                    <span className="text-xl text-white">Arbitrum</span>
                  </>
@@ -217,7 +217,7 @@ export function PortfolioSummary({
                      width={24}
                      height={24}
                      className="rounded-full"
-                     style={{ width: '24px', height: '24px' }}
+                     style={{ width: 'auto', height: 'auto' }}
                    />
                    <span className="text-xl text-white">Mainnet</span>
                  </>
