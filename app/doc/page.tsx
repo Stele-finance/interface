@@ -21,7 +21,7 @@ import Image from "next/image"
 // Responsive image component for documentation
 const ResponsiveDocImage = ({ imageName, alt, caption }: { imageName: string, alt: string, caption: string }) => {
   // Images to display at larger size
-  const largeImages = ['swap1.png', 'create1.png', 'create3.png', 'join1.png', 'join2.png', 'join4.png']
+  const largeImages = ['swap1.png', 'create1.png', 'create3.png', 'join1.png', 'join2.png', 'join4.png', 'vote2.png', 'vote3.png', 'vote4.png', 'vote5.png', 'vote6.png', 'vote7.png', 'getrewards1.png', 'getrewards2.png', 'getrewards3.png', 'getrewards4.png', 'getrewards5.png', 'getrewards6.png', 'register1.png', 'register2.png', 'register3.png', 'register4.png', 'register5.png']
   const isLargeImage = largeImages.includes(imageName)
   const pcMaxWidth = isLargeImage ? '800px' : '600px'
   const mobileMaxWidth = isLargeImage ? '500px' : '400px'
@@ -195,13 +195,13 @@ export default function DocPage() {
                         <Card className="bg-muted/30 border-border/50">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden">
+                              <div className="w-8 h-8 flex items-center justify-center">
                                 <Image
-                                  src="/networks/small/ethereum.png"
+                                  src="/networks/ethereum.png"
                                   alt="Ethereum"
                                   width={32}
                                   height={32}
-                                  className="w-full h-full object-cover"
+                                  className="object-contain"
                                   style={{ width: "auto", height: "auto" }}
                                 />
                               </div>
@@ -215,13 +215,13 @@ export default function DocPage() {
                         <Card className="bg-muted/30 border-border/50">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden">
+                              <div className="w-8 h-8 flex items-center justify-center">
                                 <Image
-                                  src="/networks/small/arbitrum.png"
+                                  src="/networks/arbitrum.png"
                                   alt="Arbitrum"
                                   width={32}
                                   height={32}
-                                  className="w-full h-full object-cover"
+                                  className="object-contain"
                                   style={{ width: "auto", height: "auto" }}
                                 />
                               </div>
@@ -680,19 +680,133 @@ export default function DocPage() {
                                 )}
 
                                 {activeSection === "vote" && (
-                                  <div>
+                                  <div className="space-y-6">
                                     <p>You can participate in platform governance to decide the future:</p>
-                                    <ol>
-                                      <li>1. Delegate STL tokens to yourself</li>
-                                      <li>2. Check proposal list</li>
-                                      <li>3. Select For/Against/Abstain</li>
-                                      <li>4. Write voting reason (optional)</li>
-                                      <li>5. Execute vote</li>
-                                    </ol>
-
-                                    <br />
                                     
-                                    <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                                    {/* Governance Step 1 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                        <p className="font-medium">Delegate STL tokens on Vote  page</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote1.png" 
+                                        alt="Delegate to self" 
+                                        caption="Delegate to self" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 2 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                        <p className="font-medium">Click Create button on Vote page</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Governance Step 3 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                        <p className="font-medium">Write proposal title and descriptions</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote2.png" 
+                                        alt="Create proposal page" 
+                                        caption="Create proposal page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 4 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                                        <p className="font-medium">Set proposal type details and click Create button</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote3.png" 
+                                        alt="Create proposal page" 
+                                        caption="Create proposal page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 5 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">5</div>
+                                        <p className="font-medium">Execute transaction</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Governance Step 6 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">6</div>
+                                        <p className="font-medium">Click proposal on Vote page</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote4.png" 
+                                        alt="Proposal table on Vote Page" 
+                                        caption="Proposal table on Vote page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 7 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">7</div>
+                                        <p className="font-medium">Check proposal on Proposal page</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote5.png" 
+                                        alt="Proposal details page" 
+                                        caption="Proposal details page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 8 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">8</div>
+                                        <p className="font-medium">Select For/Against/Abstain and click Submit Vote button</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote6.png" 
+                                        alt="Proposal details page" 
+                                        caption="Proposal details page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 9 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">9</div>
+                                        <p className="font-medium">Check proposal on Vote page</p>
+                                      </div>
+                                      <ResponsiveDocImage 
+                                        imageName="vote7.png" 
+                                        alt="Proposal table on Vote Page" 
+                                        caption="Proposal table on Vote page" 
+                                      />
+                                    </div>
+
+                                    {/* Governance Step 10 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">8</div>
+                                        <p className="font-medium">If vote period ends, Queue proposal</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Governance Step 11 */}
+                                    <div className="space-y-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">9</div>
+                                        <p className="font-medium">Execute proposal</p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800 mt-6">
                                       <div className="flex items-start gap-3">
                                         <Vote className="h-5 w-5 text-green-500 mt-0.5" />
                                         <div>

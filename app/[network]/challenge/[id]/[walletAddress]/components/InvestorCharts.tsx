@@ -212,7 +212,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     const performancePercent = Math.abs(metrics?.gainLossPercentage || 0).toFixed(2)
     const userAddress = `${investor.slice(0, 6)}...${investor.slice(-4)}`
     
-    const tweetText = `Check out User ${userAddress} in Challenge ${challengeId} on Stele Finance! Investors achieved the following investment returns: $${portfolioValue} ${performanceSign} ${performancePercent}%`
+    const tweetText = `Check out User ${userAddress} in Challenge ${challengeId} on Stele Finance! Investor achieved the following investment returns: $${portfolioValue} ${performanceSign} ${performancePercent}%`
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(currentUrl)}`
     window.open(twitterUrl, '_blank')
   }
