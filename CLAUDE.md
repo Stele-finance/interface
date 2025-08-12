@@ -1,10 +1,12 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Development Commands
 
 **Node Version**: Use Node.js 23 (`nvm use 23`)
 
 ```bash
-nvm use 23
-
 # Install dependencies
 npm install
 
