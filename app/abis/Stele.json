@@ -7,6 +7,11 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "_wethToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
           "name": "_usdToken",
           "type": "address"
         },
@@ -43,7 +48,7 @@
         },
         {
           "indexed": false,
-          "internalType": "enum ChallengeType",
+          "internalType": "enum IStele.ChallengeType",
           "name": "challengeType",
           "type": "uint8"
         },
@@ -58,12 +63,6 @@
           "internalType": "uint256",
           "name": "entryFee",
           "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "maxAssets",
-          "type": "uint8"
         }
       ],
       "name": "Create",
@@ -137,6 +136,19 @@
         }
       ],
       "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "nftContract",
+          "type": "address"
+        }
+      ],
+      "name": "PerformanceNFTContractSet",
       "type": "event"
     },
     {
@@ -347,19 +359,6 @@
     },
     {
       "inputs": [],
-      "name": "WETH",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "challengeCounter",
       "outputs": [
         {
@@ -387,7 +386,7 @@
           "type": "uint256"
         },
         {
-          "internalType": "enum ChallengeType",
+          "internalType": "enum IStele.ChallengeType",
           "name": "challengeType",
           "type": "uint8"
         },
@@ -417,9 +416,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint8",
-          "name": "maxAssets",
-          "type": "uint8"
+          "internalType": "uint32",
+          "name": "totalUsers",
+          "type": "uint32"
         }
       ],
       "stateMutability": "view",
@@ -428,7 +427,7 @@
     {
       "inputs": [
         {
-          "internalType": "enum ChallengeType",
+          "internalType": "enum IStele.ChallengeType",
           "name": "challengeType",
           "type": "uint8"
         }
@@ -459,6 +458,60 @@
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "challengeId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getChallengeInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum IStele.ChallengeType",
+          "name": "_challengeType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_startTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_endTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_totalRewards",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_seedMoney",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_entryFee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_totalUsers",
+          "type": "uint32"
         }
       ],
       "stateMutability": "view",
@@ -591,7 +644,7 @@
     {
       "inputs": [
         {
-          "internalType": "enum ChallengeType",
+          "internalType": "enum IStele.ChallengeType",
           "name": "",
           "type": "uint8"
         }
@@ -621,8 +674,34 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "challengeId",
+          "type": "uint256"
+        }
+      ],
+      "name": "mintPerformanceNFT",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "performanceNFTContract",
       "outputs": [
         {
           "internalType": "address",
@@ -732,6 +811,19 @@
         }
       ],
       "name": "setMaxAssets",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_nftContract",
+          "type": "address"
+        }
+      ],
+      "name": "setPerformanceNFTContract",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -863,6 +955,19 @@
           "internalType": "uint8",
           "name": "",
           "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "wethToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
