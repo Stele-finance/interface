@@ -1,7 +1,6 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
-import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
