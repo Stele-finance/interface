@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
-import { Trophy, BarChart3, Vote } from "lucide-react"
+import { Trophy, BarChart3, Vote, Image as ImageIcon } from "lucide-react"
 import { cn, getNetworkLogo, getWalletLogo, detectActualWalletType } from "@/lib/utils"
 import { User, Wallet, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
 import {
@@ -332,17 +332,18 @@ export function Header() {
           </DropdownMenu>
           
           <Link 
-            href="/vote"
+            href="/nft"
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-              pathname.includes("/vote")
+              pathname.includes("/nft")
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
-            <Vote className="h-4 w-4" />
-            {t('vote')}
+            <ImageIcon className="h-4 w-4" />
+            NFTs
           </Link>
+          
         </nav>
       </div>
 
@@ -499,6 +500,16 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600 z-[60]">
             <DropdownMenuItem asChild>
               <Link 
+                href="/vote"
+                className="cursor-pointer"
+              >
+                <Vote className="mr-2 h-4 w-4" />
+                {t('vote')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link 
                 href="https://github.com/Stele-finance/interface"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -590,6 +601,20 @@ export function Header() {
                 >
                   <User className="h-5 w-5 mr-3" />
                   {t('myPortfolios')}
+                </Link>
+                
+                <Link 
+                  href="/nft"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
+                    pathname.includes("/nft")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <ImageIcon className="h-5 w-5 mr-3" />
+                  NFTs
                 </Link>
                 
                 <Link 
