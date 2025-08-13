@@ -3,6 +3,7 @@
 import React, { useState, use, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
 import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
 import { AssetSwap } from "../../../../swap/components/AssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
@@ -40,7 +41,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
-  const { network: routeNetwork, id: challengeId, walletAddress } = use(params)
+  const { id: challengeId, walletAddress } = use(params)
   const router = useRouter()
   
   // Use hooks
@@ -50,13 +51,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
-  const { data: investorData, isLoading: isLoadingInvestor, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
-  const { data: userTokens = [], isLoading: isLoadingTokens, error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
-  const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
+  const { data: investorData, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
+  const { data: userTokens = [], error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
+  const { data: challengeData, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
   
   // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
-  const { data: uniswapPrices, isLoading: isLoadingUniswap, error: uniswapError } = useUserTokenPrices(
+  const { data: uniswapPrices, isLoading: isLoadingUniswap } = useUserTokenPrices(
     investorData?.investor?.isRegistered === true ? [] : userTokens,
     subgraphNetwork
   )
@@ -72,6 +73,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
 
   // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -245,10 +247,98 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     setShowRegisterModal(false)
   }
 
+  // Handle mint NFT
+  const handleMintNFT = async () => {
+    setIsMinting(true);
+    
+    try {
+      // WalletConnect only - use getProvider from useWallet hook
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      }
+
+      // Request account access
+      const accounts = await provider.send('eth_requestAccounts', []);
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts found. Please connect your wallet first.");
+      }
+
+      // Verify the connected wallet matches the investor address
+      const connectedWalletAddress = accounts[0].toLowerCase();
+      if (connectedWalletAddress !== walletAddress.toLowerCase()) {
+        throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
+      }
+
+      // Get current network
+      const chainId = await provider.send('eth_chainId', []);
+      
+      // Get contract address for current network
+      const contractAddress = getSteleContractAddress(network);
+      
+      // Use provider directly (it's already a BrowserProvider from getProvider)
+      const signer = await provider.getSigner();
+
+      // Create contract instance
+      const contract = new ethers.Contract(contractAddress, SteleABI as any, signer);
+
+      // Call mintPerformanceNFT function
+      const transaction = await contract.mintPerformanceNFT(challengeId);
+      
+      // Show toast notification
+      toast({
+        title: t('mintingNFT'),
+        description: `Transaction sent: ${transaction.hash}`,
+        action: (
+          <ToastAction 
+            altText={t('viewOnExplorer')} 
+            onClick={() => window.open(getExplorerUrl(chainId, transaction.hash), '_blank')}
+          >
+            {t('viewOnExplorer')}
+          </ToastAction>
+        ),
+      });
+
+      // Wait for transaction confirmation
+      const receipt = await transaction.wait();
+      
+      if (receipt.status === 1) {
+        // Show success toast
+        toast({
+          title: t('nftMintedSuccessfully'),
+          description: `NFT minted successfully! Transaction: ${transaction.hash}`,
+          action: (
+            <ToastAction 
+              altText={t('viewOnExplorer')} 
+              onClick={() => window.open(getExplorerUrl(chainId, transaction.hash), '_blank')}
+            >
+              {t('viewOnExplorer')}
+            </ToastAction>
+          ),
+        });
+      }
+      
+    } catch (error: any) {
+      console.error("Error minting NFT:", error);
+      
+      // Show toast notification for error
+      toast({
+        variant: "destructive",
+        title: "NFT Minting Failed",
+        description: error.message || "An unknown error occurred",
+      });
+      
+    } finally {
+      setIsMinting(false);
+    }
+  }
+
   // Computed values
   const portfolioMetrics = investorData?.investor ? calculatePortfolioMetrics(investorData.investor) : null
   const challengeDetails = getChallengeDetails(challengeData)
   const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
+  const isChallengeEnded = challengeDetails && new Date() > challengeDetails.endTime;
 
   // Handle loading and error states - removed main loading state for better UX
 
@@ -256,8 +346,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   if (investorError || tokensError || challengeError || transactionsError || !investorData?.investor) {    
     return <ErrorState challengeId={challengeId} walletAddress={walletAddress} />
   }
-
-  const investor = investorData.investor
 
   return (
     <>
@@ -412,7 +500,14 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   />
                    
                    {/* Desktop Registered status - Show on desktop, hide on mobile */}
-                  {investorData?.investor?.isRegistered === true && <RegisteredStatus />}
+                  {investorData?.investor?.isRegistered === true && (
+                    <RegisteredStatus 
+                      challengeId={challengeId}
+                      onMintNFT={handleMintNFT}
+                      isMinting={isMinting}
+                      isChallengeEnded={!!isChallengeEnded}
+                    />
+                  )}
                  </div>
               </div>
               
@@ -477,6 +572,36 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       </div>
       </div>
     </div>
+
+      {/* Mobile Mint NFT Button - Show only when registered and challenge ended */}
+      {investorData?.investor?.isRegistered === true && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+          <div className="p-4">
+            <Button 
+              variant="default" 
+              size="lg" 
+              onClick={handleMintNFT}
+              disabled={isMinting}
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+            >
+              {isMinting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Minting...
+                </>
+              ) : (
+                <>
+                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {t('mintNFT')}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Registration Confirmation Modal */}
       <AlertDialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
