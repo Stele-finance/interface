@@ -209,7 +209,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     const currentUrl = window.location.href
     const portfolioValue = (currentPortfolioValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     const performanceSign = (metrics?.isPositive || false) ? '▲' : '▼'
-    const performancePercent = Math.abs(metrics?.gainLossPercentage || 0).toFixed(2)
+    const performancePercent = (Math.floor(Math.abs(metrics?.gainLossPercentage || 0) * 10000) / 10000).toFixed(4)
     const userAddress = `${investor.slice(0, 6)}...${investor.slice(-4)}`
     
     const tweetText = `Check out User ${userAddress} in Challenge ${challengeId} on Stele Finance! Investor achieved the following investment returns: $${portfolioValue} ${performanceSign} ${performancePercent}%`
@@ -314,7 +314,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       return (
         <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-4 py-3 shadow-xl backdrop-blur-sm min-w-[280px]">
           <p className="text-gray-100 text-sm font-medium mb-2">
-            {t('portfolioValue')}: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {t('portfolioValue')}: ${(Math.floor((value || 0) * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           {isRealTime && (
             <div className="flex items-center gap-1 mb-2">
@@ -362,10 +362,10 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     </div>
                     <div className="flex items-center gap-2 ml-auto">
                     <span className="text-gray-100 text-xs font-medium">
-                        ${ranking.value.toFixed(2)}
+                        ${(Math.floor(ranking.value * 100) / 100).toFixed(2)}
                       </span>
                       <span className={`text-xs ${ranking.profitRatio >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {ranking.profitRatio >= 0 ? '+' : ''}{ranking.profitRatio.toFixed(2)}%
+                        {ranking.profitRatio >= 0 ? '+' : ''}{(Math.floor(ranking.profitRatio * 100) / 100).toFixed(2)}%
                     </span>
                     </div>
                   </div>
@@ -383,7 +383,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
                     </span>
                   </div>
                   <span className={`text-xs font-medium ${isRealTime ? 'text-green-400' : isRegistered ? 'text-blue-400' : 'text-orange-400'}`}>
-                    ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(Math.floor((value || 0) * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -565,11 +565,11 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         <div className="flex items-baseline justify-between gap-2 sm:gap-3">
           <div className="flex items-baseline gap-2 sm:gap-3">
             <CardTitle className="text-4xl font-bold text-gray-100">
-              ${currentPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ${(Math.floor(currentPortfolioValue * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </CardTitle>
             <div className="flex items-center gap-1">
               <span className={`text-sm font-medium ${metrics.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                {metrics.isPositive ? '▲' : '▼'} {Math.abs(metrics.gainLossPercentage).toFixed(2)}%
+                {metrics.isPositive ? '▲' : '▼'} {(Math.floor(Math.abs(metrics.gainLossPercentage) * 10000) / 10000).toFixed(4)}%
               </span>
             </div>
           </div>

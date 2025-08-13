@@ -35,7 +35,8 @@ export function InvestorsTab({ challengeId, subgraphNetwork }: InvestorsTabProps
   // Helper function to format USD value
   const formatUSD = (value: string) => {
     const num = parseFloat(value)
-    return `$${num.toFixed(2)}`
+    const truncated = Math.floor(num * 100) / 100
+    return `$${truncated.toFixed(2)}`
   }
 
   // Helper function to format user address
