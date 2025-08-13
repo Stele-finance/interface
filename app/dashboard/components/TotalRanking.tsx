@@ -47,7 +47,7 @@ export function TotalRanking({ className, network }: TotalRankingProps) {
   // Format profit ratio as percentage
   const formatProfitRatio = (profitRatio: string) => {
     const ratio = parseFloat(profitRatio)
-    return `${ratio.toFixed(3)}%`
+    return `${ratio.toFixed(4)}%`
   }
 
   // Handle row click to navigate to investor page

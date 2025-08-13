@@ -260,10 +260,10 @@ export function PortfolioSummary({
                   onMouseLeave={() => handleMouseLeave(setShowOnChainTooltip, onChainTooltipTimer, setOnChainTooltipTimer)}
                 >
                   <div className="text-4xl text-white">
-                    ${currentValue.toFixed(2)}
+                    ${(Math.floor(currentValue * 100) / 100).toFixed(2)}
                   </div>
                   <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                    ({isPositive ? '+' : ''}{gainLossPercentage.toFixed(2)}%)
+                    ({isPositive ? '+' : ''}{(Math.floor(gainLossPercentage * 10000) / 10000).toFixed(4)}%)
                   </div>
                 </div>
               </TooltipTrigger>
@@ -297,7 +297,7 @@ export function PortfolioSummary({
                           onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
                         >
                           <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-                          {t('live')}: ${realTimePortfolio.totalValue.toFixed(2)} ({isRealTimePositive ? '+' : ''}{realTimeGainLossPercentage.toFixed(2)}%)
+                          {t('live')}: ${(Math.floor(realTimePortfolio.totalValue * 100) / 100).toFixed(2)} ({isRealTimePositive ? '+' : ''}{(Math.floor(realTimeGainLossPercentage * 10000) / 10000).toFixed(4)}%)
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>

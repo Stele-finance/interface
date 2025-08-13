@@ -27,7 +27,8 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
   const formatScore = (score: string) => {
     try {
       const scoreValue = parseFloat(score);
-      return scoreValue.toFixed(2);
+      const truncated = Math.floor(scoreValue * 100) / 100;
+      return truncated.toFixed(2);
     } catch {
       return '0.00';
     }
@@ -41,7 +42,8 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
     
     // Convert profit ratio to percentage
     const ratioValue = parseFloat(profitRatio);
-    return `${ratioValue.toFixed(4)}%`;
+    const truncated = Math.floor(ratioValue * 10000) / 10000;
+    return `${truncated.toFixed(4)}%`;
   };
 
   const getRankIcon = (rank: number) => {

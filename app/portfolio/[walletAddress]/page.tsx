@@ -99,7 +99,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
   }
 
   const formatPercentage = (value: number) => {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(3)}%`
+    return `${value >= 0 ? '+' : ''}${value.toFixed(4)}%`
   }
 
   // Challenge Table Row Component
