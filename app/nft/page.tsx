@@ -26,12 +26,9 @@ export default function NFTPage() {
         <div className="text-center py-12">
           <div className="text-red-500 mb-4">
             <ImageIcon className="mx-auto h-16 w-16 mb-4" />
-            <h2 className="text-2xl font-bold mb-2">{t('errorLoadingNFTs')}</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('errorLoadingTokens')}</h2>
             <p className="text-muted-foreground mb-6">{error}</p>
           </div>
-          <Button onClick={() => refetch()} variant="outline">
-            {t('tryAgain')}
-          </Button>
         </div>
       </div>
     )
