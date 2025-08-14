@@ -11,6 +11,7 @@ import { useRecentChallenges, RecentChallenge } from "../hooks/useRecentChalleng
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { formatDateWithLocale } from "@/lib/utils"
+import Image from "next/image"
 
 export function RecentChallengesTable() {
   const { t, language } = useLanguage()
@@ -163,11 +164,36 @@ export function RecentChallengesTable() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('challenge')}</th>
+                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="relative">
+                              <Trophy className="h-4 w-4 text-yellow-500" />
+                              {/* Show network icon only when connected to Arbitrum */}
+                              {subgraphNetwork === 'arbitrum' && (
+                                <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                  <Image 
+                                    src="/networks/small/arbitrum.png" 
+                                    alt="Arbitrum"
+                                    width={8}
+                                    height={8}
+                                    className="rounded-full"
+                                    style={{ width: 'auto', height: 'auto' }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            {t('challenge')}
+                          </div>
+                        </th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('prize')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('status')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('users')}</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('period')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">⏰</span>
+                            {t('period')}
+                          </div>
+                        </th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('startDate')}</th>
                         <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('endDate')}</th>
                       </tr>
@@ -188,9 +214,11 @@ export function RecentChallengesTable() {
                             onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
                           >
                             <td className="py-6 pl-6 pr-4">
-                              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                                {challenge.challengeId}
-                              </Badge>
+                              <div className="ml-6">
+                                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                                  {challenge.challengeId}
+                                </Badge>
+                              </div>
                             </td>
                             <td className="py-6 px-4">
                               <div className="font-medium text-yellow-400 whitespace-nowrap">

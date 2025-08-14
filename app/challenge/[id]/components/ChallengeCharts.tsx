@@ -642,7 +642,22 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             {/* First row: Challenge title only */}
             <div className="mb-4">
               <div className="flex items-center gap-3">
-                <Trophy className="w-6 h-6 text-yellow-500" />
+                <div className="relative">
+                  <Trophy className="w-6 h-6 text-yellow-500" />
+                  {/* Show network icon only when connected to Arbitrum */}
+                  {network === 'arbitrum' && (
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                      <Image 
+                        src="/networks/small/arbitrum.png" 
+                        alt="Arbitrum"
+                        width={12}
+                        height={12}
+                        className="rounded-full"
+                        style={{ width: 'auto', height: 'auto' }}
+                      />
+                    </div>
+                  )}
+                </div>
                 <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
               </div>
             </div>
@@ -683,7 +698,22 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           <div className="hidden md:block md:mr-6">
             <div className="mb-4">
               <div className="flex items-center gap-3">
-                <Trophy className="w-6 h-6 text-yellow-500" />
+                <div className="relative">
+                  <Trophy className="w-6 h-6 text-yellow-500" />
+                  {/* Show network icon only when connected to Arbitrum */}
+                  {network === 'arbitrum' && (
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                      <Image 
+                        src="/networks/small/arbitrum.png" 
+                        alt="Arbitrum"
+                        width={12}
+                        height={12}
+                        className="rounded-full"
+                        style={{ width: 'auto', height: 'auto' }}
+                      />
+                    </div>
+                  )}
+                </div>
                 <h3 className="text-3xl text-gray-100">{t('challenge')} {challengeId}</h3>
               </div>
             </div>

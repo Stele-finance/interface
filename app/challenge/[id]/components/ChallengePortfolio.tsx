@@ -1512,19 +1512,22 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
                   {/* Progress */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg text-gray-400">
-                        {(() => {
-                          const challengeType = challengeData.challenge.challengeType;
-                          switch(challengeType) {
-                            case 0: return t('oneWeek');
-                            case 1: return t('oneMonth');
-                            case 2: return t('threeMonths');
-                            case 3: return t('sixMonths');
-                            case 4: return t('oneYear');
-                            default: return `Type ${challengeType}`;
-                          }
-                        })()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">⏳</span>
+                        <span className="text-lg text-gray-400">
+                          {(() => {
+                            const challengeType = challengeData.challenge.challengeType;
+                            switch(challengeType) {
+                              case 0: return t('oneWeek');
+                              case 1: return t('oneMonth');
+                              case 2: return t('threeMonths');
+                              case 3: return t('sixMonths');
+                              case 4: return t('oneYear');
+                              default: return `Type ${challengeType}`;
+                            }
+                          })()}
+                        </span>
+                      </div>
                       <span className="text-base font-medium text-gray-300">
                         {(() => {
                           const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
