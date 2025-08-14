@@ -21,7 +21,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, Clock, Trophy, Wallet, CheckCircle } from "lucide-react"
+import { Users, Wallet, CheckCircle, Clock, Trophy } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -525,7 +525,25 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
 
       <div className="space-y-4 mt-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Trophy className="h-8 w-8 text-yellow-500" />
+              {/* Show Arbitrum network icon only when connected to Arbitrum */}
+              {network === 'arbitrum' && (
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                  <Image 
+                    src="/networks/small/arbitrum.png" 
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                    style={{ width: 'auto', height: 'auto' }}
+                  />
+                </div>
+              )}
+            </div>
+            <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
+          </div>
           {isConnected ? (
             <ChallengeTypeModal 
               onCreateChallenge={handleCreateChallenge}
@@ -586,12 +604,42 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Table>
               <TableHeader>
                 <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">{t('period')}</TableHead>
+                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">⏰</span>
+                      {t('period')}
+                    </div>
+                  </TableHead>
                   <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
                   <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">{t('progress')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">⌛</span>
+                      {t('progress')}
+                    </div>
+                  </TableHead>
                   <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">{t('challenge')}</TableHead>
+                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Trophy className="h-4 w-4 text-yellow-500" />
+                        {/* Show network icon only when connected to Arbitrum */}
+                        {network === 'arbitrum' && (
+                          <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                            <Image 
+                              src="/networks/small/arbitrum.png" 
+                              alt="Arbitrum"
+                              width={8}
+                              height={8}
+                              className="rounded-full"
+                              style={{ width: 'auto', height: 'auto' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {t('challenge')}
+                    </div>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -610,25 +658,7 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
                     }}
                   >
                     <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                        <Trophy className="h-5 w-5 text-yellow-500" />
-                          {/* Show Arbitrum network icon only when connected to Arbitrum */}
-                          {network === 'arbitrum' && (
-                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                              <Image 
-                                src="/networks/small/arbitrum.png" 
-                                alt="Arbitrum"
-                                width={12}
-                                height={12}
-                                className="rounded-full"
-                                style={{ width: 'auto', height: 'auto' }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <span className="whitespace-nowrap">{challenge.title}</span>
-                      </div>
+                      <span className="whitespace-nowrap">{challenge.title}</span>
                     </TableCell>
                     <TableCell className="font-medium text-yellow-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
                       {challenge.prize}

@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useLanguage } from "@/lib/language-context"
-import { formatDateOnly } from "@/lib/utils"
+import { formatDateWithLocale } from "@/lib/utils"
 import { ChallengeDetails, TimeRemaining } from "../types"
 import { getTimeRemaining } from "../utils"
 import { Trophy } from "lucide-react"
+import Image from "next/image"
+import { useWallet } from "@/app/hooks/useWallet"
 
 interface ChallengeInfoProps {
   challengeId: string
@@ -25,6 +27,7 @@ export function ChallengeInfo({
   currentTime 
 }: ChallengeInfoProps) {
   const { t, language } = useLanguage()
+  const { network } = useWallet()
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [showSeedMoneyTooltip, setShowSeedMoneyTooltip] = useState(false)
@@ -163,7 +166,22 @@ export function ChallengeInfo({
           <div className="space-y-2">
             <span className="text-base text-gray-400">{t('challenge')}</span>
             <div className="flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-yellow-400" />
+              <div className="relative">
+                <Trophy className="w-6 h-6 text-yellow-400" />
+                {/* Show network icon only when connected to Arbitrum */}
+                {network === 'arbitrum' && (
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                    <Image 
+                      src="/networks/small/arbitrum.png" 
+                      alt="Arbitrum"
+                      width={12}
+                      height={12}
+                      className="rounded-full"
+                      style={{ width: 'auto', height: 'auto' }}
+                    />
+                  </div>
+                )}
+              </div>
               <div className="text-3xl text-white">
                 {challengeId}
               </div>
@@ -213,25 +231,28 @@ export function ChallengeInfo({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="text-center">
-                <span className="text-lg text-gray-400">
-                  {(() => {
-                    const challengeType = challengeData?.challenge?.challengeType;
-                    switch (challengeType) {
-                      case 0:
-                        return t('oneWeek');
-                      case 1:
-                        return t('oneMonth');
-                      case 2:
-                        return t('threeMonths');
-                      case 3:
-                        return t('sixMonths');
-                      case 4:
-                        return t('oneYear');
-                      default:
-                        return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
-                    }
-                  })()}
-                </span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg">⏳</span>
+                  <span className="text-lg text-gray-400">
+                    {(() => {
+                      const challengeType = challengeData?.challenge?.challengeType;
+                      switch (challengeType) {
+                        case 0:
+                          return t('oneWeek');
+                        case 1:
+                          return t('oneMonth');
+                        case 2:
+                          return t('threeMonths');
+                        case 3:
+                          return t('sixMonths');
+                        case 4:
+                          return t('oneYear');
+                        default:
+                          return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
+                      }
+                    })()}
+                  </span>
+                </div>
               </div>
               <span className="text-base font-medium text-gray-300">
                 {(() => {
@@ -303,8 +324,8 @@ export function ChallengeInfo({
           
           {/* Time Info */}
           <div className="flex justify-between text-sm text-gray-500">
-            <span>{challengeDetails?.startTime ? formatDateOnly(challengeDetails.startTime, language) : 'N/A'}</span>
-            <span>{challengeDetails?.endTime ? formatDateOnly(challengeDetails.endTime, language) : 'N/A'}</span>
+            <span>{challengeDetails?.startTime ? challengeDetails.startTime.toLocaleDateString() : 'N/A'}</span>
+            <span>{challengeDetails?.endTime ? challengeDetails.endTime.toLocaleDateString() : 'N/A'}</span>
           </div>
         </div>
       </CardContent>
