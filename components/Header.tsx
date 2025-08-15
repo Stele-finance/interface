@@ -275,6 +275,7 @@ export function Header() {
               maxWidth: '48px'
             }}
           />
+          <span className="hidden sm:block text-orange-500 text-xl sm:text-2xl">Stele</span>
         </Link>
         
         {/* Mobile Menu Icon - Hidden on desktop */}
@@ -292,13 +293,13 @@ export function Header() {
           <Link 
             href="/dashboard"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
               pathname === "/" || pathname === "/dashboard"
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
-            <BarChart3 className="h-4 w-4" />
+            <BarChart3 className="h-5 w-5" />
             {t('dashboard')}
           </Link>
           
@@ -307,13 +308,13 @@ export function Header() {
               <Button
                 variant="ghost"
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
                   pathname.includes("/challenges") || pathname.includes("/challenge/")
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
-                <Trophy className="h-4 w-4" />
+                <Trophy className="h-5 w-5" />
                 {t('challenges')}
               </Button>
             </DropdownMenuTrigger>
@@ -334,13 +335,13 @@ export function Header() {
           <Link 
             href="/nft"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
               pathname.includes("/nft")
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
-            <ImageIcon className="h-4 w-4" />
+            <ImageIcon className="h-5 w-5" />
             NFTs
           </Link>
           
