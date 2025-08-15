@@ -211,7 +211,7 @@ export function RecentChallengesTable() {
                           <tr 
                             key={challenge.id} 
                             className="hover:bg-gray-800/30 transition-colors cursor-pointer"
-                            onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
+                            onClick={() => router.push(`/challenge/${subgraphNetwork}/${challenge.challengeId}`)}
                           >
                             <td className="py-6 pl-6 pr-4">
                               <div className="ml-6">

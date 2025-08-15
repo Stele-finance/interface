@@ -11,9 +11,10 @@ import { formatDateOnly } from "@/lib/utils"
 interface InvestorsTabProps {
   challengeId: string
   subgraphNetwork: string
+  routeNetwork: string
 }
 
-export function InvestorsTab({ challengeId, subgraphNetwork }: InvestorsTabProps) {
+export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: InvestorsTabProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
@@ -46,7 +47,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork }: InvestorsTabProps
 
   // Helper function to handle wallet click
   const handleWalletClick = (walletAddress: string) => {
-    router.push(`/challenge/${challengeId}/${walletAddress}`)
+    router.push(`/challenge/${routeNetwork}/${challengeId}/${walletAddress}`)
   }
 
   return (

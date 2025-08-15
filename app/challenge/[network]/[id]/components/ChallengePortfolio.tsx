@@ -480,7 +480,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       
       // If wallet is already connected and we have the address, use it directly
       if (addressToUse && isConnected) {
-        router.push(`/challenge/${challengeId}/${addressToUse}`);
+        router.push(`/challenge/${subgraphNetwork}/${challengeId}/${addressToUse}`);
         return;
       }
 
@@ -527,7 +527,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
       localStorage.setItem('walletAddress', userAddress);
       
       // Navigate to account page
-      router.push(`/challenge/${challengeId}/${userAddress}`);
+      router.push(`/challenge/${subgraphNetwork}/${challengeId}/${userAddress}`);
     } catch (error: any) {
       console.error("Error navigating to account:", error);
       
@@ -996,6 +996,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
               <InvestorsTab 
                 challengeId={challengeId}
                 subgraphNetwork={subgraphNetwork}
+                routeNetwork={subgraphNetwork}
               />
             </TabsContent>
 

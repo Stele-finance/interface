@@ -64,7 +64,7 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
     if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
       return;
     }
-    router.push(`/${network}/challenge/${challengeId}/${userAddress}`);
+    router.push(`/challenge/${network}/${challengeId}/${userAddress}`);
   };
 
   return (

@@ -41,7 +41,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
-  const { id: challengeId, walletAddress } = use(params)
+  const { network: routeNetwork, id: challengeId, walletAddress } = use(params)
   const router = useRouter()
   
   // Use hooks
@@ -384,7 +384,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           {/* Go to Challenge Button */}
           <div className="px-2 sm:px-0">
           <button 
-            onClick={() => router.push(`/challenge/${challengeId}`)}
+            onClick={() => router.push(`/challenge/${routeNetwork}/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -465,6 +465,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 <InvestorsTab 
                   challengeId={challengeId}
                   subgraphNetwork={subgraphNetwork}
+                  routeNetwork={routeNetwork}
                 />
               </TabsContent>
 

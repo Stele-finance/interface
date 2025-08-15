@@ -134,7 +134,7 @@ export default function PortfolioPage({ params }: PortfolioPageProps) {
     const challengeTitle = getChallengeTitle(challengeType)
 
     const handleRowClick = () => {
-      router.push(`/${subgraphNetwork}/challenge/${investor.challengeId}/${walletAddress}`)
+      router.push(`/challenge/${subgraphNetwork}/${investor.challengeId}/${walletAddress}`)
     }
 
     return (

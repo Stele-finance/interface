@@ -54,16 +54,38 @@ export default function HomePage() {
                 <span className="text-white font-bold">
                   {t('areYouReadyToBeLegend')}
                 </span>
-                <br />
-                <span className="text-xl md:text-xl lg:text-xl text-gray-300">
+                <div className="flex justify-center items-center gap-4 mt-4">
+                  <Image
+                    src="/home/warren_buffit.png"
+                    alt="Warren Buffett 1"
+                    width={120}
+                    height={120}
+                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
+                  />
+                  <Image
+                    src="/home/warren_buffit2.png"
+                    alt="Warren Buffett 2"
+                    width={120}
+                    height={120}
+                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
+                  />
+                  <Image
+                    src="/home/warren_buffit3.png"
+                    alt="Warren Buffett 3"
+                    width={120}
+                    height={120}
+                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
+                  />
+                </div>
+                <span className="text-xl md:text-xl lg:text-xl text-gray-300 mt-2">
                   {t('carveYourNameOnBlockchain')}
                 </span>
               </h1>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+            <div className="flex flex-col gap-4 items-center relative z-10">
               <div 
-                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center justify-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
+                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
                 onClick={handleGetStarted}
                 style={{ 
                   userSelect: 'none',
@@ -71,20 +93,22 @@ export default function HomePage() {
                   pointerEvents: 'auto'
                 }}
               >
-                {t('becomeLegend')}
+                {t('virtualTradingChallenge')}
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
               
               <div 
-                className="group border-2 border-gray-600 text-gray-300 px-6 py-3 text-base rounded-lg cursor-pointer transition-all duration-300 hover:border-gray-400 hover:text-white hover:bg-gray-700 hover:shadow-2xl hover:scale-105"
+                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center justify-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
                 onClick={handleBrowseChallenges}
                 style={{ 
+                  minWidth: '240px',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
                   pointerEvents: 'auto'
                 }}
               >
-                {t('browseChallenges')}
+                {t('cryptoFund')}
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </div>
           </div>

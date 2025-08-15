@@ -13,6 +13,7 @@ interface RankingTabProps {
   rankingError: any
   challengeId: string
   walletAddress: string
+  routeNetwork: string
 }
 
 export function RankingTab({ 
@@ -20,7 +21,8 @@ export function RankingTab({
   isLoadingRanking, 
   rankingError, 
   challengeId, 
-  walletAddress 
+  walletAddress,
+  routeNetwork
 }: RankingTabProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
@@ -80,7 +82,7 @@ export function RankingTab({
     if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000' || userAddress.toLowerCase() === '0x0000000000000000000000000000000000000000') {
       return;
     }
-    router.push(`/challenge/${challengeId}/${userAddress}`);
+    router.push(`/challenge/${routeNetwork}/${challengeId}/${userAddress}`);
   };
 
   return (

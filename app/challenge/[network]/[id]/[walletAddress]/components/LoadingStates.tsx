@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 interface LoadingStateProps {
   challengeId: string
   walletAddress: string
+  routeNetwork?: string
 }
 
 export function MainLoadingState({ challengeId }: { challengeId: string }) {
@@ -155,7 +156,7 @@ export function MainLoadingState({ challengeId }: { challengeId: string }) {
   )
 }
 
-export function ErrorState({ challengeId, walletAddress }: LoadingStateProps) {
+export function ErrorState({ challengeId, walletAddress, routeNetwork = 'ethereum' }: LoadingStateProps) {
   const { t } = useLanguage()
   const router = useRouter()
 
@@ -165,7 +166,7 @@ export function ErrorState({ challengeId, walletAddress }: LoadingStateProps) {
         {/* Go to Challenge Button */}
         <div className="mb-4">
           <button 
-            onClick={() => router.push(`/challenge/${challengeId}`)}
+            onClick={() => router.push(`/challenge/${routeNetwork}/${challengeId}`)}
             className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
           >
             <ArrowLeft className="h-5 w-5" />

@@ -24,7 +24,7 @@ export default async function SwapPage({ searchParams }: SwapPageProps) {
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
-        <Link href={challengeId ? `/challenge/${challengeId}` : '/'}>
+        <Link href={challengeId ? `/challenge/ethereum/${challengeId}` : '/'}>
           <Button variant="outline" size="sm" className="bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {challengeId ? 'Back to Challenge' : 'Back to Dashboard'}
