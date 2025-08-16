@@ -15,7 +15,9 @@ import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
 import { 
   getSteleContractAddress,
-  getGovernanceContractAddress
+  getGovernanceContractAddress,
+  getExplorerName,
+  getExplorerUrl
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { useLanguage } from "@/lib/language-context"
@@ -505,8 +507,8 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
         setTransactionHash(tx.hash);
         
         // Show toast notification for transaction submitted
-        const explorerName = getExplorerName(chainId);
-        const explorerUrl = getExplorerUrl(chainId, tx.hash);
+        const explorerName = getExplorerName(contractNetwork);
+        const explorerUrl = getExplorerUrl(contractNetwork, tx.hash);
         
         toast({
           title: "Transaction Submitted",
