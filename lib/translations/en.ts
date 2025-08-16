@@ -390,7 +390,6 @@ export const en = {
   userVotingPower: "Your voting power",
   value: "Value",
   view: "View",
-  viewOn: "View on",
   viewOnEtherscan: "View on Etherscan",
   viewOnExplorer: "View on Explorer",
   viewProposal: "View Proposal",
