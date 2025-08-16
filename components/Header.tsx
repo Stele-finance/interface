@@ -576,20 +576,6 @@ export function Header() {
                 </Link>
                 
                 <Link 
-                  href="/portfolio"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname.includes("/portfolio")
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                >
-                  <User className="h-5 w-5 mr-3" />
-                  {t('myPortfolios')}
-                </Link>
-                
-                <Link 
                   href="/nft"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
