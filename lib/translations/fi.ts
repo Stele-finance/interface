@@ -391,7 +391,7 @@ export const fi = {
   value: "Arvo",
   view: "Näytä",
   viewAllPerformanceNFTs: "Näytä kaikki haasteissa osallistujien ansaitsemat Suorituskyky-NFTt, järjestettynä tuottosuhteen mukaan",
-  virtualTradingChallenge: "Virtuaalinen Kaupankäynti Haaste",
+  virtualTradingChallenge: "Kaupankäynti Haaste",
   viewOnExplorer: "Näytä Tutkijassa",
   viewOnEtherscan: "Näytä Etherscanissa",
   viewProposal: "Näytä Ehdotus",

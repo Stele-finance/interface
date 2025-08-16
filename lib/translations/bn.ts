@@ -391,7 +391,7 @@ export const bn = {
   value: "মূল্য",
   view: "দেখুন",
   viewAllPerformanceNFTs: "চ্যালেঞ্জে অংশগ্রহণকারীদের অর্জিত সকল পারফরম্যান্স NFTs দেখুন, রিটার্ন রেট অনুযায়ী সাজানো",
-  virtualTradingChallenge: "ভার্চুয়াল ট্রেডিং চ্যালেঞ্জ",
+  virtualTradingChallenge: "ট্রেডিং চ্যালেঞ্জ",
   viewOnExplorer: "এক্সপ্লোরারে দেখুন",
   viewOnEtherscan: "Etherscan-এ দেখুন",
   viewProposal: "প্রস্তাব দেখুন",

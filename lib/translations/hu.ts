@@ -391,7 +391,7 @@ export const hu = {
   value: "Érték",
   view: "Megtekintés",
   viewAllPerformanceNFTs: "Minden Teljesítmény NFT megtekintése, amelyeket a résztvevők szereztek kihívásokban, hozam szerint rendezve",
-  virtualTradingChallenge: "Virtuális Kereskedési Kihívás",
+  virtualTradingChallenge: "Kereskedési Kihívás",
   viewOnExplorer: "Megtekintés Explorerben",
   viewOnEtherscan: "Megtekintés Etherscan-en",
   viewYourPerformanceNFTs: "Saját Teljesítmény NFT-k megtekintése, amelyeket kihívásokból szereztél",

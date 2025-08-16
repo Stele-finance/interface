@@ -391,7 +391,7 @@ export const kr = {
   value: "가치",
   view: "보기",
   viewAllPerformanceNFTs: "챌린지에서 참가자들이 얻은 모든 성과 NFT를 수익률별로 표시",
-  virtualTradingChallenge: "가상 트레이딩 챌린지",
+  virtualTradingChallenge: "트레이딩 챌린지",
   viewOnExplorer: "익스플로러에서 보기",
   viewOnEtherscan: "Etherscan에서 보기",
   viewYourPerformanceNFTs: "챌린지에서 얻은 내 성과 NFT들 보기",

@@ -391,7 +391,7 @@ export const ar = {
   value: "القيمة",
   view: "عرض",
   viewAllPerformanceNFTs: "عرض جميع NFTs الأداء المكتسبة من قبل المشاركين في التحديات، مرتبة حسب معدل العائد",
-  virtualTradingChallenge: "تحدي التداول الافتراضي",
+  virtualTradingChallenge: "تحدي التداول",
   viewOnEtherscan: "عرض على Etherscan",
   viewOnExplorer: "عرض على المستكشف",
   viewProposal: "عرض المقترح",

@@ -391,7 +391,7 @@ export const th = {
   value: "ค่า",
   view: "ดู",
   viewAllPerformanceNFTs: "ดู NFT ประสิทธิภาพทั้งหมดที่ผู้เข้าร่วมได้รับจากความท้าทาย จัดเรียงตามอัตราผลตอบแทน",
-  virtualTradingChallenge: "ความท้าทายการซื้อขายเสมือน",
+  virtualTradingChallenge: "ความท้าทายการเทรด",
   viewOnExplorer: "ดูใน Explorer",
   viewOnEtherscan: "ดูบน Etherscan",
   viewYourPerformanceNFTs: "ดู NFT ประสิทธิภาพของคุณที่ได้รับจากความท้าทาย",

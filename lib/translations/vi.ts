@@ -391,7 +391,7 @@ export const vi = {
   value: "Giá trị",
   view: "Xem",
   viewAllPerformanceNFTs: "Xem tất cả NFT Hiệu suất mà người tham gia kiếm được trong thử thách, được xếp hạng theo tỷ lệ lợi nhuận",
-  virtualTradingChallenge: "Thử Thách Giao Dịch Ảo",
+  virtualTradingChallenge: "Thách thức Giao dịch",
   viewOnExplorer: "Xem trên Explorer",
   viewOnEtherscan: "Xem trên Etherscan",
   viewYourPerformanceNFTs: "Xem NFT Hiệu suất của bạn kiếm được từ thử thách",

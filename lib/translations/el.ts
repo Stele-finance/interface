@@ -391,7 +391,7 @@ export const el = {
   value: "Αξία",
   view: "Προβολή",
   viewAllPerformanceNFTs: "Προβολή όλων των Performance NFTs που κέρδισαν οι συμμετέχοντες σε προκλήσεις, καταταγμένα ανά ποσοστό απόδοσης",
-  virtualTradingChallenge: "Εικονική Πρόκληση Συναλλαγών",
+  virtualTradingChallenge: "Πρόκληση Εμπορίου",
   viewOnExplorer: "Προβολή στον Explorer",
   viewOnEtherscan: "Προβολή στο Etherscan",
   viewProposal: "Προβολή Πρότασης",

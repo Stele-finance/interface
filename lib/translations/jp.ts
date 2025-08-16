@@ -391,7 +391,7 @@ export const jp = {
   value: "価値",
   view: "表示",
   viewAllPerformanceNFTs: "チャレンジで参加者が獲得したパフォーマンスNFTを収益率別にランキングで表示",
-  virtualTradingChallenge: "バーチャルトレーディングチャレンジ",
+  virtualTradingChallenge: "トレーディングチャレンジ",
   viewOnExplorer: "エクスプローラーで表示",
   viewOnEtherscan: "Etherscanで表示",
   viewYourPerformanceNFTs: "チャレンジで獲得したあなたのパフォーマンスNFTを表示",

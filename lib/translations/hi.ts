@@ -391,7 +391,7 @@ export const hi = {
   value: "मूल्य",
   view: "देखें",
   viewAllPerformanceNFTs: "चुनौतियों में प्रतिभागियों द्वारा कमाए गए सभी Performance NFTs देखें, वापसी दर के अनुसार रैंक किए गए",
-  virtualTradingChallenge: "वर्चुअल ट्रेडिंग चैलेंज",
+  virtualTradingChallenge: "ट्रेडिंग चुनौती",
   viewOnExplorer: "Explorer पर देखें",
   viewOnEtherscan: "Etherscan पर देखें",
   viewProposal: "प्रस्ताव देखें",

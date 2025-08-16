@@ -391,7 +391,7 @@ export const nl = {
   value: "Waarde",
   view: "Bekijken",
   viewAllPerformanceNFTs: "Bekijk alle Performance NFT's verdiend door deelnemers in uitdagingen, gerangschikt op rendement",
-  virtualTradingChallenge: "Virtuele Handelsuitdaging",
+  virtualTradingChallenge: "Trading Uitdaging",
   viewOnExplorer: "Bekijken op Explorer",
   viewOnEtherscan: "Bekijken op Etherscan",
   viewYourPerformanceNFTs: "Bekijk uw Performance NFT's verdiend uit uitdagingen",

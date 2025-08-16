@@ -391,7 +391,7 @@ export const ru = {
   value: "Значение",
   view: "Просмотр",
   viewAllPerformanceNFTs: "Посмотреть все NFT производительности, заработанные участниками в вызовах, отсортированные по доходности",
-  virtualTradingChallenge: "Виртуальный Торговый Вызов",
+  virtualTradingChallenge: "Торговый вызов",
   viewOnExplorer: "Просмотреть в Проводнике",
   viewOnEtherscan: "Просмотреть в Etherscan",
   viewYourPerformanceNFTs: "Посмотреть ваши NFT производительности, заработанные в вызовах",

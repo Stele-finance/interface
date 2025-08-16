@@ -391,7 +391,7 @@ export const fr = {
   value: "Valeur",
   view: "Voir",
   viewAllPerformanceNFTs: "Voir tous les NFTs de Performance gagnés par les participants dans les défis, classés par taux de rendement",
-  virtualTradingChallenge: "Défi de Trading Virtuel",
+  virtualTradingChallenge: "Défi de Trading",
   viewOnExplorer: "Voir sur l'Explorateur",
   viewOnEtherscan: "Voir sur Etherscan",
   viewProposal: "Voir la Proposition",

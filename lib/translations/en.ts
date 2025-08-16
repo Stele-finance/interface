@@ -395,7 +395,7 @@ export const en = {
   viewProposal: "View Proposal",
   viewYourPerformanceNFTs: "View your earned Performance NFTs from challenges",
   viewAllPerformanceNFTs: "View all Performance NFTs earned by participants in challenges, ranked by return rate",
-  virtualTradingChallenge: "Virtual Trading Challenge",
+  virtualTradingChallenge: "Trading Challenge",
   vote: "Vote",
   voteAgainst: "Vote Against",
   voteEnd: "Vote End",

@@ -391,7 +391,7 @@ export const da = {
   value: "Værdi",
   view: "Se",
   viewAllPerformanceNFTs: "Se alle Performance NFTs tjent af deltagere i udfordringer, rangeret efter afkastsats",
-  virtualTradingChallenge: "Virtuel Handelsudfordring",
+  virtualTradingChallenge: "Trading Udfordring",
   viewOnExplorer: "Se på Explorer",
   viewOnEtherscan: "Se på Etherscan",
   viewProposal: "Se Forslag",

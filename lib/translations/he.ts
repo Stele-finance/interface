@@ -391,7 +391,7 @@ export const he = {
   value: "ערך",
   view: "צפה",
   viewAllPerformanceNFTs: "צפה בכל NFTs הביצועים שהרוויחו המשתתפים באתגרים, מדורגים לפי שיעור התשואה",
-  virtualTradingChallenge: "אתגר מסחר וירטואלי",
+  virtualTradingChallenge: "אתגר מסחר",
   viewOnExplorer: "צפה בסייר",
   viewOnEtherscan: "צפה ב-Etherscan",
   viewProposal: "צפה בהצעה",

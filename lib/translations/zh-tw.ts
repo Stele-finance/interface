@@ -391,7 +391,7 @@ export const zhTw = {
   value: "價值",
   view: "查看",
   viewAllPerformanceNFTs: "查看所有參與者在挑戰中獲得的表現NFT，按收益率排序",
-  virtualTradingChallenge: "虛擬交易挑戰",
+  virtualTradingChallenge: "交易挑戰",
   viewOnEtherscan: "在 Etherscan 上查看",
   viewOnExplorer: "在Explorer上查看",
   viewYourPerformanceNFTs: "查看您從挑戰中獲得的表現NFT",

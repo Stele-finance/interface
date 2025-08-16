@@ -391,7 +391,7 @@ export const id = {
   value: "Nilai",
   view: "Lihat",
   viewAllPerformanceNFTs: "Lihat Semua NFT Kinerja yang diperoleh peserta dalam tantangan, diurutkan berdasarkan tingkat pengembalian",
-  virtualTradingChallenge: "Tantangan Trading Virtual",
+  virtualTradingChallenge: "Tantangan Trading",
   viewOnExplorer: "Lihat di Explorer",
   viewOnEtherscan: "Lihat di Etherscan",
   viewYourPerformanceNFTs: "Lihat NFT Kinerja Anda yang diperoleh dari tantangan",

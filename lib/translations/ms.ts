@@ -391,7 +391,7 @@ export const ms = {
   value: "Nilai",
   view: "Lihat",
   viewAllPerformanceNFTs: "Lihat semua NFT Prestasi yang diperoleh peserta dalam cabaran, disusun mengikut kadar pulangan",
-  virtualTradingChallenge: "Cabaran Dagangan Maya",
+  virtualTradingChallenge: "Cabaran Perdagangan",
   viewOnExplorer: "Lihat di Explorer",
   viewOnEtherscan: "Lihat di Etherscan",
   viewYourPerformanceNFTs: "Lihat NFT Prestasi anda yang diperoleh dari cabaran",
