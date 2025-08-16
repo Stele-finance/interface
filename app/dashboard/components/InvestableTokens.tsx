@@ -3,7 +3,9 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Coins } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Loader2, Coins, ChevronDown } from "lucide-react"
 import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
@@ -21,12 +23,15 @@ import {
 
 interface InvestableTokensProps {
   network?: 'ethereum' | 'arbitrum' | 'solana' | null
+  setActiveTab?: (tab: 'challenges' | 'tokens') => void
+  selectedNetwork?: 'ethereum' | 'arbitrum'
+  setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void
 }
 
-export function InvestableTokens({ network }: InvestableTokensProps) {
+export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'ethereum', setSelectedNetwork }: InvestableTokensProps) {
   const { t } = useLanguage()
-  // Filter network for subgraph usage (exclude solana)
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Use selectedNetwork for data fetching
+  const subgraphNetwork = selectedNetwork
   const { data: tokensData, isLoading, error } = useInvestableTokens(subgraphNetwork)
 
   // Pagination state
@@ -147,13 +152,167 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
   }
 
   return (
-    <div className="space-y-4 mt-6">
-      <div className="flex items-center gap-3">
-        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
-        <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
-          <Coins className="h-4 w-4 mr-2" />
-          {tokens.length} {t('tokens')}
-        </Badge>
+    <div className="space-y-4 mt-8">
+      {/* Desktop Layout */}
+      <div className="hidden md:flex items-center justify-between">
+        {setActiveTab ? (
+          <div className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('challenges')}
+              className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+            >
+              {t('challenge')}
+            </button>
+            <h2 className="text-3xl text-gray-100 cursor-default">{t('token')}</h2>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
+            <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
+              <Coins className="h-4 w-4 mr-2" />
+              {tokens.length} {t('token')}
+            </Badge>
+          </div>
+        )}
+        <div className="flex items-center gap-3">
+          {/* Network Selector Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                <div className="flex items-center gap-2">
+                  {selectedNetwork === 'arbitrum' ? (
+                    <Image
+                      src="/networks/small/arbitrum.png"
+                      alt="Arbitrum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <Image
+                      src="/networks/small/ethereum.png"
+                      alt="Ethereum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  )}
+                  <ChevronDown className="h-5 w-5 text-gray-400" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
+              >
+                <Image
+                  src="/networks/small/ethereum.png"
+                  alt="Ethereum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Ethereum
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
+              >
+                <Image
+                  src="/networks/small/arbitrum.png"
+                  alt="Arbitrum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Arbitrum
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="md:hidden space-y-4">
+        {/* Title and Tab */}
+        {setActiveTab ? (
+          <div className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('challenges')}
+              className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+            >
+              {t('challenge')}
+            </button>
+            <h2 className="text-3xl text-gray-100 cursor-default">{t('token')}</h2>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
+            <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
+              <Coins className="h-4 w-4 mr-2" />
+              {tokens.length} {t('token')}
+            </Badge>
+          </div>
+        )}
+        
+        {/* Network Dropdown */}
+        <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                <div className="flex items-center gap-2">
+                  {selectedNetwork === 'arbitrum' ? (
+                    <Image
+                      src="/networks/small/arbitrum.png"
+                      alt="Arbitrum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <Image
+                      src="/networks/small/ethereum.png"
+                      alt="Ethereum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  )}
+                  <ChevronDown className="h-5 w-5 text-gray-400" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
+              >
+                <Image
+                  src="/networks/small/ethereum.png"
+                  alt="Ethereum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Ethereum
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
+              >
+                <Image
+                  src="/networks/small/arbitrum.png"
+                  alt="Arbitrum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Arbitrum
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
@@ -163,10 +322,10 @@ export function InvestableTokens({ network }: InvestableTokensProps) {
           </div>
         ) : (
           <>
-            <div className="rounded-2xl overflow-hidden overflow-x-auto">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted hover:bg-muted/80 border-b border-gray-600">
+                  <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 pl-6 text-base">{t('symbol')}</TableHead>
                     <TableHead className="text-gray-300 text-base">{t('tokenAddress')}</TableHead>
                     <TableHead className="text-gray-300 pr-6 text-base">{t('updated')}</TableHead>

@@ -1,7 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense } from "react"
+import { Suspense, useState, useEffect } from "react"
+import { useLanguage } from "@/lib/language-context"
 
 // Dynamically import client components with SSR disabled
 const ActiveChallenges = dynamic(
@@ -14,10 +15,7 @@ const InvestableTokens = dynamic(
   { ssr: false }
 )
 
-const TotalRanking = dynamic(
-  () => import("./TotalRanking").then(mod => ({ default: mod.TotalRanking })),
-  { ssr: false }
-)
+// Removed TotalRanking (Hall of Fame) component
 
 function LoadingSkeleton() {
   return (
@@ -36,13 +34,42 @@ interface DashboardClientComponentsProps {
 }
 
 export function DashboardClientComponents({ network }: DashboardClientComponentsProps) {
+  const [activeTab, setActiveTab] = useState<'challenges' | 'tokens'>('challenges')
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+  const { t } = useLanguage()
+
+  // Load network selection from localStorage on mount
+  useEffect(() => {
+    const savedNetwork = localStorage.getItem('selected-network')
+    if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
+      setSelectedNetwork(savedNetwork)
+    }
+  }, [])
+
+  // Save network selection to localStorage when it changes
+  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
+    setSelectedNetwork(network)
+    localStorage.setItem('selected-network', network)
+  }
+
   return (
     <Suspense fallback={<LoadingSkeleton />}>
-      <ActiveChallenges showCreateButton={true} />
-      <div className="mt-6 sm:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-16">
-        <InvestableTokens network={network} />
-        <TotalRanking network={network} />
-      </div>
+      {activeTab === 'challenges' ? (
+        <ActiveChallenges 
+          showCreateButton={true} 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab}
+          selectedNetwork={selectedNetwork}
+          setSelectedNetwork={handleNetworkChange}
+        />
+      ) : (
+        <InvestableTokens 
+          network={selectedNetwork} 
+          setActiveTab={setActiveTab}
+          selectedNetwork={selectedNetwork}
+          setSelectedNetwork={handleNetworkChange}
+        />
+      )}
     </Suspense>
   )
 } 

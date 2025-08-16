@@ -65,7 +65,6 @@ export function Header() {
 
   const [balance, setBalance] = useState<string>('0')
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
-  const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   
@@ -243,11 +242,12 @@ export function Header() {
       return;
     }
 
-    // Only navigate if wallet address actually changed and not already on dashboard
+    // Only navigate if wallet address actually changed and not already on dashboard/challenges
     // Also skip if wallet is being disconnected (walletAddress becomes null)
     if (prevWalletAddressRef.current !== walletAddress && 
         walletAddress !== null && 
-        !pathname.includes('/dashboard')) {
+        !pathname.includes('/dashboard') && 
+        !pathname.includes('/challenges')) {
       prevWalletAddressRef.current = walletAddress;
       router.push('/dashboard');
     } else {
@@ -298,52 +298,36 @@ export function Header() {
           <Link 
             href="/dashboard"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname === "/" || pathname === "/dashboard"
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <BarChart3 className="h-5 w-5" />
             {t('dashboard')}
           </Link>
           
-          <DropdownMenu open={challengesDropdownOpen} onOpenChange={setChallengesDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
-                  pathname.includes("/challenges") || pathname.includes("/challenge/")
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                <Trophy className="h-5 w-5" />
-                {t('challenges')}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-36 bg-muted/80 border-gray-600 z-[60]">
-               <DropdownMenuItem asChild>
-                 <Link href="/portfolio" className="cursor-pointer">
-                   {t('myPortfolio')}
-                 </Link>
-               </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                 <Link href="/challenges" className="cursor-pointer">
-                   {t('totalChallenges')}
-                 </Link>
-               </DropdownMenuItem>
-             </DropdownMenuContent>
-          </DropdownMenu>
+          <Link 
+            href="/challenges"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/challenges") || pathname.includes("/challenge/")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Trophy className="h-5 w-5" />
+            {t('challenges')}
+          </Link>
           
           <Link 
             href="/nft"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-lg font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname.includes("/nft")
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <ImageIcon className="h-5 w-5" />

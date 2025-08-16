@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, use } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { 
   Card, 
   CardContent, 
@@ -28,7 +29,7 @@ import {
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
-import { useProposalVoteResult, useProposalDetails } from "../hooks/useProposals"
+import { useProposalVoteResult, useProposalDetails } from "../../hooks/useProposals"
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
@@ -39,24 +40,24 @@ import { ClientOnly } from "@/components/ClientOnly"
 // Import separated components and utilities
 import { VoteOption } from "./components"
 import { openScanSite } from "./utils"
-import { StatusBadge as StatusBadgeComponent } from "../components"
+import { StatusBadge as StatusBadgeComponent } from "../../components"
 
 interface ProposalDetailPageProps {
   params: Promise<{
+    network: string
     id: string
   }>
 }
 
 export default function ProposalDetailPage({ params }: ProposalDetailPageProps) {
   const searchParams = useSearchParams()
-  const { id } = use(params)
+  const { network: urlNetwork, id } = use(params)
   const { t } = useLanguage()
-  const { walletType, network, getProvider, isConnected: walletConnected, address, isLoading: walletLoading } = useWallet()
+  const { walletType, getProvider, isConnected: walletConnected, address, isLoading: walletLoading } = useWallet()
     
-  // Filter network to supported types for contracts (exclude 'solana')
-  const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  // Filter network for subgraph usage (exclude solana)
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Use URL network parameter for contracts and subgraph
+  const contractNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
+  const subgraphNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
   
 
   const [voteOption, setVoteOption] = useState<VoteOption>(null)
@@ -1064,7 +1065,26 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-xl text-gray-100">{proposal.title}</CardTitle>
+                  <CardTitle className="text-xl text-gray-100 flex items-center gap-3">
+                    {contractNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={28}
+                        height={28}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={28}
+                        height={28}
+                        className="rounded-full"
+                      />
+                    )}
+                    {proposal.title}
+                  </CardTitle>
                   <CardDescription className="mt-2 text-gray-400">
                     <span 
                       className="cursor-pointer hover:text-blue-400 transition-colors"

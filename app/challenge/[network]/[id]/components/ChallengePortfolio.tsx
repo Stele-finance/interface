@@ -46,7 +46,7 @@ interface ChallengePortfolioProps {
 
 
 
-export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
+export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioProps) {
   const { t, language } = useLanguage()
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -76,7 +76,7 @@ export function ChallengePortfolio({ challengeId }: ChallengePortfolioProps) {
   const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
   
   // Use wallet hook to get current wallet info
-  const { address: connectedAddress, isConnected, walletType, network, connectWallet, getProvider } = useWallet();
+  const { address: connectedAddress, isConnected, walletType, network: walletNetwork, connectWallet, getProvider } = useWallet();
   
   // Use AppKit provider for WalletConnect
   const { walletProvider: appKitProvider } = useAppKitProvider('eip155');

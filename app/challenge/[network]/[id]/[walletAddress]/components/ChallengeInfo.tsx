@@ -7,7 +7,6 @@ import { ChallengeDetails, TimeRemaining } from "../types"
 import { getTimeRemaining } from "../utils"
 import { Trophy } from "lucide-react"
 import Image from "next/image"
-import { useWallet } from "@/app/hooks/useWallet"
 
 interface ChallengeInfoProps {
   challengeId: string
@@ -16,6 +15,7 @@ interface ChallengeInfoProps {
   timeRemaining: TimeRemaining
   isClient: boolean
   currentTime: Date
+  network: string
 }
 
 export function ChallengeInfo({ 
@@ -24,10 +24,10 @@ export function ChallengeInfo({
   challengeDetails, 
   timeRemaining, 
   isClient, 
-  currentTime 
+  currentTime,
+  network
 }: ChallengeInfoProps) {
   const { t, language } = useLanguage()
-  const { network } = useWallet()
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const [tooltipTimer, setTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [showSeedMoneyTooltip, setShowSeedMoneyTooltip] = useState(false)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import {
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
+import Image from "next/image"
 
 // Predefined governance proposal templates
 interface ProposalTemplate {
@@ -35,14 +36,21 @@ interface ProposalTemplate {
   parameterDescriptions: string[]
 }
 
-export default function CreateProposalPage() {
+interface CreateProposalPageProps {
+  params: Promise<{
+    network: string
+  }>
+}
+
+export default function CreateProposalPage({ params }: CreateProposalPageProps) {
+  const { network: urlNetwork } = use(params)
   const router = useRouter()
   const queryClient = useQueryClient()
   const { t, language } = useLanguage()
-  const { walletType, network, getProvider, isConnected: walletConnected, address: walletAddress } = useWallet()
+  const { walletType, getProvider, isConnected: walletConnected, address: walletAddress } = useWallet()
   
-  // Filter network to supported types for contracts (exclude 'solana')
-  const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Use URL network parameter for contracts
+  const contractNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
 
   const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
     {
@@ -577,7 +585,26 @@ export default function CreateProposalPage() {
         
         <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-100">{t('createProposalPage')}</h1>
+            <h1 className="text-3xl font-bold text-gray-100 flex items-center gap-3">
+              {contractNetwork === 'arbitrum' ? (
+                <Image
+                  src="/networks/small/arbitrum.png"
+                  alt="Arbitrum"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <Image
+                  src="/networks/small/ethereum.png"
+                  alt="Ethereum"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              )}
+              {t('createProposalPage')}
+            </h1>
             <p className="text-gray-400 mt-1">{t('submitNewGovernanceProposal')}</p>
           </div>
         </div>

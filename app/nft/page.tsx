@@ -1,24 +1,42 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ImageIcon, Trophy, TrendingUp, Calendar } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ImageIcon, Trophy, TrendingUp, Calendar, ChevronDown } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFormattedNFTData } from "./hooks/useNFTData"
 import { NFTCard } from "./components/NFTCard"
+import Image from "next/image"
 
 export default function NFTPage() {
   const { t } = useLanguage()
   const { network: walletNetwork } = useWallet()
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+  
+  // Load network selection from localStorage on mount
+  useEffect(() => {
+    const savedNetwork = localStorage.getItem('selected-network')
+    if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
+      setSelectedNetwork(savedNetwork)
+    }
+  }, [])
+
+  // Save network selection to localStorage when it changes
+  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
+    setSelectedNetwork(network)
+    localStorage.setItem('selected-network', network)
+  }
   
   const { 
     nfts, 
     isLoading, 
     error,
     refetch 
-  } = useFormattedNFTData(walletNetwork)
+  } = useFormattedNFTData(selectedNetwork)
 
   if (error) {
     return (
@@ -37,9 +55,67 @@ export default function NFTPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <ImageIcon className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">{t('totalNFTs')}</h1>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <ImageIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">{t('totalNFTs')}</h1>
+          </div>
+          
+          {/* Network Selector Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                <div className="flex items-center gap-2">
+                  {selectedNetwork === 'arbitrum' ? (
+                    <Image
+                      src="/networks/small/arbitrum.png"
+                      alt="Arbitrum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <Image
+                      src="/networks/small/ethereum.png"
+                      alt="Ethereum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  )}
+                  <ChevronDown className="h-5 w-5 text-gray-400" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleNetworkChange('ethereum')}
+              >
+                <Image
+                  src="/networks/small/ethereum.png"
+                  alt="Ethereum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Ethereum
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleNetworkChange('arbitrum')}
+              >
+                <Image
+                  src="/networks/small/arbitrum.png"
+                  alt="Arbitrum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Arbitrum
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <p className="text-muted-foreground">
           {t('viewAllPerformanceNFTs')}

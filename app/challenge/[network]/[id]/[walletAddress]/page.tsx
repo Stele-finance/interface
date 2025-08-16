@@ -45,11 +45,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const router = useRouter()
   
   // Use hooks
-  const { address: connectedAddress, walletType, network, getProvider } = useWallet()
+  const { address: connectedAddress, walletType, getProvider } = useWallet()
   const queryClient = useQueryClient()
 
-  // Filter network to supported types for subgraph (exclude 'solana')
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Use URL network parameter instead of wallet network for subgraph
+  const subgraphNetwork = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum'
   
   const { data: investorData, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
   const { data: userTokens = [], error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
@@ -174,8 +174,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Connect to provider with signer
       const signer = await provider.getSigner();
       
-      // Filter network to supported types for contracts (exclude 'solana')
-      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      // Use URL network parameter for contract interaction
+      const contractNetwork = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum';
       
       // Create contract instance
       const steleContract = new ethers.Contract(
@@ -274,8 +274,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Get current network
       const chainId = await provider.send('eth_chainId', []);
       
-      // Get contract address for current network
-      const contractAddress = getSteleContractAddress(network);
+      // Get contract address for URL network parameter
+      const networkParam = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum';
+      const contractAddress = getSteleContractAddress(networkParam);
       
       // Use provider directly (it's already a BrowserProvider from getProvider)
       const signer = await provider.getSigner();
@@ -548,7 +549,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   realTimePortfolio={realTimePortfolio}
                   isLoadingUniswap={isLoadingUniswap}
                   challengeData={challengeData}
-                  network={network || 'ethereum'}
+                  network={routeNetwork || 'ethereum'}
                   investorData={investorData}
                 />
               )}
@@ -561,6 +562,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 timeRemaining={timeRemaining}
                 isClient={isClient}
                 currentTime={currentTime}
+                network={subgraphNetwork}
               />
 
               {/* Ranking Section */}
