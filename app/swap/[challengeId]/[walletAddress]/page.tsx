@@ -44,7 +44,7 @@ export default function SwapPage({ params }: SwapPageProps) {
     return (
       <div className="container mx-auto py-6">
         <div className="mb-6">
-          <Link href={`/challenge/${challengeId}/${walletAddress}`}>
+          <Link href={`/challenge/${subgraphNetwork}/${challengeId}/${walletAddress}`}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Portfolio
@@ -68,7 +68,7 @@ export default function SwapPage({ params }: SwapPageProps) {
     return (
       <div className="container mx-auto py-6">
         <div className="mb-6">
-          <Link href={`/challenge/${challengeId}/${walletAddress}`}>
+          <Link href={`/challenge/${subgraphNetwork}/${challengeId}/${walletAddress}`}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Portfolio
@@ -93,7 +93,7 @@ export default function SwapPage({ params }: SwapPageProps) {
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
-        <Link href={`/challenge/${challengeId}/${walletAddress}`}>
+        <Link href={`/challenge/${subgraphNetwork}/${challengeId}/${walletAddress}`}>
           <Button variant="outline" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Portfolio

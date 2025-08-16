@@ -1,24 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense } from "react"
+import { useState, useEffect } from "react"
+import { useLanguage } from "@/lib/language-context"
 
-// Dynamically import client components with SSR disabled
-const ActiveChallenges = dynamic(
-  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
-  { ssr: false }
-)
-
-const InvestableTokens = dynamic(
-  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
-  { ssr: false }
-)
-
-const TotalRanking = dynamic(
-  () => import("./TotalRanking").then(mod => ({ default: mod.TotalRanking })),
-  { ssr: false }
-)
-
+// Loading skeleton component for dynamic imports
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
@@ -31,18 +17,64 @@ function LoadingSkeleton() {
   )
 }
 
+// Dynamically import client components with SSR disabled and loading fallback
+const ActiveChallenges = dynamic(
+  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
+  { 
+    ssr: false,
+    loading: () => <LoadingSkeleton />
+  }
+)
+
+const InvestableTokens = dynamic(
+  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
+  { 
+    ssr: false,
+    loading: () => <LoadingSkeleton />
+  }
+)
+
 interface DashboardClientComponentsProps {
   network?: 'ethereum' | 'arbitrum' | 'solana' | null
 }
 
 export function DashboardClientComponents({ network }: DashboardClientComponentsProps) {
+  const [activeTab, setActiveTab] = useState<'challenges' | 'tokens'>('challenges')
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+  const { t } = useLanguage()
+
+  // Load network selection from localStorage on mount
+  useEffect(() => {
+    const savedNetwork = localStorage.getItem('selected-network')
+    if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
+      setSelectedNetwork(savedNetwork)
+    }
+  }, [])
+
+  // Save network selection to localStorage when it changes
+  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
+    setSelectedNetwork(network)
+    localStorage.setItem('selected-network', network)
+  }
+
   return (
-    <Suspense fallback={<LoadingSkeleton />}>
-      <ActiveChallenges showCreateButton={true} />
-      <div className="mt-6 sm:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-16">
-        <InvestableTokens network={network} />
-        <TotalRanking network={network} />
-      </div>
-    </Suspense>
+    <>
+      {activeTab === 'challenges' ? (
+        <ActiveChallenges 
+          showCreateButton={true} 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab}
+          selectedNetwork={selectedNetwork}
+          setSelectedNetwork={handleNetworkChange}
+        />
+      ) : (
+        <InvestableTokens 
+          network={selectedNetwork} 
+          setActiveTab={setActiveTab}
+          selectedNetwork={selectedNetwork}
+          setSelectedNetwork={handleNetworkChange}
+        />
+      )}
+    </>
   )
 } 

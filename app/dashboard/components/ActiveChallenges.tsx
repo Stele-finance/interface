@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
@@ -21,7 +21,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, Wallet, CheckCircle, Clock, Trophy } from "lucide-react"
+import { Users, Wallet, CheckCircle, Clock, Trophy, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -113,21 +113,23 @@ function calculateProgress(startTime: string, endTime: string, isCompleted: bool
 
 interface ActiveChallengesProps {
   showCreateButton?: boolean;
+  activeTab?: 'challenges' | 'tokens';
+  setActiveTab?: (tab: 'challenges' | 'tokens') => void;
+  selectedNetwork?: 'ethereum' | 'arbitrum';
+  setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
 }
 
-export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesProps) {
+export function ActiveChallenges({ showCreateButton = true, activeTab, setActiveTab, selectedNetwork = 'ethereum', setSelectedNetwork }: ActiveChallengesProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [walletSelectOpen, setWalletSelectOpen] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType, network, getProvider, isConnected, connectWallet } = useWallet();
+  const { walletType, network, getProvider, isConnected } = useWallet();
   
   // Use AppKit provider for WalletConnect
   const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
@@ -135,8 +137,8 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
   // Use React Query client for better data management
   const queryClient = useQueryClient();
   
-  // Filter network to supported types for subgraph (exclude 'solana')
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+  // Use selectedNetwork for data fetching instead of wallet network
+  const subgraphNetwork = selectedNetwork;
 
   const { data } = useActiveChallenges(subgraphNetwork)
 
@@ -169,24 +171,6 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
     return () => clearInterval(interval);
   }, [isClient]);
 
-  // Handle Connect Wallet
-  const handleConnectWallet = async () => {
-    setIsConnecting(true);
-    setWalletSelectOpen(false);
-    
-    try {
-      await connectWallet();
-    } catch (error) {
-      console.error("Failed to connect wallet:", error);
-      toast({
-        variant: "destructive",
-        title: "Connection Failed",
-        description: error instanceof Error ? error.message : "Failed to connect wallet",
-      });
-    } finally {
-      setIsConnecting(false);
-    }
-  };
 
   // Handle Create Challenge with selected type
   const handleCreateChallenge = async (challengeType: number) => {
@@ -226,10 +210,62 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
         throw new Error('Could not determine user address');
       }
 
-      // Connect to provider with signer
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to the selected network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = subgraphNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await provider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to create a challenge.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+
+      // Get signer after ensuring correct network
       const signer = await provider.getSigner()
       
-      // Create contract instance
+      // Create contract instance with the selected network
       const steleContract = new ethers.Contract(
         getSteleContractAddress(subgraphNetwork),
         SteleABI.abi,
@@ -465,21 +501,21 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
             <Clock className="h-4 w-4" />
             {t('active')}
           </Badge>
-        )
+        );
       case "pending":
         return (
           <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
             <Clock className="h-4 w-4" />
             {t('pending')}
           </Badge>
-        )
+        );
       case "end":
         return (
           <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
             <CheckCircle className="h-3 w-3" />
             {t('end')}
           </Badge>
-        )
+        );
       default:
         return <Badge variant="secondary" className="px-3 py-1.5 text-sm whitespace-nowrap pointer-events-none hover:bg-secondary focus:bg-secondary transition-none">{t('unknown')}</Badge>
     }
@@ -524,187 +560,279 @@ export function ActiveChallenges({ showCreateButton = true }: ActiveChallengesPr
       )}
 
       <div className="space-y-4 mt-8">
-        <div className="flex items-center justify-between">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="flex gap-4">
+            <h2 className="text-3xl text-gray-100 cursor-default">{t('activeChallenges')}</h2>
+            {setActiveTab && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('tokens')}
+                className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                {t('token')}
+              </button>
+            )}
+          </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <Trophy className="h-8 w-8 text-yellow-500" />
-              {/* Show Arbitrum network icon only when connected to Arbitrum */}
-              {network === 'arbitrum' && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                  <Image 
-                    src="/networks/small/arbitrum.png" 
+            {/* Network Selector Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    {selectedNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    )}
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
                     alt="Arbitrum"
                     width={16}
                     height={16}
-                    className="rounded-full"
-                    style={{ width: 'auto', height: 'auto' }}
+                    className="rounded-full mr-2"
                   />
-                </div>
-              )}
-            </div>
-            <h2 className="text-3xl text-gray-100">{t('activeChallenges')}</h2>
+                  Arbitrum
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Create Challenge Button */}
+            {isConnected && (
+              <ChallengeTypeModal 
+                onCreateChallenge={handleCreateChallenge}
+                isCreating={isCreating}
+                activeChallenges={activeChallengesData}
+              />
+            )}
           </div>
-          {isConnected ? (
-            <ChallengeTypeModal 
-              onCreateChallenge={handleCreateChallenge}
-              isCreating={isCreating}
-              activeChallenges={activeChallengesData}
-            />
-          ) : (
-            <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="default" 
-                  size="lg"
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                  onClick={() => setWalletSelectOpen(true)}
-                >
-                  <Wallet className="mr-3 h-5 w-5" />
-                  {t('connectWallet')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
-                <DialogHeader>
-                  <DialogTitle>{t('connectWallet')}</DialogTitle>
-                  <DialogDescription>
-                    {t('selectWalletToConnect')}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 gap-4 py-4">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
-                    onClick={() => handleConnectWallet()}
-                    disabled={isConnecting}
-                  >
-                    <Image 
-                      src="/wallets/walletconnect.png"
-                      alt="WalletConnect"
-                      width={24}
-                      height={24}
-                      style={{ width: 'auto', height: '24px' }}
-                    />
-                    <div className="text-left">
-                      <div className="font-semibold">WalletConnect</div>
-                      <div className="text-sm text-muted-foreground">
-                        Mobile & Desktop Wallets
-                      </div>
-                    </div>
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
         </div>
 
-      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                  <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">⏰</span>
-                      {t('period')}
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">⌛</span>
-                      {t('progress')}
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
-                  <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="relative">
-                        <Trophy className="h-4 w-4 text-yellow-500" />
-                        {/* Show network icon only when connected to Arbitrum */}
-                        {network === 'arbitrum' && (
-                          <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                            <Image 
-                              src="/networks/small/arbitrum.png" 
-                              alt="Arbitrum"
-                              width={8}
-                              height={8}
-                              className="rounded-full"
-                              style={{ width: 'auto', height: 'auto' }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      {t('challenge')}
-                    </div>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {challenges.map((challenge) => (
-                  <TableRow 
-                    key={challenge.id}
-                    className={`border-0 transition-colors ${
-                      challenge.challengeId && challenge.challengeId !== "" 
-                        ? "hover:bg-gray-800/50 cursor-pointer" 
-                        : "cursor-default"
-                    }`}
-                    onClick={() => {
-                      if (challenge.challengeId && challenge.challengeId !== "") {
-                        router.push(`/${network}/challenge/${challenge.challengeId}`)
-                      }
-                    }}
-                  >
-                    <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
-                      <span className="whitespace-nowrap">{challenge.title}</span>
-                    </TableCell>
-                    <TableCell className="font-medium text-yellow-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
-                      {challenge.prize}
-                    </TableCell>
-                    <TableCell className="py-6 min-w-[100px]">
-                      {getStatusBadge(challenge.status)}
-                    </TableCell>
-                    <TableCell className="py-6 min-w-[120px]">
-                      <div className="flex items-center gap-2">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div>
-                                <Progress 
-                                  value={challenge.progress} 
-                                  className="w-20 h-3"
-                                />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{challenge.timeLeft}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(challenge.progress)}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-6 min-w-[80px]">
-                      <div className="flex items-center gap-2 text-gray-300 text-base whitespace-nowrap">
-                        <Users className="h-4 w-4" />
-                        <span>{challenge.participants}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="pr-6 py-6 min-w-[80px]">
-                      <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                        {challenge.challengeId}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        {/* Mobile Layout */}
+        <div className="md:hidden space-y-4">
+          {/* Title and Tab */}
+          <div className="flex gap-4">
+            <h2 className="text-3xl text-gray-100 cursor-default">{t('activeChallenges')}</h2>
+            {setActiveTab && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('tokens')}
+                className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                {t('token')}
+              </button>
+            )}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          
+          {/* Network Dropdown and New Button */}
+          <div className="flex items-center gap-3">
+            {/* Network Selector Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    {selectedNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    )}
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Arbitrum
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Create Challenge Button */}
+            {isConnected && (
+              <ChallengeTypeModal 
+                onCreateChallenge={handleCreateChallenge}
+                isCreating={isCreating}
+                activeChallenges={activeChallengesData}
+              />
+            )}
+          </div>
+        </div>
+        <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
+                    <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">⏰</span>
+                        {t('period')}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
+                    <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">⌛</span>
+                        {t('progress')}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
+                    <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
+                    <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Trophy className="h-4 w-4 text-yellow-500" />
+                          {/* Show network icon only when connected to Arbitrum */}
+                          {selectedNetwork === 'arbitrum' && (
+                            <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                              <Image 
+                                src="/networks/small/arbitrum.png" 
+                                alt="Arbitrum"
+                                width={8}
+                                height={8}
+                                className="rounded-full"
+                                style={{ width: 'auto', height: 'auto' }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        {t('challenge')}
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {challenges.map((challenge) => (
+                    <TableRow 
+                      key={challenge.id}
+                      className={`border-0 transition-colors ${
+                        challenge.challengeId && challenge.challengeId !== "" 
+                          ? "hover:bg-gray-800/50 cursor-pointer" 
+                          : "cursor-default"
+                      }`}
+                      onClick={() => {
+                        if (challenge.challengeId && challenge.challengeId !== "") {
+                          router.push(`/challenge/${selectedNetwork}/${challenge.challengeId}`)
+                        }
+                      }}
+                    >
+                      <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
+                        <span className="whitespace-nowrap">{challenge.title}</span>
+                      </TableCell>
+                      <TableCell className="py-6 min-w-[100px]">
+                        {getStatusBadge(challenge.status)}
+                      </TableCell>
+                      <TableCell className="py-6 min-w-[120px]">
+                        <div className="flex items-center gap-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  <Progress 
+                                    value={challenge.progress} 
+                                    className="w-20 h-3"
+                                  />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{challenge.timeLeft}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(challenge.progress)}%</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium text-yellow-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
+                        {challenge.prize}
+                      </TableCell>
+                      <TableCell className="py-6 min-w-[80px]">
+                        <div className="flex items-center gap-2 text-gray-300 text-base whitespace-nowrap">
+                          <Users className="h-4 w-4" />
+                          <span>{challenge.participants}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="pr-6 py-6 min-w-[80px]">
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                          {challenge.challengeId}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </>
   )
 }

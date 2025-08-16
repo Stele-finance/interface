@@ -65,7 +65,6 @@ export function Header() {
 
   const [balance, setBalance] = useState<string>('0')
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
-  const [challengesDropdownOpen, setChallengesDropdownOpen] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   
@@ -226,13 +225,9 @@ export function Header() {
       return;
     }
 
-    // Only navigate if network actually changed and not already on dashboard
-    if (prevNetworkRef.current !== walletNetwork && !pathname.includes('/dashboard')) {
-      prevNetworkRef.current = walletNetwork;
-      router.push('/dashboard');
-    } else {
-      prevNetworkRef.current = walletNetwork;
-    }
+    // Update the previous network reference but don't navigate
+    // This prevents unwanted redirects when network changes
+    prevNetworkRef.current = walletNetwork;
   }, [walletNetwork, pathname, router]);
 
   // Navigate to dashboard when wallet address changes
@@ -243,11 +238,12 @@ export function Header() {
       return;
     }
 
-    // Only navigate if wallet address actually changed and not already on dashboard
+    // Only navigate if wallet address actually changed and not already on dashboard/challenges
     // Also skip if wallet is being disconnected (walletAddress becomes null)
     if (prevWalletAddressRef.current !== walletAddress && 
         walletAddress !== null && 
-        !pathname.includes('/dashboard')) {
+        !pathname.includes('/dashboard') && 
+        !pathname.includes('/challenges')) {
       prevWalletAddressRef.current = walletAddress;
       router.push('/dashboard');
     } else {
@@ -257,6 +253,11 @@ export function Header() {
 
   const { symbol, name } = getNetworkInfo();
   const walletIcon = getWalletIcon();
+
+  // Hide header on home page
+  if (pathname === '/home') {
+    return null
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
@@ -275,6 +276,7 @@ export function Header() {
               maxWidth: '48px'
             }}
           />
+          <span className="hidden sm:block text-orange-500 text-xl sm:text-2xl">Stele</span>
         </Link>
         
         {/* Mobile Menu Icon - Hidden on desktop */}
@@ -292,55 +294,39 @@ export function Header() {
           <Link 
             href="/dashboard"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname === "/" || pathname === "/dashboard"
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <BarChart3 className="h-4 w-4" />
+            <BarChart3 className="h-5 w-5" />
             {t('dashboard')}
           </Link>
           
-          <DropdownMenu open={challengesDropdownOpen} onOpenChange={setChallengesDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                  pathname.includes("/challenges") || pathname.includes("/challenge/")
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                <Trophy className="h-4 w-4" />
-                {t('challenges')}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-36 bg-muted/80 border-gray-600 z-[60]">
-               <DropdownMenuItem asChild>
-                 <Link href="/portfolio" className="cursor-pointer">
-                   {t('myPortfolio')}
-                 </Link>
-               </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                 <Link href="/challenges" className="cursor-pointer">
-                   {t('totalChallenges')}
-                 </Link>
-               </DropdownMenuItem>
-             </DropdownMenuContent>
-          </DropdownMenu>
+          <Link 
+            href="/challenges"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/challenges") || pathname.includes("/challenge/")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Trophy className="h-5 w-5" />
+            {t('challenges')}
+          </Link>
           
           <Link 
             href="/nft"
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname.includes("/nft")
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <ImageIcon className="h-4 w-4" />
+            <ImageIcon className="h-5 w-5" />
             NFTs
           </Link>
           
@@ -587,20 +573,6 @@ export function Header() {
                 >
                   <Trophy className="h-5 w-5 mr-3" />
                   {t('challenges')}
-                </Link>
-                
-                <Link 
-                  href="/portfolio"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname.includes("/portfolio")
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                >
-                  <User className="h-5 w-5 mr-3" />
-                  {t('myPortfolios')}
                 </Link>
                 
                 <Link 

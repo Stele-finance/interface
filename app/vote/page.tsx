@@ -4,8 +4,9 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, Plus, Loader2 } from "lucide-react"
+import { Clock, Plus, Loader2, ChevronDown } from "lucide-react"
 import { useMultipleProposalVoteResults, useProposalsByStatusPaginated, useProposalsCountByStatus } from "./hooks/useProposals"
 import { useQueryClient } from '@tanstack/react-query'
 import { getRPCUrl } from "@/lib/constants"
@@ -17,6 +18,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { toast } from "@/components/ui/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
+import Image from "next/image"
 
 // Import separated components and utilities
 import {
@@ -39,7 +41,7 @@ export default function VotePage() {
   const { isMobileMenuOpen } = useMobileMenu()
   const router = useRouter()
   // Use global wallet hook instead of local state
-  const { address, isConnected, walletType, network, getProvider } = useWallet()
+  const { address, isConnected, walletType, getProvider } = useWallet()
   const walletAddress = address ?? undefined
   const queryClient = useQueryClient()
   const [isDelegating, setIsDelegating] = useState(false)
@@ -49,8 +51,25 @@ export default function VotePage() {
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [mountTimestamp, setMountTimestamp] = useState(Date.now())
   
-  // Filter network for subgraph usage (exclude solana)
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Independent network selection state (not based on wallet)
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+
+  // Load network selection from localStorage on mount
+  useEffect(() => {
+    const savedNetwork = localStorage.getItem('selected-network')
+    if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
+      setSelectedNetwork(savedNetwork)
+    }
+  }, [])
+
+  // Save network selection to localStorage when it changes
+  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
+    setSelectedNetwork(network)
+    localStorage.setItem('selected-network', network)
+  }
+  
+  // Use selected network for all queries
+  const subgraphNetwork = selectedNetwork
   
   // Fetch governance configuration from smart contract (temporarily disabled to prevent rate limiting)
   const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false)
@@ -221,8 +240,8 @@ export default function VotePage() {
 
   // Handle proposal click
   const handleProposalClick = useCallback((proposal: Proposal) => {
-    router.push(createProposalUrl(proposal, walletTokenInfo))
-  }, [router, walletTokenInfo])
+    router.push(createProposalUrl(proposal, walletTokenInfo, selectedNetwork))
+  }, [router, walletTokenInfo, selectedNetwork])
 
   // Handle delegate wrapper
   const handleDelegateWrapper = useCallback(async () => {
@@ -386,28 +405,65 @@ export default function VotePage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl text-gray-100 whitespace-nowrap">{t('governance')}</h1>
         <div className="flex items-center gap-4">
-          {/* Desktop buttons - hidden on mobile */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button 
-              variant="default" 
-              size="lg"
-              onClick={handleRefresh}
-              disabled={isInitialLoading || isCurrentTabLoading} 
-              className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
-            >
-              {isInitialLoading ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  {t('loading')}
-                </>
-              ) : (
-                <>
-                  <Clock className="mr-3 h-5 w-5" />
-                  {t('refresh')}
-                </>
-              )}
-            </Button>
-            <Link href="/vote/create">
+          {/* Network Selector Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                <div className="flex items-center gap-2">
+                  {selectedNetwork === 'arbitrum' ? (
+                    <Image
+                      src="/networks/small/arbitrum.png"
+                      alt="Arbitrum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <Image
+                      src="/networks/small/ethereum.png"
+                      alt="Ethereum"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  )}
+                  <ChevronDown className="h-5 w-5 text-gray-400" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleNetworkChange('ethereum')}
+              >
+                <Image
+                  src="/networks/small/ethereum.png"
+                  alt="Ethereum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Ethereum
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleNetworkChange('arbitrum')}
+              >
+                <Image
+                  src="/networks/small/arbitrum.png"
+                  alt="Arbitrum"
+                  width={16}
+                  height={16}
+                  className="rounded-full mr-2"
+                />
+                Arbitrum
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          {/* Desktop Create button - hidden on mobile */}
+          <div className="hidden md:flex items-center">
+            <Link href={`/vote/create/${selectedNetwork}`}>
               <Button 
                 variant="default" 
                 size="lg"
@@ -557,37 +613,16 @@ export default function VotePage() {
       {!isMobileMenuOpen && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <div className="p-4">
-            <div className="grid grid-cols-2 gap-3">
+            <Link href={`/vote/create/${selectedNetwork}`}>
               <Button 
                 variant="default" 
                 size="lg"
-                onClick={handleRefresh}
-                disabled={isInitialLoading || isCurrentTabLoading} 
-                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base border-orange-500 hover:border-orange-600 disabled:border-orange-500/50"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base border-orange-500 hover:border-orange-600"
               >
-                {isInitialLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('loading')}
-                  </>
-                ) : (
-                  <>
-                    <Clock className="mr-2 h-5 w-5" />
-                    {t('refresh')}
-                  </>
-                )}
+                <Plus className="mr-2 h-5 w-5" />
+                {t('createProposal')}
               </Button>
-              <Link href="/vote/create">
-                <Button 
-                  variant="default" 
-                  size="lg"
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base border-orange-500 hover:border-orange-600"
-                >
-                  <Plus className="mr-2 h-5 w-5" />
-                  {t('createProposal')}
-                </Button>
-              </Link>
-            </div>
+            </Link>
           </div>
         </div>
       )}

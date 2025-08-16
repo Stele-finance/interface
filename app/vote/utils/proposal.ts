@@ -335,7 +335,7 @@ export const formatDate = (date: Date): string => {
 }
 
 // Create URL with proposal data as query parameters
-export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any): string => {
+export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any, network: string = 'ethereum'): string => {
   const params = new URLSearchParams({
     title: proposal.title,
     description: proposal.description,
@@ -355,5 +355,5 @@ export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any): st
     delegatedTo: walletTokenInfo?.delegatedTo || ''
   })
   
-  return `/vote/${proposal.id}?${params.toString()}`
+  return `/vote/${network}/${proposal.id}?${params.toString()}`
 } 

@@ -6,20 +6,23 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Progress } from "@/components/ui/progress"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Trophy, Users, Clock, CheckCircle } from "lucide-react"
 import { useRecentChallenges, RecentChallenge } from "../hooks/useRecentChallenges"
 import { useLanguage } from "@/lib/language-context"
-import { useWallet } from "@/app/hooks/useWallet"
-import { formatDateWithLocale } from "@/lib/utils"
 import Image from "next/image"
 
-export function RecentChallengesTable() {
-  const { t, language } = useLanguage()
+interface RecentChallengesTableProps {
+  selectedNetwork?: 'ethereum' | 'arbitrum'
+}
+
+export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentChallengesTableProps) {
+  const { t } = useLanguage()
   const router = useRouter()
-  const { network } = useWallet()
   
-  // Filter network for subgraph usage (exclude solana)
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  // Use selected network for subgraph queries
+  const subgraphNetwork = selectedNetwork
   const { data, isLoading, error } = useRecentChallenges(subgraphNetwork)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [currentPage, setCurrentPage] = useState(1)
@@ -95,16 +98,6 @@ export function RecentChallengesTable() {
     }
   }
 
-  const formatDate = (timestamp: string): string => {
-    const date = new Date(Number(timestamp) * 1000)
-    return formatDateWithLocale(date, language, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
 
   const formatUSDAmount = (amount: string): string => {
     const num = Number(amount)
@@ -113,42 +106,32 @@ export function RecentChallengesTable() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
-        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
-          <CardContent className="p-0">
-            <div className="space-y-3 p-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-12 bg-gray-700 rounded animate-pulse"></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="space-y-3 p-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-12 bg-gray-700 rounded animate-pulse"></div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   if (error || !data?.challenges) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">{t('totalChallenges')}</h2>
-        <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
-          <CardContent className="p-0">
-            <div className="text-center py-8 px-6">
-              <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="text-center py-8 px-6">
+            <p className="text-gray-400">{t('errorLoadingChallenges')}</p>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl text-gray-100">
-        {t('totalChallenges')}
-      </h2>
-      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+    <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           {data.challenges.length === 0 ? (
             <div className="text-center py-8">
@@ -185,8 +168,14 @@ export function RecentChallengesTable() {
                             {t('challenge')}
                           </div>
                         </th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('prize')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('status')}</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">⌛</span>
+                            {t('progress')}
+                          </div>
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('prize')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('users')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
                           <div className="flex items-center gap-2">
@@ -194,8 +183,6 @@ export function RecentChallengesTable() {
                             {t('period')}
                           </div>
                         </th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('startDate')}</th>
-                        <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('endDate')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -211,7 +198,7 @@ export function RecentChallengesTable() {
                           <tr 
                             key={challenge.id} 
                             className="hover:bg-gray-800/30 transition-colors cursor-pointer"
-                            onClick={() => router.push(`/${subgraphNetwork}/challenge/${challenge.challengeId}`)}
+                            onClick={() => router.push(`/challenge/${subgraphNetwork}/${challenge.challengeId}`)}
                           >
                             <td className="py-6 pl-6 pr-4">
                               <div className="ml-6">
@@ -221,12 +208,34 @@ export function RecentChallengesTable() {
                               </div>
                             </td>
                             <td className="py-6 px-4">
-                              <div className="font-medium text-yellow-400 whitespace-nowrap">
-                                {formatUSDAmount(challenge.rewardAmountUSD)}
+                              {getStatusBadge(getChallengeStatus(challenge))}
+                            </td>
+                            <td className="py-6 px-4">
+                              <div className="flex items-center gap-2">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div>
+                                        <Progress 
+                                          value={Math.min(100, Math.max(0, ((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100))} 
+                                          className="w-20 h-3"
+                                        />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}% {t('progress')}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                <span className="text-sm text-gray-400 font-medium whitespace-nowrap">
+                                  {Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}%
+                                </span>
                               </div>
                             </td>
                             <td className="py-6 px-4">
-                              {getStatusBadge(getChallengeStatus(challenge))}
+                              <div className="font-medium text-yellow-400 whitespace-nowrap">
+                                {formatUSDAmount(challenge.rewardAmountUSD)}
+                              </div>
                             </td>
                             <td className="py-6 px-4">
                               <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
@@ -238,16 +247,6 @@ export function RecentChallengesTable() {
                               <span className="font-medium text-gray-100 text-base whitespace-nowrap">
                                 {getChallengeTypeName(challenge.challengeType)}
                               </span>
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className="text-sm text-gray-400 whitespace-nowrap">
-                                {formatDate(challenge.startTime)}
-                              </div>
-                            </td>
-                            <td className="py-6 px-6">
-                              <div className="text-left text-sm text-gray-400 whitespace-nowrap">
-                                {formatDate(challenge.endTime)}
-                              </div>
                             </td>
                           </tr>
                         ))
@@ -299,7 +298,6 @@ export function RecentChallengesTable() {
             </>
           )}
         </CardContent>
-      </Card>
-    </div>
+    </Card>
   )
 } 

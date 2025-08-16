@@ -48,10 +48,12 @@ import SteleABI from "@/app/abis/Stele.json"
 
 export function AssetSwap({ className, userTokens = [], onSwappingStateChange, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
-  const { walletType, network, getProvider, isConnected } = useWallet()
+  const { walletType, getProvider, isConnected } = useWallet()
   
-  // Filter network to supported types for subgraph (exclude 'solana')
-  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+  // Get network from URL path instead of wallet
+  const pathParts = window.location.pathname.split('/');
+  const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'ethereum';
+  const subgraphNetwork = networkFromUrl as 'ethereum' | 'arbitrum';
   
   const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
   const [fromAmount, setFromAmount] = useState<string>("")
@@ -255,19 +257,52 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
         throw new Error('Could not determine user address');
       }
 
-      // Check if we are on correct network
-      const chainId = await browserProvider.send('eth_chainId', []);
-
-      // Filter network to supported types for contracts (exclude 'solana')
-      const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
-      const targetChainId = getChainId(contractNetwork);
-      if (chainId !== targetChainId) {
-        // Switch to target network
+      // Get wallet's current network
+      const walletChainId = await browserProvider.send('eth_chainId', []);
+      const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
         try {
-          await browserProvider.send('wallet_switchEthereumChain', [{ chainId: targetChainId }]);
+          // Request network switch
+          await browserProvider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
         } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
           if (switchError.code === 4902) {
-            await browserProvider.send('wallet_addEthereumChain', [getChainConfig(contractNetwork)]);
+            try {
+              const networkParams = subgraphNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to perform swap.`);
           } else {
             throw switchError;
           }
@@ -277,9 +312,9 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
       // Use existing browserProvider and get signer
       const signer = await browserProvider.getSigner();
       
-      // Create contract instance
+      // Create contract instance with URL-based network
       const steleContract = new ethers.Contract(
-        getSteleContractAddress(contractNetwork),
+        getSteleContractAddress(subgraphNetwork),
         SteleABI.abi,
         signer
       );
@@ -324,8 +359,8 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
       );
 
       // Get network-specific explorer info
-      const explorerName = getExplorerName(network);
-      const submittedTxUrl = buildTransactionUrl(network, tx.hash);
+      const explorerName = getExplorerName(subgraphNetwork);
+      const submittedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
       
       toast({
         title: "Transaction Submitted",
@@ -341,7 +376,7 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
       const receipt = await tx.wait();
 
       if (receipt.status === 1) {
-        const confirmedTxUrl = buildTransactionUrl(network, receipt.hash);
+        const confirmedTxUrl = buildTransactionUrl(subgraphNetwork, receipt.hash);
         
         toast({
           title: "Swap Successful",
