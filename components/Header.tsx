@@ -225,13 +225,9 @@ export function Header() {
       return;
     }
 
-    // Only navigate if network actually changed and not already on dashboard
-    if (prevNetworkRef.current !== walletNetwork && !pathname.includes('/dashboard')) {
-      prevNetworkRef.current = walletNetwork;
-      router.push('/dashboard');
-    } else {
-      prevNetworkRef.current = walletNetwork;
-    }
+    // Update the previous network reference but don't navigate
+    // This prevents unwanted redirects when network changes
+    prevNetworkRef.current = walletNetwork;
   }, [walletNetwork, pathname, router]);
 
   // Navigate to dashboard when wallet address changes

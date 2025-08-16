@@ -1,22 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
 
-// Dynamically import client components with SSR disabled
-const ActiveChallenges = dynamic(
-  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
-  { ssr: false }
-)
-
-const InvestableTokens = dynamic(
-  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
-  { ssr: false }
-)
-
-// Removed TotalRanking (Hall of Fame) component
-
+// Loading skeleton component for dynamic imports
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
@@ -28,6 +16,23 @@ function LoadingSkeleton() {
     </div>
   )
 }
+
+// Dynamically import client components with SSR disabled and loading fallback
+const ActiveChallenges = dynamic(
+  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
+  { 
+    ssr: false,
+    loading: () => <LoadingSkeleton />
+  }
+)
+
+const InvestableTokens = dynamic(
+  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
+  { 
+    ssr: false,
+    loading: () => <LoadingSkeleton />
+  }
+)
 
 interface DashboardClientComponentsProps {
   network?: 'ethereum' | 'arbitrum' | 'solana' | null
@@ -53,7 +58,7 @@ export function DashboardClientComponents({ network }: DashboardClientComponents
   }
 
   return (
-    <Suspense fallback={<LoadingSkeleton />}>
+    <>
       {activeTab === 'challenges' ? (
         <ActiveChallenges 
           showCreateButton={true} 
@@ -70,6 +75,6 @@ export function DashboardClientComponents({ network }: DashboardClientComponents
           setSelectedNetwork={handleNetworkChange}
         />
       )}
-    </Suspense>
+    </>
   )
 } 

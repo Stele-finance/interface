@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { 
   getSteleContractAddress,
   getUSDCTokenAddress,
+  getRPCUrl,
   USDC_DECIMALS
 } from "@/lib/constants"
 import { useEntryFee } from "@/lib/hooks/use-entry-fee"
@@ -600,21 +601,74 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         throw new Error('Could not determine user address');
       }
 
-      // Get current network information
-      const chainId = await browserProvider.send('eth_chainId', []);
-      
-      // Use current network without switching
-      // No automatic network switching - use whatever network user is currently on
-
       if (!entryFee) {
         throw new Error("Entry fee not loaded yet. Please try again later.");
       }
 
-      // Use existing browserProvider and get signer
-      const signer = await browserProvider.getSigner();
-      
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+      
+      // Create a provider for the network from URL (not from wallet)
+      const rpcUrl = getRPCUrl(contractNetwork);
+      const networkProvider = new ethers.JsonRpcProvider(rpcUrl);
+      
+      // Get wallet's current network
+      let walletChainId = await browserProvider.send('eth_chainId', []);
+      const expectedChainId = contractNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await browserProvider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+          // Update walletChainId after switching
+          walletChainId = expectedChainId;
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = contractNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
+              walletChainId = expectedChainId;
+            } catch (addError) {
+              const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to continue.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+      
+      // Get signer after ensuring correct network
+      const signer = await browserProvider.getSigner();
       
       // Create contract instances
       const steleContract = new ethers.Contract(
@@ -623,6 +677,15 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         signer
       );
 
+      // Create USDC contract with network provider for reading
+      const usdcContractRead = new ethers.Contract(
+        getUSDCTokenAddress(contractNetwork),
+        ERC20ABI.abi,
+        networkProvider
+      );
+      
+      // Create USDC contract with signer for transactions
+      // Use URL-based network addresses
       const usdcContract = new ethers.Contract(
         getUSDCTokenAddress(contractNetwork),
         ERC20ABI.abi,
@@ -633,19 +696,30 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
 
       // Check current USDC balance
       try {
-        const usdcBalance = await usdcContract.balanceOf(userAddress);        
+        console.log("Checking USDC balance for:", {
+          userAddress,
+          usdcAddress: getUSDCTokenAddress(contractNetwork),
+          network: contractNetwork,
+          walletChainId
+        });
+        
+        // Use the read-only contract with network provider
+        const usdcBalance = await usdcContractRead.balanceOf(userAddress);        
         if (usdcBalance < discountedEntryFeeAmount) {
           const balanceFormatted = ethers.formatUnits(usdcBalance, USDC_DECIMALS);
           throw new Error(`❌ Insufficient USDC balance. You have ${balanceFormatted} USDC but need ${entryFee} USDC.`);
         }
       } catch (balanceError: any) {
         console.error("❌ Error checking USDC balance:", balanceError);
+        if (balanceError.code === 'BAD_DATA' || balanceError.value === '0x') {
+          throw new Error(`Unable to read USDC balance. Please ensure you are connected to the ${contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'} network.`);
+        }
         throw balanceError;
       }
 
-      // Check current allowance
+      // Check current allowance using read-only contract
       try {
-        const currentAllowance = await usdcContract.allowance(userAddress, getSteleContractAddress(contractNetwork));
+        const currentAllowance = await usdcContractRead.allowance(userAddress, getSteleContractAddress(contractNetwork));
         if (currentAllowance < discountedEntryFeeAmount) {
           
           // Estimate gas for approval
@@ -656,8 +730,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
             });
                         
             // Show toast notification for approve transaction submitted
-            const explorerName = getExplorerName(chainId);
-            const explorerUrl = getExplorerUrl(chainId, approveTx.hash);
+            const explorerName = getExplorerName(walletChainId);
+            const explorerUrl = getExplorerUrl(walletChainId, approveTx.hash);
             
             toast({
               title: "Approval Submitted",
@@ -704,8 +778,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         });
                 
         // Show toast notification for transaction submitted
-        const joinExplorerName = getExplorerName(chainId);
-        const joinExplorerUrl = getExplorerUrl(chainId, tx.hash);
+        const joinExplorerName = getExplorerName(walletChainId);
+        const joinExplorerUrl = getExplorerUrl(walletChainId, tx.hash);
         
         toast({
           title: "Transaction Submitted",
@@ -858,14 +932,60 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         setWalletAddress(userAddress);
       }
 
-      // Connect to provider with signer
-      const signer = await provider.getSigner()
-
-      // Get current network information
-      const chainId = await provider.send('eth_chainId', []);
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
       
-      // Use current network without switching
-      // No automatic network switching - use whatever network user is currently on
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = network === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await provider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to claim rewards.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+      
+      // Get signer after ensuring correct network
+      const signer = await provider.getSigner()
 
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
@@ -881,8 +1001,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       const tx = await steleContract.getRewards(challengeId);
       
       // Show toast notification for transaction submitted
-      const rewardExplorerName = getExplorerName(chainId);
-      const rewardExplorerUrl = getExplorerUrl(chainId, tx.hash);
+      const rewardExplorerName = getExplorerName(walletChainId);
+      const rewardExplorerUrl = getExplorerUrl(walletChainId, tx.hash);
       
       toast({
         title: t('transactionSubmitted'),

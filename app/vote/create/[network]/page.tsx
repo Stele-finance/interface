@@ -392,13 +392,59 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
         signer = await browserProvider.getSigner();
       }
 
-      // Get current network information
-      const chainId = await browserProvider.send('eth_chainId', []);
+      // Get wallet's current network
+      const walletChainId = await browserProvider.send('eth_chainId', []);
+      const expectedChainId = contractNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
       
-      // Use current network without switching
-      // No automatic network switching - use whatever network user is currently on
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await browserProvider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = contractNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to create proposal.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
       
-      // Create contract instance
+      // Create contract instance with URL-based network
       const governorContract = new ethers.Contract(
         getGovernanceContractAddress(contractNetwork),
         GovernorABI.abi,

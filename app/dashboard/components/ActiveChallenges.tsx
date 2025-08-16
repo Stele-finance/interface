@@ -210,10 +210,62 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
         throw new Error('Could not determine user address');
       }
 
-      // Connect to provider with signer
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to the selected network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = subgraphNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await provider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to create a challenge.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+
+      // Get signer after ensuring correct network
       const signer = await provider.getSigner()
       
-      // Create contract instance
+      // Create contract instance with the selected network
       const steleContract = new ethers.Contract(
         getSteleContractAddress(subgraphNetwork),
         SteleABI.abi,
@@ -514,6 +566,7 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
             <h2 className="text-3xl text-gray-100 cursor-default">{t('activeChallenges')}</h2>
             {setActiveTab && (
               <button
+                type="button"
                 onClick={() => setActiveTab('tokens')}
                 className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
               >
@@ -596,6 +649,7 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
             <h2 className="text-3xl text-gray-100 cursor-default">{t('activeChallenges')}</h2>
             {setActiveTab && (
               <button
+                type="button"
                 onClick={() => setActiveTab('tokens')}
                 className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
               >

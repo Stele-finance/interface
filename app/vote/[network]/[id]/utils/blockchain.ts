@@ -12,6 +12,56 @@ import { getGovernanceContractAddress } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { mapProposalStateToStatus } from "./proposal-detail"
 
+// Helper function to switch wallet network
+const switchToNetwork = async (provider: any, network: NetworkType) => {
+  const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
+  const walletChainId = await provider.send('eth_chainId', []);
+  
+  if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+    try {
+      await provider.send('wallet_switchEthereumChain', [
+        { chainId: expectedChainId }
+      ]);
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        try {
+          const networkParams = network === 'arbitrum' ? {
+            chainId: expectedChainId,
+            chainName: 'Arbitrum One',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io']
+          } : {
+            chainId: expectedChainId,
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+            blockExplorerUrls: ['https://etherscan.io']
+          };
+          
+          await provider.send('wallet_addEthereumChain', [networkParams]);
+        } catch (addError) {
+          const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+        }
+      } else if (switchError.code === 4001) {
+        const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+        throw new Error(`Please switch to ${networkName} network to continue.`);
+      } else {
+        throw switchError;
+      }
+    }
+  }
+};
+
 // Handle queue operation
 export const handleQueue = async (
   proposalDetails: ProposalDetails,
@@ -37,7 +87,10 @@ export const handleQueue = async (
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
 
-    // Connect to provider with signer
+    // Switch to correct network if needed
+    await switchToNetwork(provider, network);
+    
+    // Get signer after ensuring correct network
     const signer = await provider.getSigner()
     const governanceContract = new ethers.Contract(getGovernanceContractAddress(network), GovernorABI.abi, signer)
 
@@ -136,7 +189,10 @@ export const handleExecute = async (
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
 
-    // Connect to provider with signer
+    // Switch to correct network if needed
+    await switchToNetwork(provider, network);
+    
+    // Get signer after ensuring correct network
     const signer = await provider.getSigner()
     const governanceContract = new ethers.Contract(getGovernanceContractAddress(network), GovernorABI.abi, signer)
 

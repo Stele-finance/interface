@@ -117,63 +117,30 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
     return pageNumbers
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
-        <Card className="bg-transparent border border-gray-700/50">
-          <CardContent className="p-0">
-            <div className="flex items-center justify-center py-8 px-6">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-              <span className="ml-2 text-gray-400">{t('loadingTokens')}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
-        <Card className="bg-transparent border border-gray-700/50">
-          <CardContent className="p-0">
-            <div className="text-center py-8 px-6">
-              <p className="text-red-400">{t('errorLoadingTokens')}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {error instanceof Error ? error.message : 'Failed to load data'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4 mt-8">
       {/* Desktop Layout */}
       <div className="hidden md:flex items-center justify-between">
-        {setActiveTab ? (
-          <div className="flex gap-4">
+        <div className="flex gap-4">
+          {setActiveTab && (
             <button
+              type="button"
               onClick={() => setActiveTab('challenges')}
               className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
             >
               {t('challenge')}
             </button>
-            <h2 className="text-3xl text-gray-100 cursor-default">{t('token')}</h2>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
+          )}
+          <h2 className="text-3xl text-gray-100 cursor-default">
+            {setActiveTab ? t('token') : t('investableTokens')}
+          </h2>
+          {!setActiveTab && (
             <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
               <Coins className="h-4 w-4 mr-2" />
               {tokens.length} {t('token')}
             </Badge>
-          </div>
-        )}
+          )}
+        </div>
         <div className="flex items-center gap-3">
           {/* Network Selector Dropdown */}
           <DropdownMenu>
@@ -236,25 +203,26 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
       {/* Mobile Layout */}
       <div className="md:hidden space-y-4">
         {/* Title and Tab */}
-        {setActiveTab ? (
-          <div className="flex gap-4">
+        <div className="flex gap-4">
+          {setActiveTab && (
             <button
+              type="button"
               onClick={() => setActiveTab('challenges')}
               className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
             >
               {t('challenge')}
             </button>
-            <h2 className="text-3xl text-gray-100 cursor-default">{t('token')}</h2>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl text-gray-100">{t('investableTokens')}</h2>
+          )}
+          <h2 className="text-3xl text-gray-100 cursor-default">
+            {setActiveTab ? t('token') : t('investableTokens')}
+          </h2>
+          {!setActiveTab && (
             <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
               <Coins className="h-4 w-4 mr-2" />
               {tokens.length} {t('token')}
             </Badge>
-          </div>
-        )}
+          )}
+        </div>
         
         {/* Network Dropdown */}
         <div className="flex items-center gap-3">
@@ -316,7 +284,19 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
       </div>
       <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
         <CardContent className="p-0">
-        {tokens.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8 px-6">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <span className="ml-2 text-gray-400">{t('loadingTokens')}</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 px-6">
+            <p className="text-red-400">{t('errorLoadingTokens')}</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {error instanceof Error ? error.message : 'Failed to load data'}
+            </p>
+          </div>
+        ) : tokens.length === 0 ? (
           <div className="text-center py-8 px-6">
             <p className="text-gray-400">{t('noInvestableTokensFound')}</p>
           </div>

@@ -168,10 +168,59 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
-      // Get current network
-      const chainId = await provider.send('eth_chainId', []);
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = routeNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
       
-      // Connect to provider with signer
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = routeNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await provider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to register.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+      
+      // Get signer after ensuring correct network
       const signer = await provider.getSigner();
       
       // Use URL network parameter for contract interaction
@@ -188,8 +237,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       const tx = await steleContract.register(challengeId);
       
       // Show toast notification for transaction submitted
-      const registerExplorerName = getExplorerName(chainId);
-      const registerExplorerUrl = getExplorerUrl(chainId, tx.hash);
+      const registerExplorerName = getExplorerName(walletChainId);
+      const registerExplorerUrl = getExplorerUrl(walletChainId, tx.hash);
       
       toast({
         title: "Registration Submitted",
@@ -271,14 +320,63 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
-      // Get current network
-      const chainId = await provider.send('eth_chainId', []);
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = routeNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = routeNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+              
+              await provider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to mint NFT.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
       
       // Get contract address for URL network parameter
       const networkParam = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum';
       const contractAddress = getSteleContractAddress(networkParam);
       
-      // Use provider directly (it's already a BrowserProvider from getProvider)
+      // Get signer after ensuring correct network
       const signer = await provider.getSigner();
 
       // Create contract instance
@@ -294,7 +392,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         action: (
           <ToastAction 
             altText={t('viewOnExplorer')} 
-            onClick={() => window.open(getExplorerUrl(chainId, transaction.hash), '_blank')}
+            onClick={() => window.open(getExplorerUrl(walletChainId, transaction.hash), '_blank')}
           >
             {t('viewOnExplorer')}
           </ToastAction>
@@ -312,7 +410,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           action: (
             <ToastAction 
               altText={t('viewOnExplorer')} 
-              onClick={() => window.open(getExplorerUrl(chainId, transaction.hash), '_blank')}
+              onClick={() => window.open(getExplorerUrl(walletChainId, transaction.hash), '_blank')}
             >
               {t('viewOnExplorer')}
             </ToastAction>
