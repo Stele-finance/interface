@@ -34,11 +34,11 @@ export default function HomePage() {
   const router = useRouter()
 
   const handleGetStarted = () => {
-    router.push('/dashboard')
+    router.push('/dashboard/challenge')
   }
 
   const handleBrowseChallenges = () => {
-    router.push('/challenges')
+    router.push('/dashboard/fund')
   }
 
   return (
