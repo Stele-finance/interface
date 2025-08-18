@@ -65,6 +65,8 @@ export const el = {
   createProposalPage: "Δημιουργία Πρότασης",
   creating: "Δημιουργία",
   cryptoFund: "Κρυπτο Κεφάλαιο",
+  fund: "Κεφάλαιο",
+  funds: "Κεφάλαια",
   currentTime: "Τρέχων",
   customContractInteraction: "Προσαρμοσμένη Αλληλεπίδραση Συμβολαίου",
   customProposal: "Προσαρμοσμένη Πρόταση",

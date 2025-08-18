@@ -65,6 +65,8 @@ export const zhCn = {
   createProposalPage: "创建提案",
   creating: "创建中",
   cryptoFund: "加密基金",
+  fund: "基金",
+  funds: "基金",
   currentTime: "当前",
   customContractInteraction: "自定义合约交互",
   customProposal: "自定义提案",

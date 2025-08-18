@@ -65,6 +65,8 @@ export const ar = {
   createProposalPage: "إنشاء مقترح",
   creating: "جاري الإنشاء",
   cryptoFund: "صندوق العملات المشفرة",
+  fund: "صندوق",
+  funds: "صناديق",
   currentTime: "الوقت الحالي",
   customContractInteraction: "تفاعل العقد المخصص",
   customProposal: "مقترح مخصص",

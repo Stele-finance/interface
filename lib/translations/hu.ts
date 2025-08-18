@@ -65,6 +65,8 @@ export const hu = {
   createProposalPage: "Javaslat létrehozása",
   creating: "Létrehozás...",
   cryptoFund: "Kripto Alap",
+  fund: "Alap",
+  funds: "Alapok",
   currentTime: "Jelenlegi",
   customContractInteraction: "Egyéni szerződés interakció",
   customProposal: "Egyéni javaslat",

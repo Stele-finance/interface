@@ -65,6 +65,8 @@ export const nl = {
   createProposalPage: "Voorstel Maken",
   creating: "Maken",
   cryptoFund: "Crypto Fonds",
+  fund: "Fonds",
+  funds: "Fondsen",
   currentTime: "Huidige Tijd",
   customContractInteraction: "Aangepaste Contract Interactie",
   customProposal: "Aangepast Voorstel",

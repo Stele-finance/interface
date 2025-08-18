@@ -65,6 +65,8 @@ export const ms = {
   createProposalPage: "Cipta Cadangan",
   creating: "Mencipta",
   cryptoFund: "Dana Kripto",
+  fund: "Dana",
+  funds: "Dana",
   currentTime: "Masa Semasa",
   customContractInteraction: "Interaksi Kontrak Tersuai",
   customProposal: "Cadangan Tersuai",

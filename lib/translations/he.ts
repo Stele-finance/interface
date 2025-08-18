@@ -65,6 +65,8 @@ export const he = {
   createProposalPage: "צור הצעה",
   creating: "יוצר",
   cryptoFund: "קרן קריפטו",
+  fund: "קרן",
+  funds: "קרנות",
   currentTime: "נוכחי",
   customContractInteraction: "אינטראקציית חוזה מותאמת אישית",
   customProposal: "הצעה מותאמת אישית",

@@ -65,6 +65,8 @@ export const ru = {
   createProposalPage: "Создать Предложение",
   creating: "Создание",
   cryptoFund: "Крипто Фонд",
+  fund: "Фонд",
+  funds: "Фонды",
   currentTime: "Текущее Время",
   customContractInteraction: "Взаимодействие с Пользовательским Контрактом",
   customProposal: "Пользовательское Предложение",

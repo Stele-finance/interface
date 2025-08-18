@@ -65,6 +65,8 @@ export const id = {
   createProposalPage: "Buat Proposal",
   creating: "Membuat",
   cryptoFund: "Dana Kripto",
+  fund: "Dana",
+  funds: "Dana",
   currentTime: "Waktu Saat Ini",
   customContractInteraction: "Interaksi Kontrak Kustom",
   customProposal: "Proposal Kustom",

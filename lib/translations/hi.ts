@@ -65,6 +65,8 @@ export const hi = {
   createProposalPage: "प्रस्ताव बनाएं",
   creating: "बना रहे हैं",
   cryptoFund: "क्रिप्टो फंड",
+  fund: "फंड",
+  funds: "फंड्स",
   currentTime: "वर्तमान",
   customContractInteraction: "कस्टम कॉन्ट्रैक्ट इंटरैक्शन",
   customProposal: "कस्टम प्रस्ताव",

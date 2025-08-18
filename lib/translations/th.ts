@@ -65,6 +65,8 @@ export const th = {
   createProposalPage: "สร้างข้อเสนอ",
   creating: "กำลังสร้าง",
   cryptoFund: "กองทุนคริปโต",
+  fund: "กองทุน",
+  funds: "กองทุน",
   currentTime: "เวลาปัจจุบัน",
   customContractInteraction: "การโต้ตอบสัญญาแบบกำหนดเอง",
   customProposal: "ข้อเสนอแบบกำหนดเอง",

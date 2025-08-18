@@ -65,6 +65,8 @@ export const da = {
   createProposalPage: "Opret Forslag",
   creating: "Opretter",
   cryptoFund: "Krypto Fond",
+  fund: "Fond",
+  funds: "Fonde",
   currentTime: "Nuværende Tid",
   customContractInteraction: "Brugerdefineret Kontrakt Interaktion",
   customProposal: "Brugerdefineret Forslag",

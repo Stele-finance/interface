@@ -65,6 +65,8 @@ export const jp = {
   createProposalPage: "提案を作成",
   creating: "作成中",
   cryptoFund: "クリプトファンド",
+  fund: "ファンド",
+  funds: "ファンド",
   currentTime: "現在",
   customContractInteraction: "カスタムコントラクトインタラクション",
   customProposal: "カスタム提案",

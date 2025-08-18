@@ -65,6 +65,8 @@ export const vi = {
   createProposalPage: "Tạo đề xuất",
   creating: "Đang tạo",
   cryptoFund: "Quỹ Crypto",
+  fund: "Quỹ",
+  funds: "Quỹ",
   currentTime: "Hiện tại",
   customContractInteraction: "Tương tác hợp đồng tùy chỉnh",
   customProposal: "Đề xuất tùy chỉnh",

@@ -65,6 +65,8 @@ export const fi = {
   createProposalPage: "Luo Ehdotus",
   creating: "Luodaan",
   cryptoFund: "Krypto Rahasto",
+  fund: "Rahasto",
+  funds: "Rahastot",
   currentTime: "Nykyinen",
   customContractInteraction: "Mukautettu Sopimus Vuorovaikutus",
   customProposal: "Mukautettu Ehdotus",

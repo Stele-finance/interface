@@ -65,6 +65,8 @@ export const bn = {
   createProposalPage: "প্রস্তাব তৈরি করুন",
   creating: "তৈরি করা হচ্ছে",
   cryptoFund: "ক্রিপ্টো ফান্ড",
+  fund: "ফান্ড",
+  funds: "ফান্ডসমূহ",
   currentTime: "বর্তমান সময়",
   customContractInteraction: "কাস্টম কন্ট্রাক্ট ইন্টারঅ্যাকশন",
   customProposal: "কাস্টম প্রস্তাব",

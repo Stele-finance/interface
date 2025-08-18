@@ -65,6 +65,8 @@ export const zhTw = {
   createProposalPage: "創建提案",
   creating: "創建中",
   cryptoFund: "加密基金",
+  fund: "基金",
+  funds: "基金",
   currentTime: "當前",
   customContractInteraction: "自定義合約交互",
   customProposal: "自定義提案",

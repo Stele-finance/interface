@@ -65,6 +65,8 @@ export const it = {
   createProposalPage: "Crea Proposta",
   creating: "Creando",
   cryptoFund: "Fondo Cripto",
+  fund: "Fondo",
+  funds: "Fondi",
   currentTime: "Ora Corrente",
   customContractInteraction: "Interazione Contratto Personalizzato",
   customProposal: "Proposta Personalizzata",
