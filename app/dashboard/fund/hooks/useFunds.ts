@@ -1,0 +1,72 @@
+import { NETWORK_SUBGRAPHS } from '@/lib/constants'
+import { useQuery } from '@tanstack/react-query'
+import { gql, request } from 'graphql-request'
+
+const FUNDS_QUERY = gql`
+  query GetFunds($first: Int = 50) {
+    funds(first: $first, orderBy: createdAtTimestamp, orderDirection: desc) {
+      id
+      fundId
+      createdAtTimestamp
+      updatedAtTimestamp
+      manager
+      investorCount
+      currentETH
+      currentUSD
+      feeTokens
+      feeSymbols
+      feeTokensAmount
+      currentTokens
+      currentTokensSymbols
+      currentTokensDecimals
+      currentTokensAmount
+    }
+  }
+`
+
+const url = NETWORK_SUBGRAPHS.arbitrum_fund
+const headers = { 
+  Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY 
+}
+
+export interface Fund {
+  id: string
+  fundId: string
+  createdAtTimestamp: string
+  updatedAtTimestamp: string
+  manager: string
+  investorCount: string
+  currentETH: string
+  currentUSD: string
+  feeTokens: string[]
+  feeSymbols: string[]
+  feeTokensAmount: string[]
+  currentTokens: string[]
+  currentTokensSymbols: string[]
+  currentTokensDecimals: string[]
+  currentTokensAmount: string[]
+}
+
+export interface FundsResponse {
+  funds: Fund[]
+}
+
+export function useFunds(first: number = 50) {
+  return useQuery<FundsResponse>({
+    queryKey: ['funds', first],
+    queryFn: async (): Promise<FundsResponse> => {
+      try {
+        const result = await request<FundsResponse>(url, FUNDS_QUERY, { first }, headers)
+        console.log('GraphQL response:', result)
+        
+        // Return actual data (even if empty)
+        return result
+      } catch (error) {
+        console.error('Error fetching funds data:', error)
+        throw error
+      }
+    },
+    staleTime: 60 * 1000, // 1 minute
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+  })
+}

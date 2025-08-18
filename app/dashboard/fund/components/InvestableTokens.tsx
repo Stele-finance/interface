@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Loader2, Coins, ChevronDown } from "lucide-react"
-import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
+import { useInvestableTokens } from "../hooks/useInvestableTokens"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
 import Image from "next/image"
@@ -30,9 +30,9 @@ interface InvestableTokensProps {
 
 export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'ethereum', setSelectedNetwork }: InvestableTokensProps) {
   const { t } = useLanguage()
-  // Use selectedNetwork for data fetching
+  // Use the selected network for querying
   const subgraphNetwork = selectedNetwork
-  const { data: tokensData, isLoading, error } = useInvestableTokens(subgraphNetwork)
+  const { data: tokensData, isLoading, error } = useInvestableTokens(50, selectedNetwork)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -128,7 +128,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
               onClick={() => setActiveTab('funds')}
               className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
             >
-              Funds
+              Fund
             </button>
           )}
           <h2 className="text-3xl text-gray-100 cursor-default">
@@ -143,60 +143,62 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
         </div>
         <div className="flex items-center gap-3">
           {/* Network Selector Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
-              >
-                <Image
-                  src="/networks/small/ethereum.png"
-                  alt="Ethereum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Ethereum
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
-              >
-                <Image
-                  src="/networks/small/arbitrum.png"
-                  alt="Arbitrum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Arbitrum
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {setSelectedNetwork && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    {selectedNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    )}
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork('ethereum')}
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork('arbitrum')}
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Arbitrum
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -210,7 +212,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
               onClick={() => setActiveTab('funds')}
               className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
             >
-              Funds
+              Fund
             </button>
           )}
           <h2 className="text-3xl text-gray-100 cursor-default">
@@ -224,62 +226,64 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
           )}
         </div>
         
-        {/* Network Dropdown */}
+        {/* Network Selector Dropdown (Mobile) */}
         <div className="flex items-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
-              >
-                <Image
-                  src="/networks/small/ethereum.png"
-                  alt="Ethereum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Ethereum
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
-              >
-                <Image
-                  src="/networks/small/arbitrum.png"
-                  alt="Arbitrum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Arbitrum
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {setSelectedNetwork && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    {selectedNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    )}
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork('ethereum')}
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedNetwork('arbitrum')}
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Arbitrum
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
       <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
@@ -297,8 +301,20 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
             </p>
           </div>
         ) : tokens.length === 0 ? (
-          <div className="text-center py-8 px-6">
-            <p className="text-gray-400">{t('noInvestableTokensFound')}</p>
+          <div className="text-center py-12 px-6">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-300 mb-1">No Tokens Available</h3>
+                <p className="text-sm text-gray-500">
+                  No investable tokens found. Tokens will appear here once they are marked as investable.
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <>
@@ -316,15 +332,15 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                     <TableRow 
                       key={token.id} 
                       className="border-0 hover:bg-gray-800/30 cursor-pointer transition-colors"
-                      onClick={() => handleRowClick(token.tokenAddress)}
+                      onClick={() => handleRowClick(token.address)}
                     >
                       <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
                         <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
-                          {getTokenLogo(token.tokenAddress, subgraphNetwork) ? (
+                          {getTokenLogo(token.address, subgraphNetwork) ? (
                             <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex items-center justify-center">
                               <Image
-                                src={getTokenLogo(token.tokenAddress, subgraphNetwork)!}
+                                src={getTokenLogo(token.address, subgraphNetwork)!}
                                 alt={token.symbol}
                                 width={32}
                                 height={32}
@@ -336,26 +352,24 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                               {token.symbol.slice(0, 2)}
                             </div>
                           )}
-                            {/* Show Arbitrum network icon only when connected to Arbitrum */}
-                            {network === 'arbitrum' && (
-                              <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                                <Image 
-                                  src="/networks/small/arbitrum.png" 
-                                  alt="Arbitrum"
-                                  width={12}
-                                  height={12}
-                                  className="rounded-full"
-                                  style={{ width: 'auto', height: 'auto' }}
-                                />
-                              </div>
-                            )}
+                            {/* Show network icon based on selected network */}
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                              <Image 
+                                src={`/networks/small/${subgraphNetwork}.png`} 
+                                alt={subgraphNetwork}
+                                width={12}
+                                height={12}
+                                className="rounded-full"
+                                style={{ width: 'auto', height: 'auto' }}
+                              />
+                            </div>
                           </div>
                           <span>{token.symbol}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-6">
                         <span className="text-sm text-gray-300 font-mono">
-                          {formatAddress(token.tokenAddress)}
+                          {formatAddress(token.address)}
                         </span>
                       </TableCell>
                       <TableCell className="text-gray-400 pr-6 py-6 text-base whitespace-nowrap">

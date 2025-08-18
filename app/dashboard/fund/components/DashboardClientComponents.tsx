@@ -19,7 +19,7 @@ function LoadingSkeleton() {
 
 // Dynamically import client components with SSR disabled and loading fallback
 const Funds = dynamic(
-  () => import("./ActiveChallenges").then(mod => ({ default: mod.ActiveChallenges })),
+  () => import("./Funds").then(mod => ({ default: mod.Funds })),
   { 
     ssr: false,
     loading: () => <LoadingSkeleton />

@@ -42,12 +42,32 @@ export const KNOWN_GOVERNANCE_CONFIGS = {
 } as const
 
 // Network-specific Contract Addresses
-const NETWORK_CONTRACTS = {
+export const NETWORK_CONTRACTS = {
   ethereum: {
     STELE_CONTRACT_ADDRESS: "0x3A2cB739032175b4Fc66De7F78bddC415972D2ff",
     STELE_TOKEN_ADDRESS: "0x71c24377e7f24b6d822C9dad967eBC77C04667b5",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
+    // STELE FUND specific addresses (add appropriate Ethereum addresses)
+    STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
+    RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
+    EXPLORER_URL: 'https://etherscan.io',
+    EXPLORER_NAME: 'Etherscan',
+    // Uniswap V3 addresses
+    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
+    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
+    WETH_TOKEN_ADDRESS: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    WBTC_TOKEN_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    UNI_TOKEN_ADDRESS: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
+  },
+  ethereum_fund: {
+    STELE_CONTRACT_ADDRESS: "0x3A2cB739032175b4Fc66De7F78bddC415972D2ff",
+    STELE_TOKEN_ADDRESS: "0x71c24377e7f24b6d822C9dad967eBC77C04667b5",
+    USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
+    // STELE FUND specific addresses (add appropriate Ethereum addresses)
+    STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -64,6 +84,25 @@ const NETWORK_CONTRACTS = {
     STELE_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum USDC
     GOVERNANCE_CONTRACT_ADDRESS: "0xC93fe38F52481F090E28E242B36f828C74F24142",
+    RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
+    EXPLORER_URL: 'https://arbiscan.io',
+    EXPLORER_NAME: 'Arbiscan',
+    // Governance configuration
+    // Uniswap V3 addresses (Arbitrum)
+    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
+    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
+    WETH_TOKEN_ADDRESS: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // Arbitrum WETH
+    WBTC_TOKEN_ADDRESS: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // Arbitrum WBTC
+    UNI_TOKEN_ADDRESS: "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0",   // Arbitrum UNI
+    LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
+  },
+  arbitrum_fund: {
+    STELE_FUND_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
+    STELE_FUND_CONTRACT_ADDRESS: "0x3Ba91D88C11c3a995b00A6cE33E343c29384a19F",
+    STELE_FUND_INFO_ADDRESS: "0xe71a6E1B4516756716dd00DBa33D29eAEDc116Bc",
+    STELE_FUND_SETTING_ADDRESS: "0x16774b77de5B970B4B6cE57C1Fcd5383759145D4",
+    STELE_FUND_GOVERNANCE_ADDRESS: "0x38143cfB0950cF7B56CFB1B277FF549D9d9dA432",
+    USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://arbiscan.io',
     EXPLORER_NAME: 'Arbiscan',
@@ -216,7 +255,8 @@ export const STELE_DECIMALS = 18;
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
   ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
-  arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF'
+  arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
+  arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const
 
 // Helper function to get subgraph URL based on network
