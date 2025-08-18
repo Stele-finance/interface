@@ -11,6 +11,7 @@ import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
 import { LanguageProvider } from "@/lib/language-context"
 import { MobileMenuProvider } from "@/lib/mobile-menu-context"
+import { PageTypeProvider } from "@/lib/page-type-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -40,15 +41,17 @@ export default function RootLayout({
             <LanguageProvider>
               <EntryFeeProvider>
                 <MobileMenuProvider>
-                  <ClientOnly>
-                    <AppKitInitializer />
-                  </ClientOnly>
-                  <div className="flex flex-col min-h-screen bg-muted/40">
-                    <Header />
-                    <main className="flex-1 p-4 md:p-6">
-                      {children}
-                    </main>
-                  </div>
+                  <PageTypeProvider>
+                    <ClientOnly>
+                      <AppKitInitializer />
+                    </ClientOnly>
+                    <div className="flex flex-col min-h-screen bg-muted/40">
+                      <Header />
+                      <main className="flex-1 p-4 md:p-6">
+                        {children}
+                      </main>
+                    </div>
+                  </PageTypeProvider>
                 </MobileMenuProvider>
               </EntryFeeProvider>
             </LanguageProvider>

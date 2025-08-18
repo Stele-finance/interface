@@ -36,6 +36,8 @@ import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 import { useAppKitProvider, useAppKitAccount } from '@reown/appkit/react'
 import { useIsMobile } from "@/components/ui/use-mobile"
+import { usePageType } from "@/lib/page-type-context"
+import { ChevronDown, PieChart } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
@@ -44,6 +46,7 @@ export function Header() {
   const { toast } = useToast()
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
+  const { pageType, setPageType } = usePageType()
   
   // Use global wallet hook
   const { 
@@ -335,22 +338,51 @@ export function Header() {
 
       <div className="flex items-center gap-2 md:gap-4">
         
+        {/* Challenge/Fund Type Selector - always visible */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-300 hover:text-white hover:bg-gray-800/50 font-medium px-3 py-2 h-auto text-sm capitalize border-0 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {pageType === 'challenge' ? (
+                  <Trophy className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <PieChart className="h-4 w-4 text-blue-500" />
+                )}
+                <span className="text-gray-100">{pageType}</span>
+                <ChevronDown className="h-3 w-3 text-gray-400" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36 bg-gray-900/95 border-gray-700/50 backdrop-blur-sm z-[60] shadow-xl">
+            <DropdownMenuItem 
+              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
+              onClick={() => {
+                setPageType('challenge')
+                router.push('/dashboard/challenge')
+              }}
+            >
+              <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
+              <span>Challenge</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
+              onClick={() => {
+                setPageType('fund')
+                router.push('/dashboard/fund')
+              }}
+            >
+              <PieChart className="mr-2 h-4 w-4 text-blue-500" />
+              <span>Fund</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {walletAddress ? (
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Network info - visible on both mobile and desktop */}
-            <div className="flex flex-col items-center gap-1 px-2 md:px-3 py-1 md:py-2">
-              {getNetworkIcon() && (
-                <Image 
-                  src={getNetworkIcon()!} 
-                  alt={`${walletNetwork} network`}
-                  width={16}
-                  height={16}
-                  className="rounded-full md:w-5 md:h-5"
-                  style={{ width: 'auto', height: '16px' }}
-                />
-              )}
-              <span className="text-xs md:text-xs font-medium text-gray-300 text-center leading-tight">{name}</span>
-            </div>
             {isMobile ? (
               // Mobile: Open AppKit modal directly on click - icon only
               <Button 

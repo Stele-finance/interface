@@ -256,6 +256,7 @@ export const STELE_DECIMALS = 18;
 export const NETWORK_SUBGRAPHS = {
   ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
   arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
+  ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-eth/version/latest',
   arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const
 
