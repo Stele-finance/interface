@@ -1102,11 +1102,17 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           <div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="investors" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="investors" 
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              >
                 <Users className="h-4 w-4" />
                 {t('investor')}
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="transactions" 
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              >
                 <Activity className="h-4 w-4" />
                 {t('transactions')}
               </TabsTrigger>

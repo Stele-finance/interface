@@ -4,7 +4,7 @@ import React, { useState, use, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
+import { ArrowLeft, BarChart3, Activity, Loader2 } from "lucide-react"
 import { AssetSwap } from "../../../../swap/components/AssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
@@ -35,7 +35,6 @@ import { PortfolioSummary } from "./components/PortfolioSummary"
 import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
-import { InvestorsTab } from "../components/InvestorsTab"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
@@ -535,16 +534,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger 
+                  value="portfolio" 
+                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                >
                   <BarChart3 className="h-4 w-4" />
                   {t('portfolio')}
                 </TabsTrigger>
-                <TabsTrigger value="investors" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  {t('investor')}
-                </TabsTrigger>
-                <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="transactions" 
+                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                >
                   <Activity className="h-4 w-4" />
                   {t('transactions')}
                 </TabsTrigger>
@@ -560,15 +561,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 />
               </TabsContent>
 
-              <TabsContent value="investors" className="space-y-4">
-                <InvestorsTab 
-                  challengeId={challengeId}
-                  subgraphNetwork={subgraphNetwork}
-                  routeNetwork={routeNetwork}
-                />
-              </TabsContent>
-
-                            <TabsContent value="transactions" className="space-y-4">
+              <TabsContent value="transactions" className="space-y-4">
                 <TransactionsTab 
                   challengeId={challengeId}
                   investorTransactions={investorTransactions}

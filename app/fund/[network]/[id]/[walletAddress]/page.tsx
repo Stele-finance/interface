@@ -191,11 +191,17 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
               
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="portfolio" className="flex items-center gap-2">
+                  <TabsTrigger 
+                    value="portfolio" 
+                    className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                  >
                     <BarChart3 className="h-4 w-4" />
                     {t('portfolio')}
                   </TabsTrigger>
-                  <TabsTrigger value="transactions" className="flex items-center gap-2">
+                  <TabsTrigger 
+                    value="transactions" 
+                    className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                  >
                     <Activity className="h-4 w-4" />
                     {t('transactions')}
                   </TabsTrigger>
