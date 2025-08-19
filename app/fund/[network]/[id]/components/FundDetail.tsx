@@ -264,8 +264,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
 
   const handleNavigateToAccount = () => {
-    if (walletAddress) {
-      router.push(`/fund/${subgraphNetwork}/${fundId}/${walletAddress}`);
+    if (connectedAddress) {
+      router.push(`/fund/${subgraphNetwork}/${fundId}/${connectedAddress}`);
     }
   };
 
