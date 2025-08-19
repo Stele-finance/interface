@@ -260,7 +260,14 @@ export function Header() {
         !pathname.includes('/dashboard') && 
         !pathname.includes('/challenges')) {
       prevWalletAddressRef.current = walletAddress;
-      router.push('/dashboard');
+      
+      // Determine which dashboard to navigate to based on current path
+      if (pathname.includes('/fund')) {
+        router.push('/dashboard/fund');
+      } else {
+        // Default to challenge dashboard for all other pages (including /challenge)
+        router.push('/dashboard/challenge');
+      }
     } else {
       prevWalletAddressRef.current = walletAddress;
     }

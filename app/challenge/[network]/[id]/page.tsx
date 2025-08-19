@@ -65,7 +65,7 @@ function ChallengeContent({ challengeId, network }: { challengeId: string; netwo
       {/* Back to Dashboard Button */}
       <div className="px-2 sm:px-0 -mt-8">
         <button 
-          onClick={() => router.push('/dashboard')}
+          onClick={() => router.push('/dashboard/challenge')}
           className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
         >
           <ArrowLeft className="h-5 w-5" />

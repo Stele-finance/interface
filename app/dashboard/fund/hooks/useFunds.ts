@@ -58,13 +58,17 @@ export function useFunds(first: number = 50, network: 'ethereum' | 'arbitrum' = 
     queryFn: async (): Promise<FundsResponse> => {
       try {
         const result = await request<FundsResponse>(url, FUNDS_QUERY, { first }, headers)
-        console.log('GraphQL response:', result)
         
-        // Return actual data (even if empty)
+        // Ensure we always return a valid response
+        if (!result) {
+          return { funds: [] }
+        }
+        
         return result
       } catch (error) {
         console.error('Error fetching funds data:', error)
-        throw error
+        // Return empty data instead of throwing to prevent undefined
+        return { funds: [] }
       }
     },
     staleTime: 60 * 1000, // 1 minute
