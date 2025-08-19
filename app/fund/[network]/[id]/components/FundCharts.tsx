@@ -13,6 +13,7 @@ import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "@/components/ui/use-toast"
+import { useFundSnapshots } from "../hooks/useFundSnapshots"
 
 interface FundChartsProps {
   fundId: string
@@ -45,6 +46,10 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
   const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
+  
+  // Fetch real fund snapshots data
+  const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'arbitrum'
+  const { data: snapshotsData, isLoading: isLoadingSnapshots, error: snapshotsError } = useFundSnapshots(fundId, subgraphNetwork)
 
   // Update time every second for accurate progress
   useEffect(() => {
@@ -55,26 +60,22 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
     return () => clearInterval(interval)
   }, [])
 
-  // Mock data for fund charts - TVL progression over time (deterministic)
-  const mockFundData = useMemo(() => {
-    const baseDate = new Date('2024-01-01')
-    const data = []
+  // Transform real fund snapshots data for chart
+  const fundChartData = useMemo(() => {
+    if (!snapshotsData?.fundSnapshots || snapshotsData.fundSnapshots.length === 0) {
+      // Return empty array if no data
+      return []
+    }
     
-    // Deterministic seed values for consistent rendering
-    const seedValues = [
-      12500, 8300, 15800, 22100, 7400, 19600, 11200, 16900, 24300, 9700,
-      13800, 20500, 6800, 17400, 25100, 10300, 14600, 21800, 8900, 18200,
-      26400, 11700, 15300, 23600, 7200, 19900, 12800, 17100, 25800, 9400
-    ]
-    
-    for (let i = 0; i < 30; i++) {
-      const date = new Date(baseDate.getTime() + i * 24 * 60 * 60 * 1000)
-      const tvlUSD = 50000 + seedValues[i] + i * 1000 // Growing TVL with deterministic variance
+    return snapshotsData.fundSnapshots.map((snapshot) => {
+      const date = new Date(parseInt(snapshot.timestamp) * 1000)
+      const tvlUSD = parseFloat(snapshot.currentUSD)
+      const investorCount = parseInt(snapshot.investorCount)
       
-      data.push({
-        id: `fund-snapshot-${i}`,
-        investorCount: Math.floor(10 + (seedValues[i] % 20) / 1000 + i * 0.5),
-        tvlUSD: tvlUSD,
+      return {
+        id: snapshot.id,
+        investorCount,
+        tvlUSD,
         formattedDate: formatDateWithLocale(date, language, { 
           month: 'short', 
           day: 'numeric'
@@ -93,13 +94,14 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
           const [year, month, day] = date.toISOString().split('T')[0].split('-')
           return `${parseInt(month)}/${parseInt(day)}`
         })(),
-      })
-    }
-    
-    return data.sort((a, b) => a.dateLabel.localeCompare(b.dateLabel))
-  }, [language])
+        timestamp: parseInt(snapshot.timestamp),
+        currentETH: parseFloat(snapshot.currentETH),
+        currentTokensSymbols: snapshot.currentTokensSymbols
+      }
+    }).sort((a, b) => a.timestamp - b.timestamp)
+  }, [snapshotsData, language])
 
-  const chartData = mockFundData
+  const chartData = fundChartData
 
   // Calculate current TVL (use the most recent snapshot)
   const currentTVL = useMemo(() => {
@@ -107,14 +109,15 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
       const latestSnapshot = chartData[chartData.length - 1]?.tvlUSD || 0
       return latestSnapshot
     }
-    return 72000 // Default mock TVL
+    return 0 // No data available
   }, [chartData])
 
-  // Get fund details
+  // Get fund details from latest snapshot
   const getFundDetails = () => {
+    const latestSnapshot = chartData.length > 0 ? chartData[chartData.length - 1] : null
     return {
-      participants: 15,
-      createdTime: new Date('2024-01-01'),
+      participants: latestSnapshot?.investorCount || 0,
+      createdTime: latestSnapshot ? new Date(latestSnapshot.timestamp * 1000) : new Date(),
       isActive: true,
       totalValue: currentTVL,
     }
@@ -139,7 +142,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
       await navigator.clipboard.writeText(currentUrl)
       toast({
         title: t('linkCopied'),
-        description: t('fundLinkCopiedToClipboard'),
+        description: "",
       })
     } catch (err) {
       console.error('Failed to copy link:', err)
@@ -204,7 +207,35 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
     )
   }
 
-  if (error || chartData.length === 0) {
+  if (isLoadingSnapshots) {
+    return (
+      <div className="mb-6">
+        <Card className="bg-transparent border-0 -mt-12">
+          <CardHeader className="pb-2 px-1 sm:px-6 md:-ml-2">
+            <div className="h-8 bg-gray-700 rounded animate-pulse mb-4"></div>
+            <div className="h-12 bg-gray-700 rounded animate-pulse w-1/3 mb-2"></div>
+            <div className="h-4 bg-gray-700 rounded animate-pulse w-1/2"></div>
+          </CardHeader>
+          <CardContent className="px-1 sm:px-6 md:-ml-2">
+            <div className="h-80 bg-gray-700 rounded animate-pulse mb-4"></div>
+            
+            {/* Interval selector skeleton */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50">
+                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse mr-1"></div>
+                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Separator */}
+            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 pt-2"></div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (snapshotsError || chartData.length === 0) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-muted border-gray-700/50 lg:col-span-2">
@@ -214,13 +245,17 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
             </div>
             
             <div className="flex items-center justify-between mb-2">
-              <CardTitle className="text-4xl text-gray-100">$72,000</CardTitle>
+              <CardTitle className="text-4xl text-gray-100">
+                ${currentTVL.toLocaleString()}
+              </CardTitle>
             </div>
             <p className="text-sm text-gray-400">{currentDate}</p>
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
-              <p className="text-gray-400">{t('noDataAvailable')}</p>
+              <p className="text-gray-400">
+                {snapshotsError ? 'Error loading fund data' : 'No fund snapshots available'}
+              </p>
             </div>
           </CardContent>
           
@@ -624,7 +659,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
                       ) : (
                         <>
                           <Plus className="mr-2 h-5 w-5" />
-                          {investButton.t('invest')}
+                          Join
                         </>
                       )}
                     </Button>

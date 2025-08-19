@@ -1,11 +1,9 @@
 "use client"
 
 import { use } from "react"
-import { createPortal } from "react-dom"
 import { FundDetail } from "./components/FundDetail"
 // Mock fund hook instead of useChallenge
 // import { useFund } from '@/app/hooks/useFund'
-import { useWallet } from '@/app/hooks/useWallet'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/language-context'
 import { ArrowLeft } from 'lucide-react'
@@ -49,7 +47,7 @@ function FundContent({ fundId, network }: { fundId: string; network: string }) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white"></div>
-          <div className="text-white text-lg font-medium">{t('loadingFundData')}</div>
+          <div className="text-white text-lg font-medium">Loading fund data...</div>
         </div>
       </div>
     )
@@ -60,7 +58,7 @@ function FundContent({ fundId, network }: { fundId: string; network: string }) {
       <div className="text-center py-8">
         <div className="text-red-600">
           <h3 className="text-lg font-semibold mb-2">Error loading fund data</h3>
-          <p className="text-sm">{error.message}</p>
+          <p className="text-sm">Failed to load fund data</p>
         </div>
       </div>
     )

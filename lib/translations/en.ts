@@ -67,8 +67,6 @@ export const en = {
   cryptoFund: "Crypto Fund",
   fund: "Fund",
   funds: "Funds",
-  fundProgress: "Fund Progress",
-  fundLinkCopiedToClipboard: "Fund link has been copied to your clipboard.",
   investing: "Investing",
   invest: "Invest",
   tvl: "TVL",

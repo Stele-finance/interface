@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ImageIcon, Trophy, TrendingUp, Calendar, ChevronDown } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useFormattedNFTData } from "./hooks/useNFTData"
-import { NFTCard } from "./components/NFTCard"
+import { useFormattedNFTData } from "../hooks/useNFTData"
+import { NFTCard } from "../components/NFTCard"
 import Image from "next/image"
 
 export default function NFTPage() {

@@ -67,8 +67,6 @@ export const kr = {
   cryptoFund: "암호화폐 펀드",
   fund: "펀드",
   funds: "펀드",
-  fundProgress: "펀드 진행률",
-  fundLinkCopiedToClipboard: "펀드 링크가 클립보드에 복사되었습니다.",
   investing: "투자 중",
   invest: "투자",
   tvl: "TVL",

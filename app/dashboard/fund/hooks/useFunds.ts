@@ -24,7 +24,6 @@ const FUNDS_QUERY = gql`
   }
 `
 
-const url = NETWORK_SUBGRAPHS.arbitrum_fund
 const headers = { 
   Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY 
 }
@@ -51,9 +50,11 @@ export interface FundsResponse {
   funds: Fund[]
 }
 
-export function useFunds(first: number = 50) {
+export function useFunds(first: number = 50, network: 'ethereum' | 'arbitrum' = 'arbitrum') {
+  const url = network === 'ethereum' ? NETWORK_SUBGRAPHS.ethereum_fund : NETWORK_SUBGRAPHS.arbitrum_fund
+  
   return useQuery<FundsResponse>({
-    queryKey: ['funds', first],
+    queryKey: ['funds', first, network],
     queryFn: async (): Promise<FundsResponse> => {
       try {
         const result = await request<FundsResponse>(url, FUNDS_QUERY, { first }, headers)

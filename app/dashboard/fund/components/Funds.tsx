@@ -55,8 +55,8 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
   // Use selectedNetwork for data fetching instead of wallet network
   const subgraphNetwork = selectedNetwork;
 
-  // Use real fund data from GraphQL
-  const { data: fundsData, isLoading, error } = useFunds(50)
+  // Use real fund data from GraphQL with selected network
+  const { data: fundsData, isLoading, error } = useFunds(50, selectedNetwork)
   const funds = fundsData?.funds || []
 
 
@@ -165,8 +165,8 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
 
       console.log('Creating fund with contract:', contractAddress)
       
-      // Call createFund function
-      const tx = await fundInfoContract.createFund()
+      // Call create function (not createFund) based on the ABI
+      const tx = await fundInfoContract.create()
       console.log('Transaction sent:', tx.hash)
       
       // Wait for transaction confirmation

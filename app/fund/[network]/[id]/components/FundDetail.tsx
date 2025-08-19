@@ -13,13 +13,23 @@ import { ethers } from "ethers"
 import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
 import { FundCharts } from "./FundCharts"
 import { useRouter } from "next/navigation"
 import { 
   getSteleContractAddress,
   getUSDCTokenAddress,
   getRPCUrl,
-  USDC_DECIMALS
+  USDC_DECIMALS,
+  NETWORK_CONTRACTS
 } from "@/lib/constants"
 // Mock data instead of real hooks
 // import { useEntryFee } from "@/lib/hooks/use-entry-fee"
@@ -35,14 +45,14 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useAppKitProvider } from '@reown/appkit/react'
 import { useUSDCBalance } from "@/app/hooks/useUSDCBalance"
 import { getTokenLogo } from "@/lib/utils"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Wallet } from "lucide-react"
 import { InvestorsTab } from "./InvestorsTab"
+import { useFundInvestorData } from "../hooks/useFundInvestorData"
 
 interface FundDetailProps {
   fundId: string
-  network?: string
+  network: string // Make network required since it comes from URL
 }
 
 
@@ -52,6 +62,9 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isJoining, setIsJoining] = useState(false);
+  const [showJoinConfirmModal, setShowJoinConfirmModal] = useState(false);
+  // Use network from URL params (not wallet network)
+  const routeNetwork = network; // This comes from URL: /fund/[network]/[id]
   const [isGettingRewards, setIsGettingRewards] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -87,10 +100,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
+  
+  // Get fund investor data to check if user has joined (after subgraphNetwork is defined)
+  const { data: fundInvestorData, isLoading: isLoadingFundInvestor, refetch: refetchFundInvestorData } = useFundInvestorData(
+    fundId,
+    connectedAddress || "",
+    subgraphNetwork as 'ethereum' | 'arbitrum'
+  );
 
   // Get USDC balance using hook
   const { data: usdcBalanceData, isLoading: isLoadingUSDCBalance, error: usdcBalanceError } = useUSDCBalance(
-    connectedAddress || undefined,
+    connectedAddress || null,
     subgraphNetwork as 'ethereum' | 'arbitrum'
   );
   const usdcBalance = usdcBalanceData?.balance || "0"
@@ -177,8 +197,9 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     setIsMounted(true)
   }, [connectedAddress]);
 
-  // Mock fund state
-  const hasInvestedInFund = false
+  // Check if user has joined the fund based on subgraph data
+  const hasJoinedFromSubgraph = fundInvestorData?.investor !== undefined && fundInvestorData?.investor !== null;
+  const hasInvestedInFund = (hasJoinedLocally || hasJoinedFromSubgraph) && isConnected;
   const isFundClosed = false
   const shouldShowGetRewards = false
 
@@ -215,7 +236,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       case 'deposit':
         return 'Deposit';
       case 'withdraw': 
-        return t('withdraw');
+        return 'Withdraw';
       case 'swap':
         return 'Swap';
       default:
@@ -224,7 +245,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   };
 
   const getTransactionTypeColor = (type: string) => {
-    const typeMap = {
+    const typeMap: { [key: string]: string } = {
       'deposit': 'text-green-400',
       'withdraw': 'text-red-400', 
       'swap': 'text-blue-400',
@@ -241,11 +262,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     console.log('Investing in fund...');
   };
 
-  const handleGetRewards = async (event: React.MouseEvent) => {
-    event.preventDefault();
-    // Mock get rewards function
-    console.log('Getting rewards...');
-  };
 
   const handleNavigateToAccount = () => {
     if (walletAddress) {
@@ -253,36 +269,171 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     }
   };
 
+  // Handle join button click - show confirmation modal
+  const handleJoinClick = () => {
+    setShowJoinConfirmModal(true);
+  };
+
+  // Handle actual fund join after confirmation
   const handleInvestInFund = async () => {
+    setShowJoinConfirmModal(false);
+    
     try {
       setIsJoining(true);
       
       if (!connectedAddress || !appKitProvider) {
         toast({
-          title: t('error'),
+          title: 'Error',
           description: 'Please connect your wallet',
           variant: "destructive",
         });
         return;
       }
 
-      // Mock investment logic
-      console.log('Investing in fund...');
+      // Get ethers provider and signer
+      const ethersProvider = new ethers.BrowserProvider(appKitProvider);
+      
+      // Get the target chain ID based on URL network
+      const targetChainId = routeNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // Check current network and switch if needed
+      const currentNetwork = await ethersProvider.getNetwork();
+      const currentChainId = '0x' + currentNetwork.chainId.toString(16);
+      
+      if (currentChainId !== targetChainId) {
+        console.log(`Current network: ${currentChainId}, Target network: ${targetChainId}`);
+        
+        try {
+          // Try to switch to the target network
+          await window.ethereum?.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: targetChainId }],
+          });
+          
+          toast({
+            title: 'Network Switched',
+            description: `Switched to ${routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'}`,
+          });
+          
+          // Wait a moment for the network switch to complete
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            // Network not added to wallet, try to add it
+            if (routeNetwork === 'arbitrum') {
+              try {
+                await window.ethereum?.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0xa4b1',
+                    chainName: 'Arbitrum One',
+                    nativeCurrency: {
+                      name: 'ETH',
+                      symbol: 'ETH',
+                      decimals: 18,
+                    },
+                    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                    blockExplorerUrls: ['https://arbiscan.io/'],
+                  }],
+                });
+                
+                toast({
+                  title: 'Network Added',
+                  description: 'Arbitrum network added and switched',
+                });
+                
+              } catch (addError) {
+                console.error('Failed to add network:', addError);
+                toast({
+                  title: 'Network Switch Failed',
+                  description: 'Please manually switch to the correct network',
+                  variant: "destructive",
+                });
+                return;
+              }
+            } else {
+              toast({
+                title: 'Network Switch Failed',
+                description: 'Please manually switch to Ethereum mainnet',
+                variant: "destructive",
+              });
+              return;
+            }
+          } else {
+            console.error('Failed to switch network:', switchError);
+            toast({
+              title: 'Network Switch Failed',
+              description: 'Please manually switch to the correct network',
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+      }
+      
+      const signer = await ethersProvider.getSigner();
+      
+      // Get the correct contract address for the URL network (not wallet network)
+      const contractAddress = routeNetwork === 'arbitrum' 
+        ? NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_INFO_ADDRESS
+        : NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_INFO_ADDRESS;
+      
+      // Import SteleFundInfo ABI
+      const SteleFundInfoABI = (await import('@/app/abis/SteleFundInfo.json')).default;
+      
+      // Create contract instance
+      const fundInfoContract = new ethers.Contract(
+        contractAddress,
+        SteleFundInfoABI.abi,
+        signer
+      );
+      
+      console.log('Joining fund with ID:', fundId);
+      
+      // Call join function with fundId as number
+      const tx = await fundInfoContract.join(parseInt(fundId));
+      console.log('Transaction sent:', tx.hash);
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      console.log('Successfully joined fund!', receipt);
       
       toast({
         title: t('success'),
-        description: 'Investment successful!',
+        description: 'Successfully joined the fund!',
         action: (
-          <ToastAction altText="View transaction">
+          <ToastAction 
+            altText="View transaction"
+            onClick={() => {
+              const explorerUrl = routeNetwork === 'arbitrum' 
+                ? `https://arbiscan.io/tx/${receipt.hash}`
+                : `https://etherscan.io/tx/${receipt.hash}`;
+              window.open(explorerUrl, '_blank');
+            }}
+          >
             View
           </ToastAction>
         ),
       });
+      
+      // Refresh data
+      if (typeof refetchFundInvestorData === 'function') {
+        refetchFundInvestorData();
+      }
+      
     } catch (error: any) {
-      console.error('Investment error:', error);
+      console.error('Join fund error:', error);
+      
+      // Handle user rejection
+      if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+        console.log('User cancelled transaction');
+        return;
+      }
+      
       toast({
-        title: t('error'),
-        description: `Investment failed: ${error.message}`,
+        title: 'Error',
+        description: error.message || 'Failed to join fund',
         variant: "destructive",
       });
     } finally {
@@ -306,7 +457,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       <div className="text-center py-8">
         <div className="text-red-600">
           <h3 className="text-lg font-semibold mb-2">Error loading fund data</h3>
-          <p className="text-sm">{error.message}</p>
+          <p className="text-sm">Failed to load fund data</p>
         </div>
       </div>
     )
@@ -328,7 +479,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       {/* Two Column Layout - Chart + Tabs on Left, Summary on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.8fr] lg:gap-6">
         {/* Left Column: Charts + Tabs */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Fund Charts Section */}
           <FundCharts 
             fundId={fundId} 
@@ -344,7 +495,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
               isGettingRewards,
               handleInvestInFund,
               handleNavigateToAccount,
-              handleGetRewards,
+              handleGetRewards: () => {},
               t,
               isConnected,
               walletSelectOpen,
@@ -356,25 +507,25 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
           {/* Tabs */}
           <div>
-          <Tabs defaultValue="investors" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800/60 border border-gray-700/50">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger 
                 value="investors" 
-                className="data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
               >
-                <Users className="w-4 h-4 mr-2" />
+                <Users className="w-4 h-4" />
                 {t('investor')}
               </TabsTrigger>
               <TabsTrigger 
                 value="transactions" 
-                className="data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
               >
-                <Receipt className="w-4 h-4 mr-2" />
+                <Activity className="w-4 h-4" />
                 {t('transactions')}
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="investors" className="space-y-0 mt-6">
+            <TabsContent value="investors" className="space-y-0">
               <InvestorsTab 
                 challengeId={fundId}
                 subgraphNetwork={subgraphNetwork}
@@ -382,7 +533,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
               />
             </TabsContent>
 
-            <TabsContent value="transactions" className="space-y-0 mt-6">
+            <TabsContent value="transactions" className="space-y-0">
               <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -395,7 +546,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   <div className="text-center py-8 text-red-400">
                     <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p className="font-medium">Error loading transactions</p>
-                    <p className="text-sm text-gray-500 mt-2">{transactionsError.message}</p>
+                    <p className="text-sm text-gray-500 mt-2">Failed to load transactions</p>
                     <p className="text-xs text-gray-500 mt-1">Check console for more details</p>
                   </div>
                 ) : transactions.length > 0 ? (
@@ -463,8 +614,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
               </div>
             </CardContent>
           </Card>
-           </TabsContent>
-         </Tabs>
+            </TabsContent>
+          </Tabs>
           </div>
         </div>
 
@@ -520,59 +671,22 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                      </DialogContent>
                    </Dialog>
                  ) : hasInvestedInFund ? (
-                   /* Get Rewards + My Account Buttons */
-                   shouldShowGetRewards ? (
-                     <div className="grid grid-cols-2 gap-3">
-                       {/* Get Rewards Button */}
-                       <Button 
-                         variant="outline" 
-                         size="lg" 
-                         onClick={handleGetRewards}
-                         disabled={isGettingRewards}
-                         className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-                       >
-                         {isGettingRewards ? (
-                           <>
-                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                             {t('claiming')}
-                           </>
-                         ) : (
-                           <>
-                             <DollarSign className="mr-2 h-5 w-5" />
-                             {t('getRewards')}
-                           </>
-                         )}
-                       </Button>
-                       
-                       {/* My Account Button */}
-                       <Button 
-                         variant="outline" 
-                         size="lg" 
-                         onClick={handleNavigateToAccount}
-                         className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-                       >
-                         <User className="mr-2 h-5 w-5" />
-                         {t('myAccount')}
-                       </Button>
-                     </div>
-                   ) : (
-                     /* My Account Button Only */
-                     <Button 
-                       variant="outline" 
-                       size="lg" 
-                       onClick={handleNavigateToAccount}
-                       className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                     >
-                       <User className="mr-3 h-6 w-6" />
-                       {t('myAccount')}
-                     </Button>
-                   )
+                   /* My Account Button Only for Funds */
+                   <Button 
+                     variant="outline" 
+                     size="lg" 
+                     onClick={handleNavigateToAccount}
+                     className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                   >
+                     <User className="mr-3 h-6 w-6" />
+                     {t('myAccount')}
+                   </Button>
                  ) : !isFundClosed ? (
                    /* Invest Button */
                    <Button 
                      variant="outline" 
                      size="lg" 
-                     onClick={handleInvestInFund}
+                     onClick={handleJoinClick}
                      disabled={isJoining || isLoading || !data?.fund}
                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
                    >
@@ -589,7 +703,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                      ) : (
                        <>
                          <Plus className="mr-3 h-6 w-6" />
-                         {t('invest')}
+                         Join
                        </>
                      )}
                    </Button>
@@ -624,16 +738,110 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   <span className="text-sm text-white font-medium">{mockFund.investorCount}</span>
                 </div>
                 
-                <div className="flex justify-between items-center py-2">
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">Status</span>
                   <span className="text-sm text-green-400 font-medium">Active</span>
                 </div>
+                
+                {/* User Investment Info - Show only if user has joined */}
+                {hasInvestedInFund && fundInvestorData?.investor && (
+                  <>
+                    <div className="border-t border-gray-700/50 pt-4 mt-6">
+                      <h4 className="text-lg font-semibold text-gray-100 mb-3">My Investment</h4>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                      <span className="text-sm text-gray-400">Principal</span>
+                      <span className="text-sm text-white font-medium">
+                        ${parseFloat(fundInvestorData.investor.principalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                      <span className="text-sm text-gray-400">Current Value</span>
+                      <span className="text-sm text-white font-medium">
+                        ${parseFloat(fundInvestorData.investor.currentUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                      <span className="text-sm text-gray-400">P&L</span>
+                      <span className={`text-sm font-medium ${parseFloat(fundInvestorData.investor.profitUSD) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {parseFloat(fundInvestorData.investor.profitUSD) >= 0 ? '+' : ''}${parseFloat(fundInvestorData.investor.profitUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-400">ROI</span>
+                      <span className={`text-sm font-medium ${parseFloat(fundInvestorData.investor.profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {parseFloat(fundInvestorData.investor.profitRatio) >= 0 ? '+' : ''}{(parseFloat(fundInvestorData.investor.profitRatio) * 100).toFixed(2)}%
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </Card>
 
         </div>
       </div>
+      
+      {/* Join Confirmation Modal */}
+      <Dialog open={showJoinConfirmModal} onOpenChange={setShowJoinConfirmModal}>
+        <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">
+              Join Fund
+            </DialogTitle>
+            <DialogDescription className="text-gray-400 mt-2">
+              Are you sure you want to join this fund? This action will register you as an investor in Fund #{fundId}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+              <span className="text-gray-400">Fund ID</span>
+              <span className="text-white font-medium">#{fundId}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+              <span className="text-gray-400">Network</span>
+              <span className="text-white font-medium capitalize">{routeNetwork}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+              <span className="text-gray-400">Manager</span>
+              <span className="text-white font-mono text-sm">
+                {mockFund.manager ? `${mockFund.manager.slice(0, 6)}...${mockFund.manager.slice(-4)}` : 'Unknown'}
+              </span>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowJoinConfirmModal(false)}
+              className="flex-1 border-gray-600 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleInvestInFund}
+              disabled={isJoining}
+              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              {isJoining ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                'Confirm Join'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
