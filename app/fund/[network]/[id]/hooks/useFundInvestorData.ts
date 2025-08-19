@@ -67,7 +67,6 @@ export function useFundInvestorData(fundId: string, walletAddress: string, netwo
         const result = await request<FundInvestorResponse>(url, FUND_INVESTOR_QUERY, { 
           investorId 
         }, headers)
-        console.log('FundInvestor GraphQL response:', result)
         
         return result
       } catch (error) {

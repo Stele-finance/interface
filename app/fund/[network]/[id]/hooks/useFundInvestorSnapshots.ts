@@ -66,7 +66,6 @@ export function useFundInvestorSnapshots(fundId: string, investor: string, netwo
           investor: investor.toLowerCase(),
           first 
         }, headers)
-        console.log('FundInvestorSnapshots GraphQL response:', result)
         
         return result
       } catch (error) {

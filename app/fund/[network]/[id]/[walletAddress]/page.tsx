@@ -13,6 +13,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/components/ui/use-toast"
+import { FundErrorState } from "./components/FundErrorState"
 
 interface FundInvestorPageProps {
   params: Promise<{
@@ -43,7 +44,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   // Use URL network parameter instead of wallet network for subgraph
   const subgraphNetwork = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum'
   
-  const { data: fundInvestorData, error: investorError } = useFundInvestorData(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+  const { data: fundInvestorData, error: investorError, isLoading: isLoadingInvestor } = useFundInvestorData(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -96,30 +97,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
     return () => clearInterval(timeInterval);
   }, [isClient]);
 
-  // Handle loading and error states
+  // Handle error states and missing data
   if (investorError || !fundInvestorData?.investor) {    
-    return (
-      <div className="container mx-auto p-2 sm:p-6 py-4 sm:py-4">
-        <div className="max-w-6xl mx-auto space-y-2 sm:space-y-0">
-          <div className="px-2 sm:px-0">
-          <button 
-            onClick={() => router.push(`/fund/${routeNetwork}/${fundId}`)}
-            className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            Go to Fund {fundId}
-          </button>
-        </div>
-
-          <div className="text-center py-8">
-            <div className="text-red-600">
-              <h3 className="text-lg font-semibold mb-2">Error loading investor data</h3>
-              <p className="text-sm">Investor data for fund {fundId} and wallet {walletAddress} could not be found.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <FundErrorState fundId={fundId} walletAddress={walletAddress} routeNetwork={routeNetwork} />
   }
 
   const investor = fundInvestorData.investor
@@ -177,6 +157,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
               fundId={fundId}
               investor={walletAddress}
               network={subgraphNetwork as 'ethereum' | 'arbitrum'}
+              isLoadingInvestor={isLoadingInvestor}
             />
             
             {/* Interval selector */}

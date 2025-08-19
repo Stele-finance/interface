@@ -13,9 +13,10 @@ interface FundInvestorChartsProps {
   fundId: string
   investor: string
   network: 'ethereum' | 'arbitrum'
+  isLoadingInvestor?: boolean
 }
 
-export function FundInvestorCharts({ fundId, investor, network }: FundInvestorChartsProps) {
+export function FundInvestorCharts({ fundId, investor, network, isLoadingInvestor = false }: FundInvestorChartsProps) {
   const { t, language } = useLanguage()
   
   // Format investor address for display
@@ -96,7 +97,7 @@ export function FundInvestorCharts({ fundId, investor, network }: FundInvestorCh
     return null
   }
 
-  if (isLoadingSnapshots) {
+  if (isLoadingInvestor || isLoadingSnapshots) {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>

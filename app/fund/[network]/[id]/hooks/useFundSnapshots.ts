@@ -62,7 +62,6 @@ export function useFundSnapshots(fundId: string, network: 'ethereum' | 'arbitrum
           fundId, 
           first 
         }, headers)
-        console.log('FundSnapshots GraphQL response:', result)
         
         // Return actual data (even if empty)
         return result
