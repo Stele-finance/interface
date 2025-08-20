@@ -11,65 +11,22 @@ interface InvestorsTabProps {
   challengeId: string // Will represent fundId
   subgraphNetwork: string
   routeNetwork: string
+  useFundInvestors: any // Hook for fetching fund investors
 }
 
-// Mock investor data for funds
-const mockInvestors = [
-  {
-    id: '1',
-    investor: '0x1234567890123456789012345678901234567890',
-    currentUSD: '25000.50',
-    isRegistered: true,
-    updatedAtTimestamp: '1704067200' // Jan 1, 2024
-  },
-  {
-    id: '2',
-    investor: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-    currentUSD: '18500.75',
-    isRegistered: true,
-    updatedAtTimestamp: '1703635200' // Dec 27, 2023
-  },
-  {
-    id: '3',
-    investor: '0x9876543210987654321098765432109876543210',
-    currentUSD: '32000.00',
-    isRegistered: true,
-    updatedAtTimestamp: '1703030400' // Dec 20, 2023
-  },
-  {
-    id: '4',
-    investor: '0x1111222233334444555566667777888899990000',
-    currentUSD: '12750.25',
-    isRegistered: false,
-    updatedAtTimestamp: '1702425600' // Dec 13, 2023
-  },
-  {
-    id: '5',
-    investor: '0xaaaaabbbbcccccdddddeeeeefffff0000011111',
-    currentUSD: '8900.10',
-    isRegistered: true,
-    updatedAtTimestamp: '1701820800' // Dec 6, 2023
-  },
-  {
-    id: '6',
-    investor: '0xffffffffffffffffffffffffffffffffffff',
-    currentUSD: '15600.90',
-    isRegistered: true,
-    updatedAtTimestamp: '1701216000' // Nov 29, 2023
-  }
-]
 
-export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: InvestorsTabProps) {
+export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFundInvestors }: InvestorsTabProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const maxPages = 5
   
-  // Use mock data instead of real API calls
-  const investorData = mockInvestors
-  const isLoadingInvestors = false
-  const investorsError = null
+  // Use real fund investors data from subgraph
+  const { data: investorData = [], isLoading: isLoadingInvestors, error: investorsError } = useFundInvestors(
+    challengeId,
+    subgraphNetwork as 'ethereum' | 'arbitrum'
+  )
 
   // Helper function to format date
   const formatDate = (timestamp: string) => {
@@ -117,7 +74,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
                     <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
                       <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('register')}</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Role</th>
                       <th className="text-right py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('updated')}</th>
                     </tr>
                   </thead>
@@ -158,22 +115,22 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
                             </div>
                           </td>
 
-                          {/* Registered column */}
+                          {/* Manager/Investor status column */}
                           <td className="py-6 px-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              {investor.isRegistered ? (
+                              {investor.isManager ? (
                                 <Badge 
                                   variant="default"
-                                  className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
+                                  className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs"
                                 >
-                                  {t('yes')}
+                                  Manager
                                 </Badge>
                               ) : (
                                 <Badge 
                                   variant="secondary"
-                                  className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
+                                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
                                 >
-                                  {t('no')}
+                                  Investor
                                 </Badge>
                               )}
                             </div>

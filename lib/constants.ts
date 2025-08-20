@@ -48,8 +48,6 @@ export const NETWORK_CONTRACTS = {
     STELE_TOKEN_ADDRESS: "0x71c24377e7f24b6d822C9dad967eBC77C04667b5",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
-    // STELE FUND specific addresses (add appropriate Ethereum addresses)
-    STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -67,6 +65,7 @@ export const NETWORK_CONTRACTS = {
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
     // STELE FUND specific addresses (add appropriate Ethereum addresses)
+    STELE_FUND_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
     STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
@@ -98,9 +97,9 @@ export const NETWORK_CONTRACTS = {
   },
   arbitrum_fund: {
     STELE_FUND_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
-    STELE_FUND_CONTRACT_ADDRESS: "0x5BDDBBB0B5F140038e9B2830C9347a0319DFE212",
-    STELE_FUND_INFO_ADDRESS: "0xeb8cA3abaab8FA025616393c2112e96af30aeb90",
-    STELE_FUND_SETTING_ADDRESS: "0x24C8d6Be85c6F627C5Ec3baFCd8268742cC1CFeE",
+    STELE_FUND_CONTRACT_ADDRESS: "0xbb9ece59f6bd9775d4a1368057d9a4060c4a1694",
+    STELE_FUND_INFO_ADDRESS: "0xf042259c505659f0f7fecd3e3341ee228c955e7c",
+    STELE_FUND_SETTING_ADDRESS: "0x1b17abea05bd8efb53835b5f0c5429a424cff76c",
     STELE_FUND_GOVERNANCE_ADDRESS: "0x38143cfB0950cF7B56CFB1B277FF549D9d9dA432",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
@@ -256,7 +255,7 @@ export const STELE_DECIMALS = 18;
 export const NETWORK_SUBGRAPHS = {
   ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
   arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
-  ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-eth/version/latest',
+  ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund/version/latest',
   arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const
 

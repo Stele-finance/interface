@@ -12,6 +12,7 @@ const FUND_INVESTOR_QUERY = gql`
       fundId
       investor
       isManager
+      share
       principalETH
       principalUSD
       currentETH
@@ -38,6 +39,7 @@ export interface FundInvestor {
   fundId: string
   investor: string
   isManager: boolean
+  share: string
   principalETH: string
   principalUSD: string
   currentETH: string
@@ -56,8 +58,8 @@ export interface FundInvestorResponse {
 }
 
 export function useFundInvestorData(fundId: string, walletAddress: string, network: 'ethereum' | 'arbitrum' = 'arbitrum') {
-  // Create investor ID: fundId-investor format
-  const investorId = `${fundId}-${walletAddress.toLowerCase()}`
+  // Create investor ID: fundId-investor format (must match subgraph format with toUpperCase)
+  const investorId = `${fundId}-${walletAddress.toUpperCase()}`
   const url = network === 'ethereum' ? NETWORK_SUBGRAPHS.ethereum_fund : NETWORK_SUBGRAPHS.arbitrum_fund
   
   return useQuery<FundInvestorResponse>({
@@ -70,7 +72,7 @@ export function useFundInvestorData(fundId: string, walletAddress: string, netwo
         
         return result
       } catch (error) {
-        console.error('Error fetching fund investor data:', error)
+        console.error('❌ Error fetching fund investor data:', error)
         // Return null investor if not found (user hasn't joined)
         return { investor: null }
       }

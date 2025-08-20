@@ -49,6 +49,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Wallet } from "lucide-react"
 import { InvestorsTab } from "./InvestorsTab"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
+import { useFundInvestors } from "../hooks/useFundInvestors"
+import { useFundAllTransactions } from "../hooks/useFundAllTransactions"
 
 interface FundDetailProps {
   fundId: string
@@ -163,27 +165,23 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const isLoadingInvestors = false
   const investorsError = null
 
-  // Mock transactions
-  const transactions = [
-    { 
-      id: '1', 
-      timestamp: Date.now() / 1000 - 3600, // 1 hour ago
-      type: 'deposit', 
-      user: '0x1234567890123456789012345678901234567890',
-      amount: '$5,000',
-      transactionHash: '0x1234567890abcdef'
-    },
-    { 
-      id: '2', 
-      timestamp: Date.now() / 1000 - 86400, // 1 day ago
-      type: 'withdraw', 
-      user: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-      amount: '$2,500',
-      transactionHash: '0xabcdef1234567890'
-    }
-  ]
-  const isLoadingTransactions = false
-  const transactionsError = null
+  // Get real fund transactions data
+  const { data: fundTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useFundAllTransactions(
+    fundId,
+    subgraphNetwork as 'ethereum' | 'arbitrum'
+  )
+  
+  // Format transactions for display
+  const transactions = fundTransactions.map(tx => ({
+    id: tx.id,
+    user: `${tx.user.slice(0, 6)}...${tx.user.slice(-4)}`,
+    type: tx.type.charAt(0).toUpperCase() + tx.type.slice(1),
+    value: tx.amount || tx.details,
+    time: new Date(tx.timestamp * 1000),
+    address: tx.user,
+    transactionHash: tx.transactionHash,
+    timestamp: tx.timestamp
+  }))
 
 
   // Mock investor data for current user
@@ -200,6 +198,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   // Check if user has joined the fund based on subgraph data
   const hasJoinedFromSubgraph = fundInvestorData?.investor !== undefined && fundInvestorData?.investor !== null;
   const hasInvestedInFund = (hasJoinedLocally || hasJoinedFromSubgraph) && isConnected;
+  
   const isFundClosed = false
   const shouldShowGetRewards = false
 
@@ -530,6 +529,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 challengeId={fundId}
                 subgraphNetwork={subgraphNetwork}
                 routeNetwork={subgraphNetwork}
+                useFundInvestors={useFundInvestors}
               />
             </TabsContent>
 
