@@ -86,7 +86,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                       const endIndex = Math.min(startIndex + itemsPerPage, totalInvestors);
                       const paginatedInvestors = investorData.slice(startIndex, endIndex);
 
-                      return paginatedInvestors.map((investor, index: number) => (
+                      return paginatedInvestors.map((investor: any, index: number) => (
                         <tr 
                           key={investor.id} 
                           className="hover:bg-gray-800/30 transition-colors cursor-pointer"

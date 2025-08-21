@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowDown } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
@@ -39,14 +39,16 @@ import {
 // Import constants and contract utilities
 import { 
   getSteleContractAddress, 
+  getSteleFundContractAddress,
   getChainId, 
   getChainConfig, 
   buildTransactionUrl, 
   getExplorerName 
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
+import SteleFundABI from "@/app/abis/SteleFund.json"
 
-export function AssetSwap({ className, userTokens = [], onSwappingStateChange, ...props }: AssetSwapProps) {
+export function AssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, getProvider, isConnected } = useWallet()
   
@@ -55,7 +57,12 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
   const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'ethereum';
   const subgraphNetwork = networkFromUrl as 'ethereum' | 'arbitrum';
   
-  const { tokens: investableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
+  // Detect if this is a fund swap context based on URL path
+  const isFundSwap = pathParts.includes('fund');
+  
+  // Use external investableTokens if provided, otherwise fetch from subgraph
+  const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
+  const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("WETH")
@@ -66,9 +73,10 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
     onSwappingStateChange?.(isSwapping);
   }, [isSwapping, onSwappingStateChange]);
 
-  // Get challengeId from URL params for contract call
+  // Get challengeId or fundId from URL params for contract call
   const params = useParams()
   const challengeId = params?.id || params?.challengeId || "1"
+  const fundId = isFundSwap ? (params?.id || "1") : null
 
   // Create utility functions with bound parameters
   const getTokenAddressUtil = useCallback((tokenSymbol: string) => 
@@ -177,14 +185,19 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
     utilHandlePercentageClick(percentage, fromToken, userTokens, getTokenDecimalsUtil, setFromAmount), 
     [fromToken, userTokens, getTokenDecimalsUtil])
 
-  // Calculate actual output amount based on user input
-  const outputAmount = calculateOutputAmount(
-    fromAmount,
-    swapQuote,
-    simpleSwapQuote,
-    getTokenDecimalsUtil,
-    toToken
-  );
+  // Calculate actual output amount using dynamic prices
+  const outputAmount = useMemo(() => {
+    if (!fromAmount || parseFloat(fromAmount) <= 0 || !fromTokenPrice || !toTokenPrice) {
+      return "0";
+    }
+    
+    const inputAmount = parseFloat(fromAmount);
+    const exchangeRate = fromTokenPrice / toTokenPrice;
+    const outputValue = inputAmount * exchangeRate;
+    
+    return outputValue.toFixed(Math.min(6, getTokenDecimalsUtil(toToken)));
+  }, [fromAmount, fromTokenPrice, toTokenPrice, getTokenDecimalsUtil, toToken]);
+
 
   // Execute swap on blockchain - using dynamic import for ethers
   const handleSwapTransaction = async () => {
@@ -214,6 +227,38 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
         description: `You don't have enough ${fromToken}.`,
       });
       return;
+    }
+
+    // Additional validation for fund swaps
+    if (isFundSwap) {
+      const userToken = userTokens.find(token => token.symbol === fromToken);
+      console.log("Fund balance check:", {
+        fromToken,
+        requestedAmount: fromAmount,
+        userToken,
+        availableAmount: userToken?.amount || "0"
+      });
+      
+      if (!userToken) {
+        toast({
+          variant: "destructive",
+          title: "Token Not Found",
+          description: `The fund doesn't hold any ${fromToken} tokens.`,
+        });
+        return;
+      }
+      
+      const availableAmount = parseFloat(userToken.amount || "0");
+      const requestedAmount = parseFloat(fromAmount);
+      
+      if (availableAmount < requestedAmount) {
+        toast({
+          variant: "destructive",
+          title: "Insufficient Fund Balance",
+          description: `The fund only has ${availableAmount.toFixed(6)} ${fromToken}, but ${requestedAmount} ${fromToken} is requested.`,
+        });
+        return;
+      }
     }
 
     // Check if wallet is connected
@@ -312,10 +357,16 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
       // Use existing browserProvider and get signer
       const signer = await browserProvider.getSigner();
       
-      // Create contract instance with URL-based network
+      // Create contract instance with URL-based network - use appropriate contract for fund or challenge
+      const contractAddress = isFundSwap 
+        ? getSteleFundContractAddress(subgraphNetwork)
+        : getSteleContractAddress(subgraphNetwork);
+      
+      const contractABI = isFundSwap ? SteleFundABI.abi : SteleABI.abi;
+      
       const steleContract = new ethers.Contract(
-        getSteleContractAddress(subgraphNetwork),
-        SteleABI.abi,
+        contractAddress,
+        contractABI,
         signer
       );
 
@@ -327,8 +378,23 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
         throw new Error(`Could not find token addresses. From: ${fromToken} (${fromTokenAddress}), To: ${toToken} (${toTokenAddress}). Please make sure the tokens are supported.`);
       }
 
+      // Validate token addresses (must be valid Ethereum addresses)
+      if (!ethers.isAddress(fromTokenAddress) || !ethers.isAddress(toTokenAddress)) {
+        throw new Error(`Invalid token addresses. From: ${fromTokenAddress}, To: ${toTokenAddress}`);
+      }
+
       // Convert amount to wei format based on token decimals
       const fromTokenDecimals = getTokenDecimalsUtil(fromToken);
+      const toTokenDecimals = getTokenDecimalsUtil(toToken);
+      
+      // Validate decimals
+      if (!fromTokenDecimals || isNaN(Number(fromTokenDecimals)) || Number(fromTokenDecimals) < 0 || Number(fromTokenDecimals) > 77) {
+        throw new Error(`Invalid fromToken decimals: ${fromTokenDecimals}`);
+      }
+      
+      if (!toTokenDecimals || isNaN(Number(toTokenDecimals)) || Number(toTokenDecimals) < 0 || Number(toTokenDecimals) > 77) {
+        throw new Error(`Invalid toToken decimals: ${toTokenDecimals}`);
+      }
       
       // Fix decimal precision to match token decimals to prevent parseUnits error
       const numericAmount = parseFloat(fromAmount);
@@ -342,21 +408,101 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
       
       if (decimalIndex !== -1) {
         const decimalPlaces = fromAmount.length - decimalIndex - 1;
-        if (decimalPlaces > fromTokenDecimals) {
+        if (decimalPlaces > Number(fromTokenDecimals)) {
           // Trim if more decimal places than token decimals
-          adjustedAmount = numericAmount.toFixed(fromTokenDecimals);
+          adjustedAmount = numericAmount.toFixed(Number(fromTokenDecimals));
         }
       }
       
-      const amountInWei = ethers.parseUnits(adjustedAmount, fromTokenDecimals);
+      const amountInWei = ethers.parseUnits(adjustedAmount, Number(fromTokenDecimals));
       
-      // Call the swap function
-      const tx = await steleContract.swap(
-        challengeId,
-        fromTokenAddress,
-        toTokenAddress,
-        amountInWei
-      );
+      let tx;
+      
+      if (isFundSwap && fundId) {
+        // For fund swap, use the SteleFund contract method
+        // Calculate minimum output amount (accept 5% slippage)
+        let expectedOutput = BigInt(0);
+        let minOutputAmount = BigInt(0);
+        
+        try {
+          if (outputAmount && parseFloat(outputAmount) > 0) {
+            expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
+            minOutputAmount = (expectedOutput * BigInt(95)) / BigInt(100); // 5% slippage
+          }
+        } catch (error) {
+          console.warn("Could not calculate expected output amount:", error);
+          // Continue with 0 values - let the contract handle it
+        }
+        
+        // Debug logging
+        console.log("Fund Swap Debug:", {
+          fundId,
+          userAddress,
+          fromToken,
+          toToken,
+          fromTokenAddress,
+          toTokenAddress,
+          fromAmount,
+          adjustedAmount,
+          amountInWei: amountInWei.toString(),
+          outputAmount,
+          expectedOutput: expectedOutput.toString(),
+          minOutputAmount: minOutputAmount.toString(),
+          fromTokenDecimals,
+          toTokenDecimals
+        });
+
+        // Use empty path like in test code - contract will handle routing
+        const pathBytes = "0x";
+
+        console.log("Using empty path:", pathBytes);
+
+        // Prepare swap params structure for SteleFund
+        const swapParams = {
+          swapType: 0, // 0 for exact input single swap
+          tokenIn: fromTokenAddress,
+          tokenOut: toTokenAddress,
+          fee: 3000, // Default Uniswap V3 0.3% fee tier
+          amountIn: amountInWei,
+          amountOut: BigInt(0), // Will be calculated by the contract for exact input
+          amountInMaximum: BigInt(0), // Not used for exact input single
+          amountOutMinimum: minOutputAmount > BigInt(0) ? minOutputAmount : BigInt(1), // Minimum output or 1 wei
+          sqrtPriceLimitX96: BigInt(0), // No price limit
+          path: pathBytes // Proper Uniswap V3 path
+        };
+
+        console.log("Swap params:", {
+          ...swapParams,
+          amountIn: swapParams.amountIn.toString(),
+          amountOut: swapParams.amountOut.toString(),
+          amountInMaximum: swapParams.amountInMaximum.toString(),
+          amountOutMinimum: swapParams.amountOutMinimum.toString(),
+          sqrtPriceLimitX96: swapParams.sqrtPriceLimitX96.toString()
+        });
+        
+        // Call SteleFund.swap(fundId, swapParams[]) with proper gas limit
+        // Note: userAddress is not needed as a parameter - the contract uses msg.sender
+        console.log("Calling SteleFund.swap with:", {
+          fundId,
+          swapParamsArray: [swapParams]
+        });
+        
+        tx = await steleContract.swap(
+          fundId,
+          [swapParams],
+          {
+            gasLimit: 1000000 // Set explicit gas limit like in test
+          }
+        );
+      } else {
+        // For regular challenge swap, use the Stele contract method
+        tx = await steleContract.swap(
+          challengeId,
+          fromTokenAddress,
+          toTokenAddress,
+          amountInWei
+        );
+      }
 
       // Get network-specific explorer info
       const explorerName = getExplorerName(subgraphNetwork);
@@ -474,6 +620,9 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
             getTokenAddress={getTokenAddressUtil}
             getTokenDecimals={getTokenDecimalsUtil}
             getFormattedTokenBalance={getFormattedTokenBalanceUtil}
+            getSwapAmountUSD={() => 
+              getSwapAmountUSD(outputAmount, toToken, priceData, toTokenPrice || undefined)
+            }
             priceData={priceData}
             toTokenPrice={toTokenPrice || undefined}
           />
@@ -486,6 +635,8 @@ export function AssetSwap({ className, userTokens = [], onSwappingStateChange, .
             swapQuote={swapQuote}
             simpleSwapQuote={simpleSwapQuote}
             getTokenDecimals={getTokenDecimalsUtil}
+            fromTokenPrice={fromTokenPrice || undefined}
+            toTokenPrice={toTokenPrice || undefined}
           />
 
           {/* Swap Button */}

@@ -19,6 +19,11 @@
           "internalType": "address",
           "name": "_info",
           "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_usdToken",
+          "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
@@ -94,12 +99,6 @@
           "internalType": "uint256",
           "name": "fundId",
           "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "investor",
-          "type": "address"
         },
         {
           "indexed": false,
@@ -258,11 +257,6 @@
           "type": "uint256"
         },
         {
-          "internalType": "address",
-          "name": "investor",
-          "type": "address"
-        },
-        {
           "components": [
             {
               "internalType": "enum ISteleFund.SwapType",
@@ -340,6 +334,32 @@
     },
     {
       "inputs": [],
+      "name": "uniswapV3Factory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "usdToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "weth9",
       "outputs": [
         {
@@ -359,13 +379,8 @@
           "type": "uint256"
         },
         {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
           "internalType": "uint256",
-          "name": "amount",
+          "name": "percentage",
           "type": "uint256"
         }
       ],
@@ -388,7 +403,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "amount",
+          "name": "percentage",
           "type": "uint256"
         }
       ],

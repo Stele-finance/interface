@@ -271,12 +271,12 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 <TabsContent value="portfolio" className="space-y-4">
                   <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
                     <h4 className="text-lg font-semibold text-gray-100 mb-4">Portfolio Details</h4>
-                    {investor ? (
+                    {fundData?.fund ? (
                       <div className="space-y-3">
-                        {investor.currentTokensSymbols?.map((symbol, index) => (
+                        {fundData.fund.currentTokensSymbols?.map((symbol, index) => (
                           <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700/30 last:border-b-0">
                             <span className="text-gray-300">{symbol}</span>
-                            <span className="text-gray-100">{investor.currentTokensAmount?.[index] || '0'}</span>
+                            <span className="text-gray-100">{fundData.fund?.currentTokensAmount?.[index] || '0'}</span>
                           </div>
                         ))}
                       </div>
@@ -367,12 +367,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                     connectedAddress={connectedAddress}
                     fundId={fundId}
                     network={subgraphNetwork}
-                    userTokens={investor?.currentTokensSymbols?.map((symbol, index) => ({
-                      symbol,
-                      balance: investor?.currentTokensAmount?.[index] || '0',
-                      address: investor?.currentTokens?.[index],
-                      decimals: investor?.currentTokensDecimals?.[index]
-                    })) || []}
                   />
                 )}
                 

@@ -290,7 +290,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       }
 
       // Get ethers provider and signer
-      const ethersProvider = new ethers.BrowserProvider(appKitProvider);
+      const ethersProvider = new ethers.BrowserProvider(appKitProvider.walletProvider as any);
       
       // Get the target chain ID based on URL network
       const targetChainId = routeNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
@@ -595,7 +595,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                 </td>
                                 <td className="py-6 px-6">
                                   <div className="text-right">
-                                    <div className="font-medium text-gray-100 truncate whitespace-nowrap">{transaction.amount || '-'}</div>
+                                    <div className="font-medium text-gray-100 truncate whitespace-nowrap">{transaction.value || '-'}</div>
                                   </div>
                                 </td>
                               </tr>
