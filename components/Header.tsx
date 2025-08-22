@@ -37,7 +37,7 @@ import Image from "next/image"
 import { useAppKitProvider, useAppKitAccount } from '@reown/appkit/react'
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { usePageType } from "@/lib/page-type-context"
-import { ChevronDown, PieChart } from "lucide-react"
+import { ChevronDown, Coins } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
@@ -336,7 +336,7 @@ export function Header() {
             )}
           >
             {pageType === 'fund' ? (
-              <PieChart className="h-5 w-5" />
+              <Coins className="h-5 w-5" />
             ) : (
               <Trophy className="h-5 w-5" />
             )}
@@ -373,7 +373,7 @@ export function Header() {
                 {pageType === 'challenge' ? (
                   <Trophy className="h-4 w-4 text-yellow-500" />
                 ) : (
-                  <PieChart className="h-4 w-4 text-blue-500" />
+                  <Coins className="h-4 w-4 text-blue-500" />
                 )}
                 <span className="text-gray-100">{pageType}</span>
                 <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -396,7 +396,7 @@ export function Header() {
                 router.push('/dashboard/fund')
               }}
             >
-              <PieChart className="mr-2 h-4 w-4 text-blue-500" />
+              <Coins className="mr-2 h-4 w-4 text-blue-500" />
               <span>Fund</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -625,7 +625,7 @@ export function Header() {
                   )}
                 >
                   {pageType === 'fund' ? (
-                    <PieChart className="h-5 w-5 mr-3" />
+                    <Coins className="h-5 w-5 mr-3" />
                   ) : (
                     <Trophy className="h-5 w-5 mr-3" />
                   )}

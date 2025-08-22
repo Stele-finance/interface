@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { DollarSign, PieChart } from 'lucide-react'
+import { DollarSign, Coins, User } from 'lucide-react'
 import Image from 'next/image'
 import { useFundInvestorSnapshots } from "../hooks/useFundInvestorSnapshots"
 
@@ -119,7 +119,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           <div className="flex items-center justify-between gap-4 mb-1">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <PieChart className="w-6 h-6 text-blue-500" />
+                <Coins className="w-6 h-6 text-blue-500" />
                 <h3 className="text-2xl sm:text-3xl text-gray-100">
                   {formatInvestorAddress(investor)}
                 </h3>
@@ -155,7 +155,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
         <div className="flex items-center justify-between gap-4 mb-1">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <PieChart className="w-6 h-6 text-blue-500" />
+              <User className="w-6 h-6 text-blue-500" />
               <h3 className="text-2xl sm:text-3xl text-gray-100">
                 {formatInvestorAddress(investor)}
               </h3>

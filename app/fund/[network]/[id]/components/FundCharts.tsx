@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
-import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, PieChart } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, Coins } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -316,7 +316,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
             <div className="mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <PieChart className="w-8 h-8 text-blue-500" />
+                  <Coins className="w-8 h-8 text-blue-500" />
                   {/* Show network icon only when connected to Arbitrum */}
                   {network === 'arbitrum' && (
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
@@ -372,7 +372,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
             <div className="mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <PieChart className="w-8 h-8 text-blue-500" />
+                  <Coins className="w-8 h-8 text-blue-500" />
                   {/* Show network icon only when connected to Arbitrum */}
                   {network === 'arbitrum' && (
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">

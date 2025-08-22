@@ -475,7 +475,7 @@ export function FundActionTabs({
                   <p className="text-gray-400">Loading swap data...</p>
                 </div>
               </div>
-            ) : fundUserTokens.length > 0 && investableTokens.length > 0 ? (
+            ) : investableTokens.length > 0 ? (
               <AssetSwap 
                 userTokens={fundUserTokens.map(token => ({
                   symbol: token.symbol,
@@ -494,37 +494,14 @@ export function FundActionTabs({
                     <ArrowUpDown className="h-8 w-8 text-gray-400" />
                   </div>
                   <div>
-                    {fundUserTokens.length === 0 ? (
-                      <>
-                        <h3 className="text-lg font-medium text-gray-200 mb-2">No Tokens to Swap</h3>
-                        <p className="text-gray-400 text-sm mb-4">
-                          The fund currently has no tokens available for swapping.
-                        </p>
-                        <p className="text-gray-400 text-sm">
-                          Use the <span className="text-blue-400 font-medium">Deposit</span> tab to add tokens to the fund first.
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="text-lg font-medium text-gray-200 mb-2">No Investable Tokens</h3>
-                        <p className="text-gray-400 text-sm mb-4">
-                          There are no tokens available for investment at this time.
-                        </p>
-                        <p className="text-gray-400 text-sm">
-                          Please wait for investable tokens to be configured by the protocol.
-                        </p>
-                      </>
-                    )}
+                    <h3 className="text-lg font-medium text-gray-200 mb-2">No Investable Tokens</h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      There are no tokens available for investment at this time.
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Please wait for investable tokens to be configured by the protocol.
+                    </p>
                   </div>
-                  {fundUserTokens.length === 0 && (
-                    <button
-                      onClick={() => setActiveTab("deposit")}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      <ArrowDownCircle className="h-4 w-4" />
-                      Go to Deposit
-                    </button>
-                  )}
                 </div>
               </div>
             )}
@@ -550,7 +527,7 @@ export function FundActionTabs({
                     </span>
                   </label>
                   <span className="text-sm text-gray-400">
-                    Balance: {parseFloat(ethBalance).toFixed(4)} ({network})
+                    Balance: {parseFloat(ethBalance).toFixed(4)}
                   </span>
                 </div>
                 <div className="relative">
@@ -561,14 +538,6 @@ export function FundActionTabs({
                     onChange={(e) => setDepositAmount(e.target.value)}
                     className="w-full px-4 py-3 text-lg bg-gray-900/50 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  {/* USD Value Display */}
-                  {depositAmount && parseFloat(depositAmount) > 0 && (
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                      <span className="text-sm text-gray-400">
-                        ≈ {calculateUSDValue(depositAmount)}
-                      </span>
-                    </div>
-                  )}
                   <div className="flex justify-between items-center mt-2">
                     <div className="flex gap-2">
                       <button 
@@ -596,11 +565,10 @@ export function FundActionTabs({
                         MAX
                       </button>
                     </div>
-                    {/* ETH Price Display */}
-                    {ethPrice > 0 && (
+                    {depositAmount && parseFloat(depositAmount) > 0 && (
                       <div className="text-right">
-                        <span className="text-xs text-gray-500">
-                          ETH: ${ethPrice.toFixed(2)}
+                        <span className="text-sm text-gray-400">
+                          {calculateUSDValue(depositAmount)}
                         </span>
                       </div>
                     )}

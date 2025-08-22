@@ -156,13 +156,15 @@ export const getAvailableTokens = (
   priceData: any, 
   fromToken?: string
 ) => {
+  // Only show tokens that the user actually has in their portfolio
   const availableFromTokens = userTokens.length > 0 
     ? userTokens.map(token => token.symbol) 
-    : (priceData?.tokens ? Object.keys(priceData.tokens) : ['ETH', 'USDC', 'USDT', 'WETH', 'WBTC']);
+    : []; // Return empty array if no tokens in portfolio
     
+  // For investable tokens, show all available options except the selected fromToken
   const availableToTokens = investableTokens.length > 0 
     ? investableTokens.map(token => token.symbol).filter(symbol => symbol !== fromToken)
-    : ['WETH', 'USDC', 'ETH', 'USDT', 'WBTC'].filter(symbol => symbol !== fromToken);
+    : []; // Return empty array if no investable tokens available
 
   return { availableFromTokens, availableToTokens };
 }; 

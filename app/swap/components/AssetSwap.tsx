@@ -65,7 +65,7 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
-  const [toToken, setToToken] = useState<string>("WETH")
+  const [toToken, setToToken] = useState<string>("")
   const [isSwapping, setIsSwapping] = useState(false)
   
   // Notify parent component when swapping state changes
@@ -114,17 +114,20 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
     source: 'cached'
   } : null;
 
-  // Initialize toToken when investable tokens are available (keep WETH if available)
+  // Initialize tokens when they become available
   useEffect(() => {
-    if (investableTokens.length > 0 && toToken === "WETH") {
-      // Check if WETH is available in investable tokens, otherwise keep the initial WETH value
-      const wethToken = investableTokens.find(token => token.symbol === "WETH");
-      if (!wethToken) {
-        // If WETH is not available, fallback to first available token
-        setToToken(investableTokens[0].symbol);
-      }
+    // Initialize fromToken with first available user token
+    if (userTokens.length > 0 && !fromToken) {
+      setFromToken(userTokens[0].symbol);
     }
-  }, [investableTokens, toToken]);
+    
+    // Initialize toToken with first available investable token
+    if (investableTokens.length > 0 && !toToken) {
+      // Try to find WETH first, otherwise use first available
+      const wethToken = investableTokens.find(token => token.symbol === "WETH");
+      setToToken(wethToken ? "WETH" : investableTokens[0].symbol);
+    }
+  }, [investableTokens, userTokens, fromToken, toToken]);
 
   // Auto-change toToken if it becomes the same as fromToken
   useEffect(() => {
