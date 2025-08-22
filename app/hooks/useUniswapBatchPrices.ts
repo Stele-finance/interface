@@ -206,7 +206,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       
       for (let tokenIndex = 0; tokenIndex < tokensToProcess.length; tokenIndex++) {
         const token = tokensToProcess[tokenIndex]
-        const amountIn = ethers.parseUnits("1", token.decimals)
+        const amountIn = ethers.parseUnits("1", Number(token.decimals))
         
         // Try USDC pairs first
         for (const fee of feeTiers) {
@@ -569,7 +569,7 @@ export function useTokenPrice(
       }
 
       const quoterInterface = new ethers.Interface(QUOTER_ABI)
-      const amountIn = ethers.parseUnits("1", tokenDecimals)
+      const amountIn = ethers.parseUnits("1", Number(tokenDecimals))
       
       // Try to get price via USDC first
       const feeTiers = [3000, 500, 10000] // 0.3%, 0.05%, 1%
@@ -745,7 +745,7 @@ export function useSwapTokenPricesIndependent(
         const fromDecimals = getTokenDecimals(fromTokenSymbol)
         
         if (fromAddress) {
-          const amountIn = ethers.parseUnits("1", fromDecimals)
+          const amountIn = ethers.parseUnits("1", Number(fromDecimals))
           let fromPrice = null
 
           for (const fee of feeTiers) {
@@ -788,7 +788,7 @@ export function useSwapTokenPricesIndependent(
         const toDecimals = getTokenDecimals(toTokenSymbol)
         
         if (toAddress) {
-          const amountIn = ethers.parseUnits("1", toDecimals)
+          const amountIn = ethers.parseUnits("1", Number(toDecimals))
           let toPrice = null
 
           for (const fee of feeTiers) {

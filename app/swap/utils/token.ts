@@ -74,9 +74,9 @@ export const formatTokenAmount = (rawAmount: string, decimals: string): string =
     
     // Format for better readability without K/M abbreviations
     if (num >= 1) {
-      return num.toFixed(4)
+      return num.toFixed(5)
     } else {
-      return num.toFixed(6)
+      return num.toFixed(5)
     }
   } catch (error) {
     return rawAmount // Fallback to raw amount if formatting fails

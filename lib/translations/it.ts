@@ -205,7 +205,6 @@ export const it = {
   noDataAvailable: "Nessun dato disponibile",
   noInvestableTokensFound: "Nessun token investibile trovato",
   noInvestorsFound: "Nessun investitore trovato per questa sfida",
-  noInvestorsFoundDescription: "Le classifiche degli investitori appariranno qui una volta che i partecipanti si uniscono",
   noNFTsFound: "Nessun NFT Trovato",
   noNFTsFoundDescription: "Partecipa alle sfide per guadagnarli!",
   noPortfolioData: "Nessun dato del portafoglio disponibile",

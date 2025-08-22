@@ -457,7 +457,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
                         }}
                       >
                         <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
-                          <span className="whitespace-nowrap">Fund #{fund.fundId}</span>
+                          <span className="whitespace-nowrap">{fund.fundId}</span>
                         </TableCell>
                         <TableCell className="font-medium text-green-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
                           {formatCurrency(fund.tvl)}

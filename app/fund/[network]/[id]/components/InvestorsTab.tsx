@@ -41,6 +41,17 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
     return `$${truncated.toFixed(2)}`
   }
 
+  // Helper function to format profit ratio as percentage
+  const formatProfitRatio = (ratio: string | number) => {
+    const num = typeof ratio === 'string' ? parseFloat(ratio) : ratio
+    const percentage = (num * 100).toFixed(2)
+    const sign = num >= 0 ? '+' : ''
+    return `${sign}${percentage}%`
+  }
+
+  // Filter out manager from investor data - show only investors
+  const filteredInvestorData = investorData.filter((investor: any) => !investor.isManager)
+
   // Helper function to format user address
   const formatUserAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -65,7 +76,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
             <p className="font-medium">Error loading investors</p>
             <p className="text-sm text-gray-400 mt-2">Please try again later</p>
           </div>
-        ) : investorData.length > 0 ? (
+        ) : filteredInvestorData.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <div className="min-w-[500px]">
@@ -74,17 +85,17 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                     <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
                       <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Role</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Profit Ratio</th>
                       <th className="text-right py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('updated')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(() => {
-                      // Calculate pagination
-                      const totalInvestors = Math.min(investorData.length, maxPages * itemsPerPage);
+                      // Calculate pagination using filtered data
+                      const totalInvestors = Math.min(filteredInvestorData.length, maxPages * itemsPerPage);
                       const startIndex = (currentPage - 1) * itemsPerPage;
                       const endIndex = Math.min(startIndex + itemsPerPage, totalInvestors);
-                      const paginatedInvestors = investorData.slice(startIndex, endIndex);
+                      const paginatedInvestors = filteredInvestorData.slice(startIndex, endIndex);
 
                       return paginatedInvestors.map((investor: any, index: number) => (
                         <tr 
@@ -115,24 +126,16 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                             </div>
                           </td>
 
-                          {/* Manager/Investor status column */}
+                          {/* Profit Ratio column */}
                           <td className="py-6 px-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {investor.isManager ? (
-                                <Badge 
-                                  variant="default"
-                                  className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs"
-                                >
-                                  Manager
-                                </Badge>
-                              ) : (
-                                <Badge 
-                                  variant="secondary"
-                                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
-                                >
-                                  Investor
-                                </Badge>
-                              )}
+                            <div className="font-medium">
+                              <span className={`${
+                                parseFloat(investor.profitRatio || '0') >= 0 
+                                  ? 'text-green-400' 
+                                  : 'text-red-400'
+                              }`}>
+                                {formatProfitRatio(investor.profitRatio || 0)}
+                              </span>
                             </div>
                           </td>
 
@@ -152,7 +155,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
             
             {/* Pagination - outside scrollable area, fixed at bottom */}
             {(() => {
-              const totalInvestors = Math.min(investorData.length, maxPages * itemsPerPage);
+              const totalInvestors = Math.min(filteredInvestorData.length, maxPages * itemsPerPage);
               const totalPages = Math.min(Math.ceil(totalInvestors / itemsPerPage), maxPages);
               
               return totalPages > 1 && (
@@ -194,7 +197,6 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
           <div className="text-center py-8 text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>{t('noInvestorsFound')}</p>
-            <p className="text-sm mt-2">{t('noInvestorsFoundDescription')}</p>
           </div>
         )}
       </CardContent>

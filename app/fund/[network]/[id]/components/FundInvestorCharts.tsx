@@ -119,7 +119,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           <div className="flex items-center justify-between gap-4 mb-1">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <Coins className="w-6 h-6 text-blue-500" />
+                <User className="w-6 h-6 text-blue-500" />
                 <h3 className="text-2xl sm:text-3xl text-gray-100">
                   {formatInvestorAddress(investor)}
                 </h3>

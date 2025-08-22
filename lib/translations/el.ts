@@ -205,7 +205,6 @@ export const el = {
   noDataAvailable: "Δεν υπάρχουν διαθέσιμα δεδομένα",
   noInvestableTokensFound: "Δε βρέθηκαν επενδυτικά tokens",
   noInvestorsFound: "Δε βρέθηκαν επενδυτές για αυτή την πρόκληση",
-  noInvestorsFoundDescription: "Οι κατατάξεις επενδυτών θα εμφανιστούν εδώ μόλις συμμετάσχουν συμμετέχοντες",
   noNFTsFound: "Δε Βρέθηκαν NFTs",
   noNFTsFoundDescription: "Συμμετέχετε σε προκλήσεις για να τα κερδίσετε!",
   noPortfolioData: "Δεν υπάρχουν διαθέσιμα δεδομένα χαρτοφυλακίου",

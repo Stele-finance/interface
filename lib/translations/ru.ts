@@ -205,7 +205,6 @@ export const ru = {
   noDataAvailable: "Данные недоступны",
   noInvestableTokensFound: "Инвестиционные токены не найдены",
   noInvestorsFound: "Инвесторы для этого вызова не найдены",
-  noInvestorsFoundDescription: "Рейтинги инвесторов появятся здесь, как только присоединятся участники",
   noNFTsFound: "NFT Не Найдены",
   noNFTsFoundDescription: "Участвуйте в вызовах, чтобы заработать их!",
   noPortfolioData: "Данные портфолио недоступны",

@@ -212,7 +212,6 @@ export const kr = {
   noDataAvailable: "사용 가능한 데이터 없음",
   noInvestableTokensFound: "투자 가능한 토큰을 찾을 수 없습니다",
   noInvestorsFound: "이 챌린지에서 투자자를 찾을 수 없습니다",
-  noInvestorsFoundDescription: "참가자가 가입하면 투자자 순위가 여기에 표시됩니다",
   noNFTsFound: "NFT를 찾을 수 없습니다",
   noNFTsFoundDescription: "챌린지에 참여해서 얻어보세요!",
   noPortfolioData: "포트폴리오 데이터 없음",

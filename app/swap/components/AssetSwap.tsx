@@ -198,7 +198,7 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
     const exchangeRate = fromTokenPrice / toTokenPrice;
     const outputValue = inputAmount * exchangeRate;
     
-    return outputValue.toFixed(Math.min(6, getTokenDecimalsUtil(toToken)));
+    return outputValue.toFixed(Math.min(5, getTokenDecimalsUtil(toToken)));
   }, [fromAmount, fromTokenPrice, toTokenPrice, getTokenDecimalsUtil, toToken]);
 
 
@@ -258,7 +258,7 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
         toast({
           variant: "destructive",
           title: "Insufficient Fund Balance",
-          description: `The fund only has ${availableAmount.toFixed(6)} ${fromToken}, but ${requestedAmount} ${fromToken} is requested.`,
+          description: `The fund only has ${availableAmount.toFixed(5)} ${fromToken}, but ${requestedAmount} ${fromToken} is requested.`,
         });
         return;
       }

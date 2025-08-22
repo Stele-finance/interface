@@ -193,7 +193,6 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
           <div className="text-center py-8 text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>{t('noInvestorsFound')}</p>
-            <p className="text-sm mt-2">{t('noInvestorsFoundDescription')}</p>
           </div>
         )}
       </CardContent>

@@ -205,7 +205,6 @@ export const fi = {
   noDataAvailable: "Tietoja ei saatavilla",
   noInvestableTokensFound: "Sijoituskelpoisia tokeneja ei löytynyt",
   noInvestorsFound: "Sijoittajia ei löytynyt tälle haasteelle",
-  noInvestorsFoundDescription: "Sijoittajien sijoitukset ilmestyvät tänne kun osallistujat liittyvät",
   noNFTsFound: "NFTjä Ei Löytynyt",
   noNFTsFoundDescription: "Osallistu haasteisiin ansaitaksesi niitä!",
   noPortfolioData: "Portfolio-tietoja ei saatavilla",

@@ -204,9 +204,9 @@ export const calculateOutputAmount = (
 ): string => {
   const outputAmount = fromAmount && parseFloat(fromAmount) > 0 
     ? (swapQuote 
-        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(Math.min(6, getTokenDecimals(toToken)))
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(Math.min(5, getTokenDecimals(toToken)))
         : (simpleSwapQuote 
-            ? simpleSwapQuote.toAmount.toFixed(Math.min(6, getTokenDecimals(toToken)))
+            ? simpleSwapQuote.toAmount.toFixed(Math.min(5, getTokenDecimals(toToken)))
             : "0"))
     : "0";
   

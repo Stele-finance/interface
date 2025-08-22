@@ -205,7 +205,6 @@ export const es = {
   noDataAvailable: "No hay datos disponibles",
   noInvestableTokensFound: "No se encontraron tokens invertibles",
   noInvestorsFound: "No se encontraron inversores para este desafío",
-  noInvestorsFoundDescription: "Las clasificaciones de inversores aparecerán aquí una vez que se unan los participantes",
   noNFTsFound: "No se Encontraron NFTs",
   noNFTsFoundDescription: "¡Participa en desafíos para ganarlos!",
   noPortfolioData: "No hay datos de cartera disponibles",

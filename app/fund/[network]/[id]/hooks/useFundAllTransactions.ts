@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
 import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
-import { ethers } from 'ethers'
 
 const GET_FUND_ALL_TRANSACTIONS_QUERY = `
   query GetFundAllTransactions($fundId: BigInt!) {
@@ -19,6 +18,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       fundId
       investor
       token
+      symbol
       amount
       blockTimestamp
       transactionHash
@@ -35,6 +35,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       fundId
       investor
       token
+      symbol
       amount
       blockTimestamp
       transactionHash
@@ -52,8 +53,10 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       investor
       tokenIn
       tokenOut
-      amountIn
-      amountOut
+      tokenInSymbol
+      tokenOutSymbol
+      tokenInAmount
+      tokenOutAmount
       blockTimestamp
       transactionHash
     }
@@ -69,6 +72,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       fundId
       investor
       token
+      symbol
       amount
       feeAmount
       blockTimestamp
@@ -86,6 +90,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       fundId
       manager
       token
+      symbol
       amount
       blockTimestamp
       transactionHash
@@ -130,9 +135,14 @@ export interface FundTransaction {
   details: string
   timestamp: number
   transactionHash: string
+  // Token data for all transaction types
+  token?: string
+  symbol?: string
   // Additional data for swaps
   tokenIn?: string
   tokenOut?: string
+  tokenInSymbol?: string
+  tokenOutSymbol?: string
   amountIn?: string
   amountOut?: string
   // Additional data for withdraws
@@ -145,6 +155,7 @@ interface GraphQLResponse {
     fundId: string
     investor: string
     token: string
+    symbol: string
     amount: string
     blockTimestamp: string
     transactionHash: string
@@ -154,6 +165,7 @@ interface GraphQLResponse {
     fundId: string
     investor: string
     token: string
+    symbol: string
     amount: string
     blockTimestamp: string
     transactionHash: string
@@ -164,8 +176,10 @@ interface GraphQLResponse {
     investor: string
     tokenIn: string
     tokenOut: string
-    amountIn: string
-    amountOut: string
+    tokenInSymbol: string
+    tokenOutSymbol: string
+    tokenInAmount: string
+    tokenOutAmount: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -174,6 +188,7 @@ interface GraphQLResponse {
     fundId: string
     investor: string
     token: string
+    symbol: string
     amount: string
     feeAmount: string
     blockTimestamp: string
@@ -184,6 +199,7 @@ interface GraphQLResponse {
     fundId: string
     manager: string
     token: string
+    symbol: string
     amount: string
     blockTimestamp: string
     transactionHash: string
@@ -202,21 +218,6 @@ interface GraphQLResponse {
     blockTimestamp: string
     transactionHash: string
   }>
-}
-
-// Helper function to get token symbol from address
-const getTokenSymbol = (tokenAddress: string): string => {
-  const lowerAddress = tokenAddress.toLowerCase()
-  // Add known token mappings for the fund network
-  const tokenMap: { [key: string]: string } = {
-    '0x0000000000000000000000000000000000000000': 'ETH',
-    '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'WETH', // Arbitrum WETH
-    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': 'WETH', // Ethereum WETH
-    '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'USDC', // Arbitrum USDC
-    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': 'USDC', // Ethereum USDC
-  }
-  
-  return tokenMap[lowerAddress] || `${tokenAddress.slice(0, 6)}...${tokenAddress.slice(-4)}`
 }
 
 export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'arbitrum' = 'arbitrum') {
@@ -244,18 +245,20 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process deposits
         if (data.deposits && Array.isArray(data.deposits)) {
           data.deposits.forEach((deposit) => {
-            const tokenSymbol = getTokenSymbol(deposit.token)
-            const amount = ethers.formatEther(deposit.amount)
+            // Format amount to max 6 decimal places
+            const formattedAmount = parseFloat(deposit.amount).toFixed(6).replace(/\.?0+$/, '')
             
             allTransactions.push({
               type: 'deposit',
               id: deposit.id,
               fundId: deposit.fundId,
               user: deposit.investor,
-              amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
-              details: `Deposited ${tokenSymbol}`,
+              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
+              details: `Deposited ${deposit.symbol}`,
               timestamp: parseInt(deposit.blockTimestamp),
               transactionHash: deposit.transactionHash,
+              token: deposit.token,
+              symbol: deposit.symbol,
             })
           })
         }
@@ -263,18 +266,20 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process deposit fees
         if (data.depositFees && Array.isArray(data.depositFees)) {
           data.depositFees.forEach((fee) => {
-            const tokenSymbol = getTokenSymbol(fee.token)
-            const amount = ethers.formatEther(fee.amount)
+            // Format amount to max 6 decimal places
+            const formattedAmount = parseFloat(fee.amount).toFixed(6).replace(/\.?0+$/, '')
             
             allTransactions.push({
               type: 'depositFee',
               id: fee.id,
               fundId: fee.fundId,
               user: fee.investor,
-              amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
-              details: `Deposit Fee (${tokenSymbol})`,
+              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
+              details: `Deposit Fee (${fee.symbol})`,
               timestamp: parseInt(fee.blockTimestamp),
               transactionHash: fee.transactionHash,
+              token: fee.token,
+              symbol: fee.symbol,
             })
           })
         }
@@ -282,24 +287,25 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process swaps
         if (data.swaps && Array.isArray(data.swaps)) {
           data.swaps.forEach((swap) => {
-            const tokenInSymbol = getTokenSymbol(swap.tokenIn)
-            const tokenOutSymbol = getTokenSymbol(swap.tokenOut)
-            const amountIn = ethers.formatEther(swap.amountIn)
-            const amountOut = ethers.formatEther(swap.amountOut)
-
+            // Format amounts to max 6 decimal places
+            const formattedAmountIn = parseFloat(swap.tokenInAmount).toFixed(6).replace(/\.?0+$/, '')
+            const formattedAmountOut = parseFloat(swap.tokenOutAmount).toFixed(6).replace(/\.?0+$/, '')
+            
             allTransactions.push({
               type: 'swap',
               id: swap.id,
               fundId: swap.fundId,
               user: swap.investor,
-              amount: `${parseFloat(amountIn).toFixed(4)} ${tokenInSymbol}`,
-              details: `${tokenInSymbol} → ${tokenOutSymbol}`,
+              amount: formattedAmountIn, // Only amount, no symbol
+              details: `${swap.tokenInSymbol} → ${swap.tokenOutSymbol}`,
               timestamp: parseInt(swap.blockTimestamp),
               transactionHash: swap.transactionHash,
               tokenIn: swap.tokenIn,
               tokenOut: swap.tokenOut,
-              amountIn: swap.amountIn,
-              amountOut: swap.amountOut,
+              tokenInSymbol: swap.tokenInSymbol,
+              tokenOutSymbol: swap.tokenOutSymbol,
+              amountIn: formattedAmountIn,
+              amountOut: formattedAmountOut,
             })
           })
         }
@@ -307,20 +313,22 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process withdraws
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            const tokenSymbol = getTokenSymbol(withdraw.token)
-            const amount = ethers.formatEther(withdraw.amount)
-            const feeAmount = ethers.formatEther(withdraw.feeAmount)
+            // Format amounts to max 6 decimal places
+            const formattedAmount = parseFloat(withdraw.amount).toFixed(6).replace(/\.?0+$/, '')
+            const formattedFeeAmount = parseFloat(withdraw.feeAmount).toFixed(6).replace(/\.?0+$/, '')
             
             allTransactions.push({
               type: 'withdraw',
               id: withdraw.id,
               fundId: withdraw.fundId,
               user: withdraw.investor,
-              amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
-              details: `Withdrew ${tokenSymbol} (Fee: ${parseFloat(feeAmount).toFixed(4)})`,
+              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
+              details: `Withdrew ${withdraw.symbol} (Fee: ${formattedFeeAmount})`,
               timestamp: parseInt(withdraw.blockTimestamp),
               transactionHash: withdraw.transactionHash,
-              feeAmount: withdraw.feeAmount,
+              token: withdraw.token,
+              symbol: withdraw.symbol,
+              feeAmount: formattedFeeAmount,
             })
           })
         }
@@ -328,18 +336,20 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process withdraw fees
         if (data.withdrawFees && Array.isArray(data.withdrawFees)) {
           data.withdrawFees.forEach((fee) => {
-            const tokenSymbol = getTokenSymbol(fee.token)
-            const amount = ethers.formatEther(fee.amount)
+            // Format amount to max 6 decimal places
+            const formattedAmount = parseFloat(fee.amount).toFixed(6).replace(/\.?0+$/, '')
             
             allTransactions.push({
               type: 'withdrawFee',
               id: fee.id,
               fundId: fee.fundId,
               user: fee.manager,
-              amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
-              details: `Withdraw Fee Collected (${tokenSymbol})`,
+              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
+              details: `Withdraw Fee Collected (${fee.symbol})`,
               timestamp: parseInt(fee.blockTimestamp),
               transactionHash: fee.transactionHash,
+              token: fee.token,
+              symbol: fee.symbol,
             })
           })
         }

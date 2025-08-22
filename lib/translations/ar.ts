@@ -207,7 +207,6 @@ export const ar = {
   noDataAvailable: "لا توجد بيانات متاحة",
   noInvestableTokensFound: "لم يتم العثور على رموز استثمارية",
   noInvestorsFound: "لم يتم العثور على مستثمرين لهذا التحدي",
-  noInvestorsFoundDescription: "ستظهر تصنيفات المستثمرين هنا بمجرد انضمام المشاركين",
   noPortfolioData: "لا توجد بيانات محفظة متاحة",
   noProposalsFound: "لم يتم العثور على مقترحات.",
   noRankingDataFound: "لم يتم العثور على بيانات التصنيف",

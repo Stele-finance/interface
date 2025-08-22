@@ -205,7 +205,6 @@ export const th = {
   noDataAvailable: "ไม่มีข้อมูล",
   noInvestableTokensFound: "ไม่พบโทเค็นที่สามารถลงทุนได้",
   noInvestorsFound: "ไม่พบนักลงทุนสำหรับความท้าทายนี้",
-  noInvestorsFoundDescription: "การจัดอันดับนักลงทุนจะปรากฏที่นี่เมื่อมีผู้เข้าร่วม",
   noNFTsFound: "ไม่พบ NFT",
   noNFTsFoundDescription: "เข้าร่วมความท้าทายเพื่อรับพวกมัน!",
   noPortfolioData: "ไม่มีข้อมูลพอร์ตโฟลิโอ",

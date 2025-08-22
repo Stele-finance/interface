@@ -205,7 +205,6 @@ export const id = {
   noDataAvailable: "Tidak ada data tersedia",
   noInvestableTokensFound: "Tidak ada token investasi ditemukan",
   noInvestorsFound: "Tidak ada investor ditemukan untuk tantangan ini",
-  noInvestorsFoundDescription: "Peringkat investor akan muncul di sini setelah peserta bergabung",
   noNFTsFound: "Tidak Ada NFT Ditemukan",
   noNFTsFoundDescription: "Ikuti tantangan untuk mendapatkannya!",
   noPortfolioData: "Tidak ada data portfolio tersedia",

@@ -205,7 +205,6 @@ export const hu = {
   noDataAvailable: "Nincsenek elérhető adatok",
   noInvestableTokensFound: "Nem találhatók befektethető tokenek",
   noInvestorsFound: "Ehhez a kihíváshoz nem találhatók befektetők",
-  noInvestorsFoundDescription: "A befektetői rangsorok itt jelennek meg, amint csatlakoznak a résztvevők",
   noNFTsFound: "Nem találhatók NFT-k",
   noNFTsFoundDescription: "Vegyél részt kihívásokban, hogy megszerezd őket!",
   noPortfolioData: "Nincsenek elérhető portfólió adatok",

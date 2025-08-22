@@ -205,7 +205,6 @@ export const ms = {
   noDataAvailable: "Tiada data tersedia",
   noInvestableTokensFound: "Tiada token pelaburan dijumpai",
   noInvestorsFound: "Tiada pelabur dijumpai untuk cabaran ini",
-  noInvestorsFoundDescription: "Kedudukan pelabur akan muncul di sini sebaik sahaja peserta menyertai",
   noNFTsFound: "Tiada NFT Dijumpai",
   noNFTsFoundDescription: "Sertai cabaran untuk mendapatkannya!",
   noPortfolioData: "Tiada data portfolio tersedia",

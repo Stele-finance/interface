@@ -378,8 +378,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Get signer after ensuring correct network
       const signer = await provider.getSigner();
 
-      // Create contract instance
-      const contract = new ethers.Contract(contractAddress, SteleABI as any, signer);
+      // Create contract instance - use .abi property from Hardhat artifact
+      const contract = new ethers.Contract(contractAddress, SteleABI.abi, signer);
 
       // Call mintPerformanceNFT function
       const transaction = await contract.mintPerformanceNFT(challengeId);

@@ -205,7 +205,6 @@ export const he = {
   noDataAvailable: "אין נתונים זמינים",
   noInvestableTokensFound: "לא נמצאו טוקנים להשקעה",
   noInvestorsFound: "לא נמצאו משקיעים לאתגר זה",
-  noInvestorsFoundDescription: "דירוגי המשקיעים יופיעו כאן ברגע שמשתתפים יצטרפו",
   noNFTsFound: "לא נמצאו NFTs",
   noNFTsFoundDescription: "השתתף באתגרים כדי להרוויח אותם!",
   noPortfolioData: "אין נתוני פורטפוליו זמינים",

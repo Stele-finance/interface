@@ -50,7 +50,7 @@ export function SwapInput({
     if (!outputAmount || outputAmount === "0") return "0";
     const num = parseFloat(outputAmount);
     if (num % 1 === 0) return num.toString();
-    return num.toFixed(Math.min(4, getTokenDecimals(token))).replace(/\.?0+$/, '');
+    return num.toFixed(Math.min(5, getTokenDecimals(token))).replace(/\.?0+$/, '');
   }
 
   return (

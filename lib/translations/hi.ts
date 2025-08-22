@@ -205,7 +205,6 @@ export const hi = {
   noDataAvailable: "कोई डेटा उपलब्ध नहीं",
   noInvestableTokensFound: "कोई निवेश योग्य टोकन नहीं मिला",
   noInvestorsFound: "इस चुनौती के लिए कोई निवेशक नहीं मिले",
-  noInvestorsFoundDescription: "प्रतिभागियों के शामिल होने पर निवेशक रैंकिंग यहाँ दिखाई जाएगी",
   noNFTsFound: "कोई NFTs नहीं मिले",
   noNFTsFoundDescription: "उन्हें कमाने के लिए चुनौतियों में भाग लें!",
   noPortfolioData: "कोई पोर्टफोलियो डेटा उपलब्ध नहीं",

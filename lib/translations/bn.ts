@@ -205,7 +205,6 @@ export const bn = {
   noDataAvailable: "কোনো ডেটা উপলব্ধ নেই",
   noInvestableTokensFound: "কোনো বিনিয়োগযোগ্য টোকেন পাওয়া যায়নি",
   noInvestorsFound: "এই চ্যালেঞ্জের জন্য কোনো বিনিয়োগকারী পাওয়া যায়নি",
-  noInvestorsFoundDescription: "অংশগ্রহণকারীরা যোগ দিলে বিনিয়োগকারীদের র‍্যাঙ্কিং এখানে প্রদর্শিত হবে",
   noNFTsFound: "কোনো NFTs পাওয়া যায়নি",
   noNFTsFoundDescription: "চ্যালেঞ্জে অংশগ্রহণ করুন এগুলো অর্জন করতে!",
   noPortfolioData: "কোনো পোর্টফোলিও ডেটা উপলব্ধ নেই",

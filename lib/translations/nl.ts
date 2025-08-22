@@ -205,7 +205,6 @@ export const nl = {
   noDataAvailable: "Geen gegevens beschikbaar",
   noInvestableTokensFound: "Geen investeerbare tokens gevonden",
   noInvestorsFound: "Geen investeerders gevonden voor deze uitdaging",
-  noInvestorsFoundDescription: "Investeerder rankings zullen hier verschijnen zodra deelnemers zich aansluiten",
   noNFTsFound: "Geen NFT's Gevonden",
   noNFTsFoundDescription: "Doe mee aan uitdagingen om ze te verdienen!",
   noPortfolioData: "Geen portfolio gegevens beschikbaar",

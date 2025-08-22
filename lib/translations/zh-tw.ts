@@ -205,7 +205,6 @@ export const zhTw = {
   noDataAvailable: "無數據可用",
   noInvestableTokensFound: "未找到可投資代幣",
   noInvestorsFound: "此挑戰未找到投資者",
-  noInvestorsFoundDescription: "一旦參與者加入，投資者排名將在此顯示",
   noNFTsFound: "未找到NFT",
   noNFTsFoundDescription: "參與挑戰來賺取它們！",
   noPortfolioData: "無投資組合數據可用",

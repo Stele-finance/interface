@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus } from "lucide-react"
+import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus, PieChart } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { ethers } from "ethers"
@@ -35,10 +35,7 @@ import {
 // import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import SteleABI from "@/app/abis/Stele.json"
 import ERC20ABI from "@/app/abis/ERC20.json"
-// import { useFund } from "@/app/hooks/useFund"
-// import { useFundTransactions } from "../../hooks/useFundTransactions"
-// import { useFundRanking } from "@/app/hooks/useFundRanking"
-// import { useFundInvestorData } from "@/app/hooks/useFundInvestorData"
+import { useFundData } from "../hooks/useFundData"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
@@ -90,6 +87,32 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const itemsPerPage = 5;
   const maxPages = 5;
   
+  // Format relative time (1 day, 1 hour, 1 minute, 1 week, etc.)
+  const formatRelativeTime = (timestamp: number) => {
+    const now = new Date().getTime()
+    const transactionTime = timestamp * 1000
+    const diffInSeconds = Math.floor((now - transactionTime) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}${t('secondShort')}`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes}${t('minuteShort')}`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours}${t('hourShort')}`
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days}${t('dayShort')}`
+    } else if (diffInSeconds < 2592000) {
+      const weeks = Math.floor(diffInSeconds / 604800)
+      return `${weeks}${t('weekShort')}`
+    } else {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months}${t('monthShort')}`
+    }
+  }
+  
   // Mock entry fee instead of useEntryFee hook
   const entryFee = "10"
   const isLoadingEntryFee = false
@@ -103,10 +126,23 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
   
-  // Get fund investor data to check if user has joined (after subgraphNetwork is defined)
+  // Get real fund data from subgraph based on URL network
+  const { data: fundData, isLoading, error } = useFundData(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
+  
+  const fund = fundData?.fund
+  const data = { fund }
+
+  // Get fund investor data to check if user has joined (after fund data is available)
   const { data: fundInvestorData, isLoading: isLoadingFundInvestor, refetch: refetchFundInvestorData } = useFundInvestorData(
     fundId,
     connectedAddress || "",
+    subgraphNetwork as 'ethereum' | 'arbitrum'
+  );
+
+  // Get manager's portfolio data
+  const { data: managerInvestorData, isLoading: isLoadingManagerData } = useFundInvestorData(
+    fundId,
+    fund?.manager || "",
     subgraphNetwork as 'ethereum' | 'arbitrum'
   );
 
@@ -134,27 +170,23 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     }
   };
 
-  // Mock fund data
+  // Mock fund data as fallback (for properties not in subgraph)
   const mockFund = {
     id: fundId,
     name: `Fund ${fundId}`,
     fundId: fundId,
-    manager: '0x1234567890123456789012345678901234567890',
-    investorCount: 15,
-    tvl: 72000,
-    totalValue: '$72,000',
+    manager: fund?.manager || '0x1234567890123456789012345678901234567890',
+    investorCount: fund ? parseInt(fund.investorCount) : 15,
+    tvl: fund ? parseFloat(fund.currentUSD) : 72000,
+    totalValue: fund ? `$${parseFloat(fund.currentUSD).toLocaleString()}` : '$72,000',
     status: 'active',
     network: subgraphNetwork,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date(),
-    tokens: ['USDC', 'ETH', 'WBTC'],
+    createdAt: fund ? new Date(parseInt(fund.createdAtTimestamp) * 1000) : new Date('2024-01-01'),
+    updatedAt: fund ? new Date(parseInt(fund.updatedAtTimestamp) * 1000) : new Date(),
+    tokens: fund?.currentTokensSymbols || ['USDC', 'ETH', 'WBTC'],
     isActive: true,
-    investorCounter: 15
+    investorCounter: fund ? parseInt(fund.investorCount) : 15
   }
-  
-  const data = { fund: mockFund }
-  const isLoading = false
-  const error = null
 
   // Mock investors data
   const investors = [
@@ -171,7 +203,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     subgraphNetwork as 'ethereum' | 'arbitrum'
   )
   
-  // Format transactions for display
+  // Format transactions for display with full token data
   const transactions = fundTransactions.map(tx => ({
     id: tx.id,
     user: `${tx.user.slice(0, 6)}...${tx.user.slice(-4)}`,
@@ -180,7 +212,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     time: new Date(tx.timestamp * 1000),
     address: tx.user,
     transactionHash: tx.transactionHash,
-    timestamp: tx.timestamp
+    timestamp: tx.timestamp,
+    // Token data for all transaction types
+    token: tx.token,
+    symbol: tx.symbol,
+    // Preserve swap data for rendering
+    tokenIn: tx.tokenIn,
+    tokenOut: tx.tokenOut,
+    tokenInSymbol: tx.tokenInSymbol,
+    tokenOutSymbol: tx.tokenOutSymbol,
+    amountIn: tx.amountIn,
+    amountOut: tx.amountOut,
   }))
 
 
@@ -218,14 +260,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   };
 
   // Utility functions
-  const formatRelativeTime = (timestamp: number) => {
-    const now = Date.now() / 1000;
-    const diff = now - timestamp;
-    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    return `${Math.floor(diff / 86400)} days ago`;
-  };
-
   const formatUserAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
@@ -551,59 +585,213 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   </div>
                 ) : transactions.length > 0 ? (
                   <>
-                    <div className="rounded-2xl overflow-hidden overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('time')}</th>
-                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('type')}</th>
-                            <th className="text-left py-3 px-10 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
-                            <th className="text-left py-3 px-20 sm:px-40 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            // Calculate pagination
-                            const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
-                            const startIndex = (currentPage - 1) * itemsPerPage;
-                            const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
-                            const paginatedTransactions = transactions.slice(startIndex, endIndex);
+                    <div className="overflow-x-auto">
+                      <div className="min-w-[400px]">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                              <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('time')}</th>
+                              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('type')}</th>
+                              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
+                              <th className="text-right py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(() => {
+                              // Calculate pagination
+                              const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                              const startIndex = (currentPage - 1) * itemsPerPage;
+                              const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                              const paginatedTransactions = transactions.slice(startIndex, endIndex);
 
-                            return paginatedTransactions.map((transaction) => (
-                              <tr 
-                                key={transaction.id} 
-                                className="hover:bg-gray-800/30 transition-colors cursor-pointer"
-                                onClick={() => {
-                                  const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-                                  window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
-                                }}
-                              >
-                                <td className="py-6 pl-6 pr-4 whitespace-nowrap">
-                                  <div className="text-sm text-gray-400">
-                                    {formatRelativeTime(transaction.timestamp)}
-                                  </div>
-                                </td>
-                                <td className="py-6 px-4 whitespace-nowrap">
-                                  <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
-                                    {getTransactionTypeText(transaction.type)}
-                                  </div>
-                                </td>
-                                <td className="py-6 px-4 whitespace-nowrap">
-                                  <div className="text-gray-300 text-sm">
-                                    {formatUserAddress(transaction.user)}
-                                  </div>
-                                </td>
-                                <td className="py-6 px-6">
-                                  <div className="text-right">
-                                    <div className="font-medium text-gray-100 truncate whitespace-nowrap">{transaction.value || '-'}</div>
-                                  </div>
-                                </td>
-                              </tr>
-                            ));
-                          })()}
-                        </tbody>
-                      </table>
+                              return paginatedTransactions.map((transaction, index) => (
+                                <tr 
+                                  key={transaction.id} 
+                                  className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                                  onClick={() => {
+                                    const chainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+                                    window.open(getExplorerUrl(chainId, transaction.transactionHash), '_blank');
+                                  }}
+                                >
+                                  <td className="py-6 pl-6 pr-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-400">
+                                      {formatRelativeTime(transaction.timestamp)}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-4 whitespace-nowrap">
+                                    <div className={`font-medium ${getTransactionTypeColor(transaction.type)}`}>
+                                      {getTransactionTypeText(transaction.type)}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-4 whitespace-nowrap">
+                                    <div className="text-gray-300 text-sm">
+                                      {formatUserAddress(transaction.user)}
+                                    </div>
+                                  </td>
+                                  <td className="py-6 px-6 whitespace-nowrap">
+                                    <div className="text-right">
+                                      {transaction.type === 'Swap' ? (
+                                        <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <div className="relative flex-shrink-0">
+                                              {(() => {
+                                                const fromLogo = getTokenLogo(transaction.tokenIn || transaction.tokenInSymbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                                return fromLogo ? (
+                                                  <Image 
+                                                    src={fromLogo} 
+                                                    alt={transaction.tokenInSymbol || 'Token'}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                    {transaction.tokenInSymbol?.slice(0, 1) || '?'}
+                                                  </div>
+                                                )
+                                              })()}
+                                              {subgraphNetwork === 'arbitrum' && (
+                                                <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                  <Image 
+                                                    src="/networks/small/arbitrum.png" 
+                                                    alt="Arbitrum One"
+                                                    width={10}
+                                                    height={10}
+                                                    className="rounded-full"
+                                                    style={{ width: 'auto', height: 'auto' }}
+                                                  />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                              {transaction.amountIn}
+                                            </span>
+                                          </div>
+                                          <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <div className="relative flex-shrink-0">
+                                              {(() => {
+                                                const toLogo = getTokenLogo(transaction.tokenOut || transaction.tokenOutSymbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                                return toLogo ? (
+                                                  <Image 
+                                                    src={toLogo} 
+                                                    alt={transaction.tokenOutSymbol || 'Token'}
+                                                    width={20}
+                                                    height={20}
+                                                    className="rounded-full"
+                                                  />
+                                                ) : (
+                                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                                                    {transaction.tokenOutSymbol?.slice(0, 1) || '?'}
+                                                  </div>
+                                                )
+                                              })()}
+                                              {subgraphNetwork === 'arbitrum' && (
+                                                <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                  <Image 
+                                                    src="/networks/small/arbitrum.png" 
+                                                    alt="Arbitrum One"
+                                                    width={10}
+                                                    height={10}
+                                                    className="rounded-full"
+                                                    style={{ width: 'auto', height: 'auto' }}
+                                                  />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                              {transaction.amountOut}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdraw' || transaction.type === 'Withdrawfee') && transaction.symbol ? (
+                                        <div className="flex items-center gap-2 justify-end">
+                                          <div className="relative flex-shrink-0">
+                                            {(() => {
+                                              const tokenLogo = getTokenLogo(transaction.token || transaction.symbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                              return tokenLogo ? (
+                                                <Image 
+                                                  src={tokenLogo} 
+                                                  alt={transaction.symbol || 'Token'}
+                                                  width={20}
+                                                  height={20}
+                                                  className="rounded-full"
+                                                />
+                                              ) : (
+                                                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                  {transaction.symbol?.slice(0, 1) || '?'}
+                                                </div>
+                                              )
+                                            })()}
+                                            {subgraphNetwork === 'arbitrum' && (
+                                              <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                <Image 
+                                                  src="/networks/small/arbitrum.png" 
+                                                  alt="Arbitrum One"
+                                                  width={10}
+                                                  height={10}
+                                                  className="rounded-full"
+                                                  style={{ width: 'auto', height: 'auto' }}
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                            {transaction.value}
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <div className="font-medium text-gray-100">{transaction.value || '-'}</div>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ));
+                            })()}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
+                    
+                    {/* Pagination - outside scrollable area, fixed at bottom */}
+                    {(() => {
+                      const totalTransactions = Math.min(transactions.length, maxPages * itemsPerPage);
+                      const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                      
+                      return totalPages > 1 && (
+                        <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                          <Pagination>
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious 
+                                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                />
+                              </PaginationItem>
+                              
+                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <PaginationItem key={page}>
+                                  <PaginationLink
+                                    onClick={() => setCurrentPage(page)}
+                                    isActive={currentPage === page}
+                                    className="cursor-pointer hover:bg-gray-700"
+                                  >
+                                    {page}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              ))}
+                              
+                              <PaginationItem>
+                                <PaginationNext 
+                                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      );
+                    })()}
                   </>
                 ) : (
                   <div className="text-center py-8 text-gray-400">
@@ -712,11 +900,80 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
              )}
           </div>
           
-          {/* Fund Summary Card */}
+          {/* Portfolio Allocation Card */}
           <Card className="bg-transparent border border-gray-600 rounded-2xl">
             <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-100 mb-4">Fund Summary</h3>
+              <h3 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
+                <PieChart className="h-5 w-5" />
+                Portfolio
+              </h3>
               
+              {/* Mock Pie Chart */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative w-40 h-40">
+                  {/* Simple CSS pie chart using conic-gradient */}
+                  <div 
+                    className="w-full h-full rounded-full"
+                    style={{
+                      background: `conic-gradient(
+                        from 0deg,
+                        #3B82F6 0deg 144deg,     /* USDC 40% - Blue */
+                        #EF4444 144deg 216deg,   /* ETH 20% - Red */
+                        #10B981 216deg 288deg,   /* WBTC 20% - Green */
+                        #F59E0B 288deg 360deg    /* Other 20% - Yellow */
+                      )`
+                    }}
+                  />
+                  {/* Center hole */}
+                  <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-white">100%</div>
+                      <div className="text-xs text-gray-400">Allocated</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-300">USDC</span>
+                  </div>
+                  <div className="text-sm text-white font-medium">40.0%</div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span className="text-sm text-gray-300">ETH</span>
+                  </div>
+                  <div className="text-sm text-white font-medium">20.0%</div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-gray-300">WBTC</span>
+                  </div>
+                  <div className="text-sm text-white font-medium">20.0%</div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="text-sm text-gray-300">Other</span>
+                  </div>
+                  <div className="text-sm text-white font-medium">20.0%</div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Fund Info Card */}
+          <Card className="bg-transparent border border-gray-600 rounded-2xl">
+            <div className="p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">Fund ID</span>
@@ -730,55 +987,20 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">TVL</span>
-                  <span className="text-sm text-green-400 font-medium">${mockFund.tvl.toLocaleString()}</span>
+                  <span className="text-sm text-green-400 font-medium">
+                    {fund ? `$${parseFloat(fund.currentUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$0.00'}
+                  </span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('investor')}</span>
-                  <span className="text-sm text-white font-medium">{mockFund.investorCount}</span>
+                  <span className="text-sm text-white font-medium">{fund ? fund.investorCount : '0'}</span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">Status</span>
                   <span className="text-sm text-green-400 font-medium">Active</span>
                 </div>
-                
-                {/* User Investment Info - Show only if user has joined */}
-                {hasInvestedInFund && fundInvestorData?.investor && (
-                  <>
-                    <div className="border-t border-gray-700/50 pt-4 mt-6">
-                      <h4 className="text-lg font-semibold text-gray-100 mb-3">My Investment</h4>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                      <span className="text-sm text-gray-400">Principal</span>
-                      <span className="text-sm text-white font-medium">
-                        ${parseFloat(fundInvestorData.investor.principalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                      <span className="text-sm text-gray-400">Current Value</span>
-                      <span className="text-sm text-white font-medium">
-                        ${parseFloat(fundInvestorData.investor.currentUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                      <span className="text-sm text-gray-400">P&L</span>
-                      <span className={`text-sm font-medium ${parseFloat(fundInvestorData.investor.profitUSD) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {parseFloat(fundInvestorData.investor.profitUSD) >= 0 ? '+' : ''}${parseFloat(fundInvestorData.investor.profitUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-400">ROI</span>
-                      <span className={`text-sm font-medium ${parseFloat(fundInvestorData.investor.profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {parseFloat(fundInvestorData.investor.profitRatio) >= 0 ? '+' : ''}{(parseFloat(fundInvestorData.investor.profitRatio) * 100).toFixed(2)}%
-                      </span>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           </Card>
@@ -810,7 +1032,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
             <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
               <span className="text-gray-400">Manager</span>
               <span className="text-white font-mono text-sm">
-                {mockFund.manager ? `${mockFund.manager.slice(0, 6)}...${mockFund.manager.slice(-4)}` : 'Unknown'}
+                {fund?.manager ? `${fund.manager.slice(0, 6)}...${fund.manager.slice(-4)}` : 'Unknown'}
               </span>
             </div>
           </div>

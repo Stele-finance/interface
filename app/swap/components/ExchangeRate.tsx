@@ -40,7 +40,7 @@ export function ExchangeRate({
 
   return (
     <div className="text-center text-sm text-gray-400">
-      1 {fromToken} = {exchangeRate.toFixed(Math.min(6, getTokenDecimals(toToken)))} {toToken}
+      1 {fromToken} = {exchangeRate.toFixed(Math.min(5, getTokenDecimals(toToken)))} {toToken}
       {isUsingBasicEstimate && (
         <span className="text-orange-400 ml-1">({t('loadingPrice')})</span>
       )}

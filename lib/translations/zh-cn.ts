@@ -205,7 +205,6 @@ export const zhCn = {
   noDataAvailable: "无可用数据",
   noInvestableTokensFound: "未找到可投资代币",
   noInvestorsFound: "此挑战未找到投资者",
-  noInvestorsFoundDescription: "一旦参与者加入，投资者排名将在此显示",
   noNFTsFound: "未找到NFT",
   noNFTsFoundDescription: "参与挑战来赚取它们！",
   noPortfolioData: "无投资组合数据可用",

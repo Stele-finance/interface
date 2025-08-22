@@ -205,7 +205,6 @@ export const vi = {
   noDataAvailable: "Không có dữ liệu",
   noInvestableTokensFound: "Không tìm thấy token có thể đầu tư",
   noInvestorsFound: "Không tìm thấy nhà đầu tư cho thử thách này",
-  noInvestorsFoundDescription: "Bảng xếp hạng nhà đầu tư sẽ xuất hiện ở đây khi có người tham gia",
   noNFTsFound: "Không Tìm Thấy NFT",
   noNFTsFoundDescription: "Tham gia thử thách để kiếm chúng!",
   noPortfolioData: "Không có dữ liệu danh mục đầu tư",

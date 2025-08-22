@@ -205,7 +205,6 @@ export const jp = {
   noDataAvailable: "データがありません",
   noInvestableTokensFound: "投資可能トークンが見つかりません",
   noInvestorsFound: "このチャレンジで投資家が見つかりません",
-  noInvestorsFoundDescription: "参加者が参加すると、投資家ランキングがここに表示されます",
   noNFTsFound: "NFTが見つかりません",
   noNFTsFoundDescription: "チャレンジに参加して獲得しよう！",
   noPortfolioData: "ポートフォリオデータがありません",
