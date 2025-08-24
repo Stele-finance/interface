@@ -39,7 +39,10 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
   const itemsPerPage = 5
 
   // Calculate pagination data
-  const tokens = tokensData?.investableTokens || []
+  const tokens = useMemo(() => {
+    return tokensData?.investableTokens || []
+  }, [tokensData])
+  
   const totalPages = Math.ceil(tokens.length / itemsPerPage)
   
   const paginatedTokens = useMemo(() => {

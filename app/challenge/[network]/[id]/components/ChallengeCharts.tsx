@@ -99,7 +99,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
       .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)
 
     return processedData
-  }, [data, weeklyData, intervalType])
+  }, [data, weeklyData, intervalType, language])
 
   // Calculate current values for headers (use the most recent snapshot or challenge data)
   const currentRewardAmount = useMemo(() => {

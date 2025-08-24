@@ -116,16 +116,16 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       parameterDescriptions: [t('entryFeeParamDesc')]
     },
     {
-      id: 'set-max-assets',
-      name: t('setMaxAssetsTemplate'),
-      description: t('setMaxAssetsDesc'),
+      id: 'set-max-tokens',
+      name: t('setMaxTokensTemplate'),
+      description: t('setMaxTokensDesc'),
       icon: <Settings className="h-5 w-5" />,
       targetContract: getSteleContractAddress(contractNetwork),
-      functionSignature: 'setMaxAssets(uint8)',
+      functionSignature: 'setMaxTokens(uint8)',
       parameterTypes: ['uint8'],
-      parameterLabels: [t('maxAssetsCountLabel')],
+      parameterLabels: [t('maxTokensCountLabel')],
       parameterPlaceholders: ['10'],
-      parameterDescriptions: [t('maxAssetsParamDesc')]
+      parameterDescriptions: [t('maxTokensParamDesc')]
     },
     {
       id: 'set-seed-money',
@@ -138,6 +138,42 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       parameterLabels: [t('seedMoneyAmountLabel')],
       parameterPlaceholders: ['10000000000'],
       parameterDescriptions: [t('seedMoneyParamDesc')]
+    },
+    {
+      id: 'set-create-bonus',
+      name: t('setCreateBonusTemplate'),
+      description: t('setCreateBonusDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: getSteleContractAddress(contractNetwork),
+      functionSignature: 'setCreateBonus(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('createBonusAmountLabel')],
+      parameterPlaceholders: ['1000000000000000000'],
+      parameterDescriptions: [t('createBonusParamDesc')]
+    },
+    {
+      id: 'set-join-bonus',
+      name: t('setJoinBonusTemplate'),
+      description: t('setJoinBonusDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: getSteleContractAddress(contractNetwork),
+      functionSignature: 'setJoinBonus(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('joinBonusAmountLabel')],
+      parameterPlaceholders: ['500000000000000000'],
+      parameterDescriptions: [t('joinBonusParamDesc')]
+    },
+    {
+      id: 'set-get-rewards-bonus',
+      name: t('setGetRewardsBonusTemplate'),
+      description: t('setGetRewardsBonusDesc'),
+      icon: <DollarSign className="h-5 w-5" />,
+      targetContract: getSteleContractAddress(contractNetwork),
+      functionSignature: 'setGetRewardsBonus(uint256)',
+      parameterTypes: ['uint256'],
+      parameterLabels: [t('getRewardsBonusAmountLabel')],
+      parameterPlaceholders: ['200000000000000000'],
+      parameterDescriptions: [t('getRewardsBonusParamDesc')]
     },
     {
       id: 'set-voting-period',

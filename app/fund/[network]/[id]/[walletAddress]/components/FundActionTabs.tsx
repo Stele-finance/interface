@@ -60,11 +60,13 @@ export function FundActionTabs({
   const isOnlyInvestor = !isManager && isInvestor
   
   // Define available tabs based on role
-  const availableTabs = isManagerAndInvestor 
-    ? ["swap", "deposit", "withdraw", "fee"]
-    : isOnlyInvestor 
-    ? ["deposit", "withdraw"]
-    : []
+  const availableTabs = useMemo(() => {
+    return isManagerAndInvestor 
+      ? ["swap", "deposit", "withdraw", "fee"]
+      : isOnlyInvestor 
+      ? ["deposit", "withdraw"]
+      : []
+  }, [isManagerAndInvestor, isOnlyInvestor])
   
   // Fetch ETH balance for the specific network (from URL, not wallet network)
   useEffect(() => {
@@ -96,7 +98,7 @@ export function FundActionTabs({
     if (availableTabs.length > 0 && !availableTabs.includes(activeTab)) {
       setActiveTab(availableTabs[0])
     }
-  }, [availableTabs.length, activeTab])
+  }, [availableTabs, activeTab])
   
   // Handle percentage clicks for deposit using actual ETH balance
   const handleDepositPercentage = (percentage: number) => {

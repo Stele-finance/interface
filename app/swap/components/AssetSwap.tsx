@@ -105,14 +105,16 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   );
 
   // Create compatible priceData structure for existing code
-  const priceData: PriceData | null = fromTokenPrice && toTokenPrice ? {
-    tokens: {
-      [fromToken]: { priceUSD: fromTokenPrice },
-      [toToken]: { priceUSD: toTokenPrice }
-    },
-    timestamp: Date.now(),
-    source: 'cached'
-  } : null;
+  const priceData = useMemo<PriceData | null>(() => {
+    return fromTokenPrice && toTokenPrice ? {
+      tokens: {
+        [fromToken]: { priceUSD: fromTokenPrice },
+        [toToken]: { priceUSD: toTokenPrice }
+      },
+      timestamp: Date.now(),
+      source: 'cached'
+    } : null;
+  }, [fromTokenPrice, toTokenPrice, fromToken, toToken]);
 
   // Initialize tokens when they become available
   useEffect(() => {

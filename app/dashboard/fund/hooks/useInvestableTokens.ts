@@ -49,7 +49,6 @@ export function useInvestableTokens(first: number = 50, network: 'ethereum' | 'a
       try {
         const url = getSubgraphUrl(network)
         const result = await request<InvestableTokensResponse>(url, INVESTABLE_TOKENS_QUERY, { first }, headers)
-        console.log('InvestableTokens GraphQL response:', result)
         
         // Return actual data (even if empty)
         return result

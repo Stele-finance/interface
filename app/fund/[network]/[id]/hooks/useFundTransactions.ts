@@ -20,14 +20,17 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       fundId
       investor
       token
+      symbol
       amount
+      share
+      totalShare
       blockTimestamp
       transactionHash
     }
     depositFees(
       where: { 
         fundId: $fundId,
-        investor: $userAddress
+        manager: $userAddress
       }
       orderBy: blockTimestamp
       orderDirection: desc
@@ -35,8 +38,9 @@ const GET_FUND_TRANSACTIONS_QUERY = `
     ) {
       id
       fundId
-      investor
+      manager
       token
+      symbol
       amount
       blockTimestamp
       transactionHash
@@ -55,8 +59,10 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       investor
       tokenIn
       tokenOut
-      amountIn
-      amountOut
+      tokenInSymbol
+      tokenOutSymbol
+      tokenInAmount
+      tokenOutAmount
       blockTimestamp
       transactionHash
     }
@@ -72,9 +78,8 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       id
       fundId
       investor
-      token
-      amount
-      feeAmount
+      share
+      totalShare
       blockTimestamp
       transactionHash
     }
@@ -91,6 +96,7 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       fundId
       manager
       token
+      symbol
       amount
       blockTimestamp
       transactionHash
@@ -152,15 +158,19 @@ interface GraphQLResponse {
     fundId: string
     investor: string
     token: string
+    symbol: string
     amount: string
+    share: string
+    totalShare: string
     blockTimestamp: string
     transactionHash: string
   }>
   depositFees?: Array<{
     id: string
     fundId: string
-    investor: string
+    manager: string
     token: string
+    symbol: string
     amount: string
     blockTimestamp: string
     transactionHash: string
@@ -171,8 +181,10 @@ interface GraphQLResponse {
     investor: string
     tokenIn: string
     tokenOut: string
-    amountIn: string
-    amountOut: string
+    tokenInSymbol: string
+    tokenOutSymbol: string
+    tokenInAmount: string
+    tokenOutAmount: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -180,9 +192,8 @@ interface GraphQLResponse {
     id: string
     fundId: string
     investor: string
-    token: string
-    amount: string
-    feeAmount: string
+    share: string
+    totalShare: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -191,6 +202,7 @@ interface GraphQLResponse {
     fundId: string
     manager: string
     token: string
+    symbol: string
     amount: string
     blockTimestamp: string
     transactionHash: string
@@ -252,8 +264,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process deposits
         if (data.deposits && Array.isArray(data.deposits)) {
           data.deposits.forEach((deposit) => {
-            const tokenSymbol = getTokenSymbol(deposit.token)
-            const amount = ethers.formatEther(deposit.amount)
+            const tokenSymbol = deposit.symbol || getTokenSymbol(deposit.token)
+            const amount = deposit.amount
             
             allTransactions.push({
               type: 'deposit',
@@ -271,14 +283,14 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process deposit fees
         if (data.depositFees && Array.isArray(data.depositFees)) {
           data.depositFees.forEach((fee) => {
-            const tokenSymbol = getTokenSymbol(fee.token)
-            const amount = ethers.formatEther(fee.amount)
+            const tokenSymbol = fee.symbol || getTokenSymbol(fee.token)
+            const amount = fee.amount
             
             allTransactions.push({
               type: 'depositFee',
               id: fee.id,
               fundId: fee.fundId,
-              user: fee.investor,
+              user: fee.manager,
               amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
               details: `Deposit Fee (${tokenSymbol})`,
               timestamp: parseInt(fee.blockTimestamp),
@@ -290,10 +302,10 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process swaps
         if (data.swaps && Array.isArray(data.swaps)) {
           data.swaps.forEach((swap) => {
-            const tokenInSymbol = getTokenSymbol(swap.tokenIn)
-            const tokenOutSymbol = getTokenSymbol(swap.tokenOut)
-            const amountIn = ethers.formatEther(swap.amountIn)
-            const amountOut = ethers.formatEther(swap.amountOut)
+            const tokenInSymbol = swap.tokenInSymbol || getTokenSymbol(swap.tokenIn)
+            const tokenOutSymbol = swap.tokenOutSymbol || getTokenSymbol(swap.tokenOut)
+            const amountIn = swap.tokenInAmount
+            const amountOut = swap.tokenOutAmount
 
             allTransactions.push({
               type: 'swap',
@@ -306,8 +318,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
               transactionHash: swap.transactionHash,
               tokenIn: swap.tokenIn,
               tokenOut: swap.tokenOut,
-              amountIn: swap.amountIn,
-              amountOut: swap.amountOut,
+              amountIn: swap.tokenInAmount,
+              amountOut: swap.tokenOutAmount,
             })
           })
         }
@@ -315,20 +327,18 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process withdraws
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            const tokenSymbol = getTokenSymbol(withdraw.token)
-            const amount = ethers.formatEther(withdraw.amount)
-            const feeAmount = ethers.formatEther(withdraw.feeAmount)
+            const shareAmount = withdraw.share
+            const totalShare = withdraw.totalShare
             
             allTransactions.push({
               type: 'withdraw',
               id: withdraw.id,
               fundId: withdraw.fundId,
               user: withdraw.investor,
-              amount: `${parseFloat(amount).toFixed(4)} ${tokenSymbol}`,
-              details: `Withdrew ${tokenSymbol} (Fee: ${parseFloat(feeAmount).toFixed(4)})`,
+              amount: `${shareAmount} shares`,
+              details: `Withdrew ${shareAmount} shares (${((parseFloat(shareAmount) / parseFloat(totalShare)) * 100).toFixed(2)}%)`,
               timestamp: parseInt(withdraw.blockTimestamp),
               transactionHash: withdraw.transactionHash,
-              feeAmount: withdraw.feeAmount,
             })
           })
         }
@@ -336,8 +346,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process withdraw fees
         if (data.withdrawFees && Array.isArray(data.withdrawFees)) {
           data.withdrawFees.forEach((fee) => {
-            const tokenSymbol = getTokenSymbol(fee.token)
-            const amount = ethers.formatEther(fee.amount)
+            const tokenSymbol = fee.symbol || getTokenSymbol(fee.token)
+            const amount = fee.amount
             
             allTransactions.push({
               type: 'withdrawFee',

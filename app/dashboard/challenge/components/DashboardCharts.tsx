@@ -76,7 +76,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         })()
       }
     })
-  }, [dailyData])
+  }, [dailyData, language])
 
   const weeklyChartData = useMemo(() => {
     if (!weeklyData?.activeChallengesWeeklySnapshots) return []
@@ -108,7 +108,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         })()
       }
     })
-  }, [weeklyData])
+  }, [weeklyData, language])
 
   const currentChartData = intervalType === 'daily' ? dailyChartData : weeklyChartData
   const isLoading = intervalType === 'daily' ? isDailyLoading : isWeeklyLoading

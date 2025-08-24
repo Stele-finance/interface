@@ -52,7 +52,7 @@ function ChallengeContent({ challengeId, network }: { challengeId: string; netwo
       <div className="text-center py-8">
         <div className="text-gray-600">
           <h3 className="text-lg font-semibold mb-2">Challenge not found</h3>
-          <p className="text-sm">The challenge with ID "{challengeId}" could not be found.</p>
+          <p className="text-sm">The challenge with ID &quot;{challengeId}&quot; could not be found.</p>
         </div>
       </div>
     )

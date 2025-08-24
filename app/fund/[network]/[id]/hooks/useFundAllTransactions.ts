@@ -33,7 +33,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
     ) {
       id
       fundId
-      investor
+      manager
       token
       symbol
       amount
@@ -71,10 +71,8 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       id
       fundId
       investor
-      token
-      symbol
-      amount
-      feeAmount
+      share
+      totalShare
       blockTimestamp
       transactionHash
     }
@@ -163,7 +161,7 @@ interface GraphQLResponse {
   depositFees?: Array<{
     id: string
     fundId: string
-    investor: string
+    manager: string
     token: string
     symbol: string
     amount: string
@@ -187,10 +185,8 @@ interface GraphQLResponse {
     id: string
     fundId: string
     investor: string
-    token: string
-    symbol: string
-    amount: string
-    feeAmount: string
+    share: string
+    totalShare: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -273,7 +269,7 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
               type: 'depositFee',
               id: fee.id,
               fundId: fee.fundId,
-              user: fee.investor,
+              user: fee.manager,
               amount: formattedAmount, // Only amount, no symbol, max 6 decimals
               details: `Deposit Fee (${fee.symbol})`,
               timestamp: parseInt(fee.blockTimestamp),
@@ -313,22 +309,20 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process withdraws
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            // Format amounts to max 6 decimal places
-            const formattedAmount = parseFloat(withdraw.amount).toFixed(6).replace(/\.?0+$/, '')
-            const formattedFeeAmount = parseFloat(withdraw.feeAmount).toFixed(6).replace(/\.?0+$/, '')
+            // Format shares
+            const shareAmount = withdraw.share
+            const totalShare = withdraw.totalShare
+            const percentage = ((parseFloat(shareAmount) / parseFloat(totalShare)) * 100).toFixed(2)
             
             allTransactions.push({
               type: 'withdraw',
               id: withdraw.id,
               fundId: withdraw.fundId,
               user: withdraw.investor,
-              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
-              details: `Withdrew ${withdraw.symbol} (Fee: ${formattedFeeAmount})`,
+              amount: shareAmount, // Share amount
+              details: `Withdrew ${shareAmount} shares (${percentage}%)`,
               timestamp: parseInt(withdraw.blockTimestamp),
               transactionHash: withdraw.transactionHash,
-              token: withdraw.token,
-              symbol: withdraw.symbol,
-              feeAmount: formattedFeeAmount,
             })
           })
         }

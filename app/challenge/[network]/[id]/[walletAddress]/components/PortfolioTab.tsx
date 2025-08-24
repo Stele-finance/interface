@@ -58,9 +58,11 @@ export function PortfolioTab({
                              
                              if (logoPath) {
                               return (
-                                <img
+                                <Image
                                   src={logoPath}
                                   alt={token.symbol}
+                                  width={40}
+                                  height={40}
                                   className="h-10 w-10 rounded-full object-cover"
                                   onError={(e: any) => {
                                     console.error('Failed to load token logo:', logoPath)

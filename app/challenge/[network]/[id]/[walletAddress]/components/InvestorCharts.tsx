@@ -128,7 +128,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     }
 
     return processedData
-  }, [data, weeklyData, interval, realTimePortfolio, investorData])
+  }, [data, weeklyData, interval, realTimePortfolio, investorData, language, t])
 
   // Calculate current values for headers (prefer real-time data if available)
   const currentPortfolioValue = useMemo(() => {

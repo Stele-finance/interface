@@ -41,14 +41,14 @@ const GET_TRANSACTIONS_QUERY = `
       id
       challengeId
       user
-      fromAsset
-      fromAssetSymbol
-      toAsset
-      toAssetSymbol
-      fromAmount
-      fromPriceUSD
-      toPriceUSD
-      toAmount
+      tokenIn
+      tokenInSymbol
+      tokenOut
+      tokenOutSymbol
+      tokenInAmount
+      tokenInPriceUSD
+      tokenOutPriceUSD
+      tokenOutAmount
       blockTimestamp
       transactionHash
     }
@@ -128,14 +128,14 @@ const GET_ALL_TRANSACTIONS_QUERY = `
       id
       challengeId
       user
-      fromAsset
-      fromAssetSymbol
-      toAsset
-      toAssetSymbol
-      fromAmount
-      fromPriceUSD
-      toPriceUSD
-      toAmount
+      tokenIn
+      tokenInSymbol
+      tokenOut
+      tokenOutSymbol
+      tokenInAmount
+      tokenInPriceUSD
+      tokenOutPriceUSD
+      tokenOutAmount
       blockTimestamp
       transactionHash
     }
@@ -189,12 +189,12 @@ export interface TransactionData {
   timestamp: number
   transactionHash: string
   // Additional data for swaps
-  fromAsset?: string
-  toAsset?: string
-  fromAssetSymbol?: string
-  toAssetSymbol?: string
-  fromAmount?: string
-  toAmount?: string
+  tokenIn?: string
+  tokenOut?: string
+  tokenInSymbol?: string
+  tokenOutSymbol?: string
+  tokenInAmount?: string
+  tokenOutAmount?: string
 }
 
 interface GraphQLResponse {
@@ -217,14 +217,14 @@ interface GraphQLResponse {
     id: string
     challengeId: string
     user: string
-    fromAsset: string
-    fromAssetSymbol: string
-    toAsset: string
-    toAssetSymbol: string
-    fromAmount: string
-    fromPriceUSD: string
-    toPriceUSD: string
-    toAmount: string
+    tokenIn: string
+    tokenInSymbol: string
+    tokenOut: string
+    tokenOutSymbol: string
+    tokenInAmount: string
+    tokenInPriceUSD: string
+    tokenOutPriceUSD: string
+    tokenOutAmount: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -310,25 +310,25 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
         if (data.swaps && Array.isArray(data.swaps)) {
           data.swaps.forEach((swap) => {
             // Use symbol data from subgraph directly, fallback to address parsing if needed
-            const fromSymbol = swap.fromAssetSymbol || swap.fromAsset.slice(0, 6) + '...' + swap.fromAsset.slice(-4)
-            const toSymbol = swap.toAssetSymbol || swap.toAsset.slice(0, 6) + '...' + swap.toAsset.slice(-4)
+            const fromSymbol = swap.tokenInSymbol || swap.tokenIn.slice(0, 6) + '...' + swap.tokenIn.slice(-4)
+            const toSymbol = swap.tokenOutSymbol || swap.tokenOut.slice(0, 6) + '...' + swap.tokenOut.slice(-4)
 
             allTransactions.push({
               type: 'swap',
               id: swap.id,
               challengeId: swap.challengeId,
               user: swap.user,
-              amount: `${parseFloat(swap.fromAmount).toFixed(4)} ${fromSymbol}`,
+              amount: `${parseFloat(swap.tokenInAmount.toString()).toFixed(4)} ${fromSymbol}`,
               details: `${fromSymbol} → ${toSymbol}`,
               timestamp: parseInt(swap.blockTimestamp),
               transactionHash: swap.transactionHash,
               // Add swap-specific data
-              fromAsset: swap.fromAsset,
-              toAsset: swap.toAsset,
-              fromAssetSymbol: fromSymbol,
-              toAssetSymbol: toSymbol,
-              fromAmount: swap.fromAmount,
-              toAmount: swap.toAmount,
+              tokenIn: swap.tokenIn,
+              tokenOut: swap.tokenOut,
+              tokenInSymbol: fromSymbol,
+              tokenOutSymbol: toSymbol,
+              tokenInAmount: swap.tokenInAmount.toString(),
+              tokenOutAmount: swap.tokenOutAmount.toString(),
             })
           })
         }

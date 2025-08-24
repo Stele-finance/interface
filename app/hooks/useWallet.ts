@@ -109,34 +109,11 @@ export const useWallet = () => {
   const [isAppKitReady, setIsAppKitReady] = useState(false)
   
   // AppKit hooks
-  let appKit: any = null
-  let appKitAccount: any = null
-  let appKitNetwork: any = null
-  let appKitProvider: any = null
-
-  try {
-    appKit = useAppKit()
-  } catch (e) {
-    // AppKit not available
-  }
-
-  try {
-    appKitAccount = useAppKitAccount()
-  } catch (e) {
-    // AppKitAccount not available
-  }
-
-  try {
-    appKitNetwork = useAppKitNetwork()
-  } catch (e) {
-    // AppKitNetwork not available
-  }
-
-  try {
-    appKitProvider = useAppKitProvider('eip155')
-  } catch (e) {
-    // AppKitProvider not available
-  }
+  // Always call hooks in the same order - React rule
+  const appKit = useAppKit()
+  const appKitAccount = useAppKitAccount()
+  const appKitNetwork = useAppKitNetwork()
+  const appKitProvider = useAppKitProvider('eip155')
 
   // Subscribe to state
   useEffect(() => {
@@ -194,7 +171,7 @@ export const useWallet = () => {
         })
       }
     }
-  }, [appKitAccount?.address, appKitAccount?.isConnected, appKitNetwork?.chainId])
+  }, [appKitAccount, appKitNetwork])
 
   // Connect wallet - WalletConnect only
   const connectWallet = useCallback(async () => {
@@ -220,7 +197,7 @@ export const useWallet = () => {
       updateState({ isLoading: false })
       throw error
     }
-  }, [appKit])
+  }, [appKit, disconnectWallet])
 
   // Disconnect wallet
   const disconnectWallet = useCallback(async () => {

@@ -46,19 +46,27 @@ export function Header() {
   const { toast } = useToast()
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
-  const { pageType: contextPageType, setPageType } = usePageType()
   
-  // Determine pageType from URL
-  const getPageTypeFromUrl = () => {
+  // Determine pageType from URL or localStorage
+  const getPageTypeFromUrl = useCallback(() => {
     if (pathname.includes('/fund')) return 'fund'
     if (pathname.includes('/funds')) return 'fund'
     if (pathname.includes('/challenge')) return 'challenge'
     if (pathname.includes('/challenges')) return 'challenge'
+    // Check localStorage for saved preference
+    const savedPageType = typeof window !== 'undefined' ? localStorage.getItem('selected-page-type') : null
+    if (savedPageType === 'fund' || savedPageType === 'challenge') {
+      return savedPageType
+    }
     // Default to challenge
     return 'challenge'
-  }
+  }, [pathname])
   
-  const pageType = getPageTypeFromUrl()
+  const [pageType, setLocalPageType] = useState<'challenge' | 'fund'>('challenge')
+  
+  useEffect(() => {
+    setLocalPageType(getPageTypeFromUrl())
+  }, [pathname, getPageTypeFromUrl])
   
   // Use global wallet hook
   const { 
@@ -130,7 +138,7 @@ export function Header() {
   };
 
   // Fetch wallet balance using network-specific RPC
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!walletAddress) return;
     
     try {
@@ -153,7 +161,7 @@ export function Header() {
     } finally {
       setIsLoadingBalance(false);
     }
-  };
+  }, [walletAddress, walletNetwork]);
 
   const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
@@ -230,7 +238,7 @@ export function Header() {
     if (walletAddress) {
       fetchBalance();
     }
-  }, [walletAddress, walletNetwork]);
+  }, [walletAddress, walletNetwork, fetchBalance]);
 
   // Navigate to dashboard when network changes
   useEffect(() => {
@@ -356,6 +364,19 @@ export function Header() {
             NFTs
           </Link>
           
+          <Link 
+            href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/vote")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Vote className="h-5 w-5" />
+            {t('vote')}
+          </Link>
+          
         </nav>
       </div>
 
@@ -384,6 +405,7 @@ export function Header() {
             <DropdownMenuItem 
               className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
               onClick={() => {
+                localStorage.setItem('selected-page-type', 'challenge')
                 router.push('/dashboard/challenge')
               }}
             >
@@ -393,6 +415,7 @@ export function Header() {
             <DropdownMenuItem 
               className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
               onClick={() => {
+                localStorage.setItem('selected-page-type', 'fund')
                 router.push('/dashboard/fund')
               }}
             >
@@ -539,7 +562,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600 z-[60]">
             <DropdownMenuItem asChild>
               <Link 
-                href="/vote"
+                href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                 className="cursor-pointer"
               >
                 <Vote className="mr-2 h-4 w-4" />
@@ -647,7 +670,7 @@ export function Header() {
                 </Link>
                 
                 <Link 
-                  href="/vote"
+                  href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",

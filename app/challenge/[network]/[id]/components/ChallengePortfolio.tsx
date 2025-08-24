@@ -273,14 +273,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
     if (transaction.type !== 'swap') return null
     
     // Use the swap data from the transaction
-    if (transaction.fromAssetSymbol && transaction.toAssetSymbol) {
+    if (transaction.tokenInSymbol && transaction.tokenOutSymbol) {
       return {
-        fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
-        fromToken: transaction.fromAsset,
-        fromTokenSymbol: transaction.fromAssetSymbol,
-        toAmount: parseFloat(transaction.toAmount).toFixed(4),
-        toToken: transaction.toAsset,
-        toTokenSymbol: transaction.toAssetSymbol
+        fromAmount: parseFloat(transaction.tokenInAmount).toFixed(4),
+        fromToken: transaction.tokenIn,
+        fromTokenSymbol: transaction.tokenInSymbol,
+        toAmount: parseFloat(transaction.tokenOutAmount).toFixed(4),
+        toToken: transaction.tokenOut,
+        toTokenSymbol: transaction.tokenOutSymbol
       }
     }
     
@@ -695,14 +695,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       const discountedEntryFeeAmount = ethers.parseUnits(entryFee, USDC_DECIMALS);
 
       // Check current USDC balance
-      try {
-        console.log("Checking USDC balance for:", {
-          userAddress,
-          usdcAddress: getUSDCTokenAddress(contractNetwork),
-          network: contractNetwork,
-          walletChainId
-        });
-        
+      try {        
         // Use the read-only contract with network provider
         const usdcBalance = await usdcContractRead.balanceOf(userAddress);        
         if (usdcBalance < discountedEntryFeeAmount) {

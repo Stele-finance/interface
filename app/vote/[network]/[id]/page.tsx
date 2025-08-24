@@ -313,7 +313,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     } finally {
       setIsLoadingVotingPower(false)
     }
-  }, [walletConnected, id, walletType, contractNetwork, blockInfo, isLoadingBlockNumber])
+  }, [walletConnected, id, walletType, contractNetwork, address, getProvider])
 
   // Check proposal state
   const checkProposalState = useCallback(async () => {

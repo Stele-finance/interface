@@ -404,7 +404,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     } finally {
       setIsLoading(false)
     }
-  }, [tokens, getProvider, fetchBatchPricesWithMulticall])
+  }, [tokens, getProvider, fetchBatchPricesWithMulticall, network])
 
   // Create stable token key to prevent unnecessary re-renders
   const tokenKey = useMemo(() => {

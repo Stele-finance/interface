@@ -79,10 +79,10 @@ export const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   arbitrum: {
-    STELE_CONTRACT_ADDRESS: "0x566D1769B3f66372E94fD18F59c757BCEc6efb8a",
+    STELE_CONTRACT_ADDRESS: "0x2697Be05c98ed9E6Df36a32A5E6178a43BE0890f",
     STELE_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum USDC
-    GOVERNANCE_CONTRACT_ADDRESS: "0xC93fe38F52481F090E28E242B36f828C74F24142",
+    GOVERNANCE_CONTRACT_ADDRESS: "0xC11133daC3A47bb320C7b2f99F72bb8BafB4470A",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://arbiscan.io',
     EXPLORER_NAME: 'Arbiscan',
@@ -97,9 +97,9 @@ export const NETWORK_CONTRACTS = {
   },
   arbitrum_fund: {
     STELE_FUND_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
-    STELE_FUND_CONTRACT_ADDRESS: "0x0d3b0f837d4dd7c492f535d93ffc56e2ffa87e29",
-    STELE_FUND_INFO_ADDRESS: "0xee8722e695ce68e69041a3d2ad75abf65b0afc8f",
-    STELE_FUND_SETTING_ADDRESS: "0x71295d1a25e904dd184659c506a3d867476567f6",
+    STELE_FUND_SETTING_ADDRESS: "0x0f0deA84be785133cd6cF20FfcEEE1fe75B279D8",
+    STELE_FUND_INFO_ADDRESS: "0x006A19BE3DEd59A3558EFc381f36Ea96f904301e",
+    STELE_FUND_CONTRACT_ADDRESS: "0x5bC21d0d27A5b9575849589fC4D4A5d6Bbe01180",
     STELE_FUND_GOVERNANCE_ADDRESS: "0x38143cfB0950cF7B56CFB1B277FF549D9d9dA432",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
@@ -168,6 +168,11 @@ export const getSteleTokenAddress = (network: 'ethereum' | 'arbitrum' | null): s
   return NETWORK_CONTRACTS.ethereum.STELE_TOKEN_ADDRESS; // Default to Ethereum
 };
 
+export const getSteleFundTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.STELE_TOKEN_ADDRESS; // Default to Ethereum - uses STELE_TOKEN_ADDRESS for ethereum_fund
+};
+
 export const getUSDCTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.USDC_TOKEN_ADDRESS;
   return NETWORK_CONTRACTS.ethereum.USDC_TOKEN_ADDRESS; // Default to Ethereum
@@ -178,9 +183,19 @@ export const getGovernanceContractAddress = (network: 'ethereum' | 'arbitrum' | 
   return NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS; // Default to Ethereum
 };
 
+export const getSteleFundGovernanceAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_GOVERNANCE_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS; // Default to Ethereum - uses regular governance for ethereum_fund
+};
+
 export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_CONTRACT_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_CONTRACT_ADDRESS; // Default to Ethereum
+  // For Ethereum, use the regular STELE_CONTRACT_ADDRESS if STELE_FUND_CONTRACT_ADDRESS is not set
+  const ethereumFundAddress = NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_CONTRACT_ADDRESS;
+  if (ethereumFundAddress === "0x0000000000000000000000000000000000000000") {
+    return NETWORK_CONTRACTS.ethereum_fund.STELE_CONTRACT_ADDRESS;
+  }
+  return ethereumFundAddress;
 };
 
 export const getRPCUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
@@ -259,7 +274,8 @@ export const STELE_DECIMALS = 18;
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
   ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
-  arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
+  // arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
+  arbitrum: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest',
   ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund/version/latest',
   arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const

@@ -501,7 +501,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       <div className="text-center py-8">
         <div className="text-gray-600">
           <h3 className="text-lg font-semibold mb-2">Fund not found</h3>
-          <p className="text-sm">The fund with ID "{fundId}" could not be found.</p>
+          <p className="text-sm">The fund with ID &quot;{fundId}&quot; could not be found.</p>
         </div>
       </div>
     )
