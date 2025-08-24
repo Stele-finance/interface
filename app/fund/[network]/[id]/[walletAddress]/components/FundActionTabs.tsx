@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowUpDown, ArrowDownCircle, ArrowUpCircle, DollarSign, Loader2 } from "lucide-react"
 import { AssetSwap } from "@/app/swap/components/AssetSwap"

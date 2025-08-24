@@ -13,6 +13,9 @@ import { LanguageProvider } from "@/lib/language-context"
 import { MobileMenuProvider } from "@/lib/mobile-menu-context"
 import { PageTypeProvider } from "@/lib/page-type-context"
 
+// Force dynamic rendering to avoid SSR issues with wallet hooks
+export const dynamic = 'force-dynamic'
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -46,7 +49,9 @@ export default function RootLayout({
                       <AppKitInitializer />
                     </ClientOnly>
                     <div className="flex flex-col min-h-screen bg-muted/40">
-                      <Header />
+                      <ClientOnly>
+                        <Header />
+                      </ClientOnly>
                       <main className="flex-1 p-4 md:p-6">
                         {children}
                       </main>

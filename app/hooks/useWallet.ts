@@ -108,8 +108,7 @@ export const useWallet = () => {
   const [localState, setLocalState] = useState<WalletState>(globalState)
   const [isAppKitReady, setIsAppKitReady] = useState(false)
   
-  // AppKit hooks
-  // Always call hooks in the same order - React rule
+  // AppKit hooks - always call hooks in same order
   const appKit = useAppKit()
   const appKitAccount = useAppKitAccount()
   const appKitNetwork = useAppKitNetwork()
@@ -173,6 +172,26 @@ export const useWallet = () => {
     }
   }, [appKitAccount, appKitNetwork])
 
+  // Disconnect wallet
+  const disconnectWallet = useCallback(async () => {
+    try {
+      // For WalletConnect/AppKit, we close the modal and clear the state
+      if (globalState.walletType === 'walletconnect' && appKit?.close) {
+        await appKit.close()
+      }
+      
+      updateState({
+        address: null,
+        isConnected: false,
+        walletType: null,
+        network: null,
+        isLoading: false
+      })      
+    } catch (error) {
+      console.error('Failed to disconnect wallet:', error)
+    }
+  }, [appKit])
+
   // Connect wallet - WalletConnect only
   const connectWallet = useCallback(async () => {
     if (!appKit?.open) {
@@ -199,25 +218,6 @@ export const useWallet = () => {
     }
   }, [appKit, disconnectWallet])
 
-  // Disconnect wallet
-  const disconnectWallet = useCallback(async () => {
-    try {
-      if (globalState.walletType === 'walletconnect' && appKit?.disconnect) {
-        await appKit.disconnect()
-      }
-      
-      updateState({
-        address: null,
-        isConnected: false,
-        walletType: null,
-        network: null,
-        isLoading: false
-      })      
-    } catch (error) {
-      console.error('Failed to disconnect wallet:', error)
-    }
-  }, [appKit])
-
   // Switch network
   const switchNetwork = useCallback(async (targetNetwork: NetworkType) => {
     if (!globalState.isConnected || globalState.walletType !== 'walletconnect') {
@@ -227,7 +227,7 @@ export const useWallet = () => {
     const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
       
     try {
-      const provider = appKitProvider?.walletProvider
+      const provider = appKitProvider?.walletProvider as any
       if (!provider) {
         throw new Error('WalletConnect provider not available')
       }
@@ -242,7 +242,7 @@ export const useWallet = () => {
       if (switchError.code === 4902) {
         // Add network if it doesn't exist
         try {
-          const provider = appKitProvider?.walletProvider
+          const provider = appKitProvider?.walletProvider as any
           if (provider) {
             await provider.request({
               method: 'wallet_addEthereumChain',
@@ -262,7 +262,7 @@ export const useWallet = () => {
   // Get provider
   const getProvider = useCallback(() => {
     if (globalState.walletType === 'walletconnect' && appKitProvider?.walletProvider) {
-      return new BrowserProvider(appKitProvider.walletProvider)
+      return new BrowserProvider(appKitProvider.walletProvider as any)
     }
     return null
   }, [appKitProvider])

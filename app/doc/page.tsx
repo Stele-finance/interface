@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to avoid SSR issues with wallet hooks
+export const dynamic = 'force-dynamic'
+
 import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"

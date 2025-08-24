@@ -8,7 +8,8 @@ export function AppKitInitializer() {
   useEffect(() => {
     // Initialize AppKit after component mounts with a small delay
     const timer = setTimeout(() => {
-      import("@/lib/appkit-config").then(() => {
+      import("@/lib/appkit-config").then(({ initializeAppKit }) => {
+        initializeAppKit()
         setInitialized(true)
       }).catch((error) => {
         console.error('Failed to initialize AppKit:', error)
