@@ -62,7 +62,7 @@ function useEntryFeeQuery() {
       const integerFee = Math.floor(parseFloat(formattedFee)).toString();
       return integerFee
     },
-    enabled: !!network, // Only run query when network is available
+    enabled: true, // Always enable the query since we have a default network
     staleTime: 5 * 60 * 1000, // Reduce stale time to 5 minutes for faster updates
     refetchInterval: 15 * 60 * 1000, // Refetch every 15 minutes
     retry: 2, // Increase retry attempts

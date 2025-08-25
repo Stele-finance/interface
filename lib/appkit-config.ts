@@ -1,5 +1,9 @@
 'use client'
 
+import { createAppKit } from '@reown/appkit/react'
+import { EthersAdapter } from '@reown/appkit-adapter-ethers'
+import { WALLETCONNECT_PROJECT_ID } from './constants'
+
 // Initialize AppKit - this file must be imported by a client component
 let appKitInitialized = false
 
@@ -9,9 +13,6 @@ export function initializeAppKit() {
   }
 
   try {
-    const { createAppKit } = require('@reown/appkit/react')
-    const { EthersAdapter } = require('@reown/appkit-adapter-ethers')
-    const { WALLETCONNECT_PROJECT_ID } = require('./constants')
   
     // 1. Set the networks
     const networks = [

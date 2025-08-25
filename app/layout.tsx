@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider"
 import { Header } from "@/components/Header"
 import { Toaster } from "@/components/ui/toaster"
 import { ClientOnly } from "@/components/ClientOnly"
-import { AppKitInitializer } from "@/components/AppKitInitializer"
+import { WalletProvider } from "@/components/WalletProvider"
 import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
 import { LanguageProvider } from "@/lib/language-context"
@@ -42,23 +42,22 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <LanguageProvider>
-              <EntryFeeProvider>
-                <MobileMenuProvider>
-                  <PageTypeProvider>
-                    <ClientOnly>
-                      <AppKitInitializer />
-                    </ClientOnly>
-                    <div className="flex flex-col min-h-screen bg-muted/40">
-                      <ClientOnly>
-                        <Header />
-                      </ClientOnly>
-                      <main className="flex-1 p-4 md:p-6">
-                        {children}
-                      </main>
-                    </div>
-                  </PageTypeProvider>
-                </MobileMenuProvider>
-              </EntryFeeProvider>
+              <ClientOnly>
+                <WalletProvider>
+                  <EntryFeeProvider>
+                    <MobileMenuProvider>
+                      <PageTypeProvider>
+                        <div className="flex flex-col min-h-screen bg-muted/40">
+                          <Header />
+                          <main className="flex-1 p-4 md:p-6">
+                            {children}
+                          </main>
+                        </div>
+                      </PageTypeProvider>
+                    </MobileMenuProvider>
+                  </EntryFeeProvider>
+                </WalletProvider>
+              </ClientOnly>
             </LanguageProvider>
           </ThemeProvider>
         </QueryProvider>

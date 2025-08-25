@@ -106,7 +106,6 @@ const restoreFromStorage = () => {
 
 export const useWallet = () => {
   const [localState, setLocalState] = useState<WalletState>(globalState)
-  const [isAppKitReady, setIsAppKitReady] = useState(false)
   
   // AppKit hooks - always call hooks in same order
   const appKit = useAppKit()
@@ -114,37 +113,31 @@ export const useWallet = () => {
   const appKitNetwork = useAppKitNetwork()
   const appKitProvider = useAppKitProvider('eip155')
 
-  // Subscribe to state
+  // Determine if AppKit is ready without state
+  const isAppKitReady = !!(appKit && appKitAccount && appKitNetwork && appKitProvider)
+
+  // Subscribe to global state changes
   useEffect(() => {
     const unsubscribe = subscribe(setLocalState)
+    // Set initial local state
+    setLocalState(globalState)
     return unsubscribe
   }, [])
 
-  // Check if AppKit is ready
+  // Monitor WalletConnect state and update global state
   useEffect(() => {
-    if (appKit && appKitAccount && appKitNetwork && appKitProvider) {
-      setIsAppKitReady(true)
-    } else {
-      setIsAppKitReady(false)
-    }
-  }, [appKit, appKitAccount, appKitNetwork, appKitProvider])
-
-  // Initialize - DON'T auto-restore from storage to prevent automatic wallet prompts
-  useEffect(() => {
-    if (isAppKitReady) {
-      // Only set local state, don't auto-restore from storage
-      setLocalState(globalState)
-    }
-  }, [isAppKitReady])
-
-  // Monitor WalletConnect state
-  useEffect(() => {
-    if (appKitAccount && appKitNetwork) {
-      const { address, isConnected } = appKitAccount
-      const { chainId } = appKitNetwork
+    if (!isAppKitReady) return
+    
+    const { address, isConnected } = appKitAccount
+    const { chainId } = appKitNetwork
+    
+    if (isConnected && address) {
+      const network = chainIdToNetwork(chainId || 1)
       
-      if (isConnected && address) {
-        const network = chainIdToNetwork(chainId || 1)
+      // Only update if state actually changed
+      if (globalState.address !== address || 
+          globalState.isConnected !== true ||
+          globalState.network !== network) {
         updateState({
           address,
           isConnected: true,
@@ -160,17 +153,17 @@ export const useWallet = () => {
             network: network
           }))
         }
-      } else if (globalState.walletType === 'walletconnect' && globalState.isConnected) {
-        // WalletConnect disconnected
-        updateState({
-          address: null,
-          isConnected: false,
-          walletType: null,
-          network: null
-        })
       }
+    } else if (globalState.isConnected && globalState.walletType === 'walletconnect') {
+      // WalletConnect disconnected
+      updateState({
+        address: null,
+        isConnected: false,
+        walletType: null,
+        network: null
+      })
     }
-  }, [appKitAccount, appKitNetwork])
+  }, [isAppKitReady, appKitAccount, appKitNetwork])
 
   // Disconnect wallet
   const disconnectWallet = useCallback(async () => {
