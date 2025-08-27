@@ -151,7 +151,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       }
       const [ethAmountOut] = await quoter.quoteExactInputSingle.staticCall(ethToUsdcParams)
       cachedEthPrice = Number(ethAmountOut) / 1e6 // USDC has 6 decimals
-      console.log('Fetched real ETH price:', cachedEthPrice)
+      //console.log('Fetched real ETH price:', cachedEthPrice)
     } catch (err) {
       console.warn('Failed to fetch ETH price, using fallback:', err)
     }

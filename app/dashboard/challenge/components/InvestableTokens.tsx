@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Loader2, Coins, ChevronDown } from "lucide-react"
-import { useInvestableTokens } from "@/app/hooks/useInvestableTokens"
+import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
 import Image from "next/image"
@@ -32,7 +32,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
   const { t } = useLanguage()
   // Use selectedNetwork for data fetching
   const subgraphNetwork = selectedNetwork
-  const { data: tokensData, isLoading, error } = useInvestableTokens(subgraphNetwork)
+  const { data: tokensWithPrices, isLoading, error } = useInvestableTokenPrices(subgraphNetwork)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -40,8 +40,8 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
 
   // Calculate pagination data
   const tokens = useMemo(() => {
-    return tokensData?.investableTokens || []
-  }, [tokensData])
+    return tokensWithPrices || []
+  }, [tokensWithPrices])
   
   const totalPages = Math.ceil(tokens.length / itemsPerPage)
   
@@ -64,6 +64,14 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
       month: 'short',
       day: 'numeric'
     })
+  }
+
+  // Format price for display
+  const formatPrice = (price: number | null) => {
+    if (price === null) return 'N/A'
+    if (price < 0.01) return `$${price.toFixed(6)}`
+    if (price < 1) return `$${price.toFixed(4)}`
+    return `$${price.toFixed(2)}`
   }
 
   // Get explorer URL based on network
@@ -311,6 +319,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                   <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 pl-6 text-base">{t('symbol')}</TableHead>
                     <TableHead className="text-gray-300 text-base">{t('tokenAddress')}</TableHead>
+                    <TableHead className="text-gray-300 text-base">Price</TableHead>
                     <TableHead className="text-gray-300 pr-6 text-base">{t('updated')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -360,6 +369,9 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                         <span className="text-sm text-gray-300 font-mono">
                           {formatAddress(token.tokenAddress)}
                         </span>
+                      </TableCell>
+                      <TableCell className="font-medium text-green-400 py-6 text-lg">
+                        {formatPrice(token.price)}
                       </TableCell>
                       <TableCell className="text-gray-400 pr-6 py-6 text-base whitespace-nowrap">
                         {formatDate(token.updatedTimestamp)}

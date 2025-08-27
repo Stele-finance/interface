@@ -7,7 +7,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus, PieChart } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { ethers } from "ethers"
 import { formatDateWithLocale, formatDateOnly } from "@/lib/utils"
@@ -48,6 +48,7 @@ import { InvestorsTab } from "./InvestorsTab"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
 import { useFundInvestors } from "../hooks/useFundInvestors"
 import { useFundAllTransactions } from "../hooks/useFundAllTransactions"
+import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 
 interface FundDetailProps {
   fundId: string
@@ -202,6 +203,55 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     fundId,
     subgraphNetwork as 'ethereum' | 'arbitrum'
   )
+
+  // Get investable token prices for portfolio calculation
+  const { data: tokensWithPrices } = useInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
+
+  // Calculate portfolio data from fund tokens
+  const portfolioData = useMemo(() => {
+    if (!fund || !fund.currentTokensSymbols || !fund.currentTokensAmount || !tokensWithPrices) {
+      return {
+        tokens: [],
+        totalValue: 0,
+        colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+      }
+    }
+
+    const tokens = fund.currentTokensSymbols.map((symbol, index) => {
+      const amount = parseFloat(fund.currentTokensAmount?.[index] || '0')
+      const decimals = parseInt(fund.currentTokensDecimals?.[index] || '18')
+      const actualAmount = amount / Math.pow(10, decimals)
+      
+      // Find price from tokensWithPrices
+      const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
+      const price = tokenWithPrice?.price || 0
+      const value = actualAmount * price
+
+      return {
+        symbol,
+        amount: actualAmount,
+        value,
+        price,
+        percentage: 0 // Will be calculated after total
+      }
+    }).filter(token => token.amount > 0)
+
+    const totalValue = tokens.reduce((sum, token) => sum + token.value, 0)
+    
+    // Calculate percentages
+    tokens.forEach(token => {
+      token.percentage = totalValue > 0 ? (token.value / totalValue) * 100 : 0
+    })
+
+    // Sort by value descending
+    tokens.sort((a, b) => b.value - a.value)
+
+    return {
+      tokens,
+      totalValue,
+      colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+    }
+  }, [fund, tokensWithPrices])
   
   // Format transactions for display with full token data
   const transactions = fundTransactions.map(tx => ({
@@ -908,66 +958,77 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 Portfolio
               </h3>
               
-              {/* Mock Pie Chart */}
-              <div className="flex items-center justify-center mb-6">
-                <div className="relative w-40 h-40">
-                  {/* Simple CSS pie chart using conic-gradient */}
-                  <div 
-                    className="w-full h-full rounded-full"
-                    style={{
-                      background: `conic-gradient(
-                        from 0deg,
-                        #3B82F6 0deg 144deg,     /* USDC 40% - Blue */
-                        #EF4444 144deg 216deg,   /* ETH 20% - Red */
-                        #10B981 216deg 288deg,   /* WBTC 20% - Green */
-                        #F59E0B 288deg 360deg    /* Other 20% - Yellow */
-                      )`
-                    }}
-                  />
-                  {/* Center hole */}
-                  <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-white">100%</div>
-                      <div className="text-xs text-gray-400">Allocated</div>
+              {portfolioData.tokens.length > 0 ? (
+                <>
+                  {/* Pie Chart */}
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="relative w-40 h-40">
+                      {/* Dynamic CSS pie chart using conic-gradient */}
+                      <div 
+                        className="w-full h-full rounded-full"
+                        style={{
+                          background: `conic-gradient(
+                            from 0deg,
+                            ${(() => {
+                              let currentDegree = 0
+                              return portfolioData.tokens.map((token, index) => {
+                                const startDegree = currentDegree
+                                const endDegree = currentDegree + (token.percentage / 100) * 360
+                                currentDegree = endDegree
+                                const color = portfolioData.colors[index % portfolioData.colors.length]
+                                return `${color} ${startDegree}deg ${endDegree}deg`
+                              }).join(', ')
+                            })()}
+                          )`
+                        }}
+                      />
+                      {/* Center hole */}
+                      <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-white">
+                            ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </div>
+                          <div className="text-xs text-gray-400">Total Value</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Legend */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-300">USDC</span>
+                  {/* Legend */}
+                  <div className="space-y-3">
+                    {portfolioData.tokens.map((token, index) => (
+                      <div key={token.symbol} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-3 h-3 rounded-full"
+                            style={{ 
+                              backgroundColor: portfolioData.colors[index % portfolioData.colors.length] 
+                            }}
+                          ></div>
+                          <span className="text-sm text-gray-300">{token.symbol}</span>
+                          <span className="text-xs text-gray-500">
+                            ({token.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })})
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-white font-medium">
+                            {token.percentage.toFixed(1)}%
+                          </div>
+                          <div className="text-xs text-green-400">
+                            ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-sm text-white font-medium">40.0%</div>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <PieChart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No portfolio data available</p>
+                  <p className="text-xs mt-1">Fund has no current token holdings</p>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-sm text-gray-300">ETH</span>
-                  </div>
-                  <div className="text-sm text-white font-medium">20.0%</div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-300">WBTC</span>
-                  </div>
-                  <div className="text-sm text-white font-medium">20.0%</div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-300">Other</span>
-                  </div>
-                  <div className="text-sm text-white font-medium">20.0%</div>
-                </div>
-              </div>
+              )}
             </div>
           </Card>
 

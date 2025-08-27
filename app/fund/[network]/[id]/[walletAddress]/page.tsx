@@ -10,6 +10,7 @@ import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
 import { useFundData } from "../hooks/useFundData"
 import { useFundTransactions } from "../hooks/useFundTransactions"
+import { useFundSharePercentage } from "../hooks/useFundShare"
 import { FundInvestorCharts } from "../components/FundInvestorCharts"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
@@ -50,6 +51,19 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   const { data: fundInvestorData, error: investorError, isLoading: isLoadingInvestor } = useFundInvestorData(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundData } = useFundData(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useFundTransactions(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+  
+  // Get actual fund share percentage
+  const { sharePercentage, isLoading: isLoadingShare, fundShare, investorShare } = useFundSharePercentage(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+  
+  // Fallback to USD calculation if share data not available
+  const fallbackSharePercentage = (() => {
+    if (!fundInvestorData?.investor || !fundData?.fund?.currentUSD) return 0
+    const investorUSD = parseFloat(fundInvestorData.investor.currentUSD)
+    const fundUSD = parseFloat(fundData.fund.currentUSD)
+    return fundUSD > 0 ? (investorUSD / fundUSD) * 100 : 0
+  })()
+  
+  const finalSharePercentage = sharePercentage > 0 ? sharePercentage : fallbackSharePercentage
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -372,8 +386,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 
                 {/* Investment Summary with loading skeleton */}
                 <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                  <h3 className="text-xl font-bold text-gray-100 mb-4">Fund Info</h3>
-                  
                   {investor ? (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
@@ -403,7 +415,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm text-gray-400">My Share</span>
                         <span className="text-sm text-white font-medium">
-                          {fundData?.fund?.currentUSD ? ((parseFloat(investor.currentUSD) / parseFloat(fundData.fund.currentUSD)) * 100).toFixed(2) : '0.00'}%
+                          {finalSharePercentage.toFixed(2)}%
                         </span>
                       </div>
                       
