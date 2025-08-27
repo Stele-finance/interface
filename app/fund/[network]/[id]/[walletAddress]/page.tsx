@@ -372,29 +372,18 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 
                 {/* Investment Summary with loading skeleton */}
                 <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                  <h3 className="text-xl font-bold text-gray-100 mb-4">Investment Summary</h3>
+                  <h3 className="text-xl font-bold text-gray-100 mb-4">Fund Info</h3>
                   
                   {investor ? (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Investor</span>
-                        <span className="text-sm text-white font-medium">
-                          {`${investor.investor.slice(0, 6)}...${investor.investor.slice(-4)}`}
-                        </span>
+                        <span className="text-sm text-gray-400">Fund ID</span>
+                        <span className="text-sm text-white font-medium">#{fundId}</span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Manager</span>
-                        <span className="text-sm text-white font-medium">
-                          {investor.isManager ? 'Yes' : 'No'}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Principal</span>
-                        <span className="text-sm text-white font-medium">
-                          ${parseFloat(investor.principalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
+                        <span className="text-sm text-gray-400">Network</span>
+                        <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
@@ -412,11 +401,12 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       </div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm text-gray-400">ROI</span>
-                        <span className={`text-sm font-medium ${parseFloat(investor.profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          {parseFloat(investor.profitRatio) >= 0 ? '+' : ''}{(parseFloat(investor.profitRatio) * 100).toFixed(2)}%
+                        <span className="text-sm text-gray-400">My Share</span>
+                        <span className="text-sm text-white font-medium">
+                          {fundData?.fund?.currentUSD ? ((parseFloat(investor.currentUSD) / parseFloat(fundData.fund.currentUSD)) * 100).toFixed(2) : '0.00'}%
                         </span>
                       </div>
+                      
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-400">
@@ -424,28 +414,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       <p className="text-xs mt-2">User has not invested in this fund yet</p>
                     </div>
                   )}
-                </div>
-
-                {/* Fund Info */}
-                <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                  <h3 className="text-xl font-bold text-gray-100 mb-4">Fund Info</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                      <span className="text-sm text-gray-400">Fund ID</span>
-                      <span className="text-sm text-white font-medium">#{fundId}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                      <span className="text-sm text-gray-400">Network</span>
-                      <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-400">Status</span>
-                      <span className="text-sm text-green-400 font-medium">Active</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

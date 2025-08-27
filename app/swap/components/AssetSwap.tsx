@@ -457,32 +457,19 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
           toTokenDecimals
         });
 
-        // Use empty path like in test code - contract will handle routing
-        const pathBytes = "0x";
-
-        console.log("Using empty path:", pathBytes);
-
         // Prepare swap params structure for SteleFund
         const swapParams = {
-          swapType: 0, // 0 for exact input single swap
           tokenIn: fromTokenAddress,
           tokenOut: toTokenAddress,
           fee: 3000, // Default Uniswap V3 0.3% fee tier
           amountIn: amountInWei,
-          amountOut: BigInt(0), // Will be calculated by the contract for exact input
-          amountInMaximum: BigInt(0), // Not used for exact input single
-          amountOutMinimum: minOutputAmount > BigInt(0) ? minOutputAmount : BigInt(1), // Minimum output or 1 wei
-          sqrtPriceLimitX96: BigInt(0), // No price limit
-          path: pathBytes // Proper Uniswap V3 path
+          amountOutMinimum: minOutputAmount > BigInt(0) ? minOutputAmount : BigInt(1) // Minimum output or 1 wei
         };
 
         console.log("Swap params:", {
           ...swapParams,
           amountIn: swapParams.amountIn.toString(),
-          amountOut: swapParams.amountOut.toString(),
-          amountInMaximum: swapParams.amountInMaximum.toString(),
-          amountOutMinimum: swapParams.amountOutMinimum.toString(),
-          sqrtPriceLimitX96: swapParams.sqrtPriceLimitX96.toString()
+          amountOutMinimum: swapParams.amountOutMinimum.toString()
         });
         
         // Call SteleFund.swap(fundId, swapParams[]) with proper gas limit
