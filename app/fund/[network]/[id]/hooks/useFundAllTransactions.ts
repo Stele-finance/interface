@@ -71,8 +71,8 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       id
       fundId
       investor
-      share
-      totalShare
+      percentage
+      amountUSD
       blockTimestamp
       transactionHash
     }
@@ -185,8 +185,8 @@ interface GraphQLResponse {
     id: string
     fundId: string
     investor: string
-    share: string
-    totalShare: string
+    percentage: string
+    amountUSD: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -309,18 +309,18 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
         // Process withdraws
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            // Format shares
-            const shareAmount = withdraw.share
-            const totalShare = withdraw.totalShare
-            const percentage = ((parseFloat(shareAmount) / parseFloat(totalShare)) * 100).toFixed(2)
+            // Format percentage and USD amount
+            const percentage = parseFloat(withdraw.percentage)
+            const amountUSD = parseFloat(withdraw.amountUSD)
+            const formattedAmount = amountUSD.toFixed(2)
             
             allTransactions.push({
               type: 'withdraw',
               id: withdraw.id,
               fundId: withdraw.fundId,
               user: withdraw.investor,
-              amount: shareAmount, // Share amount
-              details: `Withdrew ${shareAmount} shares (${percentage}%)`,
+              amount: formattedAmount, // USD amount
+              details: `Withdrew ${percentage.toFixed(2)}% ($${formattedAmount} USD)`,
               timestamp: parseInt(withdraw.blockTimestamp),
               transactionHash: withdraw.transactionHash,
             })

@@ -66,15 +66,10 @@ export function useFundSharePercentage(fundId: string, investor: string, network
     queryKey: ['fundShare', fundId, network],
     queryFn: async () => {
       try {
-        console.log('=== Trying fundShare query ===')
-        console.log('subgraphUrl:', subgraphUrl)
-        console.log('fundId:', fundId)
-        
         const data = await request(subgraphUrl, GET_FUND_SHARE_QUERY, {
           fundId: fundId
         }, headers)
         
-        console.log('fundShare query result:', data)
         return data
       } catch (error) {
         console.error('❌ FundShare query failed:', error)
@@ -91,17 +86,11 @@ export function useFundSharePercentage(fundId: string, investor: string, network
   const { data: investorShareData, isLoading: isInvestorShareLoading, error: investorShareError } = useQuery({
     queryKey: ['investorShare', investorShareId, network],
     queryFn: async () => {
-      try {
-        console.log('=== Trying investorShare query ===')
-        console.log('subgraphUrl:', subgraphUrl)
-        console.log('original investor:', investor)
-        console.log('investorShareId:', investorShareId)
-        
+      try {        
         const data = await request(subgraphUrl, GET_INVESTOR_SHARE_QUERY, {
           investorShareId: investorShareId
         }, headers)
         
-        console.log('investorShare query result:', data)
         return data
       } catch (error) {
         console.error('❌ InvestorShare query failed:', error)
@@ -112,37 +101,18 @@ export function useFundSharePercentage(fundId: string, investor: string, network
     staleTime: 30000,
   })
 
-  console.log('=== useFundSharePercentage Debug ===')
-  console.log('fundId:', fundId)
-  console.log('investor:', investor)
-  console.log('investorShareId:', investorShareId)
-  console.log('network:', network)
-  console.log('investorData:', investorData)
-  console.log('fundShareData:', fundShareData)
-  console.log('investorShareData:', investorShareData)
-  console.log('fundShareError:', fundShareError)
-  console.log('investorShareError:', investorShareError)
-
   const sharePercentage = (() => {
     // Try to use fundShare and investor data
     const fundShare = (fundShareData as any)?.fundShare
     const investorShare = (investorShareData as any)?.investorShare
     
-    console.log('fundShare available:', !!fundShare)
-    console.log('investorShare available:', !!investorShare)
-    console.log('investorData available:', !!investorData?.investor)
-    
     // Method 1: Use FundShare + InvestorShare entities
     if (fundShare && investorShare) {
       const totalShare = parseFloat(fundShare.totalShare)
       const myShare = parseFloat(investorShare.share)
-      
-      console.log('Method 1: Using FundShare + InvestorShare entities')
-      console.log('totalShare:', totalShare, 'myShare:', myShare)
-      
+            
       if (totalShare > 0) {
         const percentage = (myShare / totalShare) * 100
-        console.log('calculated percentage from entities:', percentage)
         return percentage
       }
     }
@@ -151,19 +121,13 @@ export function useFundSharePercentage(fundId: string, investor: string, network
     if (fundShare && investorData?.investor?.share) {
       const totalShare = parseFloat(fundShare.totalShare)
       const myShare = parseFloat(investorData.investor.share)
-      
-      console.log('Method 2: Using FundShare + Investor.share')
-      console.log('totalShare:', totalShare, 'myShare:', myShare)
-      
+            
       if (totalShare > 0) {
         const percentage = (myShare / totalShare) * 100
-        console.log('calculated percentage from investor.share:', percentage)
         return percentage
       }
     }
 
-    // Method 3: No share data available
-    console.log('Method 3: No share data available, returning 0')
     return 0
   })()
 

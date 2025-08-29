@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useInvestableTokensForSwap } from "@/app/hooks/useInvestableTokens"
+import { useFundSettings, calculateMinOutputWithSlippage } from "@/app/hooks/useFundSettings"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
@@ -63,6 +64,9 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   // Use external investableTokens if provided, otherwise fetch from subgraph
   const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
   const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
+  
+  // Fetch fund settings for slippage configuration (only for fund swaps)
+  const { data: fundSettings, isLoading: isLoadingSettings } = useFundSettings(subgraphNetwork);
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("")
@@ -237,12 +241,6 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
     // Additional validation for fund swaps
     if (isFundSwap) {
       const userToken = userTokens.find(token => token.symbol === fromToken);
-      console.log("Fund balance check:", {
-        fromToken,
-        requestedAmount: fromAmount,
-        userToken,
-        availableAmount: userToken?.amount || "0"
-      });
       
       if (!userToken) {
         toast({
@@ -425,37 +423,45 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
       
       if (isFundSwap && fundId) {
         // For fund swap, use the SteleFund contract method
-        // Calculate minimum output amount (accept 5% slippage)
-        let expectedOutput = BigInt(0);
+        // Calculate minimum output amount using the maxSlippage from settings
         let minOutputAmount = BigInt(0);
         
         try {
           if (outputAmount && parseFloat(outputAmount) > 0) {
-            expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
-            minOutputAmount = (expectedOutput * BigInt(95)) / BigInt(100); // 5% slippage
+            const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));  
+            // Use maxSlippage from fund settings if available, otherwise use conservative default
+            if (fundSettings?.maxSlippage) {
+              // Calculate using the exact maxSlippage from contract settings
+              minOutputAmount = calculateMinOutputWithSlippage(expectedOutput, fundSettings.maxSlippage);
+            } else {
+              // Fallback: use conservative 0.5% slippage if settings not loaded
+              console.warn('Fund settings not available, using default 0.5% slippage');
+              minOutputAmount = (expectedOutput * BigInt(9950)) / BigInt(10000); // 0.5% slippage
+            }
+          } else if (fromTokenPrice && toTokenPrice) {
+            // Calculate based on prices if outputAmount is not available
+            const inputValue = parseFloat(fromAmount) * fromTokenPrice;
+            const expectedTokens = inputValue / toTokenPrice;
+            const expectedOutput = ethers.parseUnits(
+              expectedTokens.toFixed(Math.min(6, Number(toTokenDecimals))), 
+              Number(toTokenDecimals)
+            );
+            
+            if (fundSettings?.maxSlippage) {
+              minOutputAmount = calculateMinOutputWithSlippage(expectedOutput, fundSettings.maxSlippage);
+            } else {
+              minOutputAmount = (expectedOutput * BigInt(9950)) / BigInt(10000); // 0.5% slippage fallback
+            }
           }
         } catch (error) {
-          console.warn("Could not calculate expected output amount:", error);
-          // Continue with 0 values - let the contract handle it
+          console.warn("Error calculating minimum output:", error);
         }
         
-        // Debug logging
-        console.log("Fund Swap Debug:", {
-          fundId,
-          userAddress,
-          fromToken,
-          toToken,
-          fromTokenAddress,
-          toTokenAddress,
-          fromAmount,
-          adjustedAmount,
-          amountInWei: amountInWei.toString(),
-          outputAmount,
-          expectedOutput: expectedOutput.toString(),
-          minOutputAmount: minOutputAmount.toString(),
-          fromTokenDecimals,
-          toTokenDecimals
-        });
+        // If still 0, something went wrong - set a minimal amount to avoid reverting with 0
+        if (minOutputAmount === BigInt(0)) {
+          console.warn('Could not calculate minimum output, using minimal amount');
+          minOutputAmount = BigInt(1);
+        }
 
         // Prepare swap params structure for SteleFund
         const swapParams = {
@@ -463,27 +469,28 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
           tokenOut: toTokenAddress,
           fee: 3000, // Default Uniswap V3 0.3% fee tier
           amountIn: amountInWei,
-          amountOutMinimum: minOutputAmount > BigInt(0) ? minOutputAmount : BigInt(1) // Minimum output or 1 wei
+          amountOutMinimum: minOutputAmount
         };
-
-        console.log("Swap params:", {
-          ...swapParams,
-          amountIn: swapParams.amountIn.toString(),
-          amountOutMinimum: swapParams.amountOutMinimum.toString()
-        });
-        
-        // Call SteleFund.swap(fundId, swapParams[]) with proper gas limit
-        // Note: userAddress is not needed as a parameter - the contract uses msg.sender
-        console.log("Calling SteleFund.swap with:", {
-          fundId,
-          swapParamsArray: [swapParams]
-        });
-        
+    
+        // Estimate gas first
+        let gasEstimate;
+        try {
+          gasEstimate = await steleContract.swap.estimateGas(
+            fundId,
+            [swapParams]
+          );
+          // Add 20% buffer to gas estimate
+          gasEstimate = (gasEstimate * BigInt(120)) / BigInt(100);
+        } catch (estimateError) {
+          console.warn("Gas estimation failed, using default:", estimateError);
+          gasEstimate = BigInt(500000); // Fallback gas limit
+        }
+    
         tx = await steleContract.swap(
           fundId,
           [swapParams],
           {
-            gasLimit: 1000000 // Set explicit gas limit like in test
+            gasLimit: gasEstimate
           }
         );
       } else {

@@ -162,23 +162,16 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
         SteleFundInfoABI.abi,
         signer
       )
-
-      console.log('Creating fund with contract:', contractAddress)
       
       // Call create function (not createFund) based on the ABI
       const tx = await fundInfoContract.create()
-      console.log('Transaction sent:', tx.hash)
       
       // Wait for transaction confirmation
       const receipt = await tx.wait()
-      console.log('Fund created successfully!', receipt)
       
       // Refresh the funds data for the selected network
-      await queryClient.invalidateQueries({ queryKey: ['funds', 50] })
-      
-      // Show success message
-      console.log('Fund created successfully! Transaction hash: ' + receipt.transactionHash)
-      
+      await queryClient.invalidateQueries({ queryKey: ['funds', 50] }) 
+
     } catch (error: any) {
       console.error('Error creating fund:', error)
       
@@ -187,11 +180,9 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
       
       if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
         // User rejected transaction - this is normal, don't show error
-        console.log('User cancelled transaction')
         return // Exit without showing error
       } else if (error.message) {
         if (error.message.includes('user denied') || error.message.includes('rejected')) {
-          console.log('User cancelled transaction')
           return // Exit without showing error
         }
         errorMessage = error.message

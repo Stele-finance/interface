@@ -22,8 +22,6 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       token
       symbol
       amount
-      share
-      totalShare
       blockTimestamp
       transactionHash
     }
@@ -78,8 +76,8 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       id
       fundId
       investor
-      share
-      totalShare
+      percentage
+      amountUSD
       blockTimestamp
       transactionHash
     }
@@ -160,8 +158,6 @@ interface GraphQLResponse {
     token: string
     symbol: string
     amount: string
-    share: string
-    totalShare: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -192,8 +188,8 @@ interface GraphQLResponse {
     id: string
     fundId: string
     investor: string
-    share: string
-    totalShare: string
+    percentage: string
+    amountUSD: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -327,16 +323,16 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         // Process withdraws
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            const shareAmount = withdraw.share
-            const totalShare = withdraw.totalShare
+            const percentage = parseFloat(withdraw.percentage)
+            const amountUSD = parseFloat(withdraw.amountUSD)
             
             allTransactions.push({
               type: 'withdraw',
               id: withdraw.id,
               fundId: withdraw.fundId,
               user: withdraw.investor,
-              amount: `${shareAmount} shares`,
-              details: `Withdrew ${shareAmount} shares (${((parseFloat(shareAmount) / parseFloat(totalShare)) * 100).toFixed(2)}%)`,
+              amount: `$${amountUSD.toFixed(2)}`,
+              details: `Withdrew ${percentage.toFixed(2)}% ($${amountUSD.toFixed(2)} USD)`,
               timestamp: parseInt(withdraw.blockTimestamp),
               transactionHash: withdraw.transactionHash,
             })
