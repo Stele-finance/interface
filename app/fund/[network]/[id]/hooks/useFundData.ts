@@ -11,15 +11,17 @@ const FUND_QUERY = gql`
       updatedAtTimestamp
       manager
       investorCount
-      currentETH
-      currentUSD
+      share
+      amountUSD
+      profitUSD
+      profitRatio
       feeTokens
       feeSymbols
       feeTokensAmount
-      currentTokens
-      currentTokensSymbols
-      currentTokensDecimals
-      currentTokensAmount
+      tokens
+      tokensSymbols
+      tokensDecimals
+      tokensAmount
     }
   }
 `
@@ -35,15 +37,17 @@ export interface Fund {
   updatedAtTimestamp: string
   manager: string
   investorCount: string
-  currentETH: string
-  currentUSD: string
+  share: string
+  amountUSD: string
+  profitUSD: string
+  profitRatio: string
   feeTokens: string[]
   feeSymbols: string[]
   feeTokensAmount: string[]
-  currentTokens: string[]
-  currentTokensSymbols: string[]
-  currentTokensDecimals: string[]
-  currentTokensAmount: string[]
+  tokens: string[]
+  tokensSymbols: string[]
+  tokensDecimals: string[]
+  tokensAmount: string[]
 }
 
 export interface FundResponse {

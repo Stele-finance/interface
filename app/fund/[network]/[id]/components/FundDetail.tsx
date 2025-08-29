@@ -178,13 +178,13 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     fundId: fundId,
     manager: fund?.manager || '0x1234567890123456789012345678901234567890',
     investorCount: fund ? parseInt(fund.investorCount) : 15,
-    tvl: fund ? parseFloat(fund.currentUSD) : 72000,
-    totalValue: fund ? `$${parseFloat(fund.currentUSD).toLocaleString()}` : '$72,000',
+    tvl: fund ? parseFloat(fund.amountUSD) : 72000,
+    totalValue: fund ? `$${parseFloat(fund.amountUSD).toLocaleString()}` : '$72,000',
     status: 'active',
     network: subgraphNetwork,
     createdAt: fund ? new Date(parseInt(fund.createdAtTimestamp) * 1000) : new Date('2024-01-01'),
     updatedAt: fund ? new Date(parseInt(fund.updatedAtTimestamp) * 1000) : new Date(),
-    tokens: fund?.currentTokensSymbols || ['USDC', 'ETH', 'WBTC'],
+    tokens: fund?.tokensSymbols || ['USDC', 'ETH', 'WBTC'],
     isActive: true,
     investorCounter: fund ? parseInt(fund.investorCount) : 15
   }
@@ -209,18 +209,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
   // Calculate portfolio data from fund tokens
   const portfolioData = useMemo(() => {
-    if (!fund || !fund.currentTokensSymbols || !fund.currentTokensAmount || !tokensWithPrices) {
+    if (!fund || !fund.tokensSymbols || !fund.tokensAmount || !tokensWithPrices) {
       return {
         tokens: [],
-        totalValue: 0,
+        totalValue: fund ? parseFloat(fund.amountUSD || '0') : 0,
         colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
       }
     }
 
-    const tokens = fund.currentTokensSymbols.map((symbol, index) => {
-      const amount = parseFloat(fund.currentTokensAmount?.[index] || '0')
-      const decimals = parseInt(fund.currentTokensDecimals?.[index] || '18')
-      const actualAmount = amount / Math.pow(10, decimals)
+    const tokens = fund.tokensSymbols.map((symbol, index) => {
+      // tokensAmount is already formatted as BigDecimal from subgraph
+      const actualAmount = parseFloat(fund.tokensAmount?.[index] || '0')
       
       // Find price from tokensWithPrices
       const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
@@ -236,12 +235,34 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       }
     }).filter(token => token.amount > 0)
 
-    const totalValue = tokens.reduce((sum, token) => sum + token.value, 0)
+    // Use amountUSD from fund data directly for total value
+    const totalValue = parseFloat(fund.amountUSD || '0')
     
-    // Calculate percentages
-    tokens.forEach(token => {
-      token.percentage = totalValue > 0 ? (token.value / totalValue) * 100 : 0
-    })
+    // Calculate sum of token values for percentage calculation
+    const tokenValueSum = tokens.reduce((sum, token) => sum + token.value, 0)
+    
+    // Calculate percentages based on token value sum to ensure they add to 100%
+    if (tokens.length === 1) {
+      // If only one token, it should be 100%
+      tokens[0].percentage = 100
+    } else if (tokenValueSum > 0) {
+      // Calculate percentages and ensure they sum to 100%
+      let totalPercentage = 0
+      tokens.forEach((token, index) => {
+        if (index === tokens.length - 1) {
+          // Last token gets the remainder to ensure exactly 100%
+          token.percentage = 100 - totalPercentage
+        } else {
+          token.percentage = (token.value / tokenValueSum) * 100
+          totalPercentage += token.percentage
+        }
+      })
+    } else {
+      // No value, all percentages are 0
+      tokens.forEach(token => {
+        token.percentage = 0
+      })
+    }
 
     // Sort by value descending
     tokens.sort((a, b) => b.value - a.value)
@@ -291,6 +312,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const hasJoinedFromSubgraph = fundInvestorData?.investor !== undefined && fundInvestorData?.investor !== null;
   const hasInvestedInFund = (hasJoinedLocally || hasJoinedFromSubgraph) && isConnected;
   
+  
   const isFundClosed = false
   const shouldShowGetRewards = false
 
@@ -337,15 +359,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     return typeMap[type.toLowerCase()] || typeMap.default;
   };
 
-  // Event handlers
-  const handleJoinChallenge = async (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    // Mock invest function
-    console.log('Investing in fund...');
-  };
-
-
   const handleNavigateToAccount = () => {
     if (connectedAddress) {
       router.push(`/fund/${subgraphNetwork}/${fundId}/${connectedAddress}`);
@@ -384,8 +397,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       const currentChainId = '0x' + currentNetwork.chainId.toString(16);
       
       if (currentChainId !== targetChainId) {
-        console.log(`Current network: ${currentChainId}, Target network: ${targetChainId}`);
-        
+
         try {
           // Try to switch to the target network
           await window.ethereum?.request({
@@ -471,16 +483,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         SteleFundInfoABI.abi,
         signer
       );
-      
-      console.log('Joining fund with ID:', fundId);
-      
+            
       // Call join function with fundId as number
       const tx = await fundInfoContract.join(parseInt(fundId));
-      console.log('Transaction sent:', tx.hash);
       
       // Wait for transaction confirmation
       const receipt = await tx.wait();
-      console.log('Successfully joined fund!', receipt);
       
       toast({
         title: t('success'),
@@ -505,12 +513,20 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         refetchFundInvestorData();
       }
       
+      // Also refresh the React Query cache
+      queryClient.invalidateQueries({
+        queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork]
+      });
+      
+      // Set local joined state to immediately update UI
+      setHasJoinedLocally(true);
+      
+      
     } catch (error: any) {
       console.error('Join fund error:', error);
       
       // Handle user rejection
       if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
-        console.log('User cancelled transaction');
         return;
       }
       
@@ -754,7 +770,11 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                             </span>
                                           </div>
                                         </div>
-                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdraw' || transaction.type === 'Withdrawfee') && transaction.symbol ? (
+                                      ) : transaction.type === 'Withdraw' ? (
+                                        <div className="font-medium text-gray-100">
+                                          {transaction.value.startsWith('$') ? transaction.value : `$${transaction.value}`}
+                                        </div>
+                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee') && transaction.symbol ? (
                                         <div className="flex items-center gap-2 justify-end">
                                           <div className="relative flex-shrink-0">
                                             {(() => {
@@ -931,7 +951,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                      {isJoining ? (
                        <>
                          <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                         {t('investing')}
+                         Joining...
                        </>
                      ) : isLoading || !data?.fund ? (
                        <>
@@ -1007,7 +1027,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                           ></div>
                           <span className="text-sm text-gray-300">{token.symbol}</span>
                           <span className="text-xs text-gray-500">
-                            ({token.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })})
+                            ({token.amount < 0.0001 && token.amount > 0 
+                              ? '<0.0001' 
+                              : token.amount.toLocaleString(undefined, { 
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: token.amount < 1 ? 6 : 4 
+                                })})
                           </span>
                         </div>
                         <div className="text-right">
@@ -1023,10 +1048,22 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-8 text-gray-400">
-                  <PieChart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No portfolio data available</p>
-                  <p className="text-xs mt-1">Fund has no current token holdings</p>
+                <div className="text-center py-8">
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="relative w-40 h-40">
+                      <div className="w-full h-full rounded-full bg-gray-800 border-2 border-gray-700"></div>
+                      <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-white">
+                            ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </div>
+                          <div className="text-xs text-gray-400">Total Value</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-400">No token holdings yet</p>
+                  <p className="text-xs text-gray-500 mt-1">Portfolio composition will appear here</p>
                 </div>
               )}
             </div>
@@ -1043,13 +1080,34 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('network')}</span>
-                  <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
+                  <div className="flex items-center gap-2">
+                    <Image 
+                      src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+                      alt={subgraphNetwork}
+                      width={16}
+                      height={16}
+                      className="rounded-full"
+                    />
+                    <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
+                  </div>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">TVL</span>
                   <span className="text-sm text-green-400 font-medium">
-                    {fund ? `$${parseFloat(fund.currentUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$0.00'}
+                    {fund ? `$${parseFloat(fund.amountUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$0.00'}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">Profit</span>
+                  <span className={`text-sm font-medium ${
+                    fund && parseFloat(fund.profitRatio || '0') >= 0 ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {fund && fund.profitRatio 
+                      ? `${parseFloat(fund.profitRatio) >= 0 ? '+' : ''}${(parseFloat(fund.profitRatio) * 100).toFixed(2)}%`
+                      : '0.00%'
+                    }
                   </span>
                 </div>
                 
@@ -1058,10 +1116,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   <span className="text-sm text-white font-medium">{fund ? fund.investorCount : '0'}</span>
                 </div>
                 
-                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">Status</span>
-                  <span className="text-sm text-green-400 font-medium">Active</span>
-                </div>
               </div>
             </div>
           </Card>

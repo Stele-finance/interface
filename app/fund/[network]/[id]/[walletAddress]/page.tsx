@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
+import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
@@ -57,9 +58,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   
   // Fallback to USD calculation if share data not available
   const fallbackSharePercentage = (() => {
-    if (!fundInvestorData?.investor || !fundData?.fund?.currentUSD) return 0
-    const investorUSD = parseFloat(fundInvestorData.investor.currentUSD)
-    const fundUSD = parseFloat(fundData.fund.currentUSD)
+    if (!fundInvestorData?.investor || !fundData?.fund?.amountUSD) return 0
+    const investorUSD = parseFloat(fundInvestorData.investor.amountUSD)
+    const fundUSD = parseFloat(fundData.fund.amountUSD)
     return fundUSD > 0 ? (investorUSD / fundUSD) * 100 : 0
   })()
   
@@ -80,8 +81,8 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
     }
     
     const investor = fundInvestorData.investor
-    const currentValue = parseFloat(investor.currentUSD) || 0
-    const totalTokens = investor.currentTokensSymbols?.length || 0
+    const currentValue = parseFloat(investor.amountUSD) || 0
+    const totalTokens = investor.tokensSymbols?.length || 0
     
     return {
       totalValue: currentValue,
@@ -285,14 +286,28 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 <TabsContent value="portfolio" className="space-y-4">
                   <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
                     <h4 className="text-lg font-semibold text-gray-100 mb-4">Portfolio Details</h4>
-                    {fundData?.fund ? (
+                    {investor ? (
                       <div className="space-y-3">
-                        {fundData.fund.currentTokensSymbols?.map((symbol, index) => (
-                          <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700/30 last:border-b-0">
-                            <span className="text-gray-300">{symbol}</span>
-                            <span className="text-gray-100">{fundData.fund?.currentTokensAmount?.[index] || '0'}</span>
+                        {investor.tokensSymbols?.length > 0 ? (
+                          investor.tokensSymbols.map((symbol, index) => (
+                            <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700/30 last:border-b-0">
+                              <span className="text-gray-300">{symbol}</span>
+                              <span className="text-gray-100">
+                                {investor.tokensAmount?.[index] 
+                                  ? parseFloat(investor.tokensAmount[index]).toLocaleString(undefined, { 
+                                      minimumFractionDigits: 0, 
+                                      maximumFractionDigits: 6 
+                                    })
+                                  : '0'
+                                }
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4 text-gray-400">
+                            <p>No tokens in your portfolio</p>
                           </div>
-                        ))}
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-400">
@@ -395,20 +410,32 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">Network</span>
-                        <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
+                        <div className="flex items-center gap-2">
+                          <Image 
+                            src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+                            alt={subgraphNetwork}
+                            width={16}
+                            height={16}
+                            className="rounded-full"
+                          />
+                          <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
+                        </div>
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">Current Value</span>
                         <span className="text-sm text-white font-medium">
-                          ${parseFloat(investor.currentUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          ${parseFloat(investor.amountUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">P&L</span>
-                        <span className={`text-sm font-medium ${parseFloat(investor.profitUSD) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          {parseFloat(investor.profitUSD) >= 0 ? '+' : ''}${parseFloat(investor.profitUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <span className="text-sm text-gray-400">Profit</span>
+                        <span className={`text-sm font-medium ${parseFloat(investor.profitRatio || '0') >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {investor.profitRatio 
+                            ? `${parseFloat(investor.profitRatio) >= 0 ? '+' : ''}${(parseFloat(investor.profitRatio) * 100).toFixed(2)}%`
+                            : '0.00%'
+                          }
                         </span>
                       </div>
                       

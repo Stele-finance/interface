@@ -23,16 +23,16 @@ export function useFundUserTokens(fundId: string, network: 'ethereum' | 'arbitru
       }
 
       const fund = fundDataResponse.fund
-      const currentTokens = fund.currentTokens || []
-      const currentTokensAmount = fund.currentTokensAmount || []
-      const currentTokensSymbols = fund.currentTokensSymbols || []
-      const currentTokensDecimals = fund.currentTokensDecimals || []
+      const tokens = fund.tokens || []
+      const tokensAmount = fund.tokensAmount || []
+      const tokensSymbols = fund.tokensSymbols || []
+      const tokensDecimals = fund.tokensDecimals || []
 
       // Create token info array from Fund's current holdings
-      const userTokens: UserTokenInfo[] = currentTokens.map((address, index) => {
-        const rawAmount = currentTokensAmount[index] || '0'
-        const decimals = currentTokensDecimals[index] || '18'
-        const symbol = currentTokensSymbols[index] || `TOKEN_${index}`
+      const userTokens: UserTokenInfo[] = tokens.map((address, index) => {
+        const rawAmount = tokensAmount[index] || '0'
+        const decimals = tokensDecimals[index] || '18'
+        const symbol = tokensSymbols[index] || `TOKEN_${index}`
         
         // Fund schema uses BigDecimal which should already be in human-readable format
         // Use the amount directly as it comes from the subgraph

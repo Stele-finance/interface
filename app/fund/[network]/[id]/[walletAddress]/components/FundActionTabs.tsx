@@ -7,6 +7,7 @@ import { AssetSwap } from "@/app/swap/components/AssetSwap"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
 import { useFundUserTokens } from "../../hooks/useFundUserTokens"
+import { useFundData } from "../../hooks/useFundData"
 import { useETHPrice } from "@/app/hooks/useETHPrice"
 import { ethers } from "ethers"
 import { ETHEREUM_CHAIN_CONFIG, ARBITRUM_CHAIN_CONFIG, NETWORK_CONTRACTS, getSteleFundContractAddress } from "@/lib/constants"
@@ -38,11 +39,13 @@ export function FundActionTabs({
   const [ethBalance, setEthBalance] = useState("0")
   const [isDepositing, setIsDepositing] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [isCollectingFees, setIsCollectingFees] = useState(false)
   
   // Get investable tokens and user tokens from Fund subgraph
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'arbitrum'
   const { data: investableTokens = [], isLoading: isLoadingInvestableTokens } = useFundInvestableTokens(subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundUserTokens = [], isLoading: isLoadingUserTokens } = useFundUserTokens(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
+  const { data: fundDataResponse, isLoading: isLoadingFundData } = useFundData(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
   
   // Get ETH price for USD value display
   const { ethPrice } = useETHPrice(subgraphNetwork as 'ethereum' | 'arbitrum')
@@ -52,6 +55,25 @@ export function FundActionTabs({
     if (!ethAmount || !ethPrice || parseFloat(ethAmount) <= 0) return '$0.00'
     const usdValue = parseFloat(ethAmount) * ethPrice
     return `$${usdValue.toFixed(2)}`
+  }
+  
+  // Calculate accumulated fees in USD
+  const calculateAccumulatedFees = (): string => {
+    const fund = fundDataResponse?.fund
+    if (!fund || !fund.feeTokensAmount || fund.feeTokensAmount.length === 0) {
+      return '$0.000'
+    }
+    
+    // Sum up all fee amounts (assuming they're already in USD)
+    let totalFeesUSD = 0
+    fund.feeTokensAmount.forEach((amount: string) => {
+      const amountValue = parseFloat(amount || '0')
+      if (amountValue > 0) {
+        totalFeesUSD += amountValue
+      }
+    })
+    
+    return `$${totalFeesUSD.toFixed(3)}`
   }
   
   // Determine which tabs to show based on user role
@@ -194,13 +216,7 @@ export function FundActionTabs({
       
       // Convert percentage to basis points (100% = 10000)
       const percentageInBasisPoints = Math.round(parseFloat(withdrawAmount) * 100)
-      
-      console.log("Withdrawing:", {
-        fundId,
-        percentage: withdrawAmount + "%",
-        basisPoints: percentageInBasisPoints
-      })
-      
+            
       // Call withdraw function
       const tx = await steleFundContract.withdraw(
         fundId,
@@ -286,6 +302,146 @@ export function FundActionTabs({
       return 'Arbiscan'
     } else {
       return 'Etherscan'
+    }
+  }
+  
+  // Handle collect fees from SteleFund contract
+  const handleCollectFees = async () => {
+    setIsCollectingFees(true)
+    
+    try {
+      // WalletConnect only
+      const provider = getProvider()
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.")
+      }
+      
+      // Request account access
+      const accounts = await provider.send('eth_requestAccounts', [])
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts found. Please connect your wallet first.")
+      }
+      
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', [])
+      const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1'
+      
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ])
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            const networkParams = network === 'arbitrum' ? {
+              chainId: expectedChainId,
+              chainName: 'Arbitrum One',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+              blockExplorerUrls: ['https://arbiscan.io']
+            } : {
+              chainId: expectedChainId,
+              chainName: 'Ethereum Mainnet',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+              blockExplorerUrls: ['https://etherscan.io']
+            }
+            
+            await provider.send('wallet_addEthereumChain', [networkParams])
+          } else if (switchError.code === 4001) {
+            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum'
+            throw new Error(`Please switch to ${networkName} network to collect fees.`)
+          } else {
+            throw switchError
+          }
+        }
+      }
+      
+      // Get signer
+      const signer = await provider.getSigner()
+      
+      // Get SteleFund contract address based on network
+      const contractKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund'
+      const contractAddress = NETWORK_CONTRACTS[contractKey]?.STELE_FUND_CONTRACT_ADDRESS
+      
+      if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+        throw new Error(`SteleFund contract not configured for ${network} network`)
+      }
+      
+      // Create contract instance
+      const steleFundContract = new ethers.Contract(
+        contractAddress,
+        SteleFundABI.abi,
+        signer
+      )
+      
+      // Get ETH token address (use WETH or zero address for native ETH)
+      const ethTokenAddress = "0x0000000000000000000000000000000000000000" // Native ETH
+      
+      // Call withdrawFee function with 100% to collect all fees
+      const tx = await steleFundContract.withdrawFee(
+        fundId,
+        ethTokenAddress,
+        10000, // 100% in basis points
+        {
+          gasLimit: 1000000 // Set explicit gas limit
+        }
+      )
+      
+      // Get explorer info
+      const explorerName = getExplorerName(walletChainId)
+      const explorerUrl = getExplorerUrl(walletChainId, tx.hash)
+      
+      toast({
+        title: "Fee Collection Submitted",
+        description: `Collecting management fees from fund ${fundId}`,
+        action: (
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+            View on {explorerName}
+          </ToastAction>
+        ),
+      })
+      
+      // Wait for transaction to be mined
+      await tx.wait()
+      
+      // Show success toast
+      toast({
+        title: "Fee Collection Successful!",
+        description: `Successfully collected management fees from fund ${fundId}`,
+        action: (
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+            View on {explorerName}
+          </ToastAction>
+        ),
+      })
+      
+    } catch (error: any) {
+      console.error("Error collecting fees:", error)
+      
+      let errorMessage = "An error occurred while collecting fees. Please try again."
+      
+      if (error.code === 4001 || error.message?.includes('rejected')) {
+        errorMessage = "Transaction was cancelled by user"
+      } else if (error.message?.includes("NF")) {
+        errorMessage = "No fees available to collect"
+      } else if (error.message?.includes("OM")) {
+        errorMessage = "Only the fund manager can collect fees"
+      } else if (error.message?.includes("insufficient funds")) {
+        errorMessage = "Insufficient funds for gas fees"
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      toast({
+        variant: "destructive",
+        title: "Fee Collection Failed",
+        description: errorMessage,
+      })
+      
+    } finally {
+      setIsCollectingFees(false)
     }
   }
   
@@ -720,10 +876,23 @@ export function FundActionTabs({
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">Accumulated Fees</span>
-                  <span className="text-sm text-white font-medium">$0.00</span>
+                  <span className="text-sm text-white font-medium">
+                    {isLoadingFundData ? 'Loading...' : calculateAccumulatedFees()}
+                  </span>
                 </div>
-                <button className="w-full px-6 py-3 text-lg font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-2xl transition-colors">
-                  Collect Fees
+                <button 
+                  onClick={handleCollectFees}
+                  disabled={isCollectingFees}
+                  className="w-full px-6 py-3 text-lg font-semibold bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white rounded-2xl transition-colors disabled:cursor-not-allowed"
+                >
+                  {isCollectingFees ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin inline-block" />
+                      Collecting...
+                    </>
+                  ) : (
+                    'Collect Fees'
+                  )}
                 </button>
               </div>
             </div>

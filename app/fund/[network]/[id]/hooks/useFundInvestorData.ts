@@ -13,17 +13,13 @@ const FUND_INVESTOR_QUERY = gql`
       investor
       isManager
       share
-      principalETH
-      principalUSD
-      currentETH
-      currentUSD
-      currentTokens
-      currentTokensSymbols
-      currentTokensDecimals
-      currentTokensAmount
-      profitETH
+      amountUSD
       profitUSD
       profitRatio
+      tokens
+      tokensSymbols
+      tokensDecimals
+      tokensAmount
     }
   }
 `
@@ -40,17 +36,13 @@ export interface FundInvestor {
   investor: string
   isManager: boolean
   share: string
-  principalETH: string
-  principalUSD: string
-  currentETH: string
-  currentUSD: string
-  currentTokens: string[]
-  currentTokensSymbols: string[]
-  currentTokensDecimals: string[]
-  currentTokensAmount: string[]
-  profitETH: string
+  amountUSD: string
   profitUSD: string
   profitRatio: string
+  tokens: string[]
+  tokensSymbols: string[]
+  tokensDecimals: string[]
+  tokensAmount: string[]
 }
 
 export interface FundInvestorResponse {

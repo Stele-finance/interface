@@ -122,7 +122,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                           {/* Current USD column */}
                           <td className="py-6 px-4 whitespace-nowrap">
                             <div className="font-medium text-gray-100">
-                              {formatUSD(investor.currentUSD)}
+                              {formatUSD(investor.amountUSD)}
                             </div>
                           </td>
 

@@ -15,14 +15,15 @@ const FUND_SNAPSHOTS_QUERY = gql`
       fundId
       manager
       investorCount
-      currentETH
-      currentUSD
-      currentTokens
-      currentTokensSymbols
-      currentTokensDecimals
-      currentTokensAmount
-      currentTokensAmountETH
-      currentTokensAmountUSD
+      share
+      amountUSD
+      profitUSD
+      profitRatio
+      tokens
+      tokensSymbols
+      tokensDecimals
+      tokensAmount
+      tokensAmountUSD
     }
   }
 `
@@ -37,14 +38,15 @@ export interface FundSnapshot {
   fundId: string
   manager: string
   investorCount: string
-  currentETH: string
-  currentUSD: string
-  currentTokens: string[]
-  currentTokensSymbols: string[]
-  currentTokensDecimals: string[]
-  currentTokensAmount: string[]
-  currentTokensAmountETH: string[]
-  currentTokensAmountUSD: string[]
+  share: string
+  amountUSD: string
+  profitUSD: string
+  profitRatio: string
+  tokens: string[]
+  tokensSymbols: string[]
+  tokensDecimals: string[]
+  tokensAmount: string[]
+  tokensAmountUSD: string[]
 }
 
 export interface FundSnapshotsResponse {

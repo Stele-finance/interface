@@ -81,10 +81,10 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
     fundId: fund.fundId,
     manager: fund.manager,
     investorCount: parseInt(fund.investorCount),
-    tvl: parseFloat(fund.currentUSD),
+    tvl: parseFloat(fund.amountUSD),
     createdAt: new Date(parseInt(fund.createdAtTimestamp) * 1000),
     updatedAt: new Date(parseInt(fund.updatedAtTimestamp) * 1000),
-    tokens: fund.currentTokensSymbols
+    tokens: fund.tokensSymbols
   }))
 
   // Handle Create Fund button click - show confirmation modal
