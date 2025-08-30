@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowUpDown, ArrowDownCircle, ArrowUpCircle, DollarSign, Loader2 } from "lucide-react"
+import { ArrowUpDown, ArrowDownCircle, ArrowUpCircle, DollarSign, Loader2, PieChart } from "lucide-react"
 import { AssetSwap } from "@/app/swap/components/AssetSwap"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
 import { useFundUserTokens } from "../../hooks/useFundUserTokens"
 import { useFundData } from "../../hooks/useFundData"
 import { useETHPrice } from "@/app/hooks/useETHPrice"
+import { useUniswapBatchPrices, TokenInfo } from "@/app/hooks/useUniswapBatchPrices"
 import { ethers } from "ethers"
 import { ETHEREUM_CHAIN_CONFIG, ARBITRUM_CHAIN_CONFIG, NETWORK_CONTRACTS, getSteleFundContractAddress } from "@/lib/constants"
 import { toast } from "@/components/ui/use-toast"
@@ -50,12 +51,100 @@ export function FundActionTabs({
   // Get ETH price for USD value display
   const { ethPrice } = useETHPrice(subgraphNetwork as 'ethereum' | 'arbitrum')
   
+  // Prepare fee tokens for price fetching
+  const feeTokenInfos: TokenInfo[] = useMemo(() => {
+    const fund = fundDataResponse?.fund
+    if (!fund || !fund.feeTokens || fund.feeTokens.length === 0) {
+      return []
+    }
+    
+    return fund.feeTokens.map((address: string, index: number) => ({
+      symbol: fund.feeSymbols?.[index] || 'UNKNOWN',
+      address: address,
+      decimals: 18 // Default to 18, will be adjusted by the price hook if needed
+    }))
+  }, [fundDataResponse])
+  
+  // Get prices for fee tokens
+  const { data: feeTokenPrices, isLoading: isLoadingFeeTokenPrices } = useUniswapBatchPrices(
+    feeTokenInfos, 
+    subgraphNetwork as 'ethereum' | 'arbitrum'
+  )
+  
   // Calculate USD value of deposit amount
   const calculateUSDValue = (ethAmount: string): string => {
     if (!ethAmount || !ethPrice || parseFloat(ethAmount) <= 0) return '$0.00'
     const usdValue = parseFloat(ethAmount) * ethPrice
     return `$${usdValue.toFixed(2)}`
   }
+  
+  // Calculate fee portfolio data for pie chart
+  const feePortfolioData = useMemo(() => {
+    const fund = fundDataResponse?.fund
+    if (!fund || !fund.feeTokensAmount || fund.feeTokensAmount.length === 0 || !feeTokenPrices || isLoadingFeeTokenPrices) {
+      return {
+        tokens: [],
+        totalValue: 0,
+        colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+      }
+    }
+    
+    const tokens = fund.feeTokensAmount.map((amount: string, index: number) => {
+      const amountValue = parseFloat(amount || '0')
+      const tokenSymbol = fund.feeSymbols?.[index] || 'UNKNOWN'
+      const tokenAddress = fund.feeTokens?.[index]
+      
+      // Get token price
+      let tokenPrice = 0
+      if (tokenSymbol && feeTokenPrices.tokens[tokenSymbol]) {
+        tokenPrice = feeTokenPrices.tokens[tokenSymbol].priceUSD
+      } else if (tokenAddress) {
+        const priceEntry = Object.values(feeTokenPrices.tokens).find(
+          (token) => token.address.toLowerCase() === tokenAddress.toLowerCase()
+        )
+        if (priceEntry) {
+          tokenPrice = priceEntry.priceUSD
+        }
+      }
+      
+      const value = amountValue * tokenPrice
+      
+      return {
+        symbol: tokenSymbol,
+        amount: amountValue,
+        value,
+        price: tokenPrice,
+        percentage: 0 // Will be calculated after total
+      }
+    }).filter(token => token.amount > 0 && token.value > 0)
+    
+    // Calculate total value
+    const totalValue = tokens.reduce((sum, token) => sum + token.value, 0)
+    
+    // Calculate percentages
+    if (tokens.length === 1) {
+      tokens[0].percentage = 100
+    } else if (totalValue > 0) {
+      let totalPercentage = 0
+      tokens.forEach((token, index) => {
+        if (index === tokens.length - 1) {
+          token.percentage = 100 - totalPercentage
+        } else {
+          token.percentage = (token.value / totalValue) * 100
+          totalPercentage += token.percentage
+        }
+      })
+    }
+    
+    // Sort by value descending
+    tokens.sort((a, b) => b.value - a.value)
+    
+    return {
+      tokens,
+      totalValue,
+      colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+    }
+  }, [fundDataResponse, feeTokenPrices, isLoadingFeeTokenPrices])
   
   // Calculate accumulated fees in USD
   const calculateAccumulatedFees = (): string => {
@@ -64,12 +153,37 @@ export function FundActionTabs({
       return '$0.000'
     }
     
-    // Sum up all fee amounts (assuming they're already in USD)
+    // If prices are not loaded yet, show loading
+    if (isLoadingFeeTokenPrices || !feeTokenPrices) {
+      return 'Loading...'
+    }
+    
+    // Calculate total USD value using real token prices
     let totalFeesUSD = 0
-    fund.feeTokensAmount.forEach((amount: string) => {
+    
+    fund.feeTokensAmount.forEach((amount: string, index: number) => {
       const amountValue = parseFloat(amount || '0')
       if (amountValue > 0) {
-        totalFeesUSD += amountValue
+        const tokenSymbol = fund.feeSymbols?.[index]
+        const tokenAddress = fund.feeTokens?.[index]
+        
+        // Try to get price by symbol first, then by address
+        let tokenPrice = 0
+        
+        if (tokenSymbol && feeTokenPrices.tokens[tokenSymbol]) {
+          tokenPrice = feeTokenPrices.tokens[tokenSymbol].priceUSD
+        } else if (tokenAddress) {
+          // Search for price by address if symbol lookup fails
+          const priceEntry = Object.values(feeTokenPrices.tokens).find(
+            (token) => token.address.toLowerCase() === tokenAddress.toLowerCase()
+          )
+          if (priceEntry) {
+            tokenPrice = priceEntry.priceUSD
+          }
+        }
+        
+        // Calculate USD value (amount is already in token units with decimals)
+        totalFeesUSD += amountValue * tokenPrice
       }
     })
     
@@ -376,46 +490,93 @@ export function FundActionTabs({
         signer
       )
       
-      // Get ETH token address (use WETH or zero address for native ETH)
-      const ethTokenAddress = "0x0000000000000000000000000000000000000000" // Native ETH
+      // Get fee tokens from fund data
+      const fund = fundDataResponse?.fund
+      if (!fund || !fund.feeTokens || fund.feeTokens.length === 0) {
+        throw new Error('No fee tokens found')
+      }
       
-      // Call withdrawFee function with 100% to collect all fees
-      const tx = await steleFundContract.withdrawFee(
-        fundId,
-        ethTokenAddress,
-        10000, // 100% in basis points
-        {
-          gasLimit: 1000000 // Set explicit gas limit
+      // Filter tokens that have fees to collect
+      const tokensWithFees = fund.feeTokens
+        .map((tokenAddress: string, index: number) => ({
+          address: tokenAddress,
+          amount: parseFloat(fund.feeTokensAmount?.[index] || '0'),
+          symbol: fund.feeSymbols?.[index] || 'UNKNOWN'
+        }))
+        .filter(token => token.amount > 0)
+      
+      if (tokensWithFees.length === 0) {
+        throw new Error('No fees available to collect')
+      }
+      
+      console.log('Tokens with fees:', tokensWithFees)
+      
+      // Collect fees for each token
+      const successfulCollections: string[] = []
+      const failedCollections: { symbol: string; error: string }[] = []
+      
+      for (const token of tokensWithFees) {
+        try {
+          console.log(`Collecting fees for ${token.symbol} (${token.address})`)
+          
+          // Try to estimate gas first
+          let gasLimit = 2000000n // Default gas limit
+          try {
+            const estimatedGas = await steleFundContract.withdrawFee.estimateGas(
+              fundId,
+              token.address,
+              10000 // 100% in basis points
+            )
+            // Add 20% buffer to estimated gas
+            gasLimit = estimatedGas * 120n / 100n
+            console.log(`Estimated gas for ${token.symbol}:`, estimatedGas.toString())
+          } catch (estimateError: any) {
+            console.warn(`Gas estimation failed for ${token.symbol}:`, estimateError)
+            
+            // Check for specific revert reasons
+            if (estimateError.reason === 'NF' || estimateError.message?.includes('NF')) {
+              console.log(`No fees for ${token.symbol}, skipping...`)
+              continue // Skip this token
+            }
+            if (estimateError.reason === 'OM' || estimateError.message?.includes('OM')) {
+              throw new Error('Only the fund manager can collect fees')
+            }
+          }
+          
+          // Call withdrawFee function with 100% to collect all fees for this token
+          const tx = await steleFundContract.withdrawFee(
+            fundId,
+            token.address,
+            10000, // 100% in basis points
+            { gasLimit }
+          )
+          
+          // Wait for transaction
+          await tx.wait()
+          successfulCollections.push(token.symbol)
+          
+        } catch (error: any) {
+          console.error(`Failed to collect fees for ${token.symbol}:`, error)
+          failedCollections.push({
+            symbol: token.symbol,
+            error: error.message || 'Unknown error'
+          })
         }
-      )
+      }
       
-      // Get explorer info
-      const explorerName = getExplorerName(walletChainId)
-      const explorerUrl = getExplorerUrl(walletChainId, tx.hash)
-      
-      toast({
-        title: "Fee Collection Submitted",
-        description: `Collecting management fees from fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
-      
-      // Wait for transaction to be mined
-      await tx.wait()
-      
-      // Show success toast
-      toast({
-        title: "Fee Collection Successful!",
-        description: `Successfully collected management fees from fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
+      // Report results
+      if (successfulCollections.length > 0) {
+        const message = failedCollections.length > 0
+          ? `Successfully collected fees for: ${successfulCollections.join(', ')}. Failed for: ${failedCollections.map(f => f.symbol).join(', ')}`
+          : `Successfully collected fees for all tokens: ${successfulCollections.join(', ')}`
+          
+        toast({
+          title: "Fee Collection Complete",
+          description: message,
+        })
+      } else {
+        throw new Error('Failed to collect fees from any token')
+      }
       
     } catch (error: any) {
       console.error("Error collecting fees:", error)
@@ -870,30 +1031,59 @@ export function FundActionTabs({
         {isManagerAndInvestor && (
           <TabsContent value="fee" className="space-y-4">
             <div>
-              <p className="text-gray-400 mb-4">
-                Collect management fees
-              </p>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">Accumulated Fees</span>
-                  <span className="text-sm text-white font-medium">
-                    {isLoadingFundData ? 'Loading...' : calculateAccumulatedFees()}
-                  </span>
+              {/* Fee Tokens List */}
+              <div className="mb-6">
+                {feePortfolioData.tokens.length > 0 ? (
+                  <div className="space-y-3">
+                    {feePortfolioData.tokens.map((token, index) => (
+                      <div key={token.symbol} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-300">{token.symbol}</span>
+                          <span className="text-xs text-gray-500">
+                            ({token.amount < 0.0001 && token.amount > 0 
+                              ? '<0.0001' 
+                              : token.amount.toLocaleString(undefined, { 
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: token.amount < 1 ? 6 : 4 
+                                })})
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-white font-medium">
+                            {token.percentage.toFixed(1)}%
+                          </div>
+                          <div className="text-xs text-green-400">
+                            ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-400">No fee tokens accumulated yet</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Fee Collection Section */}
+              <div className="border-t border-gray-700/30 pt-4">
+                <div className="space-y-4">
+                  <button 
+                    onClick={handleCollectFees}
+                    disabled={isCollectingFees}
+                    className="w-full px-6 py-3 text-lg font-semibold bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white rounded-2xl transition-colors disabled:cursor-not-allowed"
+                  >
+                    {isCollectingFees ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin inline-block" />
+                        Collecting...
+                      </>
+                    ) : (
+                      'Collect Fees'
+                    )}
+                  </button>
                 </div>
-                <button 
-                  onClick={handleCollectFees}
-                  disabled={isCollectingFees}
-                  className="w-full px-6 py-3 text-lg font-semibold bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white rounded-2xl transition-colors disabled:cursor-not-allowed"
-                >
-                  {isCollectingFees ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin inline-block" />
-                      Collecting...
-                    </>
-                  ) : (
-                    'Collect Fees'
-                  )}
-                </button>
               </div>
             </div>
           </TabsContent>

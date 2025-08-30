@@ -30,6 +30,11 @@
       "type": "constructor"
     },
     {
+      "inputs": [],
+      "name": "ReentrancyGuardReentrantCall",
+      "type": "error"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -59,13 +64,19 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "share",
+          "name": "investorShare",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "totalShare",
+          "name": "fundShare",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "managerFee",
           "type": "uint256"
         }
       ],
@@ -164,13 +175,13 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "share",
+          "name": "investorShare",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "totalShare",
+          "name": "fundShare",
           "type": "uint256"
         }
       ],

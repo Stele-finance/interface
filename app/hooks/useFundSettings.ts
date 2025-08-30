@@ -69,7 +69,6 @@ export function basisPointsToDecimal(basisPoints: string | number): number {
 }
 
 // Helper function to calculate minimum output with slippage
-// Apply only 50% of the maxSlippage for tighter protection
 export function calculateMinOutputWithSlippage(
   expectedOutput: bigint,
   maxSlippageBasisPoints: string | number
@@ -79,10 +78,9 @@ export function calculateMinOutputWithSlippage(
     : BigInt(maxSlippageBasisPoints);
   
   const basisPoints = BigInt(10000);
-  // Use only half of the maxSlippage for tighter protection
-  // If maxSlippage is 3% (300 basis points), we use 1.5% (150 basis points)
-  const effectiveSlippage = slippage / BigInt(2);
   
-  // minOutput = expectedOutput * (10000 - (maxSlippage/2)) / 10000
-  return (expectedOutput * (basisPoints - effectiveSlippage)) / basisPoints;
+  // Use the full maxSlippage value from settings
+  // If maxSlippage is 100 basis points (1%), use the full 1%
+  // minOutput = expectedOutput * (10000 - maxSlippage) / 10000
+  return (expectedOutput * (basisPoints - slippage)) / basisPoints;
 }

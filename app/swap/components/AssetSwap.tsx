@@ -10,7 +10,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useInvestableTokensForSwap } from "@/app/hooks/useInvestableTokens"
-import { useFundSettings, calculateMinOutputWithSlippage } from "@/app/hooks/useFundSettings"
+import { useFundSettings } from "@/app/hooks/useFundSettings"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
@@ -422,39 +422,27 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
       let tx;
       
       if (isFundSwap && fundId) {
-        // For fund swap, use the SteleFund contract method
-        // Calculate minimum output amount using the maxSlippage from settings
         let minOutputAmount = BigInt(0);
         
-        try {
-          if (outputAmount && parseFloat(outputAmount) > 0) {
-            const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));  
-            // Use maxSlippage from fund settings if available, otherwise use conservative default
-            if (fundSettings?.maxSlippage) {
-              // Calculate using the exact maxSlippage from contract settings
-              minOutputAmount = calculateMinOutputWithSlippage(expectedOutput, fundSettings.maxSlippage);
-            } else {
-              // Fallback: use conservative 0.5% slippage if settings not loaded
-              console.warn('Fund settings not available, using default 0.5% slippage');
-              minOutputAmount = (expectedOutput * BigInt(9950)) / BigInt(10000); // 0.5% slippage
-            }
-          } else if (fromTokenPrice && toTokenPrice) {
-            // Calculate based on prices if outputAmount is not available
-            const inputValue = parseFloat(fromAmount) * fromTokenPrice;
-            const expectedTokens = inputValue / toTokenPrice;
-            const expectedOutput = ethers.parseUnits(
-              expectedTokens.toFixed(Math.min(6, Number(toTokenDecimals))), 
-              Number(toTokenDecimals)
-            );
-            
-            if (fundSettings?.maxSlippage) {
-              minOutputAmount = calculateMinOutputWithSlippage(expectedOutput, fundSettings.maxSlippage);
-            } else {
-              minOutputAmount = (expectedOutput * BigInt(9950)) / BigInt(10000); // 0.5% slippage fallback
-            }
-          }
-        } catch (error) {
-          console.warn("Error calculating minimum output:", error);
+        if (outputAmount && parseFloat(outputAmount) > 0 && fundSettings?.maxSlippage) {
+          const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
+          
+          // Use maxSlippage but reduce it by 20% for more conservative calculation
+          const maxSlippageBP = parseInt(fundSettings.maxSlippage);
+          const reducedSlippage = Math.floor(maxSlippageBP * 0.8); // 20% reduction
+                    
+          // Calculate minOutput = expectedOutput * (10000 - reducedSlippage) / 10000
+          const basisPoints = BigInt(10000);
+          const slippageBigInt = BigInt(reducedSlippage);
+          minOutputAmount = (expectedOutput * (basisPoints - slippageBigInt)) / basisPoints;          
+        } else if (outputAmount && parseFloat(outputAmount) > 0) {
+          // Fallback: use 1% slippage if settings not available
+          const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
+          minOutputAmount = (expectedOutput * BigInt(9900)) / BigInt(10000);
+          console.warn('Fund settings not available, using 1% slippage fallback');
+        } else {
+          console.warn('No outputAmount available, using minimal value');
+          minOutputAmount = BigInt(1);
         }
         
         // If still 0, something went wrong - set a minimal amount to avoid reverting with 0
@@ -481,8 +469,34 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
           );
           // Add 20% buffer to gas estimate
           gasEstimate = (gasEstimate * BigInt(120)) / BigInt(100);
-        } catch (estimateError) {
+        } catch (estimateError: any) {
           console.warn("Gas estimation failed, using default:", estimateError);
+          
+          // Check for specific contract errors
+          if (estimateError.reason) {
+            const errorReason = estimateError.reason;
+            let errorMessage = "Swap failed";
+            
+            switch (errorReason) {
+              case "ESP":
+                errorMessage = "Insufficient liquidity or slippage too low. Try increasing slippage.";
+                break;
+              case "STF":
+                errorMessage = "Token transfer failed. Check token allowances.";
+                break;
+              case "TF":
+                errorMessage = "Transaction failed. Insufficient balance or allowance.";
+                break;
+              case "IS":
+                errorMessage = "Invalid swap parameters.";
+                break;
+              default:
+                errorMessage = `Swap estimation failed: ${errorReason}`;
+            }
+            
+            throw new Error(errorMessage);
+          }
+          
           gasEstimate = BigInt(500000); // Fallback gas limit
         }
     

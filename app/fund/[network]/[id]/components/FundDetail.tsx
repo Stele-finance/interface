@@ -342,8 +342,16 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         return 'Deposit';
       case 'withdraw': 
         return 'Withdraw';
+      case 'withdrawFee':
+        return 'Withdraw Fee';
+      case 'depositFee':
+        return 'Deposit Fee';
       case 'swap':
         return 'Swap';
+      case 'create':
+        return 'Create';
+      case 'join':
+        return 'Join';
       default:
         return type;
     }
@@ -352,8 +360,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const getTransactionTypeColor = (type: string) => {
     const typeMap: { [key: string]: string } = {
       'deposit': 'text-green-400',
-      'withdraw': 'text-red-400', 
+      'withdraw': 'text-red-400',
+      'withdrawfee': 'text-orange-400',
+      'depositfee': 'text-yellow-400',
       'swap': 'text-blue-400',
+      'create': 'text-purple-400',
+      'join': 'text-cyan-400',
       'default': 'text-gray-400'
     };
     return typeMap[type.toLowerCase()] || typeMap.default;
