@@ -61,7 +61,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
     const date = new Date(parseInt(timestamp) * 1000)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short',
+      month: 'numeric',
       day: 'numeric'
     })
   }

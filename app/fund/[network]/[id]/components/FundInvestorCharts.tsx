@@ -1,22 +1,25 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { DollarSign, Coins, User } from 'lucide-react'
+import { DollarSign, Coins, User, ChevronDown, Calendar } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Image from 'next/image'
-import { useFundInvestorSnapshots } from "../hooks/useFundInvestorSnapshots"
+import { useInvestorSnapshots, InvestorSnapshotType } from "../hooks/useInvestorSnapshots"
 
 interface FundInvestorChartsProps {
   fundId: string
   investor: string
   network: 'ethereum' | 'arbitrum'
   isLoadingInvestor?: boolean
+  intervalType?: InvestorSnapshotType
 }
 
-export function FundInvestorCharts({ fundId, investor, network, isLoadingInvestor = false }: FundInvestorChartsProps) {
+export function FundInvestorCharts({ fundId, investor, network, isLoadingInvestor = false, intervalType = 'daily' }: FundInvestorChartsProps) {
   const { t, language } = useLanguage()
   
   // Format investor address for display
@@ -25,7 +28,13 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
   }
   
   // Fetch investor snapshots data
-  const { data: snapshotsData, isLoading: isLoadingSnapshots, error: snapshotsError } = useFundInvestorSnapshots(fundId, investor, network)
+  const { data: snapshotsData, isLoading: isLoadingSnapshots, error: snapshotsError } = useInvestorSnapshots({
+    fundId,
+    investor,
+    type: intervalType,
+    network,
+    first: intervalType === 'daily' ? 30 : intervalType === 'weekly' ? 12 : 12
+  })
 
   // Transform investor snapshots data for chart
   const chartData = useMemo(() => {
@@ -35,13 +44,13 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
     
     return snapshotsData.investorSnapshots.map((snapshot) => {
       const date = new Date(parseInt(snapshot.timestamp) * 1000)
-      const currentUSD = parseFloat(snapshot.currentUSD)
-      const principalUSD = parseFloat(snapshot.principalUSD)
+      const amountUSD = parseFloat(snapshot.amountUSD)
+      const profitUSD = parseFloat(snapshot.profitUSD)
       
       return {
         id: snapshot.id,
-        currentUSD,
-        principalUSD,
+        amountUSD,
+        profitUSD,
         formattedDate: formatDateWithLocale(date, language, { 
           month: 'short', 
           day: 'numeric'
@@ -55,18 +64,24 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           hour12: true
         }),
         timeLabel: (() => {
-          const [year, month, day] = date.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
+          const month = date.getMonth() + 1
+          const day = date.getDate()
+          
+          if (intervalType === 'monthly') {
+            return `${month}/${String(date.getFullYear()).slice(2)}`
+          } else {
+            return `${month}/${day}`
+          }
         })(),
         timestamp: parseInt(snapshot.timestamp),
       }
     }).sort((a, b) => a.timestamp - b.timestamp)
-  }, [snapshotsData, language])
+  }, [snapshotsData, language, intervalType])
 
   // Calculate current value (use the most recent snapshot)
   const currentValue = useMemo(() => {
     if (chartData.length > 0) {
-      const latestSnapshot = chartData[chartData.length - 1]?.currentUSD || 0
+      const latestSnapshot = chartData[chartData.length - 1]?.amountUSD || 0
       return latestSnapshot
     }
     return 0
@@ -127,7 +142,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
             </div>
           </div>
           
-          {/* Second row: Portfolio value and interval selector */}
+          {/* Second row: Portfolio value */}
           <div className="flex items-baseline justify-between gap-2 sm:gap-3">
             <div className="flex items-baseline gap-2 sm:gap-3">
               <CardTitle className="text-4xl font-bold text-gray-100">$0</CardTitle>
@@ -163,7 +178,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           </div>
         </div>
         
-        {/* Second row: Portfolio value and interval selector */}
+        {/* Second row: Portfolio value */}
         <div className="flex items-baseline justify-between gap-2 sm:gap-3">
           <div className="flex items-baseline gap-2 sm:gap-3">
             <CardTitle className="text-4xl font-bold text-gray-100">
@@ -218,7 +233,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
             />
             <Area
               type="monotone"
-              dataKey="currentUSD" 
+              dataKey="amountUSD" 
               stroke="#3b82f6"
               strokeWidth={2}
               fill="url(#valueGradient)"

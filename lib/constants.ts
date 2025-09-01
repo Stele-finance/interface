@@ -281,9 +281,14 @@ export const NETWORK_SUBGRAPHS = {
 } as const
 
 // Helper function to get subgraph URL based on network
-export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
+export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: 'fund'): string => {
   // Filter to supported networks (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+  
+  if (type === 'fund') {
+    return NETWORK_SUBGRAPHS[`${subgraphNetwork}_fund` as keyof typeof NETWORK_SUBGRAPHS]
+  }
+  
   return NETWORK_SUBGRAPHS[subgraphNetwork]
 }
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }

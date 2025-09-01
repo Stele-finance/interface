@@ -1,12 +1,12 @@
-import { getSubgraphUrl, headers } from '@/lib/constants'
 import { useQuery } from '@tanstack/react-query'
-import { gql, request } from 'graphql-request'
+import { request, gql } from 'graphql-request'
+import { getSubgraphUrl, headers } from '@/lib/constants'
 
-// GraphQL queries for different fund snapshot types
-const FUND_SNAPSHOTS_QUERY = gql`
-  query FundSnapshots($fundId: String!, $first: Int!, $orderBy: FundSnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    fundSnapshots(
-      where: { fundId: $fundId }
+// GraphQL queries for different investor snapshot types
+const INVESTOR_SNAPSHOTS_QUERY = gql`
+  query InvestorSnapshots($fundId: String!, $investor: Bytes!, $first: Int!, $orderBy: InvestorSnapshot_orderBy!, $orderDirection: OrderDirection!) {
+    investorSnapshots(
+      where: { fundId: $fundId, investor: $investor }
       first: $first
       orderBy: $orderBy
       orderDirection: $orderDirection
@@ -15,7 +15,7 @@ const FUND_SNAPSHOTS_QUERY = gql`
       timestamp
       fundId
       manager
-      investorCount
+      investor
       share
       amountUSD
       profitUSD
@@ -23,16 +23,15 @@ const FUND_SNAPSHOTS_QUERY = gql`
       tokens
       tokensSymbols
       tokensDecimals
-      tokensAmount
       tokensAmountUSD
     }
   }
 `
 
-const FUND_WEEKLY_SNAPSHOTS_QUERY = gql`
-  query FundWeeklySnapshots($fundId: String!, $first: Int!, $orderBy: FundWeeklySnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    fundWeeklySnapshots(
-      where: { fundId: $fundId }
+const INVESTOR_WEEKLY_SNAPSHOTS_QUERY = gql`
+  query InvestorWeeklySnapshots($fundId: String!, $investor: Bytes!, $first: Int!, $orderBy: InvestorWeeklySnapshot_orderBy!, $orderDirection: OrderDirection!) {
+    investorWeeklySnapshots(
+      where: { fundId: $fundId, investor: $investor }
       first: $first
       orderBy: $orderBy
       orderDirection: $orderDirection
@@ -41,7 +40,7 @@ const FUND_WEEKLY_SNAPSHOTS_QUERY = gql`
       timestamp
       fundId
       manager
-      investorCount
+      investor
       share
       amountUSD
       profitUSD
@@ -49,16 +48,15 @@ const FUND_WEEKLY_SNAPSHOTS_QUERY = gql`
       tokens
       tokensSymbols
       tokensDecimals
-      tokensAmount
       tokensAmountUSD
     }
   }
 `
 
-const FUND_MONTHLY_SNAPSHOTS_QUERY = gql`
-  query FundMonthlySnapshots($fundId: String!, $first: Int!, $orderBy: FundMonthlySnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    fundMonthlySnapshots(
-      where: { fundId: $fundId }
+const INVESTOR_MONTHLY_SNAPSHOTS_QUERY = gql`
+  query InvestorMonthlySnapshots($fundId: String!, $investor: Bytes!, $first: Int!, $orderBy: InvestorMonthlySnapshot_orderBy!, $orderDirection: OrderDirection!) {
+    investorMonthlySnapshots(
+      where: { fundId: $fundId, investor: $investor }
       first: $first
       orderBy: $orderBy
       orderDirection: $orderDirection
@@ -67,7 +65,7 @@ const FUND_MONTHLY_SNAPSHOTS_QUERY = gql`
       timestamp
       fundId
       manager
-      investorCount
+      investor
       share
       amountUSD
       profitUSD
@@ -75,18 +73,17 @@ const FUND_MONTHLY_SNAPSHOTS_QUERY = gql`
       tokens
       tokensSymbols
       tokensDecimals
-      tokensAmount
       tokensAmountUSD
     }
   }
 `
 
-export interface FundSnapshot {
+export interface InvestorSnapshot {
   id: string
   timestamp: string
   fundId: string
   manager: string
-  investorCount: string
+  investor: string
   share: string
   amountUSD: string
   profitUSD: string
@@ -94,22 +91,22 @@ export interface FundSnapshot {
   tokens: string[]
   tokensSymbols: string[]
   tokensDecimals: string[]
-  tokensAmount: string[]
   tokensAmountUSD: string[]
 }
 
-export type FundSnapshotType = 'daily' | 'weekly' | 'monthly'
+export type InvestorSnapshotType = 'daily' | 'weekly' | 'monthly'
 
-export interface UseFundSnapshotsParams {
+export interface UseInvestorSnapshotsParams {
   fundId: string
-  type: FundSnapshotType
+  investor: string
+  type: InvestorSnapshotType
   network: 'ethereum' | 'arbitrum'
   first?: number
 }
 
-export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundSnapshotsParams) {
+export function useInvestorSnapshots({ fundId, investor, type, network, first = 30 }: UseInvestorSnapshotsParams) {
   return useQuery({
-    queryKey: ['fundSnapshots', fundId, type, network, first],
+    queryKey: ['investorSnapshots', fundId, investor, type, network, first],
     queryFn: async () => {
       try {
         // Use Fund-specific subgraph URL via getSubgraphUrl helper
@@ -117,7 +114,7 @@ export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundS
         
         if (!subgraphUrl) {
           console.error('❌ No subgraph URL for network:', network)
-          return { fundSnapshots: [] }
+          return { investorSnapshots: [] }
         }
       
         let query: string
@@ -125,15 +122,15 @@ export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundS
         
         switch (type) {
           case 'daily':
-            query = FUND_SNAPSHOTS_QUERY
+            query = INVESTOR_SNAPSHOTS_QUERY
             orderBy = 'timestamp'
             break
           case 'weekly':
-            query = FUND_WEEKLY_SNAPSHOTS_QUERY
+            query = INVESTOR_WEEKLY_SNAPSHOTS_QUERY
             orderBy = 'timestamp'
             break
           case 'monthly':
-            query = FUND_MONTHLY_SNAPSHOTS_QUERY
+            query = INVESTOR_MONTHLY_SNAPSHOTS_QUERY
             orderBy = 'timestamp'
             break
           default:
@@ -142,6 +139,7 @@ export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundS
         
         const variables = {
           fundId,
+          investor: investor.toLowerCase(),
           first,
           orderBy,
           orderDirection: 'asc' as const
@@ -152,42 +150,41 @@ export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundS
         // Check if response is valid
         if (!response) {
           console.warn('GraphQL response is null or undefined')
-          return { fundSnapshots: [] }
+          return { investorSnapshots: [] }
         }
         
         // Return the appropriate data based on type
         switch (type) {
           case 'daily':
-            return { fundSnapshots: response?.fundSnapshots || [] }
+            return { investorSnapshots: response?.investorSnapshots || [] }
           case 'weekly':
-            return { fundSnapshots: response?.fundWeeklySnapshots || [] }
+            return { investorSnapshots: response?.investorWeeklySnapshots || [] }
           case 'monthly':
-            return { fundSnapshots: response?.fundMonthlySnapshots || [] }
+            return { investorSnapshots: response?.investorMonthlySnapshots || [] }
           default:
-            return { fundSnapshots: [] }
+            return { investorSnapshots: [] }
         }
       } catch (error) {
-        console.error('❌ Error fetching fund snapshots:', error)
-        return { fundSnapshots: [] }
+        console.error('❌ Error fetching investor snapshots:', error)
+        return { investorSnapshots: [] }
       }
     },
-    enabled: !!(fundId && network),
+    enabled: !!(fundId && investor && network),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
   })
 }
 
-// Helper function to format fund snapshot data for charts
-export function formatFundSnapshotDataForChart(snapshots: FundSnapshot[]) {
+// Helper function to format investor snapshot data for charts
+export function formatInvestorSnapshotDataForChart(snapshots: InvestorSnapshot[]) {
   return snapshots
     .slice()
     .map((snapshot) => ({
       date: new Date(parseInt(snapshot.timestamp) * 1000).toISOString().split('T')[0],
       timestamp: parseInt(snapshot.timestamp),
-      tvl: parseFloat(snapshot.amountUSD),
-      profit: parseFloat(snapshot.profitUSD),
+      amountUSD: parseFloat(snapshot.amountUSD),
+      profitUSD: parseFloat(snapshot.profitUSD),
       profitRatio: parseFloat(snapshot.profitRatio),
-      investorCount: parseInt(snapshot.investorCount),
       share: parseInt(snapshot.share),
     }))
 }

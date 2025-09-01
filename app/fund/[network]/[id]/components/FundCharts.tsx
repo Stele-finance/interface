@@ -7,13 +7,13 @@ import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
-import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, Coins } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, Coins, ChevronDown, Calendar } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "@/components/ui/use-toast"
-import { useFundSnapshots } from "../hooks/useFundSnapshots"
+import { useFundSnapshots, FundSnapshotType } from "../hooks/useFundSnapshots"
 
 interface FundChartsProps {
   fundId: string
@@ -43,13 +43,18 @@ interface FundChartsProps {
 export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
   const { t, language } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
-  const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
+  const [intervalType, setIntervalType] = useState<FundSnapshotType>('daily')
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
   
   // Fetch real fund snapshots data
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'arbitrum'
-  const { data: snapshotsData, isLoading: isLoadingSnapshots, error: snapshotsError } = useFundSnapshots(fundId, subgraphNetwork)
+  const { data: snapshotsData, isLoading: isLoadingSnapshots, error: snapshotsError } = useFundSnapshots({
+    fundId,
+    type: intervalType,
+    network: subgraphNetwork,
+    first: intervalType === 'daily' ? 30 : intervalType === 'weekly' ? 12 : 12
+  })
 
   // Update time every second for accurate progress
   useEffect(() => {
@@ -69,7 +74,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
     
     return snapshotsData.fundSnapshots.map((snapshot) => {
       const date = new Date(parseInt(snapshot.timestamp) * 1000)
-      const tvlUSD = parseFloat(snapshot.currentUSD)
+      const tvlUSD = parseFloat(snapshot.amountUSD)
       const investorCount = parseInt(snapshot.investorCount)
       
       return {
@@ -90,16 +95,20 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
         }),
         dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
         timeLabel: (() => {
-          // Extract month/day from dateLabel to avoid timezone issues
-          const [year, month, day] = date.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
+          const month = date.getMonth() + 1
+          const day = date.getDate()
+          
+          if (intervalType === 'monthly') {
+            return `${month}/${String(date.getFullYear()).slice(2)}`
+          } else {
+            return `${month}/${day}`
+          }
         })(),
         timestamp: parseInt(snapshot.timestamp),
-        currentETH: parseFloat(snapshot.currentETH),
-        currentTokensSymbols: snapshot.currentTokensSymbols
+        tokensSymbols: snapshot.tokensSymbols
       }
     }).sort((a, b) => a.timestamp - b.timestamp)
-  }, [snapshotsData, language])
+  }, [snapshotsData, language, intervalType])
 
   const chartData = fundChartData
 
@@ -261,28 +270,30 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
           
           {/* Interval selector - Below chart */}
           <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
-            <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-              <button
-                onClick={() => setIntervalType('daily')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  intervalType === 'daily' 
-                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('daily')}
-              </button>
-              <button
-                onClick={() => setIntervalType('weekly')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  intervalType === 'weekly' 
-                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('weekly')}
-              </button>
-            </div>
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  <Calendar className="h-4 w-4" />
+                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                <DropdownMenuItem onClick={() => setIntervalType('daily')}>
+                  {t('daily')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
+                  {t('weekly')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                  {t('monthly')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Separator Bar - Below daily/weekly buttons, chart width */}
@@ -335,35 +346,64 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
               </div>
             </div>
             
-            {/* Second row: $72K amount + Share button */}
+            {/* Second row: $72K amount + Interval selector + Share button */}
             <div className="flex items-baseline justify-between gap-3 mt-2">
               <CardTitle className="text-4xl font-bold text-gray-100">
                 ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </CardTitle>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
-                  <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
-                    <Copy className="mr-2 h-4 w-4" />
-                    {t('copyLink')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
-                    <Image 
-                      src="/x.png" 
-                      alt="X (Twitter)"
-                      width={16}
-                      height={16}
-                      className="mr-2"
-                    />
-                    {t('shareToTwitter')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                {/* Interval selector */}
+                <DropdownMenu modal={true}>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[28px]"
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
+                      <Calendar className="h-3 w-3" />
+                      {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-24 bg-muted/80 border-gray-600 z-[60]">
+                    <DropdownMenuItem onClick={() => setIntervalType('daily')}>
+                      {t('daily')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
+                      {t('weekly')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                      {t('monthly')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                {/* Share button */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+                    <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                      <Copy className="mr-2 h-4 w-4" />
+                      {t('copyLink')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                      <Image 
+                        src="/x.png" 
+                        alt="X (Twitter)"
+                        width={16}
+                        height={16}
+                        className="mr-2"
+                      />
+                      {t('shareToTwitter')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
           
@@ -487,28 +527,30 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
         
         {/* Interval selector - Below chart */}
         <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-20">
-          <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-            <button
-              onClick={() => setIntervalType('daily')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                intervalType === 'daily' 
-                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-              }`}
-            >
-              {t('daily')}
-            </button>
-            <button
-              onClick={() => setIntervalType('weekly')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                intervalType === 'weekly' 
-                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-              }`}
-            >
-              {t('weekly')}
-            </button>
-          </div>
+          <DropdownMenu modal={true}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <Calendar className="h-4 w-4" />
+                {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+              <DropdownMenuItem onClick={() => setIntervalType('daily')}>
+                {t('daily')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
+                {t('weekly')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                {t('monthly')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         {/* Separator Bar - Below daily/weekly buttons, chart width */}

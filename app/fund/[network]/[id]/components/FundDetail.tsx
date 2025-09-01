@@ -786,22 +786,27 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                         <div className="font-medium text-gray-100">
                                           {transaction.value.startsWith('$') ? transaction.value : `$${transaction.value}`}
                                         </div>
-                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee') && transaction.symbol ? (
+                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee' || transaction.type.toLowerCase() === 'withdrawfee') && transaction.symbol ? (
                                         <div className="flex items-center gap-2 justify-end">
+                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                            {transaction.value}
+                                          </span>
                                           <div className="relative flex-shrink-0">
                                             {(() => {
-                                              const tokenLogo = getTokenLogo(transaction.token || transaction.symbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                              const tokenSymbol = transaction.symbol || ''
+                                              const tokenAddress = transaction.token || tokenSymbol
+                                              const tokenLogo = getTokenLogo(tokenAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
                                               return tokenLogo ? (
                                                 <Image 
                                                   src={tokenLogo} 
-                                                  alt={transaction.symbol || 'Token'}
+                                                  alt={tokenSymbol || 'Token'}
                                                   width={20}
                                                   height={20}
                                                   className="rounded-full"
                                                 />
                                               ) : (
                                                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
-                                                  {transaction.symbol?.slice(0, 1) || '?'}
+                                                  {tokenSymbol?.slice(0, 1) || '?'}
                                                 </div>
                                               )
                                             })()}
@@ -818,9 +823,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                               </div>
                                             )}
                                           </div>
-                                          <span className="text-sm md:text-base font-medium text-gray-100 truncate">
-                                            {transaction.value}
-                                          </span>
                                         </div>
                                       ) : (
                                         <div className="font-medium text-gray-100">{transaction.value || '-'}</div>

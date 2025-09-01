@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Users, DollarSign, ChevronDown } from 'lucide-react'
+import { Users, DollarSign, ChevronDown, Calendar } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
 import { formatDateWithLocale } from '@/lib/utils'
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { useInfoSnapshots, formatSnapshotDataForChart, SnapshotType } from '../hooks/useInfoSnapshots'
 
 interface ChartDataPoint {
   id: string
@@ -35,101 +36,52 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   
   const [activeIndexTvl, setActiveIndexTvl] = useState<number | null>(null)
   const [activeIndexInvestors, setActiveIndexInvestors] = useState<number | null>(null)
-  const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
+  const [intervalType, setIntervalType] = useState<SnapshotType>('daily')
   const [chartType, setChartType] = useState<'tvl' | 'investors'>('tvl')
 
-  const dailyChartData = useMemo(() => {
-    // Static mock data for fund dashboard to avoid hydration issues
-    const staticTvlValues = [
-      12500000, 12750000, 12400000, 13100000, 12900000, 13300000, 13500000, 13200000, 13800000, 13600000,
-      14000000, 13900000, 14200000, 14500000, 14300000, 14700000, 14900000, 14600000, 15000000, 14800000,
-      15200000, 15100000, 15400000, 15600000, 15300000, 15800000, 15500000, 15900000, 16100000, 16000000
-    ]
-    
-    const staticInvestorValues = [
-      850, 865, 840, 890, 875, 905, 920, 900, 935, 925,
-      950, 945, 960, 975, 970, 985, 995, 980, 1000, 990,
-      1010, 1005, 1020, 1035, 1025, 1040, 1030, 1050, 1065, 1060
-    ]
-    
-    const data = []
-    const now = new Date()
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(now)
-      date.setDate(date.getDate() - i)
-      
-      data.push({
-        id: `daily-${i}`,
-        tvl: staticTvlValues[29 - i],
-        investors: staticInvestorValues[29 - i],
-        formattedDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
-          day: 'numeric'
-        }),
-        fullDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
-          day: 'numeric',
-          year: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }),
-        dateLabel: date.toISOString().split('T')[0],
-        timeLabel: (() => {
-          const [year, month, day] = date.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
-        })()
-      })
-    }
-    return data
-  }, [language])
+  // Fetch snapshot data based on interval type
+  const { data: snapshotData, isLoading, error } = useInfoSnapshots({
+    type: intervalType,
+    network: subgraphNetwork,
+    first: intervalType === 'daily' ? 30 : intervalType === 'weekly' ? 12 : 12 // 30 days, 12 weeks, or 12 months
+  })
 
-  const weeklyChartData = useMemo(() => {
-    // Static mock data for fund dashboard to avoid hydration issues
-    const staticWeeklyTvl = [
-      11500000, 12000000, 12800000, 13200000, 13700000, 14100000, 
-      14600000, 15000000, 15400000, 15800000, 16200000, 16000000
-    ]
+  // Process snapshot data for charts
+  const currentChartData = useMemo(() => {
+    if (!snapshotData || snapshotData.length === 0) return []
     
-    const staticWeeklyInvestors = [
-      820, 840, 870, 900, 930, 960, 990, 1020, 1050, 1080, 1110, 1060
-    ]
+    const formattedData = formatSnapshotDataForChart(snapshotData)
     
-    const data = []
-    const now = new Date()
-    for (let i = 11; i >= 0; i--) {
-      const date = new Date(now)
-      date.setDate(date.getDate() - (i * 7))
-      
-      data.push({
-        id: `weekly-${i}`,
-        tvl: staticWeeklyTvl[11 - i],
-        investors: staticWeeklyInvestors[11 - i],
-        formattedDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
-          day: 'numeric'
-        }),
-        fullDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
-          day: 'numeric',
-          year: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }),
-        dateLabel: date.toISOString().split('T')[0],
-        timeLabel: (() => {
-          const [year, month, day] = date.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
-        })()
-      })
-    }
-    return data
-  }, [language])
-
-  const currentChartData = intervalType === 'daily' ? dailyChartData : weeklyChartData
-  const isLoading = false // Using mock data
-  const error = null
+    return formattedData.map((item, index) => ({
+      id: `${intervalType}-${index}`,
+      tvl: item.tvl,
+      investors: item.investorCount,
+      formattedDate: formatDateWithLocale(new Date(item.timestamp * 1000), language, { 
+        month: 'short', 
+        day: 'numeric'
+      }),
+      fullDate: formatDateWithLocale(new Date(item.timestamp * 1000), language, { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
+      dateLabel: item.date,
+      timeLabel: (() => {
+        const date = new Date(item.timestamp * 1000)
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+        
+        if (intervalType === 'monthly') {
+          return `${month}/${String(date.getFullYear()).slice(2)}`
+        } else {
+          return `${month}/${day}`
+        }
+      })()
+    }))
+  }, [snapshotData, intervalType, language])
 
   // Calculate total values for headers (use the most recent snapshot)
   const totalTvl = useMemo(() => {
@@ -158,7 +110,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
     return null
   }
 
-  if (isLoading) {
+  if (isLoading || !snapshotData) {
     return (
       <div className="mb-6">
         <Card className="bg-transparent border-0">
@@ -219,31 +171,31 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              {/* Daily/Weekly selector */}
-              <div className="flex items-center space-x-2">
-                <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setIntervalType('daily')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'daily' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
+              {/* Time interval dropdown */}
+              <DropdownMenu modal={true}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
                   >
+                    <Calendar className="h-4 w-4" />
+                    {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={() => setIntervalType('daily')}>
                     {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setIntervalType('weekly')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'weekly' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
                     {t('weekly')}
-                  </button>
-                </div>
-              </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                    {t('monthly')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
@@ -368,31 +320,31 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            {/* Daily/Weekly selector */}
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setIntervalType('daily')}
-                  className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'daily' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
+            {/* Time interval dropdown */}
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                  onMouseDown={(e) => e.preventDefault()}
                 >
+                  <Calendar className="h-4 w-4" />
+                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                <DropdownMenuItem onClick={() => setIntervalType('daily')}>
                   {t('daily')}
-                </button>
-                <button
-                  onClick={() => setIntervalType('weekly')}
-                  className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'weekly' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
                   {t('weekly')}
-                </button>
-              </div>
-            </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                  {t('monthly')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardContent>
       </Card>

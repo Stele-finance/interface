@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useState, use, useEffect, useCallback } from "react"
+import React, { useState, use, useEffect, useCallback, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { ArrowLeft, BarChart3, Activity, Users, Loader2, Receipt, ArrowRight, ChevronDown, Calendar } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
@@ -19,6 +21,10 @@ import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/components/ui/use-toast"
 import { FundErrorState } from "./components/FundErrorState"
 import { FundActionTabs } from "./components/FundActionTabs"
+import { PieChart } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
+import { getTokenLogo } from "@/lib/utils"
 
 interface FundInvestorPageProps {
   params: Promise<{
@@ -71,8 +77,149 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   const [isClient, setIsClient] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
+  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [isMounted, setIsMounted] = useState(false)
+  const [currentTransactionPage, setCurrentTransactionPage] = useState(1)
+
+  // Helper functions for transaction formatting
+  const formatRelativeTime = (timestamp: number) => {
+    const now = new Date().getTime()
+    const transactionTime = timestamp * 1000
+    const diffInSeconds = Math.floor((now - transactionTime) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}${t('secondShort')}`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes}${t('minuteShort')}`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours}${t('hourShort')}`
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days}${t('dayShort')}`
+    } else if (diffInSeconds < 2592000) {
+      const weeks = Math.floor(diffInSeconds / 604800)
+      return `${weeks}${t('weekShort')}`
+    } else {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months}${t('monthShort')}`
+    }
+  }
+
+  const getTransactionTypeColor = (type: string) => {
+    const typeMap: { [key: string]: string } = {
+      'deposit': 'text-green-400',
+      'withdraw': 'text-red-400',
+      'withdrawfee': 'text-orange-400',
+      'depositfee': 'text-yellow-400',
+      'swap': 'text-blue-400',
+      'create': 'text-purple-400',
+      'join': 'text-cyan-400',
+      'default': 'text-gray-400'
+    };
+    return typeMap[type.toLowerCase()] || typeMap.default;
+  }
+
+  const getTransactionTypeText = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'deposit':
+        return t('deposit') || 'Deposit';
+      case 'withdraw': 
+        return t('withdraw') || 'Withdraw';
+      case 'withdrawfee':
+        return t('withdrawFee') || 'Withdraw Fee';
+      case 'depositfee':
+        return t('depositFee') || 'Deposit Fee';
+      case 'swap':
+        return t('swap') || 'Swap';
+      case 'create':
+        return t('create') || 'Create';
+      case 'join':
+        return t('join') || 'Join';
+      default:
+        return type;
+    }
+  }
+
+  const formatUserAddress = (address: string) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
+
+  // Get investor data if available
+  const investor = fundInvestorData?.investor
+  const isInvestor = !!investor
+  
+  // Get investable token prices for portfolio calculation
+  const { data: tokensWithPrices } = useInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
+
+  // Calculate portfolio data from investor tokens
+  const portfolioData = useMemo(() => {
+    if (!investor || !investor.tokensSymbols || !investor.tokensAmount || !tokensWithPrices) {
+      return {
+        tokens: [],
+        totalValue: investor ? parseFloat(investor.amountUSD || '0') : 0,
+        colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+      }
+    }
+
+    const tokens = investor.tokensSymbols.map((symbol, index) => {
+      // tokensAmount is already formatted as BigDecimal from subgraph
+      const actualAmount = parseFloat(investor.tokensAmount?.[index] || '0')
+      
+      // Find price from tokensWithPrices
+      const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
+      const price = tokenWithPrice?.price || 0
+      const value = actualAmount * price
+
+      return {
+        symbol,
+        amount: actualAmount,
+        value,
+        price,
+        percentage: 0 // Will be calculated after total
+      }
+    }).filter(token => token.amount > 0)
+
+    // Use amountUSD from investor data directly for total value
+    const totalValue = parseFloat(investor.amountUSD || '0')
+    
+    // Calculate sum of token values for percentage calculation
+    const tokenValueSum = tokens.reduce((sum, token) => sum + token.value, 0)
+    
+    // Calculate percentages based on token value sum to ensure they add to 100%
+    if (tokens.length === 1) {
+      // If only one token, it should be 100%
+      tokens[0].percentage = 100
+    } else if (tokenValueSum > 0) {
+      // Calculate percentages and ensure they sum to 100%
+      let totalPercentage = 0
+      tokens.forEach((token, index) => {
+        if (index === tokens.length - 1) {
+          // Last token gets the remainder to ensure exactly 100%
+          token.percentage = 100 - totalPercentage
+        } else {
+          token.percentage = (token.value / tokenValueSum) * 100
+          totalPercentage += token.percentage
+        }
+      })
+    } else {
+      // No value, all percentages are 0
+      tokens.forEach(token => {
+        token.percentage = 0
+      })
+    }
+
+    // Sort by value descending
+    tokens.sort((a, b) => b.value - a.value)
+
+    return {
+      tokens,
+      totalValue,
+      colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+    }
+  }, [investor, tokensWithPrices])
 
   // Calculate real-time portfolio value based on fund investor data
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -116,10 +263,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
 
     return () => clearInterval(timeInterval);
   }, [isClient]);
-
-  // Get investor data if available
-  const investor = fundInvestorData?.investor
-  const isInvestor = !!investor
   
   // Check if the connected wallet is the fund manager
   const fundManager = fundData?.fund?.manager
@@ -225,6 +368,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 investor={walletAddress}
                 network={subgraphNetwork as 'ethereum' | 'arbitrum'}
                 isLoadingInvestor={isLoadingInvestor}
+                intervalType={chartInterval}
               />
             ) : (
               <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-8">
@@ -235,34 +379,38 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
               </div>
             )}
             
-            {/* Interval selector */}
-            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
-                <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setChartInterval('daily')}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      chartInterval === 'daily' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
+            {/* Interval selector - Below chart */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8">
+              <DropdownMenu modal={true}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
                   >
+                    <Calendar className="h-4 w-4" />
+                    {chartInterval === 'daily' ? t('daily') : chartInterval === 'weekly' ? t('weekly') : t('monthly')}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={() => setChartInterval('daily')}>
                     {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setChartInterval('weekly')}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      chartInterval === 'weekly' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('weekly')}>
                     {t('weekly')}
-                  </button>
-                </div>
-              </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('monthly')}>
+                    {t('monthly')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             
-            {/* Separator Bar */}
-            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
+            {/* Separator Bar - Below dropdown, chart width */}
+            <div className="pr-6 md:mr-2 -mr-4 mb-4 pt-2">
+              <div className="border-t border-gray-600/50"></div>
+            </div>
               
             {/* Tabs section */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
@@ -285,29 +433,97 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                   
                 <TabsContent value="portfolio" className="space-y-4">
                   <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-100 mb-4">Portfolio Details</h4>
-                    {investor ? (
-                      <div className="space-y-3">
-                        {investor.tokensSymbols?.length > 0 ? (
-                          investor.tokensSymbols.map((symbol, index) => (
-                            <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700/30 last:border-b-0">
-                              <span className="text-gray-300">{symbol}</span>
-                              <span className="text-gray-100">
-                                {investor.tokensAmount?.[index] 
-                                  ? parseFloat(investor.tokensAmount[index]).toLocaleString(undefined, { 
-                                      minimumFractionDigits: 0, 
-                                      maximumFractionDigits: 6 
-                                    })
-                                  : '0'
-                                }
-                              </span>
+                    <h4 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                      <PieChart className="h-5 w-5" />
+                      Portfolio
+                    </h4>
+                    
+                    {portfolioData.tokens.length > 0 ? (
+                      <>
+                        {/* Pie Chart */}
+                        <div className="flex items-center justify-center mb-6">
+                          <div className="relative w-40 h-40">
+                            {/* Dynamic CSS pie chart using conic-gradient */}
+                            <div 
+                              className="w-full h-full rounded-full"
+                              style={{
+                                background: `conic-gradient(
+                                  from 0deg,
+                                  ${(() => {
+                                    let currentDegree = 0
+                                    return portfolioData.tokens.map((token, index) => {
+                                      const startDegree = currentDegree
+                                      const endDegree = currentDegree + (token.percentage / 100) * 360
+                                      currentDegree = endDegree
+                                      const color = portfolioData.colors[index % portfolioData.colors.length]
+                                      return `${color} ${startDegree}deg ${endDegree}deg`
+                                    }).join(', ')
+                                  })()}
+                                )`
+                              }}
+                            />
+                            {/* Center hole */}
+                            <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-white">
+                                  ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </div>
+                                <div className="text-xs text-gray-400">Total Value</div>
+                              </div>
                             </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-4 text-gray-400">
-                            <p>No tokens in your portfolio</p>
                           </div>
-                        )}
+                        </div>
+
+                        {/* Legend */}
+                        <div className="space-y-3">
+                          {portfolioData.tokens.map((token, index) => (
+                            <div key={token.symbol} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full"
+                                  style={{ 
+                                    backgroundColor: portfolioData.colors[index % portfolioData.colors.length] 
+                                  }}
+                                ></div>
+                                <span className="text-sm text-gray-300">{token.symbol}</span>
+                                <span className="text-xs text-gray-500">
+                                  ({token.amount < 0.0001 && token.amount > 0 
+                                    ? '<0.0001' 
+                                    : token.amount.toLocaleString(undefined, { 
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: token.amount < 1 ? 6 : 4 
+                                      })})
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm text-white font-medium">
+                                  {token.percentage.toFixed(1)}%
+                                </div>
+                                <div className="text-xs text-green-400">
+                                  ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : investor ? (
+                      <div className="text-center py-8">
+                        <div className="flex items-center justify-center mb-6">
+                          <div className="relative w-40 h-40">
+                            <div className="w-full h-full rounded-full bg-gray-800 border-2 border-gray-700"></div>
+                            <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-white">
+                                  ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </div>
+                                <div className="text-xs text-gray-400">Total Value</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-400">No token holdings yet</p>
+                        <p className="text-xs text-gray-500 mt-1">Portfolio composition will appear here</p>
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-400">
@@ -318,69 +534,263 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 </TabsContent>
 
                 <TabsContent value="transactions" className="space-y-4">
-                  <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-100 mb-4">Transactions</h4>
-                    
-                    {isLoadingTransactions ? (
-                      <div className="text-center py-8">
-                        <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin text-gray-400" />
-                        <p className="text-gray-400">Loading transactions...</p>
-                      </div>
-                    ) : transactionsError ? (
-                      <div className="text-center py-8 text-gray-400">
-                        <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Error loading transactions</p>
-                      </div>
-                    ) : fundTransactions.length > 0 ? (
-                      <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {fundTransactions.map((transaction) => (
-                          <div key={transaction.id} className="flex justify-between items-center py-3 px-4 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800/70 transition-colors">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                                  transaction.type === 'deposit' ? 'bg-green-500/20 text-green-400' :
-                                  transaction.type === 'withdraw' ? 'bg-red-500/20 text-red-400' :
-                                  transaction.type === 'swap' ? 'bg-blue-500/20 text-blue-400' :
-                                  transaction.type === 'join' ? 'bg-purple-500/20 text-purple-400' :
-                                  transaction.type === 'create' ? 'bg-yellow-500/20 text-yellow-400' :
-                                  'bg-gray-500/20 text-gray-400'
-                                }`}>
-                                  {transaction.type.toUpperCase()}
-                                </span>
-                                {transaction.amount && (
-                                  <span className="text-sm font-medium text-gray-200">
-                                    {transaction.amount}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-300">{transaction.details}</p>
-                              <p className="text-xs text-gray-500">
-                                {new Date(transaction.timestamp * 1000).toLocaleString()}
-                              </p>
-                            </div>
-                            <div className="flex-shrink-0">
-                              <button 
-                                onClick={() => {
-                                  const explorerUrl = subgraphNetwork === 'arbitrum' 
-                                    ? `https://arbiscan.io/tx/${transaction.transactionHash}`
-                                    : `https://etherscan.io/tx/${transaction.transactionHash}`
-                                  window.open(explorerUrl, '_blank')
-                                }}
-                                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                              >
-                                View Tx
-                              </button>
+                  <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+                    <CardContent className="p-0">
+                      {isLoadingTransactions ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                          <span className="ml-2 text-gray-400">{t('loadingTransactions')}</span>
+                        </div>
+                      ) : transactionsError ? (
+                        <div className="text-center py-8 text-red-400">
+                          <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p className="font-medium">Error loading transactions</p>
+                          <p className="text-sm text-gray-400 mt-2">Please try again later</p>
+                        </div>
+                      ) : fundTransactions.length > 0 ? (
+                        <>
+                          <div className="overflow-x-auto">
+                            <div className="min-w-[500px]">
+                              <table className="w-full">
+                                <thead>
+                                  <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('time')}</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('type')}</th>
+                                    <th className="text-left py-3 px-10 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
+                                    <th className="text-right py-3 px-20 sm:px-40 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {(() => {
+                                    // Calculate pagination
+                                    const itemsPerPage = 5;
+                                    const maxPages = 5;
+                                    const totalTransactions = Math.min(fundTransactions.length, maxPages * itemsPerPage);
+                                    const startIndex = (currentTransactionPage - 1) * itemsPerPage;
+                                    const endIndex = Math.min(startIndex + itemsPerPage, totalTransactions);
+                                    const paginatedTransactions = fundTransactions.slice(startIndex, endIndex);
+
+                                    return paginatedTransactions.map((transaction) => (
+                                      <tr 
+                                        key={transaction.id} 
+                                        className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                                        onClick={() => {
+                                          const explorerUrl = subgraphNetwork === 'arbitrum' 
+                                            ? `https://arbiscan.io/tx/${transaction.transactionHash}`
+                                            : `https://etherscan.io/tx/${transaction.transactionHash}`
+                                          window.open(explorerUrl, '_blank')
+                                        }}
+                                      >
+                                        <td className="py-6 pl-6 pr-4">
+                                          <div className="text-sm text-gray-400">
+                                            {formatRelativeTime(transaction.timestamp)}
+                                          </div>
+                                        </td>
+                                        <td className="py-6 px-4">
+                                          <div className={`font-medium whitespace-nowrap ${getTransactionTypeColor(transaction.type)}`}>
+                                            {getTransactionTypeText(transaction.type)}
+                                          </div>
+                                        </td>
+                                        <td className="py-6 px-4">
+                                          <div className="text-gray-300 text-sm">
+                                            {formatUserAddress(walletAddress)}
+                                          </div>
+                                        </td>
+                                        <td className="py-6 px-6">
+                                          <div className="text-right">
+                                            {transaction.type === 'Swap' || transaction.type === 'swap' ? (
+                                              <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                  <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                                    {transaction.amountIn}
+                                                  </span>
+                                                  <div className="relative flex-shrink-0">
+                                                    {(() => {
+                                                      const fromLogo = getTokenLogo(transaction.tokenIn || transaction.tokenInSymbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                                      return fromLogo ? (
+                                                        <Image 
+                                                          src={fromLogo} 
+                                                          alt={transaction.tokenInSymbol || 'Token'}
+                                                          width={20}
+                                                          height={20}
+                                                          className="rounded-full"
+                                                        />
+                                                      ) : (
+                                                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                          {transaction.tokenInSymbol?.slice(0, 1) || '?'}
+                                                        </div>
+                                                      )
+                                                    })()}
+                                                    {subgraphNetwork === 'arbitrum' && (
+                                                      <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                        <Image 
+                                                          src="/networks/small/arbitrum.png" 
+                                                          alt="Arbitrum One"
+                                                          width={10}
+                                                          height={10}
+                                                          className="rounded-full"
+                                                          style={{ width: 'auto', height: 'auto' }}
+                                                        />
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                                <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                  <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                                    {transaction.amountOut}
+                                                  </span>
+                                                  <div className="relative flex-shrink-0">
+                                                    {(() => {
+                                                      const toLogo = getTokenLogo(transaction.tokenOut || transaction.tokenOutSymbol || '', subgraphNetwork as 'ethereum' | 'arbitrum')
+                                                      return toLogo ? (
+                                                        <Image 
+                                                          src={toLogo} 
+                                                          alt={transaction.tokenOutSymbol || 'Token'}
+                                                          width={20}
+                                                          height={20}
+                                                          className="rounded-full"
+                                                        />
+                                                      ) : (
+                                                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                                                          {transaction.tokenOutSymbol?.slice(0, 1) || '?'}
+                                                        </div>
+                                                      )
+                                                    })()}
+                                                    {subgraphNetwork === 'arbitrum' && (
+                                                      <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                        <Image 
+                                                          src="/networks/small/arbitrum.png" 
+                                                          alt="Arbitrum One"
+                                                          width={10}
+                                                          height={10}
+                                                          className="rounded-full"
+                                                          style={{ width: 'auto', height: 'auto' }}
+                                                        />
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              <div className="flex items-center gap-2 justify-end">
+                                                {(() => {
+                                                  // Extract amount and token symbol from transaction data
+                                                  let displayAmount = transaction.amount || '';
+                                                  let tokenSymbol = transaction.symbol || '';
+                                                  
+                                                  // If amount includes token symbol, split them
+                                                  if (displayAmount && displayAmount.includes(' ')) {
+                                                    const parts = displayAmount.split(' ');
+                                                    displayAmount = parts[0];
+                                                    tokenSymbol = tokenSymbol || parts[1];
+                                                  }
+                                                  
+                                                  // For deposit/withdraw, use the token field if available
+                                                  const tokenAddress = transaction.token || tokenSymbol;
+                                                  
+                                                  return (
+                                                    <>
+                                                      <span className="text-sm md:text-base font-medium text-gray-100 truncate">
+                                                        {displayAmount || transaction.details || '-'}
+                                                      </span>
+                                                      {tokenSymbol && (
+                                                        <div className="relative flex-shrink-0">
+                                                          {(() => {
+                                                            const tokenLogo = getTokenLogo(tokenAddress || tokenSymbol, subgraphNetwork as 'ethereum' | 'arbitrum')
+                                                            return tokenLogo ? (
+                                                              <Image 
+                                                                src={tokenLogo} 
+                                                                alt={tokenSymbol}
+                                                                width={20}
+                                                                height={20}
+                                                                className="rounded-full"
+                                                              />
+                                                            ) : (
+                                                              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                                {tokenSymbol.slice(0, 1)}
+                                                              </div>
+                                                            )
+                                                          })()}
+                                                          {subgraphNetwork === 'arbitrum' && (
+                                                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                                              <Image 
+                                                                src="/networks/small/arbitrum.png" 
+                                                                alt="Arbitrum One"
+                                                                width={10}
+                                                                height={10}
+                                                                className="rounded-full"
+                                                                style={{ width: 'auto', height: 'auto' }}
+                                                              />
+                                                            </div>
+                                                          )}
+                                                        </div>
+                                                      )}
+                                                    </>
+                                                  );
+                                                })()}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ));
+                                  })()}
+                                </tbody>
+                              </table>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-400">
-                        <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>No transactions found for this investor</p>
-                      </div>
-                    )}
-                  </div>
+                          
+                          {/* Pagination */}
+                          {(() => {
+                            const itemsPerPage = 5;
+                            const maxPages = 5;
+                            const totalTransactions = Math.min(fundTransactions.length, maxPages * itemsPerPage);
+                            const totalPages = Math.min(Math.ceil(totalTransactions / itemsPerPage), maxPages);
+                            
+                            return totalPages > 1 && (
+                              <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                                <Pagination>
+                                  <PaginationContent>
+                                    <PaginationItem>
+                                      <PaginationPrevious 
+                                        onClick={() => setCurrentTransactionPage(Math.max(1, currentTransactionPage - 1))}
+                                        className={currentTransactionPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                      />
+                                    </PaginationItem>
+                                    
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                      <PaginationItem key={page}>
+                                        <PaginationLink
+                                          onClick={() => setCurrentTransactionPage(page)}
+                                          isActive={currentTransactionPage === page}
+                                          className="cursor-pointer hover:bg-gray-700"
+                                        >
+                                          {page}
+                                        </PaginationLink>
+                                      </PaginationItem>
+                                    ))}
+                                    
+                                    <PaginationItem>
+                                      <PaginationNext 
+                                        onClick={() => setCurrentTransactionPage(Math.min(totalPages, currentTransactionPage + 1))}
+                                        className={currentTransactionPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                                      />
+                                    </PaginationItem>
+                                  </PaginationContent>
+                                </Pagination>
+                              </div>
+                            );
+                          })()}
+                        </>
+                      ) : (
+                        <div className="text-center py-8 text-gray-400">
+                          <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No transactions found for this investor</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowUpDown, ArrowDownCircle, ArrowUpCircle, DollarSign, Loader2, PieChart } from "lucide-react"
+import { ArrowUpDown, ArrowDownCircle, DollarSign, Loader2, PieChart } from "lucide-react"
 import { AssetSwap } from "@/app/swap/components/AssetSwap"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
@@ -520,7 +520,7 @@ export function FundActionTabs({
           console.log(`Collecting fees for ${token.symbol} (${token.address})`)
           
           // Try to estimate gas first
-          let gasLimit = 2000000n // Default gas limit
+          let gasLimit = BigInt(2000000) // Default gas limit
           try {
             const estimatedGas = await steleFundContract.withdrawFee.estimateGas(
               fundId,
@@ -528,7 +528,7 @@ export function FundActionTabs({
               10000 // 100% in basis points
             )
             // Add 20% buffer to estimated gas
-            gasLimit = estimatedGas * 120n / 100n
+            gasLimit = estimatedGas * BigInt(120) / BigInt(100)
             console.log(`Estimated gas for ${token.symbol}:`, estimatedGas.toString())
           } catch (estimateError: any) {
             console.warn(`Gas estimation failed for ${token.symbol}:`, estimateError)
@@ -754,7 +754,6 @@ export function FundActionTabs({
               value="swap" 
               className="flex items-center gap-2 rounded-full data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
             >
-              <ArrowUpDown className="h-4 w-4" />
               Swap
             </TabsTrigger>
           )}
@@ -770,7 +769,6 @@ export function FundActionTabs({
             value="withdraw" 
             className="flex items-center gap-2 rounded-full data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
           >
-            <ArrowUpCircle className="h-4 w-4" />
             Withdraw
           </TabsTrigger>
           
@@ -915,16 +913,28 @@ export function FundActionTabs({
         {/* Withdraw Tab Content */}
         <TabsContent value="withdraw" className="space-y-4">
           <div>
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <label className="text-sm font-medium text-gray-300">
-                    Withdraw Percentage
-                  </label>
-                  <span className="text-lg font-semibold text-orange-400">
-                    {withdrawAmount}%
-                  </span>
+            {fundUserTokens.length === 0 ? (
+              <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-8">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
+                    <ArrowDownCircle className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-200 mb-2">No Portfolio Found</h3>
+                  </div>
                 </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="text-sm font-medium text-gray-300">
+                      Withdraw Percentage
+                    </label>
+                    <span className="text-lg font-semibold text-orange-400">
+                      {withdrawAmount}%
+                    </span>
+                  </div>
                 
                 {/* Percentage Slider */}
                 <div className="relative mb-6">
@@ -1024,6 +1034,7 @@ export function FundActionTabs({
                 </button>
               </div>
             </div>
+            )}
           </div>
         </TabsContent>
         
@@ -1071,7 +1082,7 @@ export function FundActionTabs({
                 <div className="space-y-4">
                   <button 
                     onClick={handleCollectFees}
-                    disabled={isCollectingFees}
+                    disabled={isCollectingFees || feePortfolioData.tokens.length === 0}
                     className="w-full px-6 py-3 text-lg font-semibold bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white rounded-2xl transition-colors disabled:cursor-not-allowed"
                   >
                     {isCollectingFees ? (
