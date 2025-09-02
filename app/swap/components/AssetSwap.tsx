@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
-import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
+import { useTokenPrices } from "@/lib/token-price-context"
 import { useInvestableTokensForSwap } from "@/app/hooks/useInvestableTokens"
 import { useFundSettings } from "@/app/hooks/useFundSettings"
 import { toast } from "@/components/ui/use-toast"
@@ -92,21 +92,18 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) => 
     getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
 
-  // Use new cached hook to get prices for selected tokens only
-  const {
-    fromTokenPrice,
-    toTokenPrice,
-    isLoading,
-    error,
-    calculateSimpleSwapQuote,
-    refetch
-  } = useSwapTokenPricesIndependent(
-    fromToken,
-    toToken,
-    getTokenAddressUtil,
-    getTokenDecimalsUtil,
-    subgraphNetwork
-  );
+  // Get token prices from global context
+  const { getTokenPriceBySymbol, isLoading, error, refetch } = useTokenPrices()
+  
+  // Get individual token prices
+  const fromTokenPrice = fromToken ? getTokenPriceBySymbol(fromToken)?.priceUSD || 0 : 0
+  const toTokenPrice = toToken ? getTokenPriceBySymbol(toToken)?.priceUSD || 0 : 0
+  
+  // Simple swap quote calculator (used by the component)
+  const calculateSimpleSwapQuote = useCallback((amount: number) => {
+    if (!fromTokenPrice || !toTokenPrice || amount <= 0) return 0
+    return (amount * fromTokenPrice) / toTokenPrice
+  }, [fromTokenPrice, toTokenPrice])
 
   // Create compatible priceData structure for existing code
   const priceData = useMemo<PriceData | null>(() => {

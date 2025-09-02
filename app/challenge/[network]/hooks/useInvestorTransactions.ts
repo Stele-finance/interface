@@ -37,12 +37,12 @@ const GET_INVESTOR_TRANSACTIONS_QUERY = `
       user
       tokenIn
       tokenInSymbol
-      tokenOut
-      tokenOutSymbol
       tokenInAmount
       tokenInPriceUSD
-      tokenOutPriceUSD
+      tokenOut
+      tokenOutSymbol
       tokenOutAmount
+      tokenOutPriceUSD
       blockTimestamp
       transactionHash
     }

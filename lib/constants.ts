@@ -273,9 +273,9 @@ export const STELE_DECIMALS = 18;
 
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
-  ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
-  // arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
-  arbitrum: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest',
+  // Use Studio subgraphs for both networks (they have consistent schema)
+  ethereum_challenge: 'https://api.studio.thegraph.com/query/110372/stele/version/latest',
+  arbitrum_challenge: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest',
   ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund/version/latest',
   arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const
@@ -289,7 +289,8 @@ export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: '
     return NETWORK_SUBGRAPHS[`${subgraphNetwork}_fund` as keyof typeof NETWORK_SUBGRAPHS]
   }
   
-  return NETWORK_SUBGRAPHS[subgraphNetwork]
+  // Return challenge subgraph by default
+  return NETWORK_SUBGRAPHS[`${subgraphNetwork}_challenge` as keyof typeof NETWORK_SUBGRAPHS]
 }
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"

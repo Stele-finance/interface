@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { request, gql } from 'graphql-request'
 import { getSubgraphUrl, headers } from '@/lib/constants'
 
-// GraphQL queries for different snapshot types
+// GraphQL queries for different snapshot types - orderBy as direct parameter
 const INFO_SNAPSHOTS_QUERY = gql`
-  query InfoSnapshots($first: Int!, $orderBy: InfoSnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    infoSnapshots(first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
+  query InfoSnapshots($first: Int!, $orderDirection: OrderDirection!) {
+    infoSnapshots(first: $first, orderBy: timestamp, orderDirection: $orderDirection) {
       id
       timestamp
       fundCount
@@ -16,8 +16,8 @@ const INFO_SNAPSHOTS_QUERY = gql`
 `
 
 const INFO_WEEKLY_SNAPSHOTS_QUERY = gql`
-  query InfoWeeklySnapshots($first: Int!, $orderBy: InfoWeeklySnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    infoWeeklySnapshots(first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
+  query InfoWeeklySnapshots($first: Int!, $orderDirection: OrderDirection!) {
+    infoWeeklySnapshots(first: $first, orderBy: timestamp, orderDirection: $orderDirection) {
       id
       timestamp
       fundCount
@@ -28,8 +28,8 @@ const INFO_WEEKLY_SNAPSHOTS_QUERY = gql`
 `
 
 const INFO_MONTHLY_SNAPSHOTS_QUERY = gql`
-  query InfoMonthlySnapshots($first: Int!, $orderBy: InfoMonthlySnapshot_orderBy!, $orderDirection: OrderDirection!) {
-    infoMonthlySnapshots(first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
+  query InfoMonthlySnapshots($first: Int!, $orderDirection: OrderDirection!) {
+    infoMonthlySnapshots(first: $first, orderBy: timestamp, orderDirection: $orderDirection) {
       id
       timestamp
       fundCount
@@ -60,7 +60,7 @@ export function useInfoSnapshots({ type, network, first = 30 }: UseInfoSnapshots
     queryKey: ['infoSnapshots', type, network, first],
     queryFn: async () => {
       try {
-        // Use Fund-specific subgraph URL via getSubgraphUrl helper
+        // Use Fund subgraph URL for info snapshots (InfoSnapshot is in Fund subgraph)
         const subgraphUrl = getSubgraphUrl(network, 'fund')
         
         if (!subgraphUrl) {
@@ -69,20 +69,16 @@ export function useInfoSnapshots({ type, network, first = 30 }: UseInfoSnapshots
         }
       
       let query: string
-      let orderBy: string
       
       switch (type) {
         case 'daily':
           query = INFO_SNAPSHOTS_QUERY
-          orderBy = 'timestamp'
           break
         case 'weekly':
           query = INFO_WEEKLY_SNAPSHOTS_QUERY
-          orderBy = 'timestamp'
           break
         case 'monthly':
           query = INFO_MONTHLY_SNAPSHOTS_QUERY
-          orderBy = 'timestamp'
           break
         default:
           throw new Error(`Unsupported snapshot type: ${type}`)
@@ -90,15 +86,19 @@ export function useInfoSnapshots({ type, network, first = 30 }: UseInfoSnapshots
       
       const variables = {
         first,
-        orderBy,
         orderDirection: 'desc' as const
       }
       
-      const response = await request(subgraphUrl, query, variables, headers) as any
+      // Studio subgraphs might not need API key
+      const response = await request(
+        subgraphUrl, 
+        query, 
+        variables, 
+        headers.Authorization ? headers : undefined
+      ) as any
       
       // Check if response is valid
       if (!response) {
-        console.warn('GraphQL response is null or undefined')
         return []
       }
       

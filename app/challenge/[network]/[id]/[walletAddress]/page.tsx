@@ -11,7 +11,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/hooks/useInvestorData"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
-import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
+import { useTokenPrices } from "@/lib/token-price-context"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -55,11 +55,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: challengeData, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
   
-  // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
-  const { data: uniswapPrices, isLoading: isLoadingUniswap } = useUserTokenPrices(
-    investorData?.investor?.isRegistered === true ? [] : userTokens,
-    subgraphNetwork
-  )
+  // Get token prices from global context
+  const { getTokenPriceBySymbol, isLoading: isLoadingUniswap } = useTokenPrices()
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -74,38 +71,36 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [isMinting, setIsMinting] = useState(false)
 
-  // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
+  // Calculate real-time portfolio value using global token prices
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
-    // Only check basic conditions - calculate if tokens and price data exist
-    if (!userTokens.length || !uniswapPrices?.tokens) {
+    if (!userTokens.length) {
       return null
     }
     
     let totalValue = 0
     let tokensWithPrices = 0
     
-    // Process individual tokens the same way as Portfolio tab
+    // Process individual tokens using global token prices
     userTokens.forEach(token => {
-      const tokenPrice = uniswapPrices.tokens[token.symbol]?.priceUSD || 0
+      const priceData = getTokenPriceBySymbol(token.symbol)
+      const tokenPrice = priceData?.priceUSD || 0
       const tokenAmount = parseFloat(token.amount) || 0
       
-      // Only include tokens with price in calculation (same as Portfolio tab)
+      // Only include tokens with price in calculation
       if (tokenPrice > 0 && tokenAmount > 0) {
         totalValue += tokenPrice * tokenAmount
         tokensWithPrices++
       }
     })
     
-    // Display if at least one token has price (same leniency as Portfolio tab)
     return {
       totalValue,
       tokensWithPrices,
       totalTokens: userTokens.length,
-      timestamp: uniswapPrices.timestamp || Date.now(),
-      // Add flag to allow display regardless of registration status
+      timestamp: Date.now(),
       isRegistered: investorData?.investor?.isRegistered === true
     }
-  }, [userTokens, uniswapPrices, investorData])
+  }, [userTokens, getTokenPriceBySymbol, investorData])
 
   // Remove useCallback for immediate reaction (same as Portfolio tab)
   const realTimePortfolio = calculateRealTimePortfolioValue()
@@ -554,7 +549,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <TabsContent value="portfolio" className="space-y-4">
                 <PortfolioTab 
                   userTokens={userTokens}
-                  uniswapPrices={uniswapPrices}
                   isLoadingUniswap={isLoadingUniswap}
                   subgraphNetwork={subgraphNetwork}
                   onTokenClick={handleTokenClick}

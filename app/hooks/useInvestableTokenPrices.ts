@@ -2,50 +2,39 @@
 
 import { useMemo } from 'react'
 import { useInvestableTokens } from './useInvestableTokens'
-import { useUniswapBatchPrices, TokenInfo } from './useUniswapBatchPrices'
+import { useTokenPrices } from '@/lib/token-price-context'
 
 export function useInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   // Get investable tokens data
   const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useInvestableTokens(network)
   
-  // Convert investable tokens to TokenInfo format for price fetching
-  const tokenInfos: TokenInfo[] = useMemo(() => {
-    if (!tokensData?.investableTokens) return []
-    
-    return tokensData.investableTokens.map(token => ({
-      symbol: token.symbol,
-      address: token.tokenAddress,
-      decimals: parseInt(token.decimals) || 18
-    }))
-  }, [tokensData])
-
-  // Fetch prices using the batch price hook
+  // Get prices from the global context
   const { 
-    data: priceData, 
+    getTokenPrice, 
+    getTokenPriceBySymbol, 
     isLoading: isLoadingPrices, 
     error: priceError,
     refetch: refetchPrices
-  } = useUniswapBatchPrices(tokenInfos, network)
+  } = useTokenPrices()
 
   // Combine token info with price data
   const tokensWithPrices = useMemo(() => {
-    if (!tokensData?.investableTokens || !priceData?.tokens) return []
+    if (!tokensData?.investableTokens) return []
 
     return tokensData.investableTokens.map(token => {
-      const priceInfo = priceData.tokens[token.symbol]
+      const priceInfo = getTokenPrice(token.tokenAddress) || getTokenPriceBySymbol(token.symbol)
       return {
         ...token,
         price: priceInfo?.priceUSD || null,
-        priceLastUpdated: priceInfo?.lastUpdated || null
+        priceLastUpdated: priceInfo?.timestamp ? new Date(priceInfo.timestamp) : null
       }
     })
-  }, [tokensData, priceData])
+  }, [tokensData, getTokenPrice, getTokenPriceBySymbol])
 
   return {
     data: tokensWithPrices,
     isLoading: isLoadingTokens || isLoadingPrices,
     error: tokensError || priceError,
-    priceData,
     refetch: refetchPrices
   }
 }
