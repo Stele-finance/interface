@@ -8,6 +8,7 @@ import { toast } from "@/components/ui/use-toast"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceDot } from 'recharts'
 import { useInvestorSnapshots } from '../../../hooks/useInvestorSnapshots'
 import { useInvestorWeeklySnapshots } from '../../../hooks/useInvestorWeeklySnapshots'
+import { useInvestorMonthlySnapshots } from '../../../hooks/useInvestorMonthlySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
 import { useRanking } from '@/app/hooks/useRanking'
 import { useMemo, useState } from 'react'
@@ -29,21 +30,24 @@ interface InvestorChartsProps {
   network: 'ethereum' | 'arbitrum' | null
   investorData?: any // Add investor data prop for calculations
   realTimePortfolio?: RealTimePortfolio | null
-  interval?: 'daily' | 'weekly'
+  interval?: 'daily' | 'weekly' | 'monthly'
   actionButtons?: React.ReactNode // Add prop for action buttons (Swap, Register)
 }
 
 export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily', actionButtons }: InvestorChartsProps) {
   const { t, language } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
-  const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 30, network)
+  const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 12, network)
+  const { data: monthlyData, isLoading: isLoadingMonthly, error: monthlyError } = useInvestorMonthlySnapshots(challengeId, investor, 12, network)
   const { data: challengeData } = useChallenge(challengeId, network)
   const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
 
   const chartData = useMemo(() => {
     // Select data source based on interval
-    const selectedData = interval === 'weekly' 
+    const selectedData = interval === 'monthly' 
+      ? monthlyData?.investorMonthlySnapshots
+      : interval === 'weekly' 
       ? weeklyData?.investorWeeklySnapshots 
       : data?.investorSnapshots
     
@@ -82,9 +86,15 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
               }),
           dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           timeLabel: (() => {
-            // Extract month/day from dateLabel to avoid timezone issues
-            const [year, month, day] = date.toISOString().split('T')[0].split('-')
-            return `${parseInt(month)}/${parseInt(day)}`
+            const month = date.getMonth() + 1
+            const day = date.getDate()
+            const year = date.getFullYear()
+            
+            if (interval === 'monthly') {
+              return `${month}/${String(year).slice(2)}`
+            } else {
+              return `${month}/${day}`
+            }
           })(),
           isRealTime: false
         }
@@ -128,7 +138,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     }
 
     return processedData
-  }, [data, weeklyData, interval, realTimePortfolio, investorData, language, t])
+  }, [data, weeklyData, monthlyData, interval, realTimePortfolio, investorData, language, t])
 
   // Calculate current values for headers (prefer real-time data if available)
   const currentPortfolioValue = useMemo(() => {
@@ -413,7 +423,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     )
   }
 
-  if (isLoading || isLoadingWeekly) {
+  if (isLoading || isLoadingWeekly || isLoadingMonthly) {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader>
@@ -428,11 +438,13 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   }
 
   // Check if there's data for the selected interval
-  const hasData = interval === 'weekly' 
+  const hasData = interval === 'monthly'
+    ? monthlyData?.investorMonthlySnapshots && monthlyData.investorMonthlySnapshots.length > 0
+    : interval === 'weekly' 
     ? weeklyData?.investorWeeklySnapshots && weeklyData.investorWeeklySnapshots.length > 0
     : data?.investorSnapshots && data.investorSnapshots.length > 0
 
-  if (error || weeklyError || !hasData || chartData.length === 0) {
+  if (error || weeklyError || monthlyError || !hasData || chartData.length === 0) {
     return (
       <Card className="bg-transparent border-0">
         <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-6 pt-2 sm:pt-6">

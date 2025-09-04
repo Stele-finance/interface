@@ -62,11 +62,12 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const isFundSwap = pathParts.includes('fund');
   
   // Use external investableTokens if provided, otherwise fetch from subgraph
-  const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork);
+  const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork, isFundSwap ? 'fund' : 'challenge');
   const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
   
-  // Fetch fund settings for slippage configuration (only for fund swaps)
-  const { data: fundSettings, isLoading: isLoadingSettings } = useFundSettings(subgraphNetwork);
+  // Fetch fund settings for slippage configuration (always call hook, but only use data for fund swaps)
+  const { data: fetchedFundSettings, isLoading: isLoadingSettings } = useFundSettings(subgraphNetwork);
+  const fundSettings = isFundSwap ? fetchedFundSettings : null;
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("")

@@ -44,7 +44,7 @@ export function useFundSettings(network: 'ethereum' | 'arbitrum') {
         const client = new GraphQLClient(subgraphUrl);
         const data = await client.request<FundSettingsResponse>(GET_FUND_SETTINGS);
         
-        if (data.settings && data.settings.length > 0) {
+        if (data && data.settings && data.settings.length > 0) {
           return data.settings[0];
         }
         

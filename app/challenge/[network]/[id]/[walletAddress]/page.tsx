@@ -4,7 +4,8 @@ import React, { useState, use, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BarChart3, Activity, Loader2 } from "lucide-react"
+import { ArrowLeft, BarChart3, Activity, Loader2, Calendar, ChevronDown } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AssetSwap } from "../../../../swap/components/AssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
@@ -65,7 +66,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
-  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
+  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -499,30 +500,32 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               interval={chartInterval}
             />
             
-            {/* Interval selector */}
+            {/* Time interval dropdown - same style as fund investor page */}
             <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setChartInterval('daily')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    chartInterval === 'daily' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setChartInterval('weekly')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    chartInterval === 'weekly' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
+              <DropdownMenu modal={true}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <Calendar className="h-4 w-4" />
+                    {chartInterval === 'daily' ? t('daily') : chartInterval === 'weekly' ? t('weekly') : t('monthly')}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={() => setChartInterval('daily')}>
+                    {t('daily')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('weekly')}>
+                    {t('weekly')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('monthly')}>
+                    {t('monthly')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             {/* Separator Bar */}

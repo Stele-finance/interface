@@ -1,7 +1,8 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
-import { getSteleTokenAddress, getSteleFundTokenAddress, STELE_DECIMALS, getRPCUrl } from '@/lib/constants'
+import { getSteleTokenAddress, getSteleFundTokenAddress, STELE_DECIMALS } from '@/lib/constants'
+import { getManagedProvider } from '@/lib/provider-manager'
 import ERC20ABI from '@/app/abis/ERC20.json'
 import ERC20VotesABI from '@/app/abis/ERC20Votes.json'
 
@@ -19,13 +20,12 @@ export function useWalletTokenInfo(walletAddress: string | null, network: 'ether
       }
 
       try {
-        // Get network-specific configurations
-        const rpcUrl = getRPCUrl(network)
         // Get the correct token address based on page type
         const steleTokenAddress = pageType === 'fund' 
           ? getSteleFundTokenAddress(network)
           : getSteleTokenAddress(network)
-        const provider = new ethers.JsonRpcProvider(rpcUrl)
+        // Use managed provider to prevent multiple connections
+        const provider = getManagedProvider(network)
         
         // Create contracts
         const tokenContract = new ethers.Contract(steleTokenAddress, ERC20ABI.abi, provider)

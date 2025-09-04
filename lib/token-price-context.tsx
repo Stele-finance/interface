@@ -26,19 +26,25 @@ interface TokenPriceContextType {
 const TokenPriceContext = createContext<TokenPriceContextType | undefined>(undefined)
 
 export function TokenPriceProvider({ 
-  children 
+  children,
+  context = 'challenge'
 }: { 
   children: React.ReactNode
+  context?: 'challenge' | 'fund'
 }) {
   const [tokenPricesMap, setTokenPricesMap] = useState<Map<string, TokenPrice>>(new Map())
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
   
-  // Get network from wallet, default to arbitrum
-  const { network: walletNetwork } = useWallet()
-  const network = (walletNetwork === '1' || walletNetwork === 1 ? 'ethereum' : walletNetwork === '42161' || walletNetwork === 42161 ? 'arbitrum' : 'arbitrum') as 'ethereum' | 'arbitrum'
+  // Get network from URL path instead of wallet
+  const pathParts = typeof window !== 'undefined' ? window.location.pathname.split('/') : []
+  const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'arbitrum'
+  const network = networkFromUrl as 'ethereum' | 'arbitrum'
+  
+  // Determine context from URL if not explicitly provided
+  const actualContext = context || (pathParts.includes('fund') ? 'fund' : 'challenge')
 
-  // Get all investable tokens
-  const { data: investableTokens, isLoading: isLoadingTokens } = useInvestableTokens(network)
+  // Get investable tokens based on context
+  const { data: investableTokens, isLoading: isLoadingTokens } = useInvestableTokens(network, actualContext)
 
   // Prepare token infos for batch price fetching
   const tokenInfos = useMemo(() => {

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, use } from "react"
+import { useState, useEffect, useCallback, use, useRef } from "react"
+import { getManagedProvider, providerManager } from "@/lib/provider-manager"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -225,8 +226,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     return () => clearInterval(interval)
   }, [])
 
-  // Get voting power and check if user has already voted
-  const checkVotingPowerAndStatus = useCallback(async () => {
+  // Create providers as refs to reuse them
+  const providersRef = useRef<{ 
+    network?: ethers.JsonRpcProvider; 
+    ethereum?: ethers.JsonRpcProvider;
+    lastBlockTime?: number;
+    lastBlockNumber?: number;
+  }>({});
+
+  // Internal function to check voting power (without debouncing)
+  const _checkVotingPowerAndStatus = useCallback(async () => {
     if (!walletConnected || !id) return
 
     setIsLoadingVotingPower(true)
@@ -259,34 +268,63 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         currentConnectedAddress = accounts[0];
       }
       
-      // Connect to provider for read-only operations using network-specific RPC
-      const rpcUrl = getRPCUrl(contractNetwork)
-        
-      const provider = new ethers.JsonRpcProvider(rpcUrl)
+      // Use managed provider to prevent multiple connections
+      const provider = getManagedProvider(contractNetwork)
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
       // For cross-chain governance, we need to use Ethereum block numbers for voting power queries
-      // even when on Arbitrum network, because Governor uses Ethereum blocks as timepoints
+      // Cache block number for 30 seconds to reduce RPC calls
       let ethereumBlock: number
-      try {
-        // Always get Ethereum block number for voting power queries
-        const ethereumProvider = new ethers.JsonRpcProvider(getRPCUrl('ethereum'))
-        ethereumBlock = await ethereumProvider.getBlockNumber()
-      } catch (ethereumError) {
-        console.warn('Failed to get Ethereum block, falling back to network block:', ethereumError)
-        // Fallback to current network block
-        ethereumBlock = await provider.getBlockNumber()
+      const now = Date.now()
+      if (providersRef.current.lastBlockTime && 
+          providersRef.current.lastBlockNumber &&
+          now - providersRef.current.lastBlockTime < 30000) {
+        // Use cached block number if it's less than 30 seconds old
+        ethereumBlock = providersRef.current.lastBlockNumber
+      } else {
+        try {
+          // Use managed provider for Ethereum
+          const ethereumProvider = getManagedProvider('ethereum')
+          ethereumBlock = await ethereumProvider.getBlockNumber()
+          // Cache the block number
+          providersRef.current.lastBlockNumber = ethereumBlock
+          providersRef.current.lastBlockTime = now
+        } catch (ethereumError) {
+          console.warn('Failed to get Ethereum block, falling back to network block:', ethereumError)
+          // Fallback to current network block
+          ethereumBlock = await provider.getBlockNumber()
+        }
       }
       
-      // Check if user has already voted using the current connected address
-      const hasUserVoted = await governanceContract.hasVoted(id, currentConnectedAddress)
-      setHasVoted(hasUserVoted)
-
-      // Get voting power at a safe past block to avoid "future lookup" error
-      // Use a more conservative offset to ensure block is finalized and avoid timing issues
+      // Batch RPC calls using Promise.all to reduce latency
       const timepoint = Math.max(1, ethereumBlock - 10)
       
-      const userVotingPower = await governanceContract.getVotes(currentConnectedAddress, timepoint)
+      // Create cache key for voting power
+      const votingPowerCacheKey = `${currentConnectedAddress}-${timepoint}-${contractNetwork}`
+      
+      // Check cache first for voting power
+      const cachedVotingPower = providerManager.getCachedVotingPower(votingPowerCacheKey)
+      
+      let hasUserVoted, userVotingPower
+      
+      if (cachedVotingPower) {
+        // Use cached voting power but still check hasVoted (this changes frequently)
+        [hasUserVoted] = await Promise.all([
+          governanceContract.hasVoted(id, currentConnectedAddress)
+        ])
+        userVotingPower = cachedVotingPower
+      } else {
+        // Fetch both values
+        [hasUserVoted, userVotingPower] = await Promise.all([
+          governanceContract.hasVoted(id, currentConnectedAddress),
+          governanceContract.getVotes(currentConnectedAddress, timepoint)
+        ])
+        
+        // Cache the voting power
+        providerManager.setCachedVotingPower(votingPowerCacheKey, userVotingPower)
+      }
+      
+      setHasVoted(hasUserVoted)
       setVotingPower(ethers.formatUnits(userVotingPower, STELE_DECIMALS))      
     } catch (error: any) {
       console.error('Error checking voting power and status:', error)
@@ -315,6 +353,14 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     }
   }, [walletConnected, id, walletType, contractNetwork, address, getProvider])
 
+  // Debounced version of voting power check
+  const checkVotingPowerAndStatus = useCallback(async () => {
+    if (!walletConnected || !id) return
+    
+    const debounceKey = `voting-power-${id}-${address}-${contractNetwork}`
+    return providerManager.debounce(debounceKey, _checkVotingPowerAndStatus)
+  }, [walletConnected, id, address, contractNetwork, _checkVotingPowerAndStatus])
+
   // Check proposal state
   const checkProposalState = useCallback(async () => {
     if (!id) return
@@ -326,12 +372,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         return
       }
 
-      // Use network-specific RPC URL instead of hardcoded Base RPC
-      const rpcUrl = getRPCUrl(contractNetwork)
-      const provider = new ethers.JsonRpcProvider(rpcUrl)
-      
-      // Test connection
-      await provider.getBlockNumber()
+      // Use managed provider to prevent multiple connections
+      const provider = getManagedProvider(contractNetwork)
       
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
 
@@ -360,7 +402,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       checkVotingPowerAndStatus()
       checkProposalState()
     }
-  }, [walletConnected, id, checkVotingPowerAndStatus, checkProposalState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletConnected, id]) // Intentionally excluded functions to prevent infinite loops
 
   // Calculate vote percentage based on total supply (1 billion STELE)
   const calculatePercentage = () => {

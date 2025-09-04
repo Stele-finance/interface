@@ -9,8 +9,9 @@ import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
 import { useChallengeSnapshots } from '../../hooks/useChallengeSnapshots'
 import { useChallengeWeeklySnapshots } from '../../hooks/useChallengeWeeklySnapshots'
+import { useChallengeMonthlySnapshots } from '../../hooks/useChallengeMonthlySnapshots'
 import { useChallenge } from '@/app/hooks/useChallenge'
-import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy } from 'lucide-react'
+import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, ChevronDown, Calendar } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -47,9 +48,10 @@ interface ChallengeChartsProps {
 export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeChartsProps) {
   const { t, language } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
-  const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
+  const [intervalType, setIntervalType] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const { data, isLoading, error } = useChallengeSnapshots(challengeId, 30, network)
-  const { data: weeklyData, isLoading: weeklyIsLoading, error: weeklyError } = useChallengeWeeklySnapshots(challengeId, 30, network)
+  const { data: weeklyData, isLoading: weeklyIsLoading, error: weeklyError } = useChallengeWeeklySnapshots(challengeId, 12, network)
+  const { data: monthlyData, isLoading: monthlyIsLoading, error: monthlyError } = useChallengeMonthlySnapshots(challengeId, 12, network)
   const { data: challengeData } = useChallenge(challengeId, network)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -64,7 +66,9 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
   }, [])
 
   const chartData = useMemo(() => {
-    const sourceData = intervalType === 'weekly' ? weeklyData?.challengeWeeklySnapshots : data?.challengeSnapshots
+    const sourceData = intervalType === 'monthly' ? monthlyData?.challengeMonthlySnapshots : 
+                       intervalType === 'weekly' ? weeklyData?.challengeWeeklySnapshots : 
+                       data?.challengeSnapshots
     if (!sourceData) return []
 
     // Convert and sort data by timestamp
@@ -90,16 +94,22 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           }),
           dateLabel: date.toISOString().split('T')[0], // YYYY-MM-DD format
           timeLabel: (() => {
-            // Extract month/day from dateLabel to avoid timezone issues
-            const [year, month, day] = date.toISOString().split('T')[0].split('-')
-            return `${parseInt(month)}/${parseInt(day)}`
+            const month = date.getMonth() + 1
+            const day = date.getDate()
+            const year = date.getFullYear()
+            
+            if (intervalType === 'monthly') {
+              return `${month}/${String(year).slice(2)}`
+            } else {
+              return `${month}/${day}`
+            }
           })(),
         }
       })
       .sort((a, b) => a.dateLabel.localeCompare(b.dateLabel)) // Sort by date (ascending)
 
     return processedData
-  }, [data, weeklyData, intervalType, language])
+  }, [data, weeklyData, monthlyData, intervalType, language])
 
   // Calculate current values for headers (use the most recent snapshot or challenge data)
   const currentRewardAmount = useMemo(() => {
@@ -305,7 +315,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     return null
   }
 
-  if (isLoading || weeklyIsLoading) {
+  if (isLoading || weeklyIsLoading || monthlyIsLoading) {
     return (
       <div className="mb-6">
         <Card className="bg-transparent border-0 -mt-12">
@@ -316,12 +326,9 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </CardHeader>
           <CardContent className="px-1 sm:px-6 md:-ml-2">
             <div className="h-80 bg-gray-700 rounded animate-pulse mb-4"></div>
-            {/* Daily/Weekly buttons skeleton */}
-            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50">
-                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse mr-1"></div>
-                <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse"></div>
-              </div>
+            {/* Time interval dropdown skeleton */}
+            <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-20">
+              <div className="w-32 h-10 bg-gray-700 rounded-full animate-pulse"></div>
             </div>
             {/* Separator */}
             <div className="border-t border-gray-600/50 mx-2 sm:mx-0 pt-2"></div>
@@ -331,7 +338,9 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
     )
   }
 
-  if ((error && intervalType === 'daily') || (weeklyError && intervalType === 'weekly') || (!data?.challengeSnapshots && intervalType === 'daily') || (!weeklyData?.challengeWeeklySnapshots && intervalType === 'weekly') || chartData.length === 0) {
+  const hasNoData = (error && intervalType === 'daily') || (weeklyError && intervalType === 'weekly') || (monthlyError && intervalType === 'monthly') || (!data?.challengeSnapshots && intervalType === 'daily') || (!weeklyData?.challengeWeeklySnapshots && intervalType === 'weekly') || (!monthlyData?.challengeMonthlySnapshots && intervalType === 'monthly') || chartData.length === 0
+  
+  if (hasNoData) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="bg-muted border-gray-700/50 lg:col-span-2">
@@ -480,30 +489,32 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
             </div>
           </CardContent>
           
-          {/* Interval selector - Below chart like investor page */}
+          {/* Time interval dropdown - Below chart like fund page */}
           <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
-            <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-              <button
-                onClick={() => setIntervalType('daily')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  intervalType === 'daily' 
-                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('daily')}
-              </button>
-              <button
-                onClick={() => setIntervalType('weekly')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                  intervalType === 'weekly' 
-                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
-              >
-                {t('weekly')}
-              </button>
-            </div>
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  <Calendar className="h-4 w-4" />
+                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                <DropdownMenuItem onClick={() => setIntervalType('daily')}>
+                  {t('daily')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
+                  {t('weekly')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                  {t('monthly')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Separator Bar - Below daily/weekly buttons, chart width */}
@@ -750,92 +761,100 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </div>
         </CardHeader>
         <CardContent className="pr-0 md:mr-16 -ml-6">
-          <ResponsiveContainer width="100%" height={320}>
-            <AreaChart 
-              data={chartData} 
-              margin={{ top: 20, right: 10, left: 5, bottom: 0 }}
-              onMouseMove={(state: any) => {
-                if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
-                  setActiveIndexRewards(state.activeTooltipIndex)
-                }
-              }}
-              onMouseLeave={() => setActiveIndexRewards(null)}
-            >
-              <defs>
-                <linearGradient id="rewardGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
-              <XAxis 
-                dataKey="timeLabel" 
-                stroke="#9CA3AF"
-                fontSize={11}
-                tick={{ fill: '#9CA3AF' }}
-                axisLine={false}
-                tickLine={false}
-                interval="preserveStartEnd"
-              />
-              <YAxis 
-                orientation="left"
-                stroke="#9CA3AF"
-                fontSize={10}
-                tick={{ fill: '#9CA3AF' }}
-                axisLine={false}
-                tickLine={false}
-                width={35}
-                tickFormatter={(value) => {
-                  if (value >= 1000000) {
-                    return `$${(value / 1000000).toFixed(1)}M`
-                  } else if (value >= 1000) {
-                    return `$${(value / 1000).toFixed(0)}K`
-                  } else {
-                    return `$${value.toFixed(0)}`
+          {chartData.length === 0 ? (
+            <div className="h-80 flex items-center justify-center">
+              <p className="text-gray-400">{t('noDataAvailable')}</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={320}>
+              <AreaChart 
+                data={chartData} 
+                margin={{ top: 20, right: 10, left: 5, bottom: 0 }}
+                onMouseMove={(state: any) => {
+                  if (state && typeof state.activeTooltipIndex === 'number' && state.activeTooltipIndex >= 0) {
+                    setActiveIndexRewards(state.activeTooltipIndex)
                   }
                 }}
-              />
-              <Tooltip 
-                content={<CustomTooltip />} 
-                cursor={{ stroke: '#f97316', strokeWidth: 1 }}
-              />
-              <Area
-                type="monotone"
-                dataKey="rewardAmountUSD" 
-                stroke="#f97316"
-                strokeWidth={2}
-                fill="url(#rewardGradient)"
-                dot={false}
-                activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+                onMouseLeave={() => setActiveIndexRewards(null)}
+              >
+                <defs>
+                  <linearGradient id="rewardGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
+                <XAxis 
+                  dataKey="timeLabel" 
+                  stroke="#9CA3AF"
+                  fontSize={11}
+                  tick={{ fill: '#9CA3AF' }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval="preserveStartEnd"
+                />
+                <YAxis 
+                  orientation="left"
+                  stroke="#9CA3AF"
+                  fontSize={10}
+                  tick={{ fill: '#9CA3AF' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={35}
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) {
+                      return `$${(value / 1000000).toFixed(1)}M`
+                    } else if (value >= 1000) {
+                      return `$${(value / 1000).toFixed(0)}K`
+                    } else {
+                      return `$${value.toFixed(0)}`
+                    }
+                  }}
+                />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  cursor={{ stroke: '#f97316', strokeWidth: 1 }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="rewardAmountUSD" 
+                  stroke="#f97316"
+                  strokeWidth={2}
+                  fill="url(#rewardGradient)"
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
         
-        {/* Interval selector - Below chart like investor page */}
+        {/* Time interval dropdown - Below chart like fund page */}
         <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-20">
-          <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-            <button
-              onClick={() => setIntervalType('daily')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                intervalType === 'daily' 
-                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-              }`}
-            >
-              {t('daily')}
-            </button>
-            <button
-              onClick={() => setIntervalType('weekly')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                intervalType === 'weekly' 
-                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-              }`}
-            >
-              {t('weekly')}
-            </button>
-          </div>
+          <DropdownMenu modal={true}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <Calendar className="h-4 w-4" />
+                {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+              <DropdownMenuItem onClick={() => setIntervalType('daily')}>
+                {t('daily')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
+                {t('weekly')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                {t('monthly')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         {/* Separator Bar - Below daily/weekly buttons, chart width */}

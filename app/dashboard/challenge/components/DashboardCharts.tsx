@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useActiveChallengesSnapshots } from '../hooks/useActiveChallengesSnapshots'
 import { useActiveChallengesWeeklySnapshots } from '../hooks/useActiveChallengesWeeklySnapshots'
-import { Users, DollarSign, ChevronDown } from 'lucide-react'
+import { useActiveChallengesMonthlySnapshots } from '../hooks/useActiveChallengesMonthlySnapshots'
+import { Users, DollarSign, ChevronDown, Calendar } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/lib/language-context'
 import { formatDateWithLocale } from '@/lib/utils'
@@ -39,11 +40,14 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   const { data: dailyData, isLoading: isDailyLoading, error: dailyError } = useActiveChallengesSnapshots(30, subgraphNetwork)
   
   // Weekly data
-  const { data: weeklyData, isLoading: isWeeklyLoading, error: weeklyError } = useActiveChallengesWeeklySnapshots(30, subgraphNetwork)
+  const { data: weeklyData, isLoading: isWeeklyLoading, error: weeklyError } = useActiveChallengesWeeklySnapshots(12, subgraphNetwork)
+  
+  // Monthly data
+  const { data: monthlyData, isLoading: isMonthlyLoading, error: monthlyError } = useActiveChallengesMonthlySnapshots(12, subgraphNetwork)
   
   const [activeIndexParticipants, setActiveIndexParticipants] = useState<number | null>(null)
   const [activeIndexRewards, setActiveIndexRewards] = useState<number | null>(null)
-  const [intervalType, setIntervalType] = useState<'daily' | 'weekly'>('daily')
+  const [intervalType, setIntervalType] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [chartType, setChartType] = useState<'participants' | 'rewards'>('rewards')
 
   const dailyChartData = useMemo(() => {
@@ -70,9 +74,9 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         }),
         dateLabel: actualDate.toISOString().split('T')[0],
         timeLabel: (() => {
-          // Extract month/day from dateLabel to avoid timezone issues
-          const [year, month, day] = actualDate.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
+          const month = actualDate.getMonth() + 1
+          const day = actualDate.getDate()
+          return `${month}/${day}`
         })()
       }
     })
@@ -102,17 +106,49 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         }),
         dateLabel: actualDate.toISOString().split('T')[0],
         timeLabel: (() => {
-          // Extract month/day from dateLabel to avoid timezone issues
-          const [year, month, day] = actualDate.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}`
+          const month = actualDate.getMonth() + 1
+          const day = actualDate.getDate()
+          return `${month}/${day}`
         })()
       }
     })
   }, [weeklyData, language])
 
-  const currentChartData = intervalType === 'daily' ? dailyChartData : weeklyChartData
-  const isLoading = intervalType === 'daily' ? isDailyLoading : isWeeklyLoading
-  const error = intervalType === 'daily' ? dailyError : weeklyError
+  const monthlyChartData = useMemo(() => {
+    if (!monthlyData?.activeChallengesMonthlySnapshots) return []
+
+    return monthlyData.activeChallengesMonthlySnapshots.map((snapshot) => {
+      const actualDate = new Date(Number(snapshot.timestamp) * 1000)
+      
+      return {
+        id: snapshot.id,
+        totalParticipants: Number(snapshot.totalParticipants),
+        totalRewards: Number(snapshot.totalRewards),
+        formattedDate: formatDateWithLocale(actualDate, language, { 
+          month: 'short', 
+          day: 'numeric'
+        }),
+        fullDate: formatDateWithLocale(actualDate, language, { 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }),
+        dateLabel: actualDate.toISOString().split('T')[0],
+        timeLabel: (() => {
+          const month = actualDate.getMonth() + 1
+          const year = actualDate.getFullYear()
+          return `${month}/${String(year).slice(2)}`
+        })()
+      }
+    })
+  }, [monthlyData, language])
+
+  const currentChartData = intervalType === 'daily' ? dailyChartData : intervalType === 'weekly' ? weeklyChartData : monthlyChartData
+  const isLoading = intervalType === 'daily' ? isDailyLoading : intervalType === 'weekly' ? isWeeklyLoading : isMonthlyLoading
+  const error = intervalType === 'daily' ? dailyError : intervalType === 'weekly' ? weeklyError : monthlyError
 
   // Calculate total values for headers (use the most recent snapshot)
   const totalParticipants = useMemo(() => {
@@ -212,31 +248,31 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              {/* Daily/Weekly selector */}
-              <div className="flex items-center space-x-2">
-                <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                  <button
-                    onClick={() => setIntervalType('daily')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'daily' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
+              {/* Time interval dropdown */}
+              <DropdownMenu modal={true}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
                   >
+                    <Calendar className="h-4 w-4" />
+                    {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={() => setIntervalType('daily')}>
                     {t('daily')}
-                  </button>
-                  <button
-                    onClick={() => setIntervalType('weekly')}
-                    className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                      intervalType === 'weekly' 
-                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                    }`}
-                  >
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
                     {t('weekly')}
-                  </button>
-                </div>
-              </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                    {t('monthly')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
@@ -369,31 +405,31 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            {/* Daily/Weekly selector */}
-            <div className="flex items-center space-x-2">
-              <div className="inline-flex bg-gray-800/60 p-0.5 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setIntervalType('daily')}
-                  className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'daily' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
+            {/* Time interval dropdown */}
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                  onMouseDown={(e) => e.preventDefault()}
                 >
+                  <Calendar className="h-4 w-4" />
+                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                <DropdownMenuItem onClick={() => setIntervalType('daily')}>
                   {t('daily')}
-                </button>
-                <button
-                  onClick={() => setIntervalType('weekly')}
-                  className={`px-6 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    intervalType === 'weekly' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
                   {t('weekly')}
-                </button>
-              </div>
-            </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
+                  {t('monthly')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardContent>
       </Card>

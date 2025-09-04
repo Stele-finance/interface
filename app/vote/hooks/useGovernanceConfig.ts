@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
-import { getGovernanceContractAddress, getRPCUrl } from '@/lib/constants'
+import { getGovernanceContractAddress } from '@/lib/constants'
+import { getManagedProvider } from '@/lib/provider-manager'
 import GovernorABI from '@/app/abis/SteleGovernor.json'
 
 interface GovernanceConfig {
@@ -19,11 +20,9 @@ export const useGovernanceConfig = (network: 'ethereum' | 'arbitrum' = 'ethereum
       // Add small fixed delay to prevent overwhelming RPC
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Use the specified network for governance
+      // Use managed provider to prevent multiple connections
       const defaultNetwork = network
-      const rpcUrl = getRPCUrl(defaultNetwork)
-        
-      const provider = new ethers.JsonRpcProvider(rpcUrl)
+      const provider = getManagedProvider(defaultNetwork)
       const governanceContract = new ethers.Contract(getGovernanceContractAddress(defaultNetwork), GovernorABI.abi, provider)
 
       // Fetch all governance parameters in parallel
