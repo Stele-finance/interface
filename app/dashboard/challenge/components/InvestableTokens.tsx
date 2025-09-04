@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Loader2, Coins, ChevronDown } from "lucide-react"
-import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
+import { useChallengeInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
 import Image from "next/image"
@@ -32,7 +32,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
   const { t } = useLanguage()
   // Use selectedNetwork for data fetching
   const subgraphNetwork = selectedNetwork
-  const { data: tokensWithPrices, isLoading, error } = useInvestableTokenPrices(subgraphNetwork)
+  const { data: tokensWithPrices, isLoading, error } = useChallengeInvestableTokenPrices(subgraphNetwork)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)

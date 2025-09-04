@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useInvestableTokens } from './useInvestableTokens'
 import { useTokenPrices } from '@/lib/token-price-context'
 
-// Challenge-specific investable token prices hook
 export function useChallengeInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   // Get challenge investable tokens data
   const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useInvestableTokens(network)
@@ -55,12 +54,7 @@ export function useChallengeInvestableTokenPrices(network: 'ethereum' | 'arbitru
   }
 }
 
-// Backward compatibility - keep the old function name but use challenge-specific implementation
-export function useInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  return useChallengeInvestableTokenPrices(network)
-}
-
-export interface InvestableTokenWithPrice {
+export interface ChallengeInvestableTokenWithPrice {
   id: string
   tokenAddress: string
   decimals: string

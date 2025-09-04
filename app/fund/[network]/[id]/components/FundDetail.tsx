@@ -48,7 +48,7 @@ import { InvestorsTab } from "./InvestorsTab"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
 import { useFundInvestors } from "../hooks/useFundInvestors"
 import { useFundAllTransactions } from "../hooks/useFundAllTransactions"
-import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
+import { useFundInvestableTokenPrices } from "../../../hooks/useFundInvestableTokenPrices"
 
 interface FundDetailProps {
   fundId: string
@@ -204,8 +204,13 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     subgraphNetwork as 'ethereum' | 'arbitrum'
   )
 
-  // Get investable token prices for portfolio calculation
-  const { data: tokensWithPrices } = useInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
+  // Get fund investable token prices for portfolio calculation
+  const { 
+    data: tokensWithPrices, 
+    getFundTokenPriceBySymbol, 
+    getFundTokenInfoBySymbol,
+    isLoading: isLoadingTokenPrices 
+  } = useFundInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
 
   // Calculate portfolio data from fund tokens
   const portfolioData = useMemo(() => {
@@ -221,9 +226,9 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       // tokensAmount is already formatted as BigDecimal from subgraph
       const actualAmount = parseFloat(fund.tokensAmount?.[index] || '0')
       
-      // Find price from tokensWithPrices
-      const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
-      const price = tokenWithPrice?.price || 0
+      // Get real-time price and token info for fund tokens using dedicated fund price hook
+      const tokenInfo = getFundTokenInfoBySymbol ? getFundTokenInfoBySymbol(symbol) : null
+      const price = tokenInfo?.price || 0
       const value = actualAmount * price
 
       return {
@@ -231,12 +236,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         amount: actualAmount,
         value,
         price,
-        percentage: 0 // Will be calculated after total
+        percentage: 0, // Will be calculated after total
+        isRealTime: tokenInfo?.isRealTime || false, // Use isRealTime from token info
+        priceLastUpdated: tokenInfo?.priceLastUpdated || null
       }
     }).filter(token => token.amount > 0)
 
-    // Use amountUSD from fund data directly for total value
-    const totalValue = parseFloat(fund.amountUSD || '0')
+    // Calculate real-time total value from token prices
+    const realTimeTotalValue = tokens.reduce((sum, token) => sum + token.value, 0)
+    
+    // Use real-time calculated value if we have price data, otherwise fallback to subgraph data
+    const totalValue = realTimeTotalValue > 0 ? realTimeTotalValue : parseFloat(fund.amountUSD || '0')
     
     // Calculate sum of token values for percentage calculation
     const tokenValueSum = tokens.reduce((sum, token) => sum + token.value, 0)
@@ -272,7 +282,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       totalValue,
       colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
     }
-  }, [fund, tokensWithPrices])
+  }, [fund, tokensWithPrices, getFundTokenInfoBySymbol])
   
   // Format transactions for display with full token data
   const transactions = fundTransactions.map(tx => ({
@@ -1023,6 +1033,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                             ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                           </div>
                           <div className="text-xs text-gray-400">Total Value</div>
+                          {portfolioData.tokens.some(token => token.isRealTime) && (
+                            <div className="flex items-center justify-center gap-1 mt-1">
+                              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                              <span className="text-xs text-green-400">Live</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1048,6 +1064,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                   maximumFractionDigits: token.amount < 1 ? 6 : 4 
                                 })})
                           </span>
+                          {token.isRealTime && (
+                            <span className="text-xs text-green-400 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                              Live
+                            </span>
+                          )}
                         </div>
                         <div className="text-right">
                           <div className="text-sm text-white font-medium">
@@ -1056,6 +1078,11 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                           <div className="text-xs text-green-400">
                             ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </div>
+                          {token.price > 0 && (
+                            <div className="text-xs text-gray-500">
+                              ${token.price.toLocaleString(undefined, { maximumFractionDigits: 4 })} each
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1107,9 +1134,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">TVL</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">TVL</span>
+                    {portfolioData.tokens.some(token => token.isRealTime) && (
+                      <span className="text-xs text-green-400 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                        Live
+                      </span>
+                    )}
+                  </div>
                   <span className="text-sm text-green-400 font-medium">
-                    {fund ? `$${parseFloat(fund.amountUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$0.00'}
+                    ${portfolioData.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 

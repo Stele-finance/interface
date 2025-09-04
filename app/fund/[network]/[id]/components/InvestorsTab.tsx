@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { Loader2, Users, FolderOpen } from "lucide-react"
+import { Loader2, Users, FolderOpen, Crown } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
 import { formatDateOnly } from "@/lib/utils"
@@ -49,8 +49,14 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
     return `${sign}${percentage}%`
   }
 
-  // Filter out manager from investor data - show only investors
-  const filteredInvestorData = investorData.filter((investor: any) => !investor.isManager)
+  // Sort data to show manager first, then investors by amount
+  const sortedInvestorData = [...investorData].sort((a: any, b: any) => {
+    // Manager always comes first
+    if (a.isManager && !b.isManager) return -1
+    if (!a.isManager && b.isManager) return 1
+    // Among non-managers, sort by amount (highest first)
+    return parseFloat(b.amountUSD) - parseFloat(a.amountUSD)
+  })
 
   // Helper function to format user address
   const formatUserAddress = (address: string) => {
@@ -76,7 +82,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
             <p className="font-medium">Error loading investors</p>
             <p className="text-sm text-gray-400 mt-2">Please try again later</p>
           </div>
-        ) : filteredInvestorData.length > 0 ? (
+        ) : sortedInvestorData.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <div className="min-w-[500px]">
@@ -91,11 +97,11 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                   </thead>
                   <tbody>
                     {(() => {
-                      // Calculate pagination using filtered data
-                      const totalInvestors = Math.min(filteredInvestorData.length, maxPages * itemsPerPage);
+                      // Calculate pagination using sorted data
+                      const totalInvestors = Math.min(sortedInvestorData.length, maxPages * itemsPerPage);
                       const startIndex = (currentPage - 1) * itemsPerPage;
                       const endIndex = Math.min(startIndex + itemsPerPage, totalInvestors);
-                      const paginatedInvestors = filteredInvestorData.slice(startIndex, endIndex);
+                      const paginatedInvestors = sortedInvestorData.slice(startIndex, endIndex);
 
                       return paginatedInvestors.map((investor: any, index: number) => (
                         <tr 
@@ -106,15 +112,28 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                           {/* Wallet column */}
                           <td className="py-6 pl-6 pr-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
-                              {/* Ranking badge */}
+                              {/* Manager crown or ranking badge */}
                               <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-400 font-medium min-w-[20px]">
-                                  {startIndex + index + 1}
-                                </span>
+                                {investor.isManager ? (
+                                  <Crown className="h-4 w-4 text-yellow-500" title="Fund Manager" />
+                                ) : (
+                                  <span className="text-sm text-gray-400 font-medium min-w-[20px]">
+                                    {startIndex + index + (sortedInvestorData.some((inv: any) => inv.isManager) ? 0 : 1)}
+                                  </span>
+                                )}
                               </div>
                               {/* Wallet address */}
-                              <div className="text-gray-300 text-sm hover:text-blue-400 transition-colors">
-                                {formatUserAddress(investor.investor)}
+                              <div className="flex items-center gap-2">
+                                <div className={`text-sm hover:text-blue-400 transition-colors ${
+                                  investor.isManager ? 'text-yellow-300 font-medium' : 'text-gray-300'
+                                }`}>
+                                  {formatUserAddress(investor.investor)}
+                                </div>
+                                {investor.isManager && (
+                                  <Badge variant="outline" className="text-xs px-2 py-0.5 border-yellow-500 text-yellow-400 bg-yellow-500/10">
+                                    Manager
+                                  </Badge>
+                                )}
                               </div>
                             </div>
                           </td>
@@ -155,7 +174,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
             
             {/* Pagination - outside scrollable area, fixed at bottom */}
             {(() => {
-              const totalInvestors = Math.min(filteredInvestorData.length, maxPages * itemsPerPage);
+              const totalInvestors = Math.min(sortedInvestorData.length, maxPages * itemsPerPage);
               const totalPages = Math.min(Math.ceil(totalInvestors / itemsPerPage), maxPages);
               
               return totalPages > 1 && (

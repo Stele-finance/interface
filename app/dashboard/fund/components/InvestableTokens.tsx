@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Loader2, Coins, ChevronDown } from "lucide-react"
-import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
+import { useFundInvestableTokenPrices } from "../../../fund/hooks/useFundInvestableTokenPrices"
 import { useLanguage } from "@/lib/language-context"
 import { getTokenLogo } from "@/lib/utils"
 import Image from "next/image"
@@ -32,7 +32,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
   const { t } = useLanguage()
   // Use the selected network for querying
   const subgraphNetwork = selectedNetwork
-  const { data: tokensWithPrices, isLoading, error } = useInvestableTokenPrices(selectedNetwork)
+  const { data: tokensWithPrices, isLoading, error } = useFundInvestableTokenPrices(selectedNetwork)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -344,15 +344,15 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                     <TableRow 
                       key={token.id} 
                       className="border-0 hover:bg-gray-800/30 cursor-pointer transition-colors"
-                      onClick={() => handleRowClick(token.tokenAddress)}
+                      onClick={() => handleRowClick(token.address)}
                     >
                       <TableCell className="font-medium text-gray-100 pl-6 py-6 text-base">
                         <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
-                          {getTokenLogo(token.tokenAddress, subgraphNetwork) ? (
+                          {getTokenLogo(token.address, subgraphNetwork) ? (
                             <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex items-center justify-center">
                               <Image
-                                src={getTokenLogo(token.tokenAddress, subgraphNetwork)!}
+                                src={getTokenLogo(token.address, subgraphNetwork)!}
                                 alt={token.symbol}
                                 width={32}
                                 height={32}
@@ -381,7 +381,7 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                       </TableCell>
                       <TableCell className="py-6">
                         <span className="text-sm text-gray-300 font-mono">
-                          {formatAddress(token.tokenAddress)}
+                          {formatAddress(token.address)}
                         </span>
                       </TableCell>
                       <TableCell className="font-medium text-green-400 py-6 text-lg">
