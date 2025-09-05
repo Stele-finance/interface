@@ -84,7 +84,7 @@ export default function VotePage() {
   const subgraphNetwork = selectedNetwork
   
   // Fetch governance configuration from smart contract (temporarily disabled to prevent rate limiting)
-  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false)
+  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false, pageType)
   
   // Debug: Log governance config when it loads
   useEffect(() => {
@@ -132,7 +132,8 @@ export default function VotePage() {
     activeProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchActive
+    shouldFetchActive,
+    pageType
   )
   
   const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(
@@ -140,7 +141,8 @@ export default function VotePage() {
     completedProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchCompleted
+    shouldFetchCompleted,
+    pageType
   )
   
   const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(
@@ -148,13 +150,14 @@ export default function VotePage() {
     allProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchAll
+    shouldFetchAll,
+    pageType
   )
   
   // Fetch total counts for pagination - only for current tab
-  const { data: actionableCount } = useProposalsCountByStatus(activeStatuses, subgraphNetwork, shouldFetchActive)
-  const { data: completedCount } = useProposalsCountByStatus(completedStatuses, subgraphNetwork, shouldFetchCompleted)
-  const { data: allCount } = useProposalsCountByStatus(allStatuses, subgraphNetwork, shouldFetchAll)
+  const { data: actionableCount } = useProposalsCountByStatus(activeStatuses, subgraphNetwork, shouldFetchActive, pageType)
+  const { data: completedCount } = useProposalsCountByStatus(completedStatuses, subgraphNetwork, shouldFetchCompleted, pageType)
+  const { data: allCount } = useProposalsCountByStatus(allStatuses, subgraphNetwork, shouldFetchAll, pageType)
   
   // Get proposal IDs only for current tab to reduce API calls
   const getCurrentTabProposalIds = () => {
@@ -173,7 +176,7 @@ export default function VotePage() {
   const currentTabProposalIds = getCurrentTabProposalIds()
   
   // Fetch vote results only for current tab's proposals
-  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds, subgraphNetwork)
+  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds, subgraphNetwork, pageType)
 
   // Get current Ethereum mainnet block info from RPC (called only once)
   const getCurrentBlockInfo = useCallback(async () => {
