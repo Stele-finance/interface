@@ -13,6 +13,7 @@ interface PortfolioSummaryProps {
   challengeData: any
   network: string
   investorData: any
+  walletAddress: string
 }
 
 export function PortfolioSummary({ 
@@ -21,7 +22,8 @@ export function PortfolioSummary({
   isLoadingUniswap, 
   challengeData, 
   network, 
-  investorData 
+  investorData,
+  walletAddress 
 }: PortfolioSummaryProps) {
   const { t } = useLanguage()
   const { currentValue, formattedSeedMoney, gainLoss, gainLossPercentage, isPositive } = portfolioMetrics
@@ -177,140 +179,140 @@ export function PortfolioSummary({
   // Note: Using click-only approach for both desktop and mobile to prevent flickering issues
 
   return (
-    <Card className="bg-muted border-0 rounded-2xl">
-      <CardContent className="p-8 space-y-8">
-        {/* Row 1: Type and Status */}
-        <div className="grid grid-cols-2 gap-6">
-          {/* Network */}
-          <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('network')}</span>
-              <div className="flex items-center gap-3">
-               {network === 'ethereum' ? (
-                 <>
-                   <Image 
-                     src="/networks/small/ethereum.png" 
-                     alt="Ethereum Mainnet"
-                     width={24}
-                     height={24}
-                     className="rounded-full"
-                     style={{ width: 'auto', height: 'auto' }}
-                   />
-                   <span className="text-xl text-white">Mainnet</span>
-                 </>
-               ) : network === 'arbitrum' ? (
-                 <>
-                   <Image 
-                     src="/networks/small/arbitrum.png" 
-                     alt="Arbitrum One"
-                     width={24}
-                     height={24}
-                     className="rounded-full"
-                     style={{ width: 'auto', height: 'auto' }}
-                   />
-                   <span className="text-xl text-white">Arbitrum</span>
-                 </>
-               ) : (
-                 <>
-                   <Image 
-                     src="/networks/small/ethereum.png" 
-                     alt="Ethereum Mainnet"
-                     width={24}
-                     height={24}
-                     className="rounded-full"
-                     style={{ width: 'auto', height: 'auto' }}
-                   />
-                   <span className="text-xl text-white">Mainnet</span>
-                 </>
-               )}
-             </div>
-          </div>
-          
-          {/* Register */}
-          <div className="space-y-2 ml-6">
+    <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
+      <div className="p-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+            <span className="text-sm text-gray-400">{t('network')}</span>
             <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-blue-500" />
-              <span className="text-base text-gray-400">{t('register')}</span>
-            </div>
-            <div className="flex items-right gap-2 ml-4">
-              <span 
-                className={`text-xl font-medium ${investorData?.investor?.isRegistered === true ? 'text-green-400' : 'text-gray-400'}`}
-              >
-                {investorData?.investor?.isRegistered === true ? t('yes') : t('no')}
+              <Image 
+                src={network === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+                alt={network}
+                width={16}
+                height={16}
+                className="rounded-full"
+              />
+              <span className="text-sm text-white font-medium">
+                {network === 'ethereum' ? 'Mainnet' : network === 'arbitrum' ? 'Arbitrum' : 'Mainnet'}
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Portfolio Value */}
-        <div className="space-y-2">
-          <span className="text-base text-gray-400">{t('onChainValue')}</span>
-          <TooltipProvider>
-            <Tooltip open={showOnChainTooltip}>
-              <TooltipTrigger asChild>
-                <div 
-                  className="flex items-baseline gap-1 cursor-pointer"
-                  onClick={(e) => handleTooltipClick(
-                    e, 
-                    'onchain', 
-                    showOnChainTooltip, 
-                    setShowOnChainTooltip, 
-                    onChainTooltipTimer, 
-                    setOnChainTooltipTimer
-                  )}
-                  onMouseLeave={() => handleMouseLeave(setShowOnChainTooltip, onChainTooltipTimer, setOnChainTooltipTimer)}
-                >
-                  <div className="text-4xl text-white">
-                    ${(Math.floor(currentValue * 100) / 100).toFixed(2)}
-                  </div>
-                  <div className={`text-base ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                    ({isPositive ? '+' : ''}{(Math.floor(gainLossPercentage * 10000) / 10000).toFixed(4)}%)
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">{t('tooltipOnChainValue')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          {/* Real-time portfolio value */}
-          {realTimePortfolio && (
-            <div className="space-y-1">
-              {(() => {
-                const realTimeGainLoss = realTimePortfolio.totalValue - formattedSeedMoney
-                const realTimeGainLossPercentage = formattedSeedMoney > 0 ? (realTimeGainLoss / formattedSeedMoney) * 100 : 0
-                const isRealTimePositive = realTimeGainLoss >= 0
-                
-                return (
-                  <TooltipProvider>
-                    <Tooltip open={showLiveTooltip}>
-                      <TooltipTrigger asChild>
-                        <div 
-                          className={`text-base flex items-center gap-2 cursor-pointer ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}
-                          onClick={(e) => handleTooltipClick(
-                            e, 
-                            'live', 
-                            showLiveTooltip, 
-                            setShowLiveTooltip, 
-                            liveTooltipTimer, 
-                            setLiveTooltipTimer
-                          )}
-                          onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
-                        >
-                          <span className="w-3 h-3 bg-current rounded-full animate-pulse"></span>
-                          {t('live')}: ${(Math.floor(realTimePortfolio.totalValue * 100) / 100).toFixed(2)} ({isRealTimePositive ? '+' : ''}{(Math.floor(realTimeGainLossPercentage * 10000) / 10000).toFixed(4)}%)
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm">{t('tooltipLiveValue')}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )
-              })()}
+          
+          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+            <span className="text-sm text-gray-400">{t('status')}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-green-400">Active</span>
             </div>
-          )}
+          </div>
+          
+          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+            <span className="text-sm text-gray-400">{t('investor')}</span>
+            <span className="text-sm text-white font-medium">
+              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </span>
+          </div>
+          
+          <div className="py-2">
+            <div className="flex justify-between">
+              <div>
+                <span className="text-sm text-gray-400 block">{t('onChainValue')}</span>
+                {/* Real-time portfolio value */}
+                {realTimePortfolio && (
+                  <div className="mt-1">
+                    {(() => {
+                      const realTimeGainLoss = realTimePortfolio.totalValue - formattedSeedMoney
+                      const realTimeGainLossPercentage = formattedSeedMoney > 0 ? (realTimeGainLoss / formattedSeedMoney) * 100 : 0
+                      const isRealTimePositive = realTimeGainLoss >= 0
+                      
+                      return (
+                        <TooltipProvider>
+                          <Tooltip open={showLiveTooltip}>
+                            <TooltipTrigger asChild>
+                              <div 
+                                className={`text-sm inline-flex items-center gap-1 cursor-pointer ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}
+                                onClick={(e) => handleTooltipClick(
+                                  e, 
+                                  'live', 
+                                  showLiveTooltip, 
+                                  setShowLiveTooltip, 
+                                  liveTooltipTimer, 
+                                  setLiveTooltipTimer
+                                )}
+                                onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
+                              >
+                                <span className="w-2 h-2 bg-current rounded-full animate-pulse"></span>
+                                <span>{t('live')}:</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-sm">{t('tooltipLiveValue')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )
+                    })()}
+                  </div>
+                )}
+              </div>
+              <div className="text-right">
+                <TooltipProvider>
+                  <Tooltip open={showOnChainTooltip}>
+                    <TooltipTrigger asChild>
+                      <div 
+                        className="cursor-pointer"
+                        onClick={(e) => handleTooltipClick(
+                          e, 
+                          'onchain', 
+                          showOnChainTooltip, 
+                          setShowOnChainTooltip, 
+                          onChainTooltipTimer, 
+                          setOnChainTooltipTimer
+                        )}
+                        onMouseLeave={() => handleMouseLeave(setShowOnChainTooltip, onChainTooltipTimer, setOnChainTooltipTimer)}
+                      >
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-sm text-white font-medium">
+                            ${(Math.floor(currentValue * 100) / 100).toFixed(2)}
+                          </span>
+                          <span className={`text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                            ({isPositive ? '+' : ''}{(Math.floor(gainLossPercentage * 10000) / 10000).toFixed(4)}%)
+                          </span>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">{t('tooltipOnChainValue')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                {/* Real-time portfolio value - right side */}
+                {realTimePortfolio && (
+                  <div className="mt-1">
+                    {(() => {
+                      const realTimeGainLoss = realTimePortfolio.totalValue - formattedSeedMoney
+                      const realTimeGainLossPercentage = formattedSeedMoney > 0 ? (realTimeGainLoss / formattedSeedMoney) * 100 : 0
+                      const isRealTimePositive = realTimeGainLoss >= 0
+                      
+                      return (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-sm text-white font-medium">
+                            ${(Math.floor(realTimePortfolio.totalValue * 100) / 100).toFixed(2)}
+                          </span>
+                          <span className={`text-sm ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
+                            ({isRealTimePositive ? '+' : ''}{(Math.floor(realTimeGainLossPercentage * 10000) / 10000).toFixed(4)}%)
+                          </span>
+                        </div>
+                      )
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   )
 } 

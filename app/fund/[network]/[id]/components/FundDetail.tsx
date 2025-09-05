@@ -605,6 +605,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           <FundCharts 
             fundId={fundId} 
             network={network as 'ethereum' | 'arbitrum' | null}
+            fundData={data}
+            tokensWithPrices={tokensWithPrices}
             investButton={isClient ? {
               isClient,
               shouldShowGetRewards,
@@ -652,6 +654,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 subgraphNetwork={subgraphNetwork}
                 routeNetwork={subgraphNetwork}
                 useFundInvestors={useFundInvestors}
+                fundData={data}
               />
             </TabsContent>
 
@@ -995,7 +998,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           </div>
           
           {/* Portfolio Allocation Card */}
-          <Card className="bg-transparent border border-gray-600 rounded-2xl">
+          <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
                 <PieChart className="h-5 w-5" />
@@ -1032,7 +1035,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                           <div className="text-lg font-bold text-white">
                             ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                           </div>
-                          <div className="text-xs text-gray-400">Total Value</div>
                           {portfolioData.tokens.some(token => token.isRealTime) && (
                             <div className="flex items-center justify-center gap-1 mt-1">
                               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -1064,12 +1066,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                   maximumFractionDigits: token.amount < 1 ? 6 : 4 
                                 })})
                           </span>
-                          {token.isRealTime && (
-                            <span className="text-xs text-green-400 flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                              Live
-                            </span>
-                          )}
                         </div>
                         <div className="text-right">
                           <div className="text-sm text-white font-medium">
@@ -1078,11 +1074,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                           <div className="text-xs text-green-400">
                             ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </div>
-                          {token.price > 0 && (
-                            <div className="text-xs text-gray-500">
-                              ${token.price.toLocaleString(undefined, { maximumFractionDigits: 4 })} each
-                            </div>
-                          )}
                         </div>
                       </div>
                     ))}
@@ -1111,7 +1102,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           </Card>
 
           {/* Fund Info Card */}
-          <Card className="bg-transparent border border-gray-600 rounded-2xl">
+          <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
@@ -1134,6 +1125,16 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">Investment</span>
+                  <span className="text-sm text-white font-medium">
+                    ${fund && fund.share 
+                      ? (parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : '0.00'
+                    }
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-400">TVL</span>
                     {portfolioData.tokens.some(token => token.isRealTime) && (
@@ -1151,12 +1152,19 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">Profit</span>
                   <span className={`text-sm font-medium ${
-                    fund && parseFloat(fund.profitRatio || '0') >= 0 ? 'text-green-400' : 'text-red-400'
+                    (() => {
+                      const principal = fund && fund.share ? parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS) : 0
+                      const currentValue = portfolioData.totalValue
+                      const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                      return profitPercent >= 0 ? 'text-green-400' : 'text-red-400'
+                    })()
                   }`}>
-                    {fund && fund.profitRatio 
-                      ? `${parseFloat(fund.profitRatio) >= 0 ? '+' : ''}${(parseFloat(fund.profitRatio) * 100).toFixed(2)}%`
-                      : '0.00%'
-                    }
+                    {(() => {
+                      const principal = fund && fund.share ? parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS) : 0
+                      const currentValue = portfolioData.totalValue
+                      const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                      return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`
+                    })()}
                   </span>
                 </div>
                 

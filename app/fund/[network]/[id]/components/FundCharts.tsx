@@ -18,6 +18,8 @@ import { useFundSnapshots, FundSnapshotType } from "../hooks/useFundSnapshots"
 interface FundChartsProps {
   fundId: string
   network: 'ethereum' | 'arbitrum' | null
+  fundData?: any // Fund data for calculating real-time value
+  tokensWithPrices?: any[] // Real-time token prices
   investButton?: {
     isClient: boolean
     shouldShowGetRewards: boolean
@@ -40,7 +42,7 @@ interface FundChartsProps {
   }
 }
 
-export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
+export function FundCharts({ fundId, network, fundData, tokensWithPrices, investButton }: FundChartsProps) {
   const { t, language } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
   const [intervalType, setIntervalType] = useState<FundSnapshotType>('daily')
@@ -65,6 +67,34 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
     return () => clearInterval(interval)
   }, [])
 
+  // Calculate real-time fund value using latest snapshot tokens and current prices
+  const realTimeFundValue = useMemo(() => {
+    if (!fundData?.fund || !tokensWithPrices || tokensWithPrices.length === 0) {
+      return null
+    }
+
+    if (!snapshotsData?.fundSnapshots || snapshotsData.fundSnapshots.length === 0) {
+      return null
+    }
+
+    // Calculate real-time value using fund tokens and current prices
+    let totalValue = 0
+    let hasRealTimeData = false
+
+    fundData.fund.tokensSymbols.forEach((symbol: string, index: number) => {
+      const fundTokenAmount = parseFloat(fundData.fund.tokensAmount?.[index] || '0')
+      
+      // Find current price for this token
+      const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
+      if (tokenWithPrice?.price) {
+        totalValue += fundTokenAmount * tokenWithPrice.price
+        hasRealTimeData = true
+      }
+    })
+
+    return hasRealTimeData ? totalValue : null
+  }, [fundData, tokensWithPrices, snapshotsData])
+
   // Transform real fund snapshots data for chart
   const fundChartData = useMemo(() => {
     if (!snapshotsData?.fundSnapshots || snapshotsData.fundSnapshots.length === 0) {
@@ -72,7 +102,7 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
       return []
     }
     
-    return snapshotsData.fundSnapshots.map((snapshot) => {
+    const snapshots = snapshotsData.fundSnapshots.map((snapshot) => {
       const date = new Date(parseInt(snapshot.timestamp) * 1000)
       const tvlUSD = parseFloat(snapshot.amountUSD)
       const investorCount = parseInt(snapshot.investorCount)
@@ -108,7 +138,33 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
         tokensSymbols: snapshot.tokensSymbols
       }
     }).sort((a, b) => a.timestamp - b.timestamp)
-  }, [snapshotsData, language, intervalType])
+
+    // Add LIVE data point if we have real-time data
+    if (realTimeFundValue !== null && snapshots.length > 0) {
+      const now = new Date()
+      const month = now.getMonth() + 1
+      const day = now.getDate()
+      
+      const liveDataPoint = {
+        id: 'live',
+        investorCount: snapshots[snapshots.length - 1].investorCount, // Use latest investor count
+        tvlUSD: realTimeFundValue,
+        formattedDate: 'Live',
+        fullDate: 'Real-time data',
+        dateLabel: now.toISOString().split('T')[0],
+        timeLabel: intervalType === 'monthly' 
+          ? `${month}/${String(now.getFullYear()).slice(2)}-Live`
+          : `${month}/${day}-Live`,
+        timestamp: Math.floor(now.getTime() / 1000),
+        tokensSymbols: fundData.fund.tokensSymbols,
+        isLive: true
+      }
+      
+      return [...snapshots, liveDataPoint]
+    }
+
+    return snapshots
+  }, [snapshotsData, language, intervalType, realTimeFundValue, fundData])
 
   const chartData = fundChartData
 
@@ -521,6 +577,40 @@ export function FundCharts({ fundId, network, investButton }: FundChartsProps) {
                 dot={false}
                 activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
               />
+              
+              {/* Add green reference dot for LIVE data point with pulsing animation - matching investor page UI/UX */}
+              {realTimeFundValue !== null && chartData.length > 0 && (() => {
+                const liveDataPoint = chartData.find(d => d.isLive)
+                if (liveDataPoint) {
+                  const PulsingDot = (props: any) => (
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={8}
+                      fill="#22c55e"
+                      stroke="#ffffff"
+                      strokeWidth={3}
+                    >
+                      <animate
+                        attributeName="opacity"
+                        values="1;0.3;1"
+                        dur="2s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  )
+                  
+                  return (
+                    <ReferenceDot
+                      key="live-dot"
+                      x={liveDataPoint.timeLabel}
+                      y={liveDataPoint.tvlUSD}
+                      shape={<PulsingDot />}
+                    />
+                  )
+                }
+                return null
+              })()}
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>

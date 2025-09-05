@@ -16,10 +16,6 @@ const FUND_INVESTOR_QUERY = gql`
       amountUSD
       profitUSD
       profitRatio
-      tokens
-      tokensSymbols
-      tokensDecimals
-      tokensAmount
     }
   }
 `
@@ -35,14 +31,10 @@ export interface FundInvestor {
   fundId: string
   investor: string
   isManager: boolean
-  share: string
+  share: string  // Will be BigInt from subgraph but treated as string in GraphQL
   amountUSD: string
   profitUSD: string
   profitRatio: string
-  tokens: string[]
-  tokensSymbols: string[]
-  tokensDecimals: string[]
-  tokensAmount: string[]
 }
 
 export interface FundInvestorResponse {

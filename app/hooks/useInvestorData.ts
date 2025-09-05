@@ -7,6 +7,7 @@ export const getInvestorQuery = (investorId: string) => gql`{
   investor(id: "${investorId}") {
     challengeId
     createdAtTimestamp
+    endTime
     updatedAtTimestamp
     investor
     seedMoneyUSD
@@ -17,7 +18,6 @@ export const getInvestorQuery = (investorId: string) => gql`{
     tokensSymbols
     profitUSD
     profitRatio
-    isRegistered
   }
 }`
 
@@ -25,6 +25,7 @@ export interface InvestorData {
   investor: {
     challengeId: string
     createdAtTimestamp: string
+    endTime: string
     updatedAtTimestamp: string
     investor: string
     seedMoneyUSD: string
@@ -35,7 +36,6 @@ export interface InvestorData {
     tokensSymbols: string[]
     profitUSD: string
     profitRatio: string
-    isRegistered: boolean
   }
 }
 

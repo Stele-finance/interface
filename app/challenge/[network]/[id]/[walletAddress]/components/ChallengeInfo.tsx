@@ -158,177 +158,36 @@ export function ChallengeInfo({
   // Note: Using click-only approach for both desktop and mobile to prevent flickering issues
 
   return (
-    <Card className="bg-muted border-0 rounded-2xl">
-      <CardContent className="p-8 space-y-8">
-        {/* Row 1: Challenge ID and Seed Money */}
-        <div className="grid grid-cols-2 gap-6">
-          {/* Challenge ID */}
-          <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('challenge')}</span>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Trophy className="w-6 h-6 text-yellow-400" />
-                {/* Show network icon only when connected to Arbitrum */}
-                {network === 'arbitrum' && (
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                    <Image 
-                      src="/networks/small/arbitrum.png" 
-                      alt="Arbitrum"
-                      width={12}
-                      height={12}
-                      className="rounded-full"
-                      style={{ width: 'auto', height: 'auto' }}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="text-3xl text-white">
-                {challengeId}
-              </div>
-            </div>
-          </div>
-
-          {/* Seed Money */}
-          <div className="space-y-2">
-            <span className="text-base text-gray-400">{t('seedMoney')}</span>
-            <TooltipProvider>
-              <Tooltip open={showSeedMoneyTooltip}>
-                <TooltipTrigger asChild>
-                                    <div 
-                    className="text-3xl text-white cursor-pointer"
-                    onClick={(e) => handleTooltipClick(
-                      e, 
-                      'seedmoney', 
-                      showSeedMoneyTooltip, 
-                      setShowSeedMoneyTooltip, 
-                      seedMoneyTooltipTimer, 
-                      setSeedMoneyTooltipTimer
-                    )}
-                    onMouseLeave={() => handleMouseLeave(setShowSeedMoneyTooltip, seedMoneyTooltipTimer, setSeedMoneyTooltipTimer)}
-                  >
-                    {(() => {
-                      // If we have challenge data and seedMoney is available
-                      if (challengeData?.challenge?.seedMoney) {
-                        const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                        return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
-                      }
-                      // Default fallback
-                      return '$0';
-                    })()}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm">{t('tooltipSeedMoney')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-
-        {/* Challenge Type & Progress */}
-        <div className="space-y-3">
-          {/* Progress */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg">⏳</span>
-                  <span className="text-lg text-gray-400">
-                    {(() => {
-                      const challengeType = challengeData?.challenge?.challengeType;
-                      switch (challengeType) {
-                        case 0:
-                          return t('oneWeek');
-                        case 1:
-                          return t('oneMonth');
-                        case 2:
-                          return t('threeMonths');
-                        case 3:
-                          return t('sixMonths');
-                        case 4:
-                          return t('oneYear');
-                        default:
-                          return challengeType !== undefined ? `Type ${challengeType}` : `Type Unknown`;
-                      }
-                    })()}
-                  </span>
-                </div>
-              </div>
-              <span className="text-base font-medium text-gray-300">
-                {(() => {
-                  if (!challengeDetails || !isClient) return '0%';
-                  
-                  const startTime = challengeDetails.startTime.getTime();
-                  const endTime = challengeDetails.endTime.getTime();
-                  const now = currentTime.getTime();
-                  
-                  if (now < startTime) return '0%';
-                  if (now >= endTime) return '100%';
-                  
-                  const totalDuration = endTime - startTime;
-                  const elapsed = now - startTime;
-                  const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                  
-                  return `${progress.toFixed(0)}%`;
-                })()}
-              </span>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="relative">
-              <TooltipProvider>
-                <Tooltip open={showMobileTooltip}>
-                  <TooltipTrigger asChild>
-                    <div 
-                      className="w-full bg-gray-700 rounded-full h-3 cursor-pointer"
-                      onClick={(e) => handleTooltipClick(
-                        e, 
-                        'progress', 
-                        showMobileTooltip, 
-                        setShowMobileTooltip, 
-                        tooltipTimer, 
-                        setTooltipTimer
-                      )}
-                      onMouseLeave={() => handleMouseLeave(setShowMobileTooltip, tooltipTimer, setTooltipTimer)}
-                    >
-                      <div 
-                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300 ease-out"
-                        style={{ 
-                          width: `${(() => {
-                            if (!challengeDetails || !isClient) return 0;
-                            
-                            const startTime = challengeDetails.startTime.getTime();
-                            const endTime = challengeDetails.endTime.getTime();
-                            const now = currentTime.getTime();
-                            
-                            if (now < startTime) return 0;
-                            if (now >= endTime) return 100;
-                            
-                            const totalDuration = endTime - startTime;
-                            const elapsed = now - startTime;
-                            const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                            
-                            return progress;
-                          })()}%` 
-                        }}
-                      ></div>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm font-medium">{timeRemaining.text}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+    <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
+      <div className="p-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+            <span className="text-sm text-gray-400">Challenge ID</span>
+            <span className="text-sm text-white font-medium">#{challengeId}</span>
           </div>
           
-          {/* Time Info */}
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>{challengeDetails?.startTime ? challengeDetails.startTime.toLocaleDateString() : 'N/A'}</span>
-            <span>{challengeDetails?.endTime ? challengeDetails.endTime.toLocaleDateString() : 'N/A'}</span>
+          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+            <span className="text-sm text-gray-400">{t('seedMoney')}</span>
+            <span className="text-sm text-white font-medium">
+              {(() => {
+                if (challengeData?.challenge?.seedMoney) {
+                  const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
+                  return seedMoneyValue > 0 ? `$${seedMoneyValue.toLocaleString()}` : '$0';
+                }
+                return '$0';
+              })()}
+            </span>
           </div>
+          
+          <div className="flex justify-between items-center py-2">
+            <span className="text-sm text-gray-400">{t('investors')}</span>
+            <span className="text-sm text-white font-medium">
+              {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
+            </span>
+          </div>
+          
         </div>
-      </CardContent>
+      </div>
     </Card>
   )
 } 

@@ -14,10 +14,18 @@ const GET_CHALLENGE_INVESTORS_QUERY = `
     ) {
       id
       challengeId
-      investor
-      currentUSD
-      isRegistered
+      createdAtTimestamp
+      endTime
       updatedAtTimestamp
+      investor
+      seedMoneyUSD
+      currentUSD
+      tokens
+      tokensAmount
+      tokensDecimals
+      tokensSymbols
+      profitUSD
+      profitRatio
     }
   }
 `
@@ -25,20 +33,36 @@ const GET_CHALLENGE_INVESTORS_QUERY = `
 export interface ChallengeInvestorData {
   id: string
   challengeId: string
-  investor: string
-  currentUSD: string
-  isRegistered: boolean
+  createdAtTimestamp: string
+  endTime: string
   updatedAtTimestamp: string
+  investor: string
+  seedMoneyUSD: string
+  currentUSD: string
+  tokens: string[]
+  tokensAmount: string[]
+  tokensDecimals: string[]
+  tokensSymbols: string[]
+  profitUSD: string
+  profitRatio: string
 }
 
 interface GraphQLResponse {
   investors: Array<{
     id: string
     challengeId: string
-    investor: string
-    currentUSD: string
-    isRegistered: boolean
+    createdAtTimestamp: string
+    endTime: string
     updatedAtTimestamp: string
+    investor: string
+    seedMoneyUSD: string
+    currentUSD: string
+    tokens: string[]
+    tokensAmount: string[]
+    tokensDecimals: string[]
+    tokensSymbols: string[]
+    profitUSD: string
+    profitRatio: string
   }>
 }
 

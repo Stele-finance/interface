@@ -15,6 +15,8 @@ import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useTokenPrices } from "@/lib/token-price-context"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
+import { usePerformanceNFT } from "../../hooks/usePerformanceNFT"
+import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -37,6 +39,7 @@ import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { isUserInTop5 } from "./utils/rankingUtils"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
@@ -55,6 +58,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: userTokens = [], error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
   const { data: challengeData, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
+  const { data: performanceNFT } = usePerformanceNFT(challengeId, walletAddress, subgraphNetwork)
+  const { data: rankingData } = useRanking(challengeId, subgraphNetwork)
   
   // Get token prices from global context
   const { getTokenPriceBySymbol, isLoading: isLoadingUniswap } = useTokenPrices()
@@ -99,7 +104,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       tokensWithPrices,
       totalTokens: userTokens.length,
       timestamp: Date.now(),
-      isRegistered: investorData?.investor?.isRegistered === true
+      isRegistered: investorData?.investor !== null && investorData?.investor !== undefined
     }
   }, [userTokens, getTokenPriceBySymbol, investorData])
 
@@ -433,6 +438,25 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const challengeDetails = getChallengeDetails(challengeData)
   const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
   const isChallengeEnded = challengeDetails && new Date() > challengeDetails.endTime;
+  
+  // Determine challenge state
+  const getChallengeState = () => {
+    if (!challengeData?.challenge) return 'unknown';
+    const isActive = challengeData.challenge.isActive === true;
+    const hasTimePassed = challengeDetails && new Date() > challengeDetails.endTime;
+    
+    if (isActive && !hasTimePassed) return 'active';
+    if (isActive && hasTimePassed) return 'pending';
+    return 'end';
+  };
+  
+  const challengeState = getChallengeState();
+  
+  // Check if user is in top 5 for mint NFT eligibility
+  const userInTop5 = isUserInTop5(rankingData, walletAddress)
+  
+  // Check if NFT has been minted (disable mint button if already minted)
+  const hasNFTMinted = !!performanceNFT
 
   // Handle loading and error states - removed main loading state for better UX
 
@@ -581,23 +605,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <ActionButtons 
                     connectedAddress={connectedAddress}
                     walletAddress={walletAddress}
-                    isRegistered={investorData?.investor?.isRegistered === true}
+                    challengeState={challengeState}
+                    userInTop5={userInTop5}
+                    hasNFTMinted={hasNFTMinted}
                     isSwapMode={isSwapMode}
                     isRegistering={isRegistering}
                     isAssetSwapping={isAssetSwapping}
+                    isMinting={isMinting}
                     onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
                     onRegister={handleRegisterClick}
+                    onMintNFT={handleMintNFT}
                   />
-                   
-                   {/* Desktop Registered status - Show on desktop, hide on mobile */}
-                  {investorData?.investor?.isRegistered === true && (
-                    <RegisteredStatus 
-                      challengeId={challengeId}
-                      onMintNFT={handleMintNFT}
-                      isMinting={isMinting}
-                      isChallengeEnded={!!isChallengeEnded}
-                    />
-                  )}
                  </div>
               </div>
               
@@ -639,6 +657,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   challengeData={challengeData}
                   network={routeNetwork || 'ethereum'}
                   investorData={investorData}
+                  walletAddress={walletAddress}
                 />
               )}
 
@@ -665,7 +684,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     </div>
 
       {/* Mobile Mint NFT Button - Show only when registered and challenge ended */}
-      {investorData?.investor?.isRegistered === true && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
+      {investorData?.investor && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <div className="p-4">
             <Button 

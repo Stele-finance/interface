@@ -25,6 +25,7 @@ import { PieChart } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 import { getTokenLogo } from "@/lib/utils"
+import { USDC_DECIMALS } from "@/lib/constants"
 
 interface FundInvestorPageProps {
   params: Promise<{
@@ -154,9 +155,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   // Get investable token prices for portfolio calculation
   const { data: tokensWithPrices } = useInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
 
-  // Calculate portfolio data from investor tokens
+  // Calculate portfolio data from fund tokens using investor's share ratio
   const portfolioData = useMemo(() => {
-    if (!investor || !investor.tokensSymbols || !investor.tokensAmount || !tokensWithPrices) {
+    if (!investor || !fundData?.fund?.tokensSymbols || !fundData?.fund?.tokensAmount || !tokensWithPrices) {
       return {
         tokens: [],
         totalValue: investor ? parseFloat(investor.amountUSD || '0') : 0,
@@ -164,29 +165,35 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
       }
     }
 
-    const tokens = investor.tokensSymbols.map((symbol, index) => {
-      // tokensAmount is already formatted as BigDecimal from subgraph
-      const actualAmount = parseFloat(investor.tokensAmount?.[index] || '0')
+    // Calculate share ratio: investor.share / fund.share
+    const investorShare = parseFloat(investor.share || '0')
+    const fundShare = parseFloat(fundData.fund.share || '0')
+    const shareRatio = fundShare > 0 ? investorShare / fundShare : 0
+
+    const tokens = fundData.fund.tokensSymbols.map((symbol, index) => {
+      // Get fund's token amount and calculate investor's portion using share ratio
+      const fundTokenAmount = parseFloat(fundData.fund.tokensAmount?.[index] || '0')
+      const investorTokenAmount = fundTokenAmount * shareRatio
       
       // Find price from tokensWithPrices
       const tokenWithPrice = tokensWithPrices.find(t => t.symbol === symbol)
       const price = tokenWithPrice?.price || 0
-      const value = actualAmount * price
+      const value = investorTokenAmount * price
 
       return {
         symbol,
-        amount: actualAmount,
+        amount: investorTokenAmount,
         value,
         price,
-        percentage: 0 // Will be calculated after total
+        percentage: 0, // Will be calculated after total
+        isRealTime: !!tokenWithPrice?.price // Mark as real-time if price is available
       }
     }).filter(token => token.amount > 0)
 
-    // Use amountUSD from investor data directly for total value
-    const totalValue = parseFloat(investor.amountUSD || '0')
-    
-    // Calculate sum of token values for percentage calculation
+    // Calculate total value from real-time token prices 
     const tokenValueSum = tokens.reduce((sum, token) => sum + token.value, 0)
+    // Use real-time calculation if we have token data, otherwise fall back to investor.amountUSD
+    const totalValue = tokenValueSum > 0 ? tokenValueSum : parseFloat(investor.amountUSD || '0')
     
     // Calculate percentages based on token value sum to ensure they add to 100%
     if (tokens.length === 1) {
@@ -219,7 +226,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
       totalValue,
       colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
     }
-  }, [investor, tokensWithPrices])
+  }, [investor, fundData, tokensWithPrices])
 
   // Calculate real-time portfolio value based on fund investor data
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -369,6 +376,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 network={subgraphNetwork as 'ethereum' | 'arbitrum'}
                 isLoadingInvestor={isLoadingInvestor}
                 intervalType={chartInterval}
+                fundData={fundData}
+                investorData={fundInvestorData}
+                tokensWithPrices={tokensWithPrices}
               />
             ) : (
               <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-8">
@@ -468,7 +478,12 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                 <div className="text-lg font-bold text-white">
                                   ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                 </div>
-                                <div className="text-xs text-gray-400">Total Value</div>
+                                {portfolioData.tokens.some(token => token.isRealTime) && (
+                                  <div className="flex items-center justify-center gap-1 mt-1">
+                                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                                    <span className="text-xs text-green-400">Live</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -517,7 +532,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                 <div className="text-lg font-bold text-white">
                                   ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                 </div>
-                                <div className="text-xs text-gray-400">Total Value</div>
                               </div>
                             </div>
                           </div>
@@ -833,24 +847,51 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Current Value</span>
+                        <span className="text-sm text-gray-400">Investment</span>
                         <span className="text-sm text-white font-medium">
-                          ${parseFloat(investor.amountUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          ${investor && investor.share 
+                            ? (parseFloat(investor.share) / Math.pow(10, USDC_DECIMALS)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            : '0.00'
+                          }
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-400">Current Value</span>
+                          {portfolioData.tokens.some(token => token.isRealTime) && (
+                            <span className="text-xs text-green-400 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                              Live
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-sm text-white font-medium">
+                          ${portfolioData.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">Profit</span>
-                        <span className={`text-sm font-medium ${parseFloat(investor.profitRatio || '0') >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          {investor.profitRatio 
-                            ? `${parseFloat(investor.profitRatio) >= 0 ? '+' : ''}${(parseFloat(investor.profitRatio) * 100).toFixed(2)}%`
-                            : '0.00%'
-                          }
+                        <span className={`text-sm font-medium ${
+                          (() => {
+                            const currentValue = portfolioData.totalValue  // Use real-time value from portfolio
+                            const principal = investor?.share ? parseFloat(investor.share) / Math.pow(10, USDC_DECIMALS) : 0
+                            const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                            return profitPercent >= 0 ? 'text-green-400' : 'text-red-400'
+                          })()
+                        }`}>
+                          {(() => {
+                            const currentValue = portfolioData.totalValue  // Use real-time value from portfolio
+                            const principal = investor?.share ? parseFloat(investor.share) / Math.pow(10, USDC_DECIMALS) : 0
+                            const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                            return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`
+                          })()}
                         </span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm text-gray-400">My Share</span>
+                        <span className="text-sm text-gray-400">Stake</span>
                         <span className="text-sm text-white font-medium">
                           {finalSharePercentage.toFixed(2)}%
                         </span>

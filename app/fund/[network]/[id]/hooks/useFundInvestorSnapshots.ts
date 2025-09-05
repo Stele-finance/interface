@@ -20,10 +20,6 @@ const FUND_INVESTOR_SNAPSHOTS_QUERY = gql`
       amountUSD
       profitUSD
       profitRatio
-      tokens
-      tokensSymbols
-      tokensDecimals
-      tokensAmountUSD
     }
   }
 `
@@ -38,14 +34,10 @@ export interface FundInvestorSnapshot {
   fundId: string
   manager: string
   investor: string
-  share: string
+  share: string  // BigInt from subgraph but treated as string in GraphQL
   amountUSD: string
   profitUSD: string
   profitRatio: string
-  tokens: string[]
-  tokensSymbols: string[]
-  tokensDecimals: string[]
-  tokensAmountUSD: string[]
 }
 
 export interface FundInvestorSnapshotsResponse {

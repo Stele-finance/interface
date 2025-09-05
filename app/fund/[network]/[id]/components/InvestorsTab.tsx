@@ -12,10 +12,11 @@ interface InvestorsTabProps {
   subgraphNetwork: string
   routeNetwork: string
   useFundInvestors: any // Hook for fetching fund investors
+  fundData?: any // Fund data for stake calculation
 }
 
 
-export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFundInvestors }: InvestorsTabProps) {
+export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFundInvestors, fundData }: InvestorsTabProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
@@ -41,12 +42,14 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
     return `$${truncated.toFixed(2)}`
   }
 
-  // Helper function to format profit ratio as percentage
-  const formatProfitRatio = (ratio: string | number) => {
-    const num = typeof ratio === 'string' ? parseFloat(ratio) : ratio
-    const percentage = (num * 100).toFixed(2)
-    const sign = num >= 0 ? '+' : ''
-    return `${sign}${percentage}%`
+  // Helper function to calculate stake percentage
+  const calculateStake = (investorShare: string) => {
+    if (!fundData?.fund?.share || !investorShare) return '0.00%'
+    const investorShareNum = parseFloat(investorShare)
+    const fundShareNum = parseFloat(fundData.fund.share)
+    if (fundShareNum === 0) return '0.00%'
+    const percentage = (investorShareNum / fundShareNum) * 100
+    return `${percentage.toFixed(2)}%`
   }
 
   // Sort data to show manager first, then investors by amount
@@ -91,7 +94,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                     <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
                       <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Profit Ratio</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Stake</th>
                       <th className="text-right py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('updated')}</th>
                     </tr>
                   </thead>
@@ -145,16 +148,10 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                             </div>
                           </td>
 
-                          {/* Profit Ratio column */}
+                          {/* Stake column */}
                           <td className="py-6 px-4 whitespace-nowrap">
-                            <div className="font-medium">
-                              <span className={`${
-                                parseFloat(investor.profitRatio || '0') >= 0 
-                                  ? 'text-green-400' 
-                                  : 'text-red-400'
-                              }`}>
-                                {formatProfitRatio(investor.profitRatio || 0)}
-                              </span>
+                            <div className="font-medium text-blue-400">
+                              {calculateStake(investor.share)}
                             </div>
                           </td>
 
