@@ -24,10 +24,6 @@ const GET_FUND_INVESTORS_QUERY = `
       amountUSD
       profitUSD
       profitRatio
-      tokens
-      tokensSymbols
-      tokensDecimals
-      tokensAmount
     }
   }
 `
@@ -39,14 +35,10 @@ export interface FundInvestor {
   fundId: string
   investor: string
   isManager: boolean
-  share: string
+  share: string | null
   amountUSD: string
   profitUSD: string
   profitRatio: string
-  tokens: string[]
-  tokensSymbols: string[]
-  tokensDecimals: string[]
-  tokensAmount: string[]
 }
 
 export interface FundInvestorsResponse {
