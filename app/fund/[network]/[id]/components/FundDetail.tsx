@@ -242,31 +242,20 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       const networkKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund';
       const steleFundAddress = NETWORK_CONTRACTS[networkKey].STELE_FUND_CONTRACT_ADDRESS;
       
-      console.log('SteleFund contract address:', steleFundAddress);
-      console.log('Fund ID:', fundId);
-      console.log('Fund ID type:', typeof fundId);
-      console.log('Network:', network);
-      console.log('Connected address:', connectedAddress);
-      console.log('Fund manager:', fund?.manager);
-      console.log('Is manager (calculated):', isManager);
       
       // Convert fundId to number
       const fundIdNumber = parseInt(fundId);
-      console.log('Fund ID as number:', fundIdNumber);
       
       // Create contract instance
       const steleFundContract = new ethers.Contract(steleFundAddress, SteleFundABI.abi, signer);
       
       // Verify the signer address matches connected address
       const signerAddress = await signer.getAddress();
-      console.log('Signer address:', signerAddress);
-      console.log('Addresses match:', signerAddress.toLowerCase() === connectedAddress.toLowerCase());
       
       // Estimate gas first (SteleFund.mintManagerNFT only takes fundId)
       let gasEstimate;
       try {
         gasEstimate = await steleFundContract.mintManagerNFT.estimateGas(fundIdNumber);
-        console.log('Gas estimate:', gasEstimate.toString());
       } catch (estimateError) {
         console.error('Gas estimation error:', estimateError);
         throw new Error('Failed to estimate gas. Please check if you are the fund manager.');

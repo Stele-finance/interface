@@ -647,8 +647,8 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
           await queryClient.invalidateQueries({ queryKey: ['proposalsByStatus'] });
           await queryClient.invalidateQueries({ queryKey: ['multipleProposalVoteResults'] });
           
-          // Navigate to vote page
-          router.push("/vote");
+          // Navigate to challenge vote page
+          router.push("/vote/challenge");
         }, 1000);
       }
     }

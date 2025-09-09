@@ -275,13 +275,20 @@ export function useActiveProposalsData(currentBlockNumber?: number, network: 'et
 export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
+  
   return useQuery<ProposalVoteResultResponse>({
     queryKey: ['proposalVoteResult', proposalId, network, pageType],
     queryFn: async () => {
+      
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 300))
-      const result = await request(subgraphUrl, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
-      return result
+      
+      try {
+        const result = await request(subgraphUrl, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
+        return result
+      } catch (error) {
+        throw error
+      }
     },
     enabled: !!proposalId, // Only run query if proposalId is provided
     refetchInterval: 2 * 60 * 1000, // Increase to 2 minutes
@@ -471,13 +478,20 @@ export function useProposalsCountByStatus(
 export function useProposalDetails(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
+  
   return useQuery<ProposalDetailsResponse>({
     queryKey: ['proposalDetails', proposalId, network, pageType],
     queryFn: async () => {
+      
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 600 + 200))
-      const result = await request(subgraphUrl, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
-      return result || { proposal: null }
+      
+      try {
+        const result = await request(subgraphUrl, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
+        return result || { proposalCreateds: [] }
+      } catch (error) {
+        throw error
+      }
     },
     enabled: !!proposalId, // Only run query if proposalId is provided
     staleTime: 15 * 60 * 1000, // 15 minutes (proposal details rarely change)

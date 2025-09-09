@@ -95,10 +95,10 @@ export const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
   },
   arbitrum_fund: {
-    STELE_FUND_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
-    STELE_FUND_SETTING_ADDRESS: "0x809D9f5Eb31C653d888250657C0fe2315dA2BA25",
-    STELE_FUND_INFO_ADDRESS: "0x77c8E364773a48C978926aEe54D3752442A0bbE0",
-    STELE_FUND_CONTRACT_ADDRESS: "0xd4474751F0C1EE2F9f623aD19861bB562efEBCDF",
+    STELE_FUND_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
+    STELE_FUND_SETTING_ADDRESS: "0xbC8b4f64E5850Ab36357120436c63443234a9110",
+    STELE_FUND_INFO_ADDRESS: "0x29FCa58aF1eB6d60C8c58441008235f35B39c12E",
+    STELE_FUND_CONTRACT_ADDRESS: "0xE64FA6e23aFdA9aD677f65864a20566BAeA8aAf5",
     STELE_FUND_GOVERNANCE_ADDRESS: "0xb430680a3eB0BE00Bc1e203630B234f584c4d42d",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
@@ -284,12 +284,19 @@ export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: '
   // Filter to supported networks (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
   
+  let url: string
+  let key: string
+  
   if (type === 'fund') {
-    return NETWORK_SUBGRAPHS[`${subgraphNetwork}_fund` as keyof typeof NETWORK_SUBGRAPHS]
+    key = `${subgraphNetwork}_fund`
+    url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
+  } else {
+    key = `${subgraphNetwork}_challenge`
+    url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
   }
   
-  // Return challenge subgraph by default
-  return NETWORK_SUBGRAPHS[`${subgraphNetwork}_challenge` as keyof typeof NETWORK_SUBGRAPHS]
+  
+  return url
 }
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"

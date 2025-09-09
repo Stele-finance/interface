@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Settings, DollarSign, Plus, Loader2, ArrowLeft } from "lucide-react"
+import { Settings, DollarSign, Plus, Loader2, ArrowLeft, Wallet } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -49,7 +49,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
   const router = useRouter()
   const queryClient = useQueryClient()
   const { t, language } = useLanguage()
-  const { walletType, getProvider, isConnected: walletConnected, address: walletAddress } = useWallet()
+  const { walletType, getProvider, isConnected: walletConnected, address: walletAddress, connectWallet } = useWallet()
   
   // Use URL network parameter for contracts
   const contractNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
@@ -232,7 +232,6 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
 
         return calldata;
       } catch (error) {
-        console.error("Error creating calldata:", error);
         toast({
           variant: "destructive",
           title: "Invalid Function Data",
@@ -295,7 +294,6 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
 
         return calldata;
       } catch (error) {
-        console.error("Error creating template calldata:", error);
         toast({
           variant: "destructive",
           title: "Invalid Template Parameters",
@@ -353,7 +351,6 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
         signer = await browserProvider.getSigner();
         await signer.getAddress(); // Verify we can get address
       } catch (error: any) {
-        console.warn('Could not get signer, requesting accounts:', error);
         
         // Check if user rejected the request
         if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
@@ -436,18 +433,25 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
 
       if (isCustomProposal) {
         // Custom proposal logic
-        targets = targetAddress ? [targetAddress] : [];
-        values = targetAddress ? [BigInt(0)] : [];
-        
-        if (targetAddress && functionSignature) {
-          const calldata = createCalldata();
-          if (calldata) {
-            calldatas = [calldata];
+        if (targetAddress) {
+          targets = [targetAddress];
+          values = [BigInt(0)];
+          
+          if (functionSignature) {
+            const calldata = createCalldata();
+            if (calldata) {
+              calldatas = [calldata];
+            } else {
+              throw new Error("Failed to create calldata. Please check function signature and parameters.");
+            }
           } else {
-            throw new Error("Failed to create calldata. Please check function signature and parameters.");
+            calldatas = ['0x'];
           }
-        } else if (targetAddress) {
-          calldatas = ['0x'];
+        } else {
+          // Text-only proposal (no on-chain action)
+          targets = [];
+          values = [];
+          calldatas = [];
         }
       } else if (selectedTemplate) {
         // Template-based proposal logic
@@ -527,20 +531,12 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
             ),
           });
         } catch (confirmationError) {
-          console.error("Error waiting for transaction confirmation:", confirmationError);
           // Still navigate to vote page even if confirmation fails
         }
       } else {
         throw new Error("Invalid proposal parameters. Please check your inputs.");
       }
     } catch (error: any) {
-      console.error("❌ Error creating proposal:", error);
-      console.error("Error details:", {
-        message: error.message,
-        code: error.code,
-        reason: error.reason,
-        stack: error.stack
-      });
       
       let errorMessage = error.message || "An unknown error occurred";
       let toastVariant: "destructive" | "default" = "destructive";
@@ -587,8 +583,8 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
           await queryClient.invalidateQueries({ queryKey: ['proposalsByStatus'] });
           await queryClient.invalidateQueries({ queryKey: ['multipleProposalVoteResults'] });
           
-          // Navigate to vote page
-          router.push("/vote");
+          // Navigate to fund vote page
+          router.push("/vote/fund");
         }, 1000);
       }
     }
@@ -803,16 +799,23 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
               <Button 
                 variant="default"
                 size="lg"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleCreateProposal();
+                onClick={() => {
+                  if (!walletConnected) {
+                    connectWallet()
+                  } else {
+                    handleCreateProposal()
+                  }
                 }}
-                disabled={isSubmitting || !title || !description || (!isCustomProposal && !selectedTemplate)}
+                disabled={!walletConnected ? false : (isSubmitting || !title || !description || (!isCustomProposal && !selectedTemplate))}
                 className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white font-semibold px-12 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg min-w-[200px] border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 touch-manipulation"
                 style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                {isSubmitting ? (
+                {!walletConnected ? (
+                  <>
+                    <Wallet className="mr-3 h-5 w-5" />
+                    {t('connectWallet')}
+                  </>
+                ) : isSubmitting ? (
                   <>
                     <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                     {t('submittingProposal')}

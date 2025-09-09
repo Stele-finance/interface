@@ -46,8 +46,9 @@ export const calculateBlockTimestamp = (
   const targetBlock = parseInt(targetBlockNumber)
   const blockDifference = targetBlock - currentBlockInfo.blockNumber
   
-  // Use network-specific block time
-  const BLOCK_TIME_SECONDS = getBlockTimeSeconds(network)
+  // Always use Ethereum block time for Cross-Chain Governance
+  // Block numbers from governance contracts are based on Ethereum mainnet
+  const BLOCK_TIME_SECONDS = getBlockTimeSeconds('ethereum')
   const estimatedTimestamp = currentBlockInfo.timestamp + (blockDifference * BLOCK_TIME_SECONDS)
   return estimatedTimestamp
 }
@@ -81,8 +82,8 @@ export const processProposalData = (
     startTimestamp = parseInt(proposalData.startTimestamp)
     endTimestamp = parseInt(proposalData.endTimestamp)
   } else if (proposalData.voteStart && proposalData.voteEnd) {
-    startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, network)
-    endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, network)
+    startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, 'ethereum')
+    endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, 'ethereum')
   } else {
     // Fallback to current time
     const now = Date.now() / 1000
@@ -166,9 +167,9 @@ export const processStatusBasedProposalData = (
   let endTime: Date
   
   if (proposalData.voteStart && proposalData.voteEnd && currentBlockInfo) {
-    // Use actual voting period from blockchain data
-    const startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, network)
-    const endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, network)
+    // Use actual voting period from blockchain data with Ethereum block time for Cross-Chain Governance
+    const startTimestamp = calculateBlockTimestamp(proposalData.voteStart, currentBlockInfo, 'ethereum')
+    const endTimestamp = calculateBlockTimestamp(proposalData.voteEnd, currentBlockInfo, 'ethereum')
     startTime = new Date(startTimestamp * 1000)
     endTime = new Date(endTimestamp * 1000)
   } else {
@@ -191,8 +192,9 @@ export const processStatusBasedProposalData = (
       votingDelayBlocks = knownConfig.votingDelay
     }
     
-    // Convert blocks to milliseconds using network-specific block time
-    const BLOCK_TIME_MS = getBlockTimeSeconds(network) * 1000
+    // Always use Ethereum block time for Cross-Chain Governance
+    // Block numbers from governance contracts are based on Ethereum mainnet
+    const BLOCK_TIME_MS = getBlockTimeSeconds('ethereum') * 1000
     const votingPeriodMs = votingPeriodBlocks * BLOCK_TIME_MS
     const votingDelayMs = votingDelayBlocks * BLOCK_TIME_MS
     
@@ -335,7 +337,7 @@ export const formatDate = (date: Date): string => {
 }
 
 // Create URL with proposal data as query parameters
-export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any, network: string = 'ethereum'): string => {
+export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any, network: string = 'ethereum', pageType: 'fund' | 'challenge' = 'challenge'): string => {
   const params = new URLSearchParams({
     title: proposal.title,
     description: proposal.description,
@@ -355,5 +357,6 @@ export const createProposalUrl = (proposal: Proposal, walletTokenInfo?: any, net
     delegatedTo: walletTokenInfo?.delegatedTo || ''
   })
   
-  return `/vote/${network}/${proposal.id}?${params.toString()}`
+  // Create URL based on pageType: challenge -> /vote/challenge/network/id, fund -> /vote/fund/network/id
+  return `/vote/${pageType}/${network}/${proposal.id}?${params.toString()}`
 } 

@@ -479,7 +479,6 @@ export function FundActionTabs({
         throw new Error('No fees available to collect')
       }
       
-      console.log('Tokens with fees:', tokensWithFees)
       
       // Collect fees for each token
       const successfulCollections: string[] = []
@@ -487,7 +486,6 @@ export function FundActionTabs({
       
       for (const token of tokensWithFees) {
         try {
-          console.log(`Collecting fees for ${token.symbol} (${token.address})`)
           
           // Try to estimate gas first
           let gasLimit = BigInt(2000000) // Default gas limit
@@ -499,13 +497,11 @@ export function FundActionTabs({
             )
             // Add 20% buffer to estimated gas
             gasLimit = estimatedGas * BigInt(120) / BigInt(100)
-            console.log(`Estimated gas for ${token.symbol}:`, estimatedGas.toString())
           } catch (estimateError: any) {
             console.warn(`Gas estimation failed for ${token.symbol}:`, estimateError)
             
             // Check for specific revert reasons
             if (estimateError.reason === 'NF' || estimateError.message?.includes('NF')) {
-              console.log(`No fees for ${token.symbol}, skipping...`)
               continue // Skip this token
             }
             if (estimateError.reason === 'OM' || estimateError.message?.includes('OM')) {

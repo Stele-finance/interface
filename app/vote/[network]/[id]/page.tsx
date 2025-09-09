@@ -25,7 +25,9 @@ import {
   STELE_DECIMALS, 
   STELE_TOTAL_SUPPLY,
   getGovernanceContractAddress,
+  getSteleFundGovernanceAddress,
   getSteleTokenAddress,
+  getSteleFundTokenAddress,
   getRPCUrl
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
@@ -34,6 +36,7 @@ import { useProposalVoteResult, useProposalDetails } from "../../hooks/usePropos
 import { useQueryClient } from "@tanstack/react-query"
 import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
+import { usePageType } from "@/lib/page-type-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useAppKitProvider } from '@reown/appkit/react'
 import { ClientOnly } from "@/components/ClientOnly"
@@ -54,12 +57,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const searchParams = useSearchParams()
   const { network: urlNetwork, id } = use(params)
   const { t } = useLanguage()
+  const { pageType } = usePageType()
   const { walletType, getProvider, isConnected: walletConnected, address, isLoading: walletLoading } = useWallet()
     
   // Use URL network parameter for contracts and subgraph
   const contractNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
   const subgraphNetwork = urlNetwork === 'ethereum' || urlNetwork === 'arbitrum' ? urlNetwork : 'ethereum'
-  
 
   const [voteOption, setVoteOption] = useState<VoteOption>(null)
   const [reason, setReason] = useState("")
@@ -74,9 +77,9 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   const [isExecuting, setIsExecuting] = useState(false)
   
   // Fetch vote results from subgraph
-  const { data: voteResultData, isLoading: isLoadingVoteResult } = useProposalVoteResult(id, subgraphNetwork)
+  const { data: voteResultData, isLoading: isLoadingVoteResult } = useProposalVoteResult(id, subgraphNetwork, pageType)
   // Fetch proposal details for queue function
-  const { data: proposalDetailsData, isLoading: isLoadingProposalDetails } = useProposalDetails(id, subgraphNetwork)
+  const { data: proposalDetailsData, isLoading: isLoadingProposalDetails } = useProposalDetails(id, subgraphNetwork, pageType)
   // Get current block number with global caching
   const { data: blockInfo, isLoading: isLoadingBlockNumber } = useBlockNumber()
   const queryClient = useQueryClient()
@@ -108,85 +111,83 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     return { title, description: desc }
   }
 
-  // Extract proposal data from URL parameters
+  // Extract proposal data from subgraph
   const getProposalFromParams = () => {
-    // Check if we have proposal details from subgraph first
+    // Get proposal details from subgraph
     const subgraphProposal = proposalDetailsData?.proposalCreateds?.[0]
     
-    const rawDescription = subgraphProposal?.description || 
-                          searchParams.get('description') || 
-                          'This proposal aims to increase the reward for the 1 week challenge from 100 USDC to 150 USDC to attract more participants.'
-    const urlTitle = searchParams.get('title')
     
-    // Parse title from description if not provided in URL
+    // If no subgraph data, return loading state
+    if (!subgraphProposal) {
+      return null
+    }
+    
+    const rawDescription = subgraphProposal.description || 'Proposal Description'
+    
+    // Parse title from description
     const parsedDetails = parseProposalDetails(rawDescription)
-    const title = urlTitle || parsedDetails.title || `Proposal #${id.slice(0, 8)}...`
+    const title = parsedDetails.title || `Proposal #${id.slice(0, 8)}...`
     const description = parsedDetails.description
-    const proposer = searchParams.get('proposer') || '0x1234...5678'
-    const status = searchParams.get('status') || 'active'
-    const startTimeStr = searchParams.get('startTime')
-    const endTimeStr = searchParams.get('endTime')
-    const votesForStr = searchParams.get('votesFor')
-    const votesAgainstStr = searchParams.get('votesAgainst')
-    const abstainStr = searchParams.get('abstain')
-    const blockTimestamp = searchParams.get('blockTimestamp') || ''
-    const blockNumber = searchParams.get('blockNumber') || ''
-    const valuesStr = searchParams.get('values')
-    // Use subgraph transaction hash if available, otherwise use URL param
-    const transactionHash = subgraphProposal?.transactionHash || 
-                            searchParams.get('transactionHash') || 
-                            id // fallback to proposal ID if no transaction hash available
-    // Get cached token info from URL parameters
-    const cachedTokenBalance = searchParams.get('tokenBalance') || '0'
-    const cachedDelegatedTo = searchParams.get('delegatedTo') || ''
-
-    // Parse dates - if from URL params, use them; otherwise calculate based on subgraph data
+    const proposer = subgraphProposal.proposer || '0x0000000000000000000000000000000000000000'
+    const blockTimestamp = subgraphProposal.blockTimestamp || ''
+    const blockNumber = subgraphProposal.blockNumber || ''
+    const transactionHash = subgraphProposal.transactionHash || id
+    
+    // Calculate dates from blockchain data
     let startTime: Date
     let endTime: Date
     
-    if (startTimeStr && endTimeStr) {
-      // Use provided timestamps from URL
-      startTime = new Date(startTimeStr)
-      endTime = new Date(endTimeStr)
-    } else if (subgraphProposal?.voteStart && subgraphProposal?.voteEnd && blockInfo) {
-      // Calculate from blockchain data using network-specific block time
-      const { calculateProposalTimestamps } = require('./utils/proposal-detail')
-      const timestamps = calculateProposalTimestamps(
-        subgraphProposal.voteStart,
-        subgraphProposal.voteEnd,
-        blockInfo.blockNumber,
-        blockInfo.timestamp,
-        subgraphNetwork
-      )
-      startTime = timestamps.startTime
-      endTime = timestamps.endTime
+    if (subgraphProposal.voteStart && subgraphProposal.voteEnd && blockInfo) {
+      // Calculate from blockchain data using Ethereum block time for Cross-Chain Governance
+      const startBlock = parseInt(subgraphProposal.voteStart)
+      const endBlock = parseInt(subgraphProposal.voteEnd)
+      const currentBlock = blockInfo.blockNumber
+      const currentTimestamp = blockInfo.timestamp
+      
+      // Always use Ethereum block time (12 seconds) for Cross-Chain Governance
+      // Block numbers from governance contracts are based on Ethereum mainnet
+      const blockTimeSeconds = 12
+      
+      // Calculate time differences in seconds
+      const startBlockDiff = startBlock - currentBlock
+      const endBlockDiff = endBlock - currentBlock
+      
+      // Convert current timestamp from milliseconds to seconds if needed
+      const currentTimestampSeconds = currentTimestamp > 1e12 ? currentTimestamp / 1000 : currentTimestamp
+      
+      const startTimestamp = currentTimestampSeconds + (startBlockDiff * blockTimeSeconds)
+      const endTimestamp = currentTimestampSeconds + (endBlockDiff * blockTimeSeconds)
+      
+      startTime = new Date(startTimestamp * 1000) // Convert to milliseconds
+      endTime = new Date(endTimestamp * 1000)     // Convert to milliseconds
+      
     } else {
       // Fallback to default periods
       startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       endTime = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     }
 
-    // Parse vote counts (use subgraph data if available, otherwise use URL params)
-    const votesFor = voteResult ? parseFloat(ethers.formatUnits(voteResult.forVotes, STELE_DECIMALS)) : 
-                    (votesForStr ? parseFloat(votesForStr) : 0)
-    const votesAgainst = voteResult ? parseFloat(ethers.formatUnits(voteResult.againstVotes, STELE_DECIMALS)) : 
-                        (votesAgainstStr ? parseFloat(votesAgainstStr) : 0)
-    const abstain = voteResult ? parseFloat(ethers.formatUnits(voteResult.abstainVotes, STELE_DECIMALS)) : 
-                   (abstainStr ? parseFloat(abstainStr) : 0)
+    // Parse vote counts from subgraph data only
+    const votesFor = voteResult ? parseFloat(ethers.formatUnits(voteResult.forVotes, STELE_DECIMALS)) : 0
+    const votesAgainst = voteResult ? parseFloat(ethers.formatUnits(voteResult.againstVotes, STELE_DECIMALS)) : 0
+    const abstain = voteResult ? parseFloat(ethers.formatUnits(voteResult.abstainVotes, STELE_DECIMALS)) : 0
 
-    // Parse values array
-    let values: string[] = []
-    try {
-      values = valuesStr ? JSON.parse(valuesStr) : []
-    } catch (error) {
-      console.error('Error parsing values:', error)
-      values = []
-    }
+    // Parse values array from subgraph
+    const values: string[] = subgraphProposal.values || []
 
-    // Determine if proposer is full address or abbreviated
+    // Format proposer address
     const isFullAddress = proposer.length === 42 && proposer.startsWith('0x')
-    const fullProposer = isFullAddress ? proposer : '0x1234567890abcdef1234567890abcdef12345678' // fallback for abbreviated
+    const fullProposer = isFullAddress ? proposer : proposer
     const displayProposer = isFullAddress ? `${proposer.slice(0, 6)}...${proposer.slice(-4)}` : proposer
+
+    // Determine status based on timestamps and current time
+    const now = new Date()
+    let status = 'active'
+    if (now < startTime) {
+      status = 'pending'
+    } else if (now > endTime) {
+      status = proposalState !== null ? (proposalState === 4 ? 'executed' : 'succeeded') : 'succeeded'
+    }
 
     return {
       id: id,
@@ -205,17 +206,9 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       values,
       transactionHash,
       details: description, // Use description as details for now
-      hasVoted: hasVoted,
-      // Cached token info from parent page
-      cachedTokenBalance,
-      cachedDelegatedTo,
+      hasVoted: hasVoted
     }
   }
-
-  // Get proposal data (from URL params or defaults)
-  const proposal = getProposalFromParams()
-
-
 
   // Set current time on client side only
   useEffect(() => {
@@ -270,7 +263,13 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       
       // Use managed provider to prevent multiple connections
       const provider = getManagedProvider(contractNetwork)
-      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
+      
+      // Get the correct governance contract address based on pageType
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(contractNetwork)
+        : getGovernanceContractAddress(contractNetwork)
+      
+      const governanceContract = new ethers.Contract(governanceAddress, GovernorABI.abi, provider)
 
       // For cross-chain governance, we need to use Ethereum block numbers for voting power queries
       // Cache block number for 30 seconds to reduce RPC calls
@@ -351,7 +350,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     } finally {
       setIsLoadingVotingPower(false)
     }
-  }, [walletConnected, id, walletType, contractNetwork, address, getProvider])
+  }, [walletConnected, id, walletType, contractNetwork, address, getProvider, pageType])
 
   // Debounced version of voting power check
   const checkVotingPowerAndStatus = useCallback(async () => {
@@ -375,7 +374,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Use managed provider to prevent multiple connections
       const provider = getManagedProvider(contractNetwork)
       
-      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, provider)
+      // Get the correct governance contract address based on pageType
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(contractNetwork)
+        : getGovernanceContractAddress(contractNetwork)
+      
+      const governanceContract = new ethers.Contract(governanceAddress, GovernorABI.abi, provider)
 
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => 
@@ -390,11 +394,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Convert BigInt to number to ensure proper comparison
       setProposalState(Number(state))
     } catch (error) {
-      console.error('Error checking proposal state:', error)
       // Don't show user-facing error for state check failures
       // as this is just for UI enhancement
     }
-  }, [id, contractNetwork])
+  }, [id, contractNetwork, pageType])
 
   // Check voting power and voting status when wallet is connected
   useEffect(() => {
@@ -404,6 +407,23 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletConnected, id]) // Intentionally excluded functions to prevent infinite loops
+
+  // Get proposal data from subgraph
+  const proposal = getProposalFromParams()
+  
+  // Show loading state if subgraph data is not yet available
+  if (isLoadingProposalDetails || !proposal) {
+    return (
+      <div className="container mx-auto px-2 py-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
+            <span className="text-gray-400">{t('loading')}</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Calculate vote percentage based on total supply (1 billion STELE)
   const calculatePercentage = () => {
@@ -599,7 +619,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       
       // Use browserProvider and get signer
       const signer = await browserProvider.getSigner()
-      const contract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
+      // Get the correct governance contract address based on pageType
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(contractNetwork)
+        : getGovernanceContractAddress(contractNetwork)
+      
+      const contract = new ethers.Contract(governanceAddress, GovernorABI.abi, signer)
 
       // Convert vote option to support value
       // 0 = Against, 1 = For, 2 = Abstain
@@ -655,10 +680,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Invalidate and refetch vote result data
       queryClient.invalidateQueries({ queryKey: ['proposalVoteResult', id] })
       
-      // Refresh voting power and status
+      // Redirect to appropriate vote page based on pageType
       setTimeout(() => {
-        checkVotingPowerAndStatus()
-      }, 3000)
+        router.push(`/vote/${pageType}`)
+      }, 2000) // 2초 후 리다이렉트
 
     } catch (error: any) {
       console.error("Voting error:", error)
@@ -724,7 +749,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       // Connect to provider with signer
       const signer = await provider.getSigner()
-      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
+      // Get the correct governance contract address based on pageType
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(contractNetwork)
+        : getGovernanceContractAddress(contractNetwork)
+      
+      const governanceContract = new ethers.Contract(governanceAddress, GovernorABI.abi, signer)
 
       // Prepare queue parameters
       const targets = proposalDetails.targets || []
@@ -760,8 +790,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
           ),
         })
         
-        // Refresh proposal state
-        await checkProposalState()
+        // Redirect to appropriate vote page based on pageType
+        setTimeout(() => {
+          router.push(`/vote/${pageType}`)
+        }, 2000) // 2초 후 리다이렉트
       } else {
         throw new Error('Transaction failed')
       }
@@ -828,7 +860,12 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       // Connect to provider with signer
       const signer = await provider.getSigner()
-      const governanceContract = new ethers.Contract(getGovernanceContractAddress(contractNetwork), GovernorABI.abi, signer)
+      // Get the correct governance contract address based on pageType
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(contractNetwork)
+        : getGovernanceContractAddress(contractNetwork)
+      
+      const governanceContract = new ethers.Contract(governanceAddress, GovernorABI.abi, signer)
 
       // Double-check proposal state before executing
       let currentState
@@ -886,8 +923,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
           ),
         })
         
-        // Refresh proposal state
-        await checkProposalState()
+        // Redirect to appropriate vote page based on pageType
+        setTimeout(() => {
+          router.push(`/vote/${pageType}`)
+        }, 2000) // 2초 후 리다이렉트
       } else {
         throw new Error('Transaction failed')
       }

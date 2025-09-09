@@ -255,8 +255,8 @@ export default function VotePage() {
 
   // Handle proposal click
   const handleProposalClick = useCallback((proposal: Proposal) => {
-    router.push(createProposalUrl(proposal, walletTokenInfo, selectedNetwork))
-  }, [router, walletTokenInfo, selectedNetwork])
+    router.push(createProposalUrl(proposal, walletTokenInfo, selectedNetwork, pageType))
+  }, [router, walletTokenInfo, selectedNetwork, pageType])
 
   // Handle delegate wrapper
   const handleDelegateWrapper = useCallback(async () => {
