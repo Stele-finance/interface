@@ -65,6 +65,9 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork, isFundSwap ? 'fund' : 'challenge');
   const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
   
+  // If externalInvestableTokens are provided, we're not loading from the hook
+  const effectiveIsLoadingInvestableTokens = externalInvestableTokens ? false : isLoadingInvestableTokens;
+  
   // Fetch fund settings for slippage configuration (always call hook, but only use data for fund swaps)
   const { data: fetchedFundSettings, isLoading: isLoadingSettings } = useFundSettings(subgraphNetwork);
   const fundSettings = isFundSwap ? fetchedFundSettings : null;
@@ -162,7 +165,10 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const hasToTokenData = toToken ? priceData?.tokens?.[toToken] !== undefined : true;
 
   // Simplified data ready check - focus on essential conditions
-  const isDataReady = !isLoadingInvestableTokens && !investableTokensError;
+  // For fund swaps with external tokens, check if we have the essential data
+  const isDataReady = externalInvestableTokens 
+    ? !investableTokensError && investableTokens.length > 0 && userTokens.length > 0
+    : !effectiveIsLoadingInvestableTokens && !investableTokensError;
 
   // Get available tokens
   const { availableFromTokens, availableToTokens } = getAvailableTokens(

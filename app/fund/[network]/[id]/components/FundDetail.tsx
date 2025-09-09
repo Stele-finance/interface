@@ -34,7 +34,9 @@ import {
 // Mock data instead of real hooks
 // import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import SteleABI from "@/app/abis/Stele.json"
+import SteleFundABI from "@/app/abis/SteleFund.json"
 import ERC20ABI from "@/app/abis/ERC20.json"
+import SteleFundManagerNFTABI from "@/app/abis/SteleFundManagerNFT.json"
 import { useFundData } from "../hooks/useFundData"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -85,6 +87,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const [statusTooltipTimer, setStatusTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [activeTab, setActiveTab] = useState("investors")
   const [isMounted, setIsMounted] = useState(false)
+  const [isMintingNFT, setIsMintingNFT] = useState(false)
   const itemsPerPage = 5;
   const maxPages = 5;
   
@@ -171,6 +174,173 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     }
   };
 
+  // Handle mint NFT for fund manager
+  const handleMintNFT = async () => {
+    if (!isManager || !fund || !connectedAddress) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "Only the fund manager can mint NFTs.",
+      });
+      return;
+    }
+
+    setIsMintingNFT(true);
+    
+    try {
+      const provider = getProvider();
+      if (!provider || walletType !== 'walletconnect') {
+        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      }
+
+      // Request account access
+      const accounts = await provider.send('eth_requestAccounts', []);
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts found. Please connect your wallet first.");
+      }
+
+      // Get wallet's current network
+      const walletChainId = await provider.send('eth_chainId', []);
+      const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
+      
+      // If wallet is on wrong network, switch to URL-based network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            const networkParams = network === 'arbitrum' ? {
+              chainId: expectedChainId,
+              chainName: 'Arbitrum One',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+              blockExplorerUrls: ['https://arbiscan.io']
+            } : {
+              chainId: expectedChainId,
+              chainName: 'Ethereum Mainnet',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+              blockExplorerUrls: ['https://etherscan.io']
+            };
+            
+            await provider.send('wallet_addEthereumChain', [networkParams]);
+          } else if (switchError.code === 4001) {
+            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to mint NFT.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+
+      // Get signer
+      const signer = await provider.getSigner();
+
+      // Get SteleFund contract address
+      const networkKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund';
+      const steleFundAddress = NETWORK_CONTRACTS[networkKey].STELE_FUND_CONTRACT_ADDRESS;
+      
+      console.log('SteleFund contract address:', steleFundAddress);
+      console.log('Fund ID:', fundId);
+      console.log('Fund ID type:', typeof fundId);
+      console.log('Network:', network);
+      console.log('Connected address:', connectedAddress);
+      console.log('Fund manager:', fund?.manager);
+      console.log('Is manager (calculated):', isManager);
+      
+      // Convert fundId to number
+      const fundIdNumber = parseInt(fundId);
+      console.log('Fund ID as number:', fundIdNumber);
+      
+      // Create contract instance
+      const steleFundContract = new ethers.Contract(steleFundAddress, SteleFundABI.abi, signer);
+      
+      // Verify the signer address matches connected address
+      const signerAddress = await signer.getAddress();
+      console.log('Signer address:', signerAddress);
+      console.log('Addresses match:', signerAddress.toLowerCase() === connectedAddress.toLowerCase());
+      
+      // Estimate gas first (SteleFund.mintManagerNFT only takes fundId)
+      let gasEstimate;
+      try {
+        gasEstimate = await steleFundContract.mintManagerNFT.estimateGas(fundIdNumber);
+        console.log('Gas estimate:', gasEstimate.toString());
+      } catch (estimateError) {
+        console.error('Gas estimation error:', estimateError);
+        throw new Error('Failed to estimate gas. Please check if you are the fund manager.');
+      }
+
+      // Call mintManagerNFT function with estimated gas + buffer
+      const gasLimit = gasEstimate * 120n / 100n; // Add 20% buffer
+      const tx = await steleFundContract.mintManagerNFT(fundIdNumber, {
+        gasLimit: gasLimit
+      });
+
+      const explorerName = network === 'arbitrum' ? 'Arbiscan' : 'Etherscan';
+      const explorerUrl = network === 'arbitrum' 
+        ? `https://arbiscan.io/tx/${tx.hash}`
+        : `https://etherscan.io/tx/${tx.hash}`;
+
+      toast({
+        title: "NFT Mint Submitted",
+        description: `Manager NFT minting transaction has been sent to the network.`,
+        action: (
+          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+            View on {explorerName}
+          </ToastAction>
+        ),
+      });
+
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+
+      if (receipt.status === 1) {
+        toast({
+          title: "NFT Minted Successfully!",
+          description: `Manager NFT has been minted successfully for Fund ${fundId}.`,
+          action: (
+            <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
+              View on {explorerName}
+            </ToastAction>
+          ),
+        });
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error: any) {
+      console.error("Error minting NFT:", error);
+      
+      let errorMessage = "An error occurred while minting NFT. Please try again.";
+      let toastVariant: "destructive" | "default" = "destructive";
+      let toastTitle = "NFT Mint Failed";
+      
+      if (error.code === 4001 || error.message?.includes('rejected')) {
+        errorMessage = "Transaction was cancelled by user";
+        toastVariant = "default";
+        toastTitle = "Transaction Cancelled";
+      } else if (error.message?.includes("insufficient funds")) {
+        errorMessage = "Insufficient funds for gas fees";
+      } else if (error.message?.includes("NM")) {
+        errorMessage = "Only the fund manager can mint NFTs";
+      } else if (error.message?.includes("NNC")) {
+        errorMessage = "NFT contract is not set";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast({
+        variant: toastVariant,
+        title: toastTitle,
+        description: errorMessage,
+      });
+    } finally {
+      setIsMintingNFT(false);
+    }
+  };
+
   // Mock fund data as fallback (for properties not in subgraph)
   const mockFund = {
     id: fundId,
@@ -203,6 +373,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     fundId,
     subgraphNetwork as 'ethereum' | 'arbitrum'
   )
+
+  // Check if connected wallet is the fund manager
+  const isManager = useMemo(() => {
+    if (!connectedAddress || !fund?.manager) return false;
+    return connectedAddress.toLowerCase() === fund.manager.toLowerCase();
+  }, [connectedAddress, fund?.manager]);
 
   // Get fund investable token prices for portfolio calculation
   const { 
@@ -955,8 +1131,9 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                        </div>
                      </DialogContent>
                    </Dialog>
-                 ) : hasInvestedInFund ? (
-                   /* My Account Button Only for Funds */
+                ) : hasInvestedInFund ? (
+                  <>
+                    {/* My Account Button Only for Funds */}
                    <Button 
                      variant="outline" 
                      size="lg" 
@@ -966,7 +1143,29 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                      <User className="mr-3 h-6 w-6" />
                      {t('myAccount')}
                    </Button>
-                 ) : !isFundClosed ? (
+                   {isManager && (
+                     <Button 
+                       variant="outline" 
+                       size="lg" 
+                       onClick={handleMintNFT}
+                       disabled={isMintingNFT}
+                       className="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                     >
+                       {isMintingNFT ? (
+                         <>
+                           <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                           Minting...
+                         </>
+                       ) : (
+                         <>
+                           <Trophy className="mr-3 h-6 w-6" />
+                           Mint NFT
+                         </>
+                       )}
+                     </Button>
+                   )}
+                 </>
+                ) : !isFundClosed ? (
                    /* Invest Button */
                    <Button 
                      variant="outline" 

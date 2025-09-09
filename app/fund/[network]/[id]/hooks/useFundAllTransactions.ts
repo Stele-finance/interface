@@ -23,23 +23,6 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
       blockTimestamp
       transactionHash
     }
-    depositFees(
-      where: { 
-        fundId: $fundId
-      }
-      orderBy: blockTimestamp
-      orderDirection: desc
-      first: 50
-    ) {
-      id
-      fundId
-      manager
-      token
-      symbol
-      amount
-      blockTimestamp
-      transactionHash
-    }
     swaps(
       where: { 
         fundId: $fundId
@@ -125,7 +108,7 @@ const GET_FUND_ALL_TRANSACTIONS_QUERY = `
 `
 
 export interface FundTransaction {
-  type: 'deposit' | 'depositFee' | 'swap' | 'withdraw' | 'withdrawFee' | 'create' | 'join'
+  type: 'deposit' | 'swap' | 'withdraw' | 'withdrawFee' | 'create' | 'join'
   id: string
   fundId: string
   user: string
@@ -152,16 +135,6 @@ interface GraphQLResponse {
     id: string
     fundId: string
     investor: string
-    token: string
-    symbol: string
-    amount: string
-    blockTimestamp: string
-    transactionHash: string
-  }>
-  depositFees?: Array<{
-    id: string
-    fundId: string
-    manager: string
     token: string
     symbol: string
     amount: string
@@ -255,27 +228,6 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
               transactionHash: deposit.transactionHash,
               token: deposit.token,
               symbol: deposit.symbol,
-            })
-          })
-        }
-
-        // Process deposit fees
-        if (data.depositFees && Array.isArray(data.depositFees)) {
-          data.depositFees.forEach((fee) => {
-            // Format amount to max 6 decimal places
-            const formattedAmount = parseFloat(fee.amount).toFixed(6).replace(/\.?0+$/, '')
-            
-            allTransactions.push({
-              type: 'depositFee',
-              id: fee.id,
-              fundId: fee.fundId,
-              user: fee.manager,
-              amount: formattedAmount, // Only amount, no symbol, max 6 decimals
-              details: `Deposit Fee (${fee.symbol})`,
-              timestamp: parseInt(fee.blockTimestamp),
-              transactionHash: fee.transactionHash,
-              token: fee.token,
-              symbol: fee.symbol,
             })
           })
         }
