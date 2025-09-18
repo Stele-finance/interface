@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, use, useRef } from "react"
 import { getManagedProvider, providerManager } from "@/lib/provider-manager"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { 
@@ -55,7 +55,6 @@ interface ProposalDetailPageProps {
 
 export default function ProposalDetailPage({ params }: ProposalDetailPageProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { network: urlNetwork, id } = use(params)
   const { t } = useLanguage()
   const { pageType } = usePageType()
