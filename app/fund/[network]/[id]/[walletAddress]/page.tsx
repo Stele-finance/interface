@@ -172,7 +172,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
 
     const tokens = fundData.fund.tokensSymbols.map((symbol, index) => {
       // Get fund's token amount and calculate investor's portion using share ratio
-      const fundTokenAmount = parseFloat(fundData.fund.tokensAmount?.[index] || '0')
+      const fundTokenAmount = parseFloat(fundData.fund?.tokensAmount?.[index] || '0')
       const investorTokenAmount = fundTokenAmount * shareRatio
       
       // Find price from tokensWithPrices
@@ -233,11 +233,11 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
     if (!fundInvestorData?.investor) {
       return null
     }
-    
+
     const investor = fundInvestorData.investor
     const currentValue = parseFloat(investor.amountUSD) || 0
-    const totalTokens = investor.tokensSymbols?.length || 0
-    
+    const totalTokens = fundData?.fund?.tokensSymbols?.length || 0
+
     return {
       totalValue: currentValue,
       tokensWithPrices: totalTokens,
@@ -245,7 +245,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
       timestamp: Date.now(),
       isJoined: true
     }
-  }, [fundInvestorData])
+  }, [fundInvestorData, fundData])
 
   const realTimePortfolio = calculateRealTimePortfolioValue()
 
@@ -612,7 +612,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                         </td>
                                         <td className="py-6 px-6">
                                           <div className="text-right">
-                                            {transaction.type === 'Swap' || transaction.type === 'swap' ? (
+                                            {transaction.type === 'swap' ? (
                                               <div className="flex items-center gap-2 justify-end min-w-0 flex-wrap md:flex-nowrap">
                                                 <div className="flex items-center gap-2 min-w-0">
                                                   <span className="text-sm md:text-base font-medium text-gray-100 truncate">

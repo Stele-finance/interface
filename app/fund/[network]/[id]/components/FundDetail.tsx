@@ -262,7 +262,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       }
 
       // Call mintManagerNFT function with estimated gas + buffer
-      const gasLimit = gasEstimate * 120n / 100n; // Add 20% buffer
+      const gasLimit = gasEstimate * BigInt(120) / BigInt(100); // Add 20% buffer
       const tx = await steleFundContract.mintManagerNFT(fundIdNumber, {
         gasLimit: gasLimit
       });

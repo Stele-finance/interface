@@ -118,7 +118,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork, useFu
                               {/* Manager crown or ranking badge */}
                               <div className="flex items-center gap-2">
                                 {investor.isManager ? (
-                                  <Crown className="h-4 w-4 text-yellow-500" title="Fund Manager" />
+                                  <Crown className="h-4 w-4 text-yellow-500" />
                                 ) : (
                                   <span className="text-sm text-gray-400 font-medium min-w-[20px]">
                                     {startIndex + index + (sortedInvestorData.some((inv: any) => inv.isManager) ? 0 : 1)}

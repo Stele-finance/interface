@@ -88,10 +88,14 @@ export interface UseInvestorSnapshotsParams {
   first?: number
 }
 
+export interface InvestorSnapshotsResponse {
+  investorSnapshots: InvestorSnapshot[]
+}
+
 export function useInvestorSnapshots({ fundId, investor, type, network, first = 30 }: UseInvestorSnapshotsParams) {
-  return useQuery({
+  return useQuery<InvestorSnapshotsResponse>({
     queryKey: ['investorSnapshots', fundId, investor, type, network, first],
-    queryFn: async () => {
+    queryFn: async (): Promise<InvestorSnapshotsResponse> => {
       try {
         // Use Fund-specific subgraph URL via getSubgraphUrl helper
         const subgraphUrl = getSubgraphUrl(network, 'fund')

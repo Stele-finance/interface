@@ -307,7 +307,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
             
             {/* Add green reference dot for LIVE data point with pulsing animation - matching challenge page UI/UX */}
             {realTimePortfolioValue !== null && chartData.length > 0 && (() => {
-              const liveDataPoint = chartData.find(d => d.isLive)
+              const liveDataPoint = chartData.find(d => 'isLive' in d && d.isLive)
               if (liveDataPoint) {
                 const PulsingDot = (props: any) => (
                   <circle

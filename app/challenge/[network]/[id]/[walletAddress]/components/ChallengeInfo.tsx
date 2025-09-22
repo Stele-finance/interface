@@ -180,7 +180,7 @@ export function ChallengeInfo({
           </div>
           
           <div className="flex justify-between items-center py-2">
-            <span className="text-sm text-gray-400">{t('investors')}</span>
+            <span className="text-sm text-gray-400">{t('investor')}</span>
             <span className="text-sm text-white font-medium">
               {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
             </span>

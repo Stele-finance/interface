@@ -159,7 +159,7 @@ export function ActionButtons({
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
               >
                 <Gift className="mr-2 h-5 w-5" />
-                {t('getReward')}
+                {t('getRewards')}
               </Button>
             )}
             {userInTop5 && (
@@ -173,7 +173,7 @@ export function ActionButtons({
                 {isMinting ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('minting')}...
+                    {t('mintingNFT')}...
                   </>
                 ) : hasNFTMinted ? (
                   <>
@@ -203,7 +203,7 @@ export function ActionButtons({
                       className="bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                     >
                       <Gift className="mr-2 h-5 w-5" />
-                      {t('getReward')}
+                      {t('getRewards')}
                     </Button>
                   )}
                   {userInTop5 && (
@@ -217,7 +217,7 @@ export function ActionButtons({
                       {isMinting ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          {t('minting')}...
+                          {t('mintingNFT')}...
                         </>
                       ) : hasNFTMinted ? (
                         <>
@@ -253,7 +253,7 @@ export function ActionButtons({
               className="w-full bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
             >
               <Gift className="mr-2 h-5 w-5" />
-              {t('getReward')}
+              {t('getRewards')}
             </Button>
           </div>
 
@@ -268,7 +268,7 @@ export function ActionButtons({
                   className="w-full bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
                 >
                   <Gift className="mr-2 h-5 w-5" />
-                  {t('getReward')}
+                  {t('getRewards')}
                 </Button>
               </div>
             </div>
@@ -296,7 +296,7 @@ export function ActionButtons({
             {isMinting ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                {t('minting')}...
+                {t('mintingNFT')}...
               </>
             ) : hasNFTMinted ? (
               <>
@@ -326,7 +326,7 @@ export function ActionButtons({
                 {isMinting ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('minting')}...
+                    {t('mintingNFT')}...
                   </>
                 ) : hasNFTMinted ? (
                   <>

@@ -21,7 +21,7 @@ import { SwapButton } from "./SwapButton"
 import { ExchangeRate } from "./ExchangeRate"
 
 // Import types and utils
-import { AssetSwapProps, PriceData, SwapQuote } from "./types"
+import { AssetSwapProps, PriceData, SwapQuote, SimpleSwapQuote } from "./types"
 import { 
   getTokenAddress, 
   getTokenDecimals, 
@@ -104,9 +104,13 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const toTokenPrice = toToken ? getTokenPriceBySymbol(toToken)?.priceUSD || 0 : 0
   
   // Simple swap quote calculator (used by the component)
-  const calculateSimpleSwapQuote = useCallback((amount: number) => {
-    if (!fromTokenPrice || !toTokenPrice || amount <= 0) return 0
-    return (amount * fromTokenPrice) / toTokenPrice
+  const calculateSimpleSwapQuote = useCallback((amount: number): SimpleSwapQuote | null => {
+    if (!fromTokenPrice || !toTokenPrice || amount <= 0) return null
+    const toAmount = (amount * fromTokenPrice) / toTokenPrice
+    return {
+      toAmount,
+      exchangeRate: fromTokenPrice / toTokenPrice
+    }
   }, [fromTokenPrice, toTokenPrice])
 
   // Create compatible priceData structure for existing code

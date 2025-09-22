@@ -71,7 +71,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         ],
         themeMode: 'dark',
         themeVariables: {
-          '--w3m-z-index': '1000',
+          '--w3m-z-index': 1000,
           '--w3m-accent': '#3b82f6'
         },
         ...(isLocalhost && {

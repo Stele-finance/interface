@@ -1350,8 +1350,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
               {/* Voting Period UI - Only show during Active voting period (proposalState === 1) */}
               {proposalState === 1 && (
                 <>
-                  {/* Delegate Button - Show when user has tokens but no voting power */}
-                  {walletConnected && !walletLoading && !isLoadingVotingPower && parseFloat(proposal.cachedTokenBalance) > 0 && Number(votingPower) === 0 && (
+                  {/* Delegate Button - Show when user has no voting power */}
+                  {walletConnected && !walletLoading && !isLoadingVotingPower && Number(votingPower) === 0 && (
                     <Button 
                       className="w-full bg-orange-500 hover:bg-orange-600" 
                       onClick={handleDelegate}

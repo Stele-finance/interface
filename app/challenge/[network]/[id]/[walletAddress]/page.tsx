@@ -453,7 +453,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const challengeState = getChallengeState();
   
   // Check if user is in top 5 for mint NFT eligibility
-  const userInTop5 = isUserInTop5(rankingData, walletAddress)
+  const userInTop5 = isUserInTop5(rankingData ?? null, walletAddress)
   
   // Check if NFT has been minted (disable mint button if already minted)
   const hasNFTMinted = !!performanceNFT

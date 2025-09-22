@@ -123,9 +123,14 @@ export interface FundTransactionData {
   details: string
   timestamp: number
   transactionHash: string
+  // Additional data for deposits
+  token?: string
+  symbol?: string
   // Additional data for swaps
   tokenIn?: string
   tokenOut?: string
+  tokenInSymbol?: string
+  tokenOutSymbol?: string
   amountIn?: string
   amountOut?: string
   // Additional data for withdraws
@@ -244,6 +249,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
               details: `Deposited ${tokenSymbol}`,
               timestamp: parseInt(deposit.blockTimestamp),
               transactionHash: deposit.transactionHash,
+              token: deposit.token,
+              symbol: tokenSymbol,
             })
           })
         }
@@ -263,6 +270,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
               details: `Withdraw Fee Collected (${tokenSymbol})`,
               timestamp: parseInt(fee.blockTimestamp),
               transactionHash: fee.transactionHash,
+              token: fee.token,
+              symbol: tokenSymbol,
             })
           })
         }
@@ -286,6 +295,8 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
               transactionHash: swap.transactionHash,
               tokenIn: swap.tokenIn,
               tokenOut: swap.tokenOut,
+              tokenInSymbol: tokenInSymbol,
+              tokenOutSymbol: tokenOutSymbol,
               amountIn: swap.tokenInAmount,
               amountOut: swap.tokenOutAmount,
             })
