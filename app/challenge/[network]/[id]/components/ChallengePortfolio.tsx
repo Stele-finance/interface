@@ -273,14 +273,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
     if (transaction.type !== 'swap') return null
     
     // Use the swap data from the transaction
-    if (transaction.fromAssetSymbol && transaction.toAssetSymbol) {
+    if (transaction.tokenInSymbol && transaction.tokenOutSymbol) {
       return {
-        fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
-        fromToken: transaction.fromAsset,
-        fromTokenSymbol: transaction.fromAssetSymbol,
-        toAmount: parseFloat(transaction.toAmount).toFixed(4),
-        toToken: transaction.toAsset,
-        toTokenSymbol: transaction.toAssetSymbol
+        fromAmount: parseFloat(transaction.tokenInAmount).toFixed(4),
+        fromToken: transaction.tokenIn,
+        fromTokenSymbol: transaction.tokenInSymbol,
+        toAmount: parseFloat(transaction.tokenOutAmount).toFixed(4),
+        toToken: transaction.tokenOut,
+        toTokenSymbol: transaction.tokenOutSymbol
       }
     }
     
@@ -695,14 +695,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       const discountedEntryFeeAmount = ethers.parseUnits(entryFee, USDC_DECIMALS);
 
       // Check current USDC balance
-      try {
-        console.log("Checking USDC balance for:", {
-          userAddress,
-          usdcAddress: getUSDCTokenAddress(contractNetwork),
-          network: contractNetwork,
-          walletChainId
-        });
-        
+      try {        
         // Use the read-only contract with network provider
         const usdcBalance = await usdcContractRead.balanceOf(userAddress);        
         if (usdcBalance < discountedEntryFeeAmount) {
@@ -1102,11 +1095,17 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           <div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="investors" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="investors" 
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              >
                 <Users className="h-4 w-4" />
                 {t('investor')}
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="transactions" 
+                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              >
                 <Activity className="h-4 w-4" />
                 {t('transactions')}
               </TabsTrigger>
@@ -1484,169 +1483,116 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           </div>
 
           {/* Challenge Info Card */}
-          <Card className="bg-muted border-0 rounded-2xl h-fit">
-            <CardContent className="p-8 space-y-10">
-              {/* Row 1: Network and Status */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Network */}
-                <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('network')}</span>
-                                     <div className="flex items-center gap-3">
-                     {subgraphNetwork === 'ethereum' ? (
-                       <>
-                         <Image 
-                           src="/networks/small/ethereum.png" 
-                           alt="Ethereum Mainnet"
-                           width={24}
-                           height={24}
-                           className="rounded-full"
-                           style={{ width: 'auto', height: 'auto' }}
-                         />
-                         <span className="text-xl text-white">Mainnet</span>
-                       </>
-                     ) : subgraphNetwork === 'arbitrum' ? (
-                       <>
-                         <Image 
-                           src="/networks/small/arbitrum.png" 
-                           alt="Arbitrum One"
-                           width={24}
-                           height={24}
-                           className="rounded-full"
-                           style={{ width: 'auto', height: 'auto' }}
-                         />
-                         <span className="text-xl text-white">Arbitrum</span>
-                       </>
-                     ) : (
-                       <>
-                         <Image 
-                           src="/networks/small/ethereum.png" 
-                           alt="Ethereum Mainnet"
-                           width={24}
-                           height={24}
-                           className="rounded-full"
-                           style={{ width: 'auto', height: 'auto' }}
-                         />
-                         <span className="text-xl text-white">Mainnet</span>
-                       </>
-                     )}
-                   </div>
+          <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">Challenge ID</span>
+                  <span className="text-sm text-white font-medium">#{challengeId}</span>
                 </div>
                 
-                {/* Status */}
-                <div className="space-y-2 ml-6">
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">{t('network')}</span>
                   <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span className="text-base text-gray-400">{t('status')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <TooltipProvider>
-                      <Tooltip open={showStatusTooltip}>
-                        <TooltipTrigger asChild>
-                                                    <span 
-                            className={`text-xl font-medium cursor-pointer ${(() => {
-                              if (!challengeData?.challenge) return 'text-red-400';
-                              
-                              const challenge = challengeData.challenge;
-                              const endTime = new Date(parseInt(challenge.endTime) * 1000);
-                              const hasEnded = currentTime >= endTime;
-                              
-                              if (challenge.isActive && !hasEnded) {
-                                return 'text-green-400'; // active
-                              } else if (challenge.isActive && hasEnded) {
-                                return 'text-orange-400'; // pending
-                              } else {
-                                return 'text-gray-400'; // end
-                              }
-                            })()}`}
-                            onClick={(e) => handleTooltipClick(
-                              e,
-                              'status',
-                              showStatusTooltip,
-                              setShowStatusTooltip,
-                              statusTooltipTimer,
-                              setStatusTooltipTimer
-                            )}
-                            onMouseLeave={() => handleMouseLeave(setShowStatusTooltip, statusTooltipTimer, setStatusTooltipTimer)}
-                          >
-                            {(() => {
-                              if (!challengeData?.challenge) return t('end');
-                              
-                              const challenge = challengeData.challenge;
-                              const endTime = new Date(parseInt(challenge.endTime) * 1000);
-                              const hasEnded = currentTime >= endTime;
-                              
-                              if (challenge.isActive && !hasEnded) {
-                                return t('active');
-                              } else if (challenge.isActive && hasEnded) {
-                                return t('pending');
-                              } else {
-                                return t('end');
-                              }
-                            })()}
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <div className="text-sm space-y-1">
-                            <p>{t('tooltipStatusActive')}</p>
-                            <p>{t('tooltipStatusPending')}</p>
-                            <p>{t('tooltipStatusEnd')}</p>
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Image 
+                      src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+                      alt={subgraphNetwork}
+                      width={16}
+                      height={16}
+                      className="rounded-full"
+                    />
+                    <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Row 2: Seed Money and Users */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Seed Money */}
-                <div className="space-y-2">
-                  <span className="text-base text-gray-400">{t('seedMoney')}</span>
-                  <div className="text-4xl text-white">
+                
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">{t('status')}</span>
+                  <span className={`text-sm font-medium ${
+                    (() => {
+                      if (!challengeData?.challenge) return 'text-red-400';
+                      
+                      const challenge = challengeData.challenge;
+                      const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                      const hasEnded = currentTime >= endTime;
+                      
+                      if (challenge.isActive && !hasEnded) {
+                        return 'text-green-400';
+                      } else if (challenge.isActive && hasEnded) {
+                        return 'text-orange-400';
+                      } else {
+                        return 'text-gray-400';
+                      }
+                    })()
+                  }`}>
                     {(() => {
-                      // If we have challenge data and seedMoney is available
+                      if (!challengeData?.challenge) return t('end');
+                      
+                      const challenge = challengeData.challenge;
+                      const endTime = new Date(parseInt(challenge.endTime) * 1000);
+                      const hasEnded = currentTime >= endTime;
+                      
+                      if (challenge.isActive && !hasEnded) {
+                        return t('active');
+                      } else if (challenge.isActive && hasEnded) {
+                        return t('pending');
+                      } else {
+                        return t('end');
+                      }
+                    })()}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
+                  <span className="text-sm text-gray-400">{t('seedMoney')}</span>
+                  <span className="text-sm text-white font-medium">
+                    {(() => {
                       if (challengeData?.challenge?.seedMoney) {
                         const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                        return seedMoneyValue > 0 ? `$${seedMoneyValue}` : '$0';
+                        return seedMoneyValue > 0 ? `$${seedMoneyValue.toLocaleString()}` : '$0';
                       }
-                      // Default fallback
                       return '$0';
                     })()}
-                  </div>
+                  </span>
                 </div>
-
-                {/* Users */}
-                <div className="space-y-2 ml-6">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-gray-400" />
-                    <span className="text-base text-gray-400">{t('investor')}</span>
-                  </div>
-                  <div className="text-4xl text-white">
+                
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-gray-400">{t('investor')}</span>
+                  <span className="text-sm text-white font-medium">
                     {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
-                  </div>
+                  </span>
                 </div>
+                
               </div>
+            </div>
+          </Card>
 
-              {/* Row 3: Challenge Type & Progress */}
+          {/* Challenge Type & Progress Card */}
+          <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
+            <div className="p-6">
+              {/* Challenge Type & Progress */}
               {challengeData?.challenge && (
                 <div className="space-y-3">
                   {/* Progress */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg text-gray-400">
-                        {(() => {
-                          const challengeType = challengeData.challenge.challengeType;
-                          switch(challengeType) {
-                            case 0: return t('oneWeek');
-                            case 1: return t('oneMonth');
-                            case 2: return t('threeMonths');
-                            case 3: return t('sixMonths');
-                            case 4: return t('oneYear');
-                            default: return `Type ${challengeType}`;
-                          }
-                        })()}
-                      </span>
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-lg">⏳</span>
+                          <span className="text-lg text-gray-400">
+                            {(() => {
+                              const challengeType = challengeData.challenge.challengeType;
+                              switch(challengeType) {
+                                case 0: return t('oneWeek');
+                                case 1: return t('oneMonth');
+                                case 2: return t('threeMonths');
+                                case 3: return t('sixMonths');
+                                case 4: return t('oneYear');
+                                default: return `Type ${challengeType}`;
+                              }
+                            })()}
+                          </span>
+                        </div>
+                      </div>
                       <span className="text-base font-medium text-gray-300">
                         {(() => {
                           const startTime = new Date(parseInt(challengeData.challenge.startTime) * 1000);
@@ -1771,7 +1717,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
                   </div>
                 </div>
               )}
-            </CardContent>
+            </div>
           </Card>
 
           {/* Ranking Section */}

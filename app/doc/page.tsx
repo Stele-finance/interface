@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to avoid SSR issues with wallet hooks
+export const dynamic = 'force-dynamic'
+
 import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -299,7 +302,7 @@ export default function DocPage() {
                                     <div className="space-y-3">
                                       <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                                        <p className="font-medium">Click "Create Challenge" button on dashboard</p>
+                                        <p className="font-medium">Click &quot;Create Challenge&quot; button on dashboard</p>
                                       </div>
                                       <ResponsiveDocImage 
                                         imageName="create1.png" 
@@ -520,7 +523,7 @@ export default function DocPage() {
                                     <div className="space-y-3">
                                       <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                                        <p className="font-medium">Click "Register" on portfolio page</p>
+                                        <p className="font-medium">Click &quot;Register&quot; on portfolio page</p>
                                       </div>
                                       <ResponsiveDocImage 
                                         imageName="register1.png" 
@@ -578,7 +581,7 @@ export default function DocPage() {
                                         <AlertCircle className="h-5 w-5 text-green-500 mt-0.5" />
                                         <div>
                                           <h4 className="font-semibold text-green-700 dark:text-green-300">Important</h4>
-                                          <p className="text-green-600 dark:text-green-400">If you don't register your performance, it won't be reflected in rankings and you won't be able to receive rewards.</p>
+                                          <p className="text-green-600 dark:text-green-400">If you don&apos;t register your performance, it won&apos;t be reflected in rankings and you won&apos;t be able to receive rewards.</p>
                                         </div>
                                       </div>
                                     </div>
@@ -619,7 +622,7 @@ export default function DocPage() {
                                     <div className="space-y-3">
                                       <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">3</div>
-                                        <p className="font-medium">Click "Claim Rewards" button</p>
+                                        <p className="font-medium">Click &quot;Claim Rewards&quot; button</p>
                                       </div>
                                       <ResponsiveDocImage 
                                         imageName="getrewards3.png" 
@@ -632,7 +635,7 @@ export default function DocPage() {
                                     <div className="space-y-3">
                                       <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">4</div>
-                                        <p className="font-medium">Confirm "Claim Rewards"</p>
+                                        <p className="font-medium">Confirm &quot;Claim Rewards&quot;</p>
                                       </div>
                                       <ResponsiveDocImage 
                                         imageName="getrewards4.png" 

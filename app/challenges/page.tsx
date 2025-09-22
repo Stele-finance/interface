@@ -1,7 +1,14 @@
 "use client"
 
-import { Metadata } from "next"
-import { ChallengesClientComponents } from "./components/ChallengesClientComponents"
+import dynamicImport from "next/dynamic"
+
+// Force dynamic rendering to avoid SSR issues with wallet hooks
+export const dynamic = 'force-dynamic'
+
+const ChallengesClientComponents = dynamicImport(
+  () => import("./components/ChallengesClientComponents").then(mod => ({ default: mod.ChallengesClientComponents })),
+  { ssr: false }
+)
 
 export default function ChallengesPage() {
   return (

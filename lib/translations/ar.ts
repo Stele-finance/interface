@@ -10,22 +10,25 @@ export const ar = {
   allProposals: "جميع المقترحات",
   alreadyActive: "نشط بالفعل",
   alreadyVoted: "تم التصويت بالفعل",
+  alwaysAvailable: "متوفر على مدار 24/7 في أي وقت وأي مكان للاستثمار",
   amount: "المبلغ",
-  areYouReadyToBeLegend: "هل أنت مستعد لتصبح أسطورة الاستثمار؟",
+  areYouReadyToBeLegend: "يمكن لأي شخص أن يصبح أسطورة في الاستثمار، حتى بدون ائتمان أو حسابات مصرفية",
   back: "العودة",
   backToProposals: "العودة إلى المقترحات",
   balance: "الرصيد",
   balanceUnavailable: "الرصيد غير متوفر",
   balanceCheckFailed: "فشل فحص الرصيد",
-  becomeLegend: "كن أسطورة",
+  blockchainRecord: "أداء الاستثمار مسجل بشكل دائم على البلوك تشين",
+  borderlessAccess: "وصول بلا حدود إلى منصات الاستثمار العالمية",
   browserExtension: "إضافة المتصفح",
   browseChallenges: "تصفح التحديات",
-  buffettQuote: "القاعدة الأولى: لا تخسر المال أبدًا. ولا تنس القاعدة الأولى أبدًا.",
   buy: "شراء",
   cancel: "إلغاء",
   canceled: "ملغى",
-  carveYourNameOnBlockchain: "انقش تاريخ استثماراتك على البلوك تشين!",
+  carveYourNameOnBlockchain: "حرية الاستثمار التي تبدأ بمحفظة واحدة فقط",
   castYourVote: "أدلِ بصوتك",
+  complexBankProcedures: "إجراءات فتح الحساب المصرفي المعقدة والأوراق",
+  createOwnFund: "إنشاء وتشغيل صندوقك الخاص",
   challenge: "التحدي",
   challengeAlreadyActive: "التحدي نشط بالفعل",
   challengeLinkCopiedToClipboard: "تم نسخ رابط التحدي إلى الحافظة.",
@@ -46,6 +49,7 @@ export const ar = {
   clickAllTabToView: "انقر على علامة التبويب جميع المقترحات لعرض المقترحات",
   clickCompletedTabToView: "انقر على علامة التبويب المكتملة لعرض المقترحات",
   close: "إغلاق",
+  closed: "Closed",
   commandPaletteDescription: "لوحة الأوامر للبحث واختيار الخيارات",
   completed: "مكتمل",
   confirm: "تأكيد",
@@ -63,8 +67,12 @@ export const ar = {
   createNewChallenge: "إنشاء تحدي جديد",
   createProposal: "إنشاء",
   createProposalPage: "إنشاء مقترح",
+  createBonusAmountLabel: "Create Challenge Bonus (STL)",
+  createBonusParamDesc: "Amount of STL tokens rewarded for creating a challenge (in wei, 18 decimals)",
   creating: "جاري الإنشاء",
   cryptoFund: "صندوق العملات المشفرة",
+  fund: "صندوق",
+  funds: "صناديق",
   currentTime: "الوقت الحالي",
   customContractInteraction: "تفاعل العقد المخصص",
   customProposal: "مقترح مخصص",
@@ -86,12 +94,15 @@ export const ar = {
   delegationProcessing: "يتم معالجة تفويضك...",
   delegationSuccessful: "نجح التفويض",
   delegationSuccessfulMessage: "لقد فوضت رموزك لنفسك بنجاح. يجب أن تكون قوة التصويت متاحة الآن.",
+  deposit: "إيداع",
+  depositFee: "رسوم الإيداع",
   description: "الوصف",
   detailedDescriptionPlaceholder: "اشرح مقترحك بالتفصيل.",
   detailedDescriptionVote: "الوصف التفصيلي",
   disconnect: "قطع الاتصال",
   doc: "التوثيق",
   duration: "المدة",
+  earnPrizesWithSkill: "اربح جوائز حقيقية بمهارات الاستثمار",
   empty: "فارغ",
   end: "انتهاء",
   endDate: "تاريخ الانتهاء",
@@ -110,6 +121,7 @@ export const ar = {
   errorLoadingTokens: "خطأ في تحميل الرموز",
   errorLoadingTransactions: "خطأ في تحميل المعاملات",
   ethereumMainnet: "شبكة إيثريوم الرئيسية",
+  everyoneFundManager: "يمكن للجميع أن يكونوا مديري صناديق",
   exampleFunctionParameter: "مثال: 150000000",
   exampleFunctionSignature: "مثال: setRewardAmount(uint256)",
   executed: "تم التنفيذ",
@@ -129,12 +141,16 @@ export const ar = {
   functionSignatureVote: "توقيع الدالة",
   gainLoss: "الربح/الخسارة",
   getRewards: "احصل على المكافآت",
+  getRewardsBonusAmountLabel: "Get Rewards Bonus (STL)",
+  getRewardsBonusParamDesc: "Amount of STL tokens rewarded for claiming rewards (in wei, 18 decimals)",
+  globalInvestors: "جذب التمويل مباشرة من المستثمرين العالميين",
   github: "Github",
   goToChallenge: "انتقل إلى التحدي",
   governance: "الحوكمة",
   governanceActionVote: "إجراء الحوكمة",
   governanceVoting: "التصويت الحاكم",
   governanceVotingSystemDesc: "يدعم نظام التصويت الحاكم. يمكن تحديد الرموز القابلة للاستثمار ورسوم الدخول وحدود رموز المحفظة وطرق توزيع المكافآت ومبالغ الأموال الأولية من خلال التصويت الحاكم.",
+  highMinimumInvestment: "مبالغ استثمار دنيا عالية ومتطلبات أهلية للمشاركة في الصناديق",
   hallOfFame: "قاعة المشاهير",
   holdings: "الحيازات",
   hours: "ساعات",
@@ -143,12 +159,19 @@ export const ar = {
   insufficientBalance: "رصيد غير كافي",
   insufficientFundsGas: "أموال غير كافية للغاز",
   insufficientVotingPower: "قوة تصويت غير كافية",
+  instantAccountCreation: "إنشاء حساب استثمار فوري دون KYC معقد",
   invalidAmount: "مبلغ غير صالح",
   invalidAmountFormat: "تنسيق المبلغ غير صالح",
+  invest: "Invest",
+  investing: "Investing",
   investableTokens: "الرموز",
   investor: "المستثمر",
+  investorsComeToyou: "بمجرد التحقق، سيأتي المستثمرون إليك",
   join: "انضم",
+  joinBonusAmountLabel: "Join Challenge Bonus (STL)",
+  joinBonusParamDesc: "Amount of STL tokens rewarded for joining a challenge (in wei, 18 decimals)",
   joinChallenge: "انضم للتحدي",
+  joinDate: "Join Date",
   joinRequestSuccessful: "تم إرسال طلب الانضمام بنجاح!",
   joining: "جاري الانضمام...",
   language: "اللغة",
@@ -175,11 +198,14 @@ export const ar = {
   loadingVotingPower: "تحميل قوة التصويت...",
   loadingWalletTokenInfo: "تحميل معلومات رموز المحفظة...",
   manualActionRequired: "مطلوب إجراء يدوي",
-  maxAssetsCountLabel: "الحد الأقصى لعدد الأصول",
-  maxAssetsParamDesc: "الحد الأقصى لعدد الرموز المختلفة التي يمكن الاحتفاظ بها في المحفظة (1-255)",
+  maxTokensCountLabel: "الحد الأقصى لعدد الأصول",
+  maxTokensParamDesc: "الحد الأقصى لعدد الرموز المختلفة التي يمكن الاحتفاظ بها في المحفظة (1-255)",
+  managerFeeLabel: "Manager Fee (basis points)",
+  maxSlippageLabel: "Max Slippage (basis points, max 5000)",
   minimumAmountRequired: "مطلوب حد أدنى للمبلغ",
   minutes: "دقائق",
   minuteShort: "د",
+  monthly: "شهري",
   mintingNFT: "سك NFT",
   mintNFT: "سك NFT",
   months: "أشهر",
@@ -191,6 +217,8 @@ export const ar = {
   network: "الشبكة",
   networkSwitchCancelled: "تم إلغاء تبديل الشبكة",
   nft: "NFT",
+  nftCertification: "اعتماد قدراتك الاستثمارية من خلال إصدار NFT",
+  nftCollection: "حول الأداء إلى NFT للجمع مدى الحياة",
   nftMintedSuccessfully: "تم سك NFT بنجاح",
   noNFTsFound: "لم يتم العثور على NFTs",
   noNFTsFoundDescription: "شارك في التحديات لكسبها!",
@@ -202,10 +230,10 @@ export const ar = {
   noChallengesFound: "لم يتم العثور على تحديات",
   noChallengesFoundPortfolio: "لم يتم العثور على تحديات",
   noCompletedProposalsFound: "لم يتم العثور على مقترحات مكتملة.",
+  noCreditAccess: "عدم القدرة على الوصول للخدمات المالية لمن ليس لديهم تاريخ ائتماني",
   noDataAvailable: "لا توجد بيانات متاحة",
   noInvestableTokensFound: "لم يتم العثور على رموز استثمارية",
   noInvestorsFound: "لم يتم العثور على مستثمرين لهذا التحدي",
-  noInvestorsFoundDescription: "ستظهر تصنيفات المستثمرين هنا بمجرد انضمام المشاركين",
   noPortfolioData: "لا توجد بيانات محفظة متاحة",
   noProposalsFound: "لم يتم العثور على مقترحات.",
   noRankingDataFound: "لم يتم العثور على بيانات التصنيف",
@@ -229,8 +257,6 @@ export const ar = {
   performance: "الأداء",
   period: "فترة",
   perToken: "لكل رمز",
-  phantomWalletNotConnected: "محفظة Phantom غير متصلة",
-  phantomWalletNotInstalled: "محفظة Phantom غير مثبتة أو دعم إيثريوم غير مفعل",
   pleaseConnectWallet: "🔗 يرجى ربط محفظتك",
   portfolio: "المحفظة",
   portfolioOverview: "نظرة عامة على المحفظة",
@@ -299,12 +325,22 @@ export const ar = {
   selectWalletToConnect: "اختر المحفظة للربط",
   selectYourVotingOption: "اختر خيار التصويت وأرسل صوتك",
   sell: "بيع",
+  setCreateBonusDesc: "Update bonus for creating challenges",
+  setCreateBonusTemplate: "Set Create Challenge Bonus",
   setEntryFeeDesc: "تحديث رسوم الدخول للتحدي",
   setEntryFeeTemplate: "تعيين رسوم الدخول",
+  setGetRewardsBonusDesc: "Update bonus for claiming rewards",
+  setGetRewardsBonusTemplate: "Set Get Rewards Bonus",
   setInvestableTokenDesc: "إضافة أو تحديث الرمز الاستثماري في النظام",
   setInvestableTokenTemplate: "تعيين الرمز الاستثماري",
-  setMaxAssetsDesc: "تحديث الحد الأقصى للأصول في المحفظة",
-  setMaxAssetsTemplate: "تعيين الحد الأقصى للأصول",
+  setJoinBonusDesc: "Update bonus for joining challenges",
+  setJoinBonusTemplate: "Set Join Challenge Bonus",
+  setMaxTokensDesc: "تحديث الحد الأقصى للأصول في المحفظة",
+  setMaxTokensTemplate: "تعيين الحد الأقصى للأصول",
+  setManagerFeeDesc: "Update the manager fee percentage",
+  setManagerFeeTemplate: "Set Manager Fee",
+  setMaxSlippageDesc: "Update maximum allowed slippage for swaps",
+  setMaxSlippageTemplate: "Set Max Slippage",
   setRewardRatioDesc: "تحديث نسب توزيع المكافآت للترتيبات المختلفة",
   setRewardRatioTemplate: "تعيين نسبة المكافآت",
   setSeedMoneyDesc: "تحديث مبلغ الاستثمار الأولي",
@@ -313,15 +349,17 @@ export const ar = {
   setVotingPeriodTemplate: "تعيين فترة التصويت",
   shortDescription: "الوصف المختصر *",
   showing: "عرض",
+  singleWalletStart: "بمحفظة واحدة فقط",
+  skillAsAsset: "مهاراتك تصبح أصولك",
   sixMonths: "6 أشهر",
   sixMonthsChallenge: "6 أشهر",
   shareToTwitter: "مشاركة على تويتر",
   shareToTwitterTemplate: "اطلع على التحدي {challengeId} في Stele Finance! 💰 إجمالي الجائزة: ${totalPrize}",
-  solana: "Solana",
   start: "ابدأ",
   startDate: "تاريخ البداية",
   state: "الحالة",
   status: "الحالة",
+  steleInnovation: "الابتكار الذي تقدمه Stele",
   stlTokenAirdrop: "إسقاط رمز STL",
   stlTokenAirdropDesc: "يحصل المستخدمون المشاركون في نظام Stele البيئي على رموز الحوكمة كمكافآت. يحصل منشئو التحديات على 1,000 رمز STL، ويحصل أفضل 1-5 مستخدمين في التحديات على 100,000 رمز STL لكل منهم كمكافآت.",
   submit: "إرسال",
@@ -343,12 +381,19 @@ export const ar = {
   templateParametersVote: "معاملات القالب",
   thirdPlaceDesc: "نسبة الجائزة للمركز الثالث",
   thirdPlaceLabel: "المركز الثالث (%)",
+  thirdWorldInfrastructure: "نقص البنية التحتية المالية في البلدان النامية",
   thisWalletHasntParticipated: "عنوان المحفظة هذا لم يشارك في أي تحدي.",
   threeMonths: "3 أشهر",
   threeMonthsChallenge: "3 أشهر",
   time: "الوقت",
+  traditionalFinanceLimitations: "قيود التمويل التقليدي",
+  tradingCompetition: "إثبات مهارات الاستثمار من خلال مسابقات التداول",
+  transparentReturns: "الكشف الشفاف عن العوائد والتحقق منها",
+  transparentVerification: "التحقق الشفاف من المهارات",
+  trueFreedom: "هذه هي الحرية المالية الحقيقية.",
   timeLeft: "الوقت المتبقي",
   title: "العنوان",
+  topInvestors: "Top Investors",
   token: "الرمز",
   tokenAddress: "العنوان",
   tokenAddressDesc: "عنوان عقد الرمز الذي سيتم إضافته كأصل استثماري",
@@ -378,14 +423,14 @@ export const ar = {
   tooltipStatusActive: "نشط: التحدي قيد التقدم",
   tooltipStatusEnd: "منتهي: تم توزيع مكافآت التحدي. مغلق بالكامل",
   tooltipStatusPending: "معلق: انتهت فترة التحدي، في انتظار توزيع المكافآت",
+  tvl: "TVL",
   type: "النوع",
-  uniswapWallet: "محفظة Uniswap",
-  uniswapWalletDesc: "يبدأ جميع المستخدمين الاستثمار التجريبي بنفس الأموال الأولية. فقط رسوم الدخول ورسوم غاز Ethereum مطلوبة.",
   unableToCopyLinkToClipboard: "غير قادر على نسخ الرابط إلى الحافظة.",
   unknown: "غير معروف",
   unknownError: "حدث خطأ غير معروف",
   updated: "محدث",
   user: "المستخدم",
+  userBenefits: "الفوائد الحقيقية من منظور المستخدم",
   users: "المستخدمون",
   userVotingPower: "قوة التصويت الخاصة بك",
   value: "القيمة",
@@ -409,12 +454,14 @@ export const ar = {
   votingPeriodBlocksLabel: "فترة التصويت (كتل)",
   votingPeriodParamDesc: "عدد الكتل التي تدوم فيها فترة التصويت (50400 كتلة ≈ 7 أيام على إيثريوم)",
   volume: "الحجم",
+  whatYouGet: "ما ستحصل عليه",
   wallet: "المحفظة",
   walletNotConnected: "المحفظة غير متصلة",
   warning: "تحذير",
-  warrenBuffett: "وارن بافيت",
   weekShort: "أ",
   weekly: "أسبوعي",
+  withdraw: "سحب",
+  withdrawFee: "رسوم السحب",
   youCancelledNetworkSwitch: "ألغيت طلب تبديل الشبكة.",
   youHaveAlreadyVoted: "لقد صوتت بالفعل على هذا المقترح",
   youNeedToDelegate: "تحتاج إلى تفويض رموزك للمشاركة في الحوكمة",

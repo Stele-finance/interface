@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { getSteleTokenAddress } from "@/lib/constants"
+import { getSteleTokenAddress, getSteleFundTokenAddress } from "@/lib/constants"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -11,7 +11,8 @@ export const handleDelegate = async (
   subgraphNetwork: 'ethereum' | 'arbitrum',
   getProvider: () => any,
   refetchWalletTokenInfo: () => void,
-  t: (key: any) => string
+  t: (key: any) => string,
+  pageType: 'challenge' | 'fund' = 'challenge'
 ): Promise<void> => {
   if (!walletAddress) {
     toast({
@@ -99,7 +100,11 @@ export const handleDelegate = async (
       signer = await provider.getSigner();
     }
     
-    const steleTokenAddress = getSteleTokenAddress(subgraphNetwork)
+    // Get the correct token address based on page type
+    const steleTokenAddress = pageType === 'fund' 
+      ? getSteleFundTokenAddress(subgraphNetwork)
+      : getSteleTokenAddress(subgraphNetwork)
+    
     const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
     // Delegate to self

@@ -138,12 +138,47 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     
     const processedTokens: Record<string, TokenPrice> = {}
     
+    // Get real ETH price first
+    let cachedEthPrice = 3500 // Default fallback
+    try {
+      const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+      const ethToUsdcParams = {
+        tokenIn: wethAddress,
+        tokenOut: usdcAddress,
+        amountIn: ethers.parseEther('1'),
+        fee: 3000, // 0.3% fee tier
+        sqrtPriceLimitX96: 0
+      }
+      const [ethAmountOut] = await quoter.quoteExactInputSingle.staticCall(ethToUsdcParams)
+      cachedEthPrice = Number(ethAmountOut) / 1e6 // USDC has 6 decimals
+      //console.log('Fetched real ETH price:', cachedEthPrice)
+    } catch (err) {
+      console.warn('Failed to fetch ETH price, using fallback:', err)
+    }
+    
     // Always add USDC first
     processedTokens.USDC = {
       symbol: 'USDC',
       address: usdcAddress,
       priceUSD: 1.0,
       decimals: 6,
+      lastUpdated: new Date()
+    }
+    
+    // Add ETH price
+    processedTokens.ETH = {
+      symbol: 'ETH',
+      address: wethAddress,
+      priceUSD: cachedEthPrice,
+      decimals: 18,
+      lastUpdated: new Date()
+    }
+    
+    processedTokens.WETH = {
+      symbol: 'WETH',
+      address: wethAddress,
+      priceUSD: cachedEthPrice,
+      decimals: 18,
       lastUpdated: new Date()
     }
 
@@ -171,7 +206,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       
       for (let tokenIndex = 0; tokenIndex < tokensToProcess.length; tokenIndex++) {
         const token = tokensToProcess[tokenIndex]
-        const amountIn = ethers.parseUnits("1", token.decimals)
+        const amountIn = ethers.parseUnits("1", Number(token.decimals))
         
         // Try USDC pairs first
         for (const fee of feeTiers) {
@@ -274,8 +309,8 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
               priceUSD = parseFloat(ethers.formatUnits(amountOut, 6))
             } else if (mapping.feeType === 'weth') {
               const ethAmount = parseFloat(ethers.formatUnits(amountOut, 18))
-              const ethPriceUSD = 2400 // Rough estimate
-              priceUSD = ethAmount * ethPriceUSD
+              // Get real ETH price from WETH -> USDC conversion
+              priceUSD = ethAmount * cachedEthPrice
             }
             
             if (priceUSD > 0 && (!bestPrice || priceUSD > bestPrice.priceUSD)) {
@@ -369,7 +404,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     } finally {
       setIsLoading(false)
     }
-  }, [tokens, getProvider, fetchBatchPricesWithMulticall])
+  }, [tokens, getProvider, fetchBatchPricesWithMulticall, network])
 
   // Create stable token key to prevent unnecessary re-renders
   const tokenKey = useMemo(() => {
@@ -534,7 +569,7 @@ export function useTokenPrice(
       }
 
       const quoterInterface = new ethers.Interface(QUOTER_ABI)
-      const amountIn = ethers.parseUnits("1", tokenDecimals)
+      const amountIn = ethers.parseUnits("1", Number(tokenDecimals))
       
       // Try to get price via USDC first
       const feeTiers = [3000, 500, 10000] // 0.3%, 0.05%, 1%
@@ -584,8 +619,23 @@ export function useTokenPrice(
             if (amountOut > 0) {
               const ethAmount = parseFloat(ethers.formatUnits(amountOut, 18))
               
-              // Get ETH price in USD (assuming ~$2500 for immediate feedback)
-              const ethPriceUSD = 2500 // This should be more dynamic in production
+              // Get real ETH price from cached data or fetch it
+              let ethPriceUSD = 3500 // Default fallback
+              try {
+                // Try to get ETH price from Uniswap
+                const ethQuoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+                const ethToUsdcParams = {
+                  tokenIn: wethAddress,
+                  tokenOut: usdcAddress,
+                  amountIn: ethers.parseEther('1'),
+                  fee: 3000,
+                  sqrtPriceLimitX96: 0
+                }
+                const [ethToUsdcAmount] = await ethQuoter.quoteExactInputSingle.staticCall(ethToUsdcParams)
+                ethPriceUSD = Number(ethToUsdcAmount) / 1e6
+              } catch (err) {
+                console.warn('Using fallback ETH price:', ethPriceUSD)
+              }
               tokenPrice = ethAmount * ethPriceUSD
               break
             }
@@ -695,7 +745,7 @@ export function useSwapTokenPricesIndependent(
         const fromDecimals = getTokenDecimals(fromTokenSymbol)
         
         if (fromAddress) {
-          const amountIn = ethers.parseUnits("1", fromDecimals)
+          const amountIn = ethers.parseUnits("1", Number(fromDecimals))
           let fromPrice = null
 
           for (const fee of feeTiers) {
@@ -738,7 +788,7 @@ export function useSwapTokenPricesIndependent(
         const toDecimals = getTokenDecimals(toTokenSymbol)
         
         if (toAddress) {
-          const amountIn = ethers.parseUnits("1", toDecimals)
+          const amountIn = ethers.parseUnits("1", Number(toDecimals))
           let toPrice = null
 
           for (const fee of feeTiers) {

@@ -106,69 +106,38 @@ const restoreFromStorage = () => {
 
 export const useWallet = () => {
   const [localState, setLocalState] = useState<WalletState>(globalState)
-  const [isAppKitReady, setIsAppKitReady] = useState(false)
   
-  // AppKit hooks
-  let appKit: any = null
-  let appKitAccount: any = null
-  let appKitNetwork: any = null
-  let appKitProvider: any = null
+  // AppKit hooks - always call hooks in same order
+  const appKit = useAppKit()
+  const appKitAccount = useAppKitAccount()
+  const appKitNetwork = useAppKitNetwork()
+  const appKitProvider = useAppKitProvider('eip155')
 
-  try {
-    appKit = useAppKit()
-  } catch (e) {
-    // AppKit not available
-  }
+  // Determine if AppKit is ready without state
+  const isAppKitReady = !!(appKit && appKitAccount && appKitNetwork && appKitProvider)
 
-  try {
-    appKitAccount = useAppKitAccount()
-  } catch (e) {
-    // AppKitAccount not available
-  }
-
-  try {
-    appKitNetwork = useAppKitNetwork()
-  } catch (e) {
-    // AppKitNetwork not available
-  }
-
-  try {
-    appKitProvider = useAppKitProvider('eip155')
-  } catch (e) {
-    // AppKitProvider not available
-  }
-
-  // Subscribe to state
+  // Subscribe to global state changes
   useEffect(() => {
     const unsubscribe = subscribe(setLocalState)
+    // Set initial local state
+    setLocalState(globalState)
     return unsubscribe
   }, [])
 
-  // Check if AppKit is ready
+  // Monitor WalletConnect state and update global state
   useEffect(() => {
-    if (appKit && appKitAccount && appKitNetwork && appKitProvider) {
-      setIsAppKitReady(true)
-    } else {
-      setIsAppKitReady(false)
-    }
-  }, [appKit, appKitAccount, appKitNetwork, appKitProvider])
-
-  // Initialize - DON'T auto-restore from storage to prevent automatic wallet prompts
-  useEffect(() => {
-    if (isAppKitReady) {
-      // Only set local state, don't auto-restore from storage
-      setLocalState(globalState)
-    }
-  }, [isAppKitReady])
-
-  // Monitor WalletConnect state
-  useEffect(() => {
-    if (appKitAccount && appKitNetwork) {
-      const { address, isConnected } = appKitAccount
-      const { chainId } = appKitNetwork
+    if (!isAppKitReady) return
+    
+    const { address, isConnected } = appKitAccount
+    const { chainId } = appKitNetwork
+    
+    if (isConnected && address) {
+      const network = chainIdToNetwork(chainId || 1)
       
-      if (isConnected && address) {
-        const network = chainIdToNetwork(chainId || 1)
+      // Only update if state actually changed
+      if (globalState.address !== address || 
+          globalState.isConnected !== true ||
+          globalState.network !== network) {
         updateState({
           address,
           isConnected: true,
@@ -184,17 +153,37 @@ export const useWallet = () => {
             network: network
           }))
         }
-      } else if (globalState.walletType === 'walletconnect' && globalState.isConnected) {
-        // WalletConnect disconnected
-        updateState({
-          address: null,
-          isConnected: false,
-          walletType: null,
-          network: null
-        })
       }
+    } else if (globalState.isConnected && globalState.walletType === 'walletconnect') {
+      // WalletConnect disconnected
+      updateState({
+        address: null,
+        isConnected: false,
+        walletType: null,
+        network: null
+      })
     }
-  }, [appKitAccount?.address, appKitAccount?.isConnected, appKitNetwork?.chainId])
+  }, [isAppKitReady, appKitAccount, appKitNetwork])
+
+  // Disconnect wallet
+  const disconnectWallet = useCallback(async () => {
+    try {
+      // For WalletConnect/AppKit, we close the modal and clear the state
+      if (globalState.walletType === 'walletconnect' && appKit?.close) {
+        await appKit.close()
+      }
+      
+      updateState({
+        address: null,
+        isConnected: false,
+        walletType: null,
+        network: null,
+        isLoading: false
+      })      
+    } catch (error) {
+      console.error('Failed to disconnect wallet:', error)
+    }
+  }, [appKit])
 
   // Connect wallet - WalletConnect only
   const connectWallet = useCallback(async () => {
@@ -220,26 +209,7 @@ export const useWallet = () => {
       updateState({ isLoading: false })
       throw error
     }
-  }, [appKit])
-
-  // Disconnect wallet
-  const disconnectWallet = useCallback(async () => {
-    try {
-      if (globalState.walletType === 'walletconnect' && appKit?.disconnect) {
-        await appKit.disconnect()
-      }
-      
-      updateState({
-        address: null,
-        isConnected: false,
-        walletType: null,
-        network: null,
-        isLoading: false
-      })      
-    } catch (error) {
-      console.error('Failed to disconnect wallet:', error)
-    }
-  }, [appKit])
+  }, [appKit, disconnectWallet])
 
   // Switch network
   const switchNetwork = useCallback(async (targetNetwork: NetworkType) => {
@@ -250,7 +220,7 @@ export const useWallet = () => {
     const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
       
     try {
-      const provider = appKitProvider?.walletProvider
+      const provider = appKitProvider?.walletProvider as any
       if (!provider) {
         throw new Error('WalletConnect provider not available')
       }
@@ -265,7 +235,7 @@ export const useWallet = () => {
       if (switchError.code === 4902) {
         // Add network if it doesn't exist
         try {
-          const provider = appKitProvider?.walletProvider
+          const provider = appKitProvider?.walletProvider as any
           if (provider) {
             await provider.request({
               method: 'wallet_addEthereumChain',
@@ -285,7 +255,7 @@ export const useWallet = () => {
   // Get provider
   const getProvider = useCallback(() => {
     if (globalState.walletType === 'walletconnect' && appKitProvider?.walletProvider) {
-      return new BrowserProvider(appKitProvider.walletProvider)
+      return new BrowserProvider(appKitProvider.walletProvider as any)
     }
     return null
   }, [appKitProvider])

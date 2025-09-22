@@ -1,14 +1,15 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
-import { getSteleTokenAddress, STELE_DECIMALS, getRPCUrl } from '@/lib/constants'
+import { getSteleTokenAddress, getSteleFundTokenAddress, STELE_DECIMALS } from '@/lib/constants'
+import { getManagedProvider } from '@/lib/provider-manager'
 import ERC20ABI from '@/app/abis/ERC20.json'
 import ERC20VotesABI from '@/app/abis/ERC20Votes.json'
 
 // Hook for getting wallet token balance and delegation info
-export function useWalletTokenInfo(walletAddress: string | null, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
+export function useWalletTokenInfo(walletAddress: string | null, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   return useQuery({
-    queryKey: ['walletTokenInfo', walletAddress, network],
+    queryKey: ['walletTokenInfo', walletAddress, network, pageType],
     queryFn: async () => {
       if (!walletAddress) {
         return {
@@ -19,10 +20,12 @@ export function useWalletTokenInfo(walletAddress: string | null, network: 'ether
       }
 
       try {
-        // Get network-specific configurations
-        const rpcUrl = getRPCUrl(network)
-        const steleTokenAddress = getSteleTokenAddress(network)
-        const provider = new ethers.JsonRpcProvider(rpcUrl)
+        // Get the correct token address based on page type
+        const steleTokenAddress = pageType === 'fund' 
+          ? getSteleFundTokenAddress(network)
+          : getSteleTokenAddress(network)
+        // Use managed provider to prevent multiple connections
+        const provider = getManagedProvider(network)
         
         // Create contracts
         const tokenContract = new ethers.Contract(steleTokenAddress, ERC20ABI.abi, provider)

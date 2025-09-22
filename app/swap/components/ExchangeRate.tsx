@@ -10,6 +10,8 @@ interface ExchangeRateProps {
   swapQuote: SwapQuote | null;
   simpleSwapQuote: SimpleSwapQuote | null;
   getTokenDecimals: (symbol: string) => number;
+  fromTokenPrice?: number;
+  toTokenPrice?: number;
 }
 
 export function ExchangeRate({
@@ -18,7 +20,9 @@ export function ExchangeRate({
   toToken,
   swapQuote,
   simpleSwapQuote,
-  getTokenDecimals
+  getTokenDecimals,
+  fromTokenPrice,
+  toTokenPrice
 }: ExchangeRateProps) {
   const { t } = useLanguage()
   
@@ -29,11 +33,14 @@ export function ExchangeRate({
     return null;
   }
 
-  const exchangeRate = swapQuote ? swapQuote.exchangeRate : simpleSwapQuote?.exchangeRate || 0;
+  // Use same price source as SELL/BUY components
+  const exchangeRate = (fromTokenPrice && toTokenPrice) 
+    ? fromTokenPrice / toTokenPrice 
+    : (swapQuote ? swapQuote.exchangeRate : simpleSwapQuote?.exchangeRate || 0);
 
   return (
     <div className="text-center text-sm text-gray-400">
-      1 {fromToken} = {exchangeRate.toFixed(Math.min(6, getTokenDecimals(toToken)))} {toToken}
+      1 {fromToken} = {exchangeRate.toFixed(Math.min(5, getTokenDecimals(toToken)))} {toToken}
       {isUsingBasicEstimate && (
         <span className="text-orange-400 ml-1">({t('loadingPrice')})</span>
       )}

@@ -5,14 +5,14 @@ export const getSwapDetails = (transaction: any): SwapDetails | null => {
   if (transaction.type !== 'swap') return null
   
   // First try: Use the swap data from the transaction
-  if (transaction.fromAssetSymbol && transaction.toAssetSymbol && transaction.fromAmount && transaction.toAmount) {
+  if (transaction.tokenInSymbol && transaction.tokenOutSymbol && transaction.tokenInAmount && transaction.tokenOutAmount) {
     const swapDetails = {
-      fromAmount: parseFloat(transaction.fromAmount).toFixed(4),
-      fromToken: transaction.fromAsset,
-      fromTokenSymbol: transaction.fromAssetSymbol,
-      toAmount: parseFloat(transaction.toAmount).toFixed(4),
-      toToken: transaction.toAsset,
-      toTokenSymbol: transaction.toAssetSymbol
+      fromAmount: parseFloat(transaction.tokenInAmount).toFixed(4),
+      fromToken: transaction.tokenIn,
+      fromTokenSymbol: transaction.tokenInSymbol,
+      toAmount: parseFloat(transaction.tokenOutAmount).toFixed(4),
+      toToken: transaction.tokenOut,
+      toTokenSymbol: transaction.tokenOutSymbol
     }
     return swapDetails
   }

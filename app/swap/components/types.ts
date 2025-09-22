@@ -1,8 +1,18 @@
 import { HTMLAttributes } from "react"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 
+export interface InvestableToken {
+  id: string
+  address: string
+  decimals: string
+  symbol: string
+  updatedTimestamp: string
+  isInvestable: boolean
+}
+
 export interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
+  investableTokens?: InvestableToken[];
   onSwappingStateChange?: (isSwapping: boolean) => void;
 }
 

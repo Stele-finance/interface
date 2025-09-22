@@ -3,12 +3,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Wallet } from "lucide-react"
 import { getTokenLogo } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
+import { useTokenPrices } from "@/lib/token-price-context"
 import { formatTokenAmount, getTokenExplorerUrl } from "../utils"
 import Image from "next/image"
 
 interface PortfolioTabProps {
   userTokens: any[]
-  uniswapPrices: any
   isLoadingUniswap: boolean
   subgraphNetwork: string
   onTokenClick: (tokenAddress: string) => void
@@ -16,12 +16,12 @@ interface PortfolioTabProps {
 
 export function PortfolioTab({ 
   userTokens, 
-  uniswapPrices, 
   isLoadingUniswap, 
   subgraphNetwork, 
   onTokenClick 
 }: PortfolioTabProps) {
   const { t } = useLanguage()
+  const { getTokenPriceBySymbol } = useTokenPrices()
 
   return (
     <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
@@ -37,8 +37,9 @@ export function PortfolioTab({
               </thead>
               <tbody>
                 {userTokens.map((token, index) => {
-                  // Get price from Uniswap data
-                  const tokenPrice = uniswapPrices?.tokens?.[token.symbol]?.priceUSD || 0
+                  // Get price from global token price context
+                  const priceData = getTokenPriceBySymbol(token.symbol)
+                  const tokenPrice = priceData?.priceUSD || 0
                   const isLoadingPrice = isLoadingUniswap
                   const hasValidPrice = tokenPrice > 0
                   const tokenAmount = parseFloat(token.amount) || 0
@@ -58,9 +59,11 @@ export function PortfolioTab({
                              
                              if (logoPath) {
                               return (
-                                <img
+                                <Image
                                   src={logoPath}
                                   alt={token.symbol}
+                                  width={40}
+                                  height={40}
                                   className="h-10 w-10 rounded-full object-cover"
                                   onError={(e: any) => {
                                     console.error('Failed to load token logo:', logoPath)

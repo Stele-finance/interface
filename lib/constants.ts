@@ -42,12 +42,30 @@ export const KNOWN_GOVERNANCE_CONFIGS = {
 } as const
 
 // Network-specific Contract Addresses
-const NETWORK_CONTRACTS = {
+export const NETWORK_CONTRACTS = {
   ethereum: {
+    STELE_CONTRACT_ADDRESS: "0x88e94435F0F6D66a3D6FCEfb1AdA2286DDA2A929",
+    STELE_TOKEN_ADDRESS: "0xc4f1E00cCfdF3a068e2e6853565107ef59D96089",
+    USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    GOVERNANCE_CONTRACT_ADDRESS: "0xeaeE546f06f52d0657742415d1b950a23E421Ed1",
+    RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
+    EXPLORER_URL: 'https://etherscan.io',
+    EXPLORER_NAME: 'Etherscan',
+    // Uniswap V3 addresses
+    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
+    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
+    WETH_TOKEN_ADDRESS: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    WBTC_TOKEN_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    UNI_TOKEN_ADDRESS: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
+  },
+  ethereum_fund: {
     STELE_CONTRACT_ADDRESS: "0x3A2cB739032175b4Fc66De7F78bddC415972D2ff",
     STELE_TOKEN_ADDRESS: "0x71c24377e7f24b6d822C9dad967eBC77C04667b5",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
+    STELE_FUND_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
+    STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -60,10 +78,29 @@ const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   arbitrum: {
-    STELE_CONTRACT_ADDRESS: "0x566D1769B3f66372E94fD18F59c757BCEc6efb8a",
-    STELE_TOKEN_ADDRESS: "0x08C9c9EE6F161c6056060BF6AC7fE85e38638619",
+    STELE_CONTRACT_ADDRESS: "0xD017dd389c0F07B9bC382aBA8467F00efE285FD8",
+    STELE_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum USDC
-    GOVERNANCE_CONTRACT_ADDRESS: "0xC93fe38F52481F090E28E242B36f828C74F24142",
+    GOVERNANCE_CONTRACT_ADDRESS: "0x7680ba5FC79f28e053b7AAa77787C1912ED4Eb30",
+    RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
+    EXPLORER_URL: 'https://arbiscan.io',
+    EXPLORER_NAME: 'Arbiscan',
+    // Governance configuration
+    // Uniswap V3 addresses (Arbitrum)
+    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
+    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
+    WETH_TOKEN_ADDRESS: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // Arbitrum WETH
+    WBTC_TOKEN_ADDRESS: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // Arbitrum WBTC
+    UNI_TOKEN_ADDRESS: "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0",   // Arbitrum UNI
+    LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
+  },
+  arbitrum_fund: {
+    STELE_FUND_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
+    STELE_FUND_SETTING_ADDRESS: "0x4cb8CE80f9E419Ebe2ca190CD904c3302d7E944e",
+    STELE_FUND_INFO_ADDRESS: "0x90F84E40896b5eEEAd5148AEbA70B8B67Cb4886E",
+    STELE_FUND_CONTRACT_ADDRESS: "0x2a8F0603708A71267C2eC7Ec4C6a00050F0A537F",
+    STELE_FUND_GOVERNANCE_ADDRESS: "0x041A131168B1150B8F4c815b39b6dA2Cd3b0878e",
+    USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://arbiscan.io',
     EXPLORER_NAME: 'Arbiscan',
@@ -130,6 +167,11 @@ export const getSteleTokenAddress = (network: 'ethereum' | 'arbitrum' | null): s
   return NETWORK_CONTRACTS.ethereum.STELE_TOKEN_ADDRESS; // Default to Ethereum
 };
 
+export const getSteleFundTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.STELE_TOKEN_ADDRESS; // Default to Ethereum - uses STELE_TOKEN_ADDRESS for ethereum_fund
+};
+
 export const getUSDCTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.USDC_TOKEN_ADDRESS;
   return NETWORK_CONTRACTS.ethereum.USDC_TOKEN_ADDRESS; // Default to Ethereum
@@ -138,6 +180,21 @@ export const getUSDCTokenAddress = (network: 'ethereum' | 'arbitrum' | null): st
 export const getGovernanceContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.GOVERNANCE_CONTRACT_ADDRESS;
   return NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS; // Default to Ethereum
+};
+
+export const getSteleFundGovernanceAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_GOVERNANCE_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS; // Default to Ethereum - uses regular governance for ethereum_fund
+};
+
+export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_CONTRACT_ADDRESS;
+  // For Ethereum, use the regular STELE_CONTRACT_ADDRESS if STELE_FUND_CONTRACT_ADDRESS is not set
+  const ethereumFundAddress = NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_CONTRACT_ADDRESS;
+  if (ethereumFundAddress === "0x0000000000000000000000000000000000000000") {
+    return NETWORK_CONTRACTS.ethereum_fund.STELE_CONTRACT_ADDRESS;
+  }
+  return ethereumFundAddress;
 };
 
 export const getRPCUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
@@ -215,15 +272,30 @@ export const STELE_DECIMALS = 18;
 
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
-  ethereum: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
-  arbitrum: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF'
+  // Use Studio subgraphs for both networks (they have consistent schema)
+  ethereum_challenge: 'https://api.studio.thegraph.com/query/110372/stele/version/latest',
+  arbitrum_challenge: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest',
+  ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund/version/latest',
+  arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
 } as const
 
 // Helper function to get subgraph URL based on network
-export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
+export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: 'fund'): string => {
   // Filter to supported networks (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  return NETWORK_SUBGRAPHS[subgraphNetwork]
+  
+  let url: string
+  let key: string
+  
+  if (type === 'fund') {
+    key = `${subgraphNetwork}_fund`
+    url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
+  } else {
+    key = `${subgraphNetwork}_challenge`
+    url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
+  }
+  
+  return url
 }
 export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
 export const BYTE_ZERO = "0x00000000"

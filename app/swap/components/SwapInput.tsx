@@ -50,7 +50,7 @@ export function SwapInput({
     if (!outputAmount || outputAmount === "0") return "0";
     const num = parseFloat(outputAmount);
     if (num % 1 === 0) return num.toString();
-    return num.toFixed(Math.min(4, getTokenDecimals(token))).replace(/\.?0+$/, '');
+    return num.toFixed(Math.min(5, getTokenDecimals(token))).replace(/\.?0+$/, '');
   }
 
   return (
@@ -86,7 +86,10 @@ export function SwapInput({
                   }}
                 />
                 <div className="text-sm text-gray-400 mt-1">
-                  ${getSwapAmountUSD?.().toFixed(2) || '0.00'}
+                  ${(() => {
+                    const result = getSwapAmountUSD?.() || 0;
+                    return result.toFixed(2);
+                  })() || '0.00'}
                 </div>
               </>
             ) : (
@@ -101,8 +104,10 @@ export function SwapInput({
                   {formatOutputAmount(amount)}
                 </div>
                 <div className="text-sm text-gray-400 mt-1">
-                  ${amount && token && (priceData?.tokens?.[token] || toTokenPrice) ? 
-                    (parseFloat(amount) * (priceData?.tokens?.[token]?.priceUSD || toTokenPrice || 0)).toFixed(2) : "0.00"}
+                  ${(() => {
+                    const result = getSwapAmountUSD?.() || 0;
+                    return result.toFixed(2);
+                  })() || '0.00'}
                 </div>
               </>
             )}

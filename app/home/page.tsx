@@ -3,145 +3,185 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { ArrowRight } from "lucide-react"
-
-// Feature explanation cards
-const getFeatureCards = (t: any) => [
-  {
-    title: t('seedMoney'),
-    image: "/home/seedmoney.png",
-    description: t('seedMoneySystemDesc')
-  },
-  {
-    title: t('rewardDistribution'),
-    image: "/home/rewardTransactions.png",
-    description: t('rewardDistributionSystemDesc')
-  },
-  {
-    title: t('governanceVoting'),
-    image: "/home/createProposal.png",
-    description: t('governanceVotingSystemDesc')
-  },
-  {
-    title: t('stlTokenAirdrop'),
-    image: "/home/airdrop.png",
-    description: t('stlTokenAirdropDesc')
-  }
-]
+import { ArrowRight, Wallet, Trophy, Briefcase, Star, Shield, Globe, Clock } from "lucide-react"
 
 export default function HomePage() {
   const { t } = useLanguage()
   const router = useRouter()
 
   const handleGetStarted = () => {
-    router.push('/dashboard')
+    router.push('/dashboard/challenge')
   }
 
   const handleBrowseChallenges = () => {
-    router.push('/challenges')
+    router.push('/dashboard/fund')
   }
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div> 
-        <div className="container mx-auto px-6 py-20 lg:py-20">
-          {/* Main Title */}
-          <div className="text-center space-y-8 mb-0">
-            <div className="max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl text-gray-100 leading-tight">
-                <span className="text-white font-bold">
-                  {t('areYouReadyToBeLegend')}
-                </span>
-                <div className="flex justify-center items-center gap-4 mt-4">
-                  <Image
-                    src="/home/warren_buffit.png"
-                    alt="Warren Buffett 1"
-                    width={120}
-                    height={120}
-                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
-                  />
-                  <Image
-                    src="/home/warren_buffit2.png"
-                    alt="Warren Buffett 2"
-                    width={120}
-                    height={120}
-                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
-                  />
-                  <Image
-                    src="/home/warren_buffit3.png"
-                    alt="Warren Buffett 3"
-                    width={120}
-                    height={120}
-                    className="rounded-full w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover"
-                  />
-                </div>
-                <span className="text-xl md:text-xl lg:text-xl text-gray-300 mt-2">
-                  {t('carveYourNameOnBlockchain')}
-                </span>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 opacity-50"></div>
+        <div className="container mx-auto px-6 py-20 lg:py-24 relative z-10">
+          <div className="text-center space-y-12">
+            <div className="max-w-5xl mx-auto">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl text-white font-bold leading-tight mb-8">
+                {t('areYouReadyToBeLegend')}
               </h1>
+              <p className="text-xl md:text-2xl text-blue-300 font-medium mb-8">
+                🚀 {t('carveYourNameOnBlockchain')}
+              </p>
             </div>
 
-            <div className="flex flex-col gap-4 items-center relative z-10">
-              <div 
-                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                className="group bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold px-8 py-4 text-lg rounded-xl cursor-pointer flex items-center transition-all duration-300 hover:from-blue-600 hover:to-purple-700 hover:shadow-2xl hover:scale-105 transform"
                 onClick={handleGetStarted}
-                style={{ 
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  pointerEvents: 'auto'
-                }}
               >
                 {t('virtualTradingChallenge')}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </div>
-              
-              <div 
-                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-6 py-3 text-base rounded-lg cursor-pointer flex items-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 hover:brightness-110"
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
+
+              <button
+                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-8 py-4 text-lg rounded-xl cursor-pointer flex items-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 transform"
                 onClick={handleBrowseChallenges}
-                style={{ 
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  pointerEvents: 'auto'
-                }}
               >
                 {t('cryptoFund')}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Traditional Finance Limitations */}
+      <section className="py-16 bg-slate-800/50">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+              {t('traditionalFinanceLimitations')}:
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
+                <Shield className="h-8 w-8 text-red-400 mx-auto mb-4" />
+                <p className="text-red-200 text-lg">- {t('complexBankProcedures')}</p>
+              </div>
+              <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
+                <Star className="h-8 w-8 text-red-400 mx-auto mb-4" />
+                <p className="text-red-200 text-lg">- {t('highMinimumInvestment')}</p>
+              </div>
+              <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
+                <Globe className="h-8 w-8 text-red-400 mx-auto mb-4" />
+                <p className="text-red-200 text-lg">- {t('thirdWorldInfrastructure')}</p>
+              </div>
+              <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
+                <Clock className="h-8 w-8 text-red-400 mx-auto mb-4" />
+                <p className="text-red-200 text-lg">- {t('noCreditAccess')}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Cards Section */}
-      <section className="py-8">
-        <div className="container mx-auto px-2 lg:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-6xl mx-auto">
-            {getFeatureCards(t).map((card, index) => (
-              <Card key={index} className="bg-transparent border-transparent transition-all duration-500 hover:transform hover:scale-[1.02]">
-                <CardContent className="p-6 space-y-4">
-                  {/* Card Title */}
-                  <h3 className="text-3xl text-gray-100 mb-4">{card.title}</h3>
-                  
-                  {/* Card Image */}
-                  <div className="w-full">
-                    <Image
-                      src={card.image}
-                      alt={card.title}
-                      width={400}
-                      height={250}
-                      className="w-full h-auto rounded-lg"
-                    />
+      {/* Stele Innovation */}
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
+              {t('steleInnovation')}:
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Single Wallet */}
+              <Card className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 border border-blue-500/30 transition-all duration-300 hover:scale-105">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-blue-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                    <Wallet className="h-8 w-8 text-blue-400" />
                   </div>
-                  
-                  {/* Card Description */}
-                  <p className="text-gray-300 text-lg leading-relaxed">
-                    {card.description}
-                  </p>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    📱 {t('singleWalletStart')}
+                  </h3>
+                  <div className="space-y-3 text-left">
+                    <p className="text-blue-200">• {t('instantAccountCreation')}</p>
+                    <p className="text-blue-200">• {t('borderlessAccess')}</p>
+                    <p className="text-blue-200">• {t('alwaysAvailable')}</p>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
+
+              {/* Transparent Verification */}
+              <Card className="bg-gradient-to-br from-green-900/50 to-emerald-900/50 border border-green-500/30 transition-all duration-300 hover:scale-105">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-green-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                    <Trophy className="h-8 w-8 text-green-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    🏆 {t('transparentVerification')}
+                  </h3>
+                  <div className="space-y-3 text-left">
+                    <p className="text-green-200">• {t('tradingCompetition')}</p>
+                    <p className="text-green-200">• {t('blockchainRecord')}</p>
+                    <p className="text-green-200">• {t('nftCertification')}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Everyone Fund Manager */}
+              <Card className="bg-gradient-to-br from-amber-900/50 to-orange-900/50 border border-amber-500/30 transition-all duration-300 hover:scale-105">
+                <CardContent className="p-8 text-center">
+                  <div className="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                    <Briefcase className="h-8 w-8 text-amber-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    💼 {t('everyoneFundManager')}
+                  </h3>
+                  <div className="space-y-3 text-left">
+                    <p className="text-amber-200">• {t('createOwnFund')}</p>
+                    <p className="text-amber-200">• {t('transparentReturns')}</p>
+                    <p className="text-amber-200">• {t('globalInvestors')}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* User Benefits */}
+      <section className="py-16 bg-gradient-to-br from-purple-900/30 to-blue-900/30">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              {t('userBenefits')}
+            </h2>
+            <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-12">
+              💰 {t('whatYouGet')}
+            </h3>
+
+            <Card className="bg-gradient-to-br from-yellow-900/30 to-amber-900/30 border border-yellow-500/30 p-8">
+              <CardContent className="space-y-8">
+                <h4 className="text-xl md:text-2xl font-bold text-yellow-300 mb-6">
+                  {t('skillAsAsset')}
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                  <div className="space-y-2">
+                    <p className="text-yellow-200">• {t('earnPrizesWithSkill')}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-yellow-200">• {t('nftCollection')}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-yellow-200">• {t('investorsComeToyou')}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="mt-12">
+              <h3 className="text-2xl md:text-3xl font-bold text-white">
+                {t('trueFreedom')}
+              </h3>
+            </div>
           </div>
         </div>
       </section>

@@ -25,11 +25,14 @@ export function TokenSelector({
     <div className="relative token-dropdown">
       <Button
         variant="ghost"
-        onClick={() => onOpenChange(!isOpen)}
-        className="bg-transparent hover:bg-muted/60 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between"
+        onClick={() => availableTokens.length > 0 ? onOpenChange(!isOpen) : undefined}
+        disabled={availableTokens.length === 0}
+        className="bg-transparent hover:bg-muted/60 border border-gray-600 text-white rounded-full px-4 py-2 text-sm font-medium h-auto gap-2 transition-all duration-200 min-w-[120px] justify-between disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="flex items-center gap-2">
-          {selectedToken ? (
+          {availableTokens.length === 0 ? (
+            <span className="text-gray-400">{label === "From" ? "No tokens" : "Select token"}</span>
+          ) : selectedToken ? (
             <>
               <Image
                 src={getTokenLogo(getTokenAddress(selectedToken), subgraphNetwork) || `/tokens/small/${selectedToken.toLowerCase()}.png`}
@@ -60,18 +63,24 @@ export function TokenSelector({
       
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-muted/80 border border-gray-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
-          {!selectedToken && (
-            <div
-              className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-gray-400 text-sm"
-              onClick={() => {
-                onTokenSelect("")
-                onOpenChange(false)
-              }}
-            >
-              <span>{t('select')}</span>
+          {availableTokens.length === 0 ? (
+            <div className="px-3 py-4 text-center text-gray-400 text-sm">
+              {label === "From" ? "No tokens available in fund" : "No investable tokens available"}
             </div>
-          )}
-          {availableTokens.map((token) => (
+          ) : (
+            <>
+              {!selectedToken && (
+                <div
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-gray-400 text-sm"
+                  onClick={() => {
+                    onTokenSelect("")
+                    onOpenChange(false)
+                  }}
+                >
+                  <span>{t('select')}</span>
+                </div>
+              )}
+              {availableTokens.map((token) => (
             <div
               key={token}
               className="flex items-center gap-2 px-3 py-2 hover:bg-muted/60 cursor-pointer text-white text-sm"
@@ -101,7 +110,9 @@ export function TokenSelector({
               <span>{token}</span>
               {selectedToken === token && <Check className="h-4 w-4 ml-auto" />}
             </div>
-          ))}
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>

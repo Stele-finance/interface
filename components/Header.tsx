@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { ethers } from "ethers"
 import {
@@ -36,6 +36,8 @@ import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 import { useAppKitProvider, useAppKitAccount } from '@reown/appkit/react'
 import { useIsMobile } from "@/components/ui/use-mobile"
+import { usePageType } from "@/lib/page-type-context"
+import { ChevronDown, Coins } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
@@ -44,6 +46,27 @@ export function Header() {
   const { toast } = useToast()
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
+  
+  // Determine pageType from URL or localStorage
+  const getPageTypeFromUrl = useCallback(() => {
+    if (pathname.includes('/fund')) return 'fund'
+    if (pathname.includes('/funds')) return 'fund'
+    if (pathname.includes('/challenge')) return 'challenge'
+    if (pathname.includes('/challenges')) return 'challenge'
+    // Check localStorage for saved preference
+    const savedPageType = typeof window !== 'undefined' ? localStorage.getItem('selected-page-type') : null
+    if (savedPageType === 'fund' || savedPageType === 'challenge') {
+      return savedPageType
+    }
+    // Default to challenge
+    return 'challenge'
+  }, [pathname])
+  
+  const [pageType, setLocalPageType] = useState<'challenge' | 'fund'>('challenge')
+  
+  useEffect(() => {
+    setLocalPageType(getPageTypeFromUrl())
+  }, [pathname, getPageTypeFromUrl])
   
   // Use global wallet hook
   const { 
@@ -115,7 +138,7 @@ export function Header() {
   };
 
   // Fetch wallet balance using network-specific RPC
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!walletAddress) return;
     
     try {
@@ -138,7 +161,7 @@ export function Header() {
     } finally {
       setIsLoadingBalance(false);
     }
-  };
+  }, [walletAddress, walletNetwork]);
 
   const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
@@ -215,7 +238,7 @@ export function Header() {
     if (walletAddress) {
       fetchBalance();
     }
-  }, [walletAddress, walletNetwork]);
+  }, [walletAddress, walletNetwork, fetchBalance]);
 
   // Navigate to dashboard when network changes
   useEffect(() => {
@@ -245,7 +268,14 @@ export function Header() {
         !pathname.includes('/dashboard') && 
         !pathname.includes('/challenges')) {
       prevWalletAddressRef.current = walletAddress;
-      router.push('/dashboard');
+      
+      // Determine which dashboard to navigate to based on current path
+      if (pathname.includes('/fund')) {
+        router.push('/dashboard/fund');
+      } else {
+        // Default to challenge dashboard for all other pages (including /challenge)
+        router.push('/dashboard/challenge');
+      }
     } else {
       prevWalletAddressRef.current = walletAddress;
     }
@@ -292,10 +322,10 @@ export function Header() {
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden md:flex items-center gap-6">
           <Link 
-            href="/dashboard"
+            href={pageType === 'fund' ? '/dashboard/fund' : '/dashboard/challenge'}
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname === "/" || pathname === "/dashboard"
+              pathname === "/" || pathname.includes("/dashboard")
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             )}
@@ -305,20 +335,24 @@ export function Header() {
           </Link>
           
           <Link 
-            href="/challenges"
+            href={pageType === 'fund' ? '/funds' : '/challenges'}
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname.includes("/challenges") || pathname.includes("/challenge/")
+              pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/funds") || pathname.includes("/fund/")
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Trophy className="h-5 w-5" />
-            {t('challenges')}
+            {pageType === 'fund' ? (
+              <Coins className="h-5 w-5" />
+            ) : (
+              <Trophy className="h-5 w-5" />
+            )}
+            {pageType === 'fund' ? t('funds') : t('challenges')}
           </Link>
           
           <Link 
-            href="/nft"
+            href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname.includes("/nft")
@@ -330,27 +364,69 @@ export function Header() {
             NFTs
           </Link>
           
+          <Link 
+            href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/vote")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Vote className="h-5 w-5" />
+            {t('vote')}
+          </Link>
+          
         </nav>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
         
+        {/* Challenge/Fund Type Selector - always visible */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-300 hover:text-white hover:bg-gray-800/50 font-medium px-3 py-2 h-auto text-sm capitalize border-0 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {pageType === 'challenge' ? (
+                  <Trophy className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <Coins className="h-4 w-4 text-blue-500" />
+                )}
+                <span className="text-gray-100">{pageType}</span>
+                <ChevronDown className="h-3 w-3 text-gray-400" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36 bg-gray-900/95 border-gray-700/50 backdrop-blur-sm z-[60] shadow-xl">
+            <DropdownMenuItem 
+              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
+              onClick={() => {
+                localStorage.setItem('selected-page-type', 'challenge')
+                router.push('/dashboard/challenge')
+              }}
+            >
+              <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
+              <span>Challenge</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
+              onClick={() => {
+                localStorage.setItem('selected-page-type', 'fund')
+                router.push('/dashboard/fund')
+              }}
+            >
+              <Coins className="mr-2 h-4 w-4 text-blue-500" />
+              <span>Fund</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {walletAddress ? (
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Network info - visible on both mobile and desktop */}
-            <div className="flex flex-col items-center gap-1 px-2 md:px-3 py-1 md:py-2">
-              {getNetworkIcon() && (
-                <Image 
-                  src={getNetworkIcon()!} 
-                  alt={`${walletNetwork} network`}
-                  width={16}
-                  height={16}
-                  className="rounded-full md:w-5 md:h-5"
-                  style={{ width: 'auto', height: '16px' }}
-                />
-              )}
-              <span className="text-xs md:text-xs font-medium text-gray-300 text-center leading-tight">{name}</span>
-            </div>
             {isMobile ? (
               // Mobile: Open AppKit modal directly on click - icon only
               <Button 
@@ -486,7 +562,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600 z-[60]">
             <DropdownMenuItem asChild>
               <Link 
-                href="/vote"
+                href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                 className="cursor-pointer"
               >
                 <Vote className="mr-2 h-4 w-4" />
@@ -548,11 +624,11 @@ export function Header() {
               {/* Menu Items */}
               <div className="space-y-1 mb-4">
                 <Link 
-                  href="/dashboard"
+                  href={pageType === 'fund' ? '/dashboard/fund' : '/dashboard/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname === "/" || pathname === "/dashboard"
+                    pathname === "/" || pathname.includes("/dashboard")
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
@@ -562,21 +638,25 @@ export function Header() {
                 </Link>
                 
                 <Link 
-                  href="/challenges"
+                  href={pageType === 'fund' ? '/funds' : '/challenges'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname.includes("/challenges") || pathname.includes("/challenge/")
+                    pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/funds") || pathname.includes("/fund/")
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <Trophy className="h-5 w-5 mr-3" />
-                  {t('challenges')}
+                  {pageType === 'fund' ? (
+                    <Coins className="h-5 w-5 mr-3" />
+                  ) : (
+                    <Trophy className="h-5 w-5 mr-3" />
+                  )}
+                  {pageType === 'fund' ? t('funds') : t('challenges')}
                 </Link>
                 
                 <Link 
-                  href="/nft"
+                  href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
@@ -590,7 +670,7 @@ export function Header() {
                 </Link>
                 
                 <Link 
-                  href="/vote"
+                  href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",

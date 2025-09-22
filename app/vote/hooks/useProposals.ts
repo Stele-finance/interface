@@ -217,11 +217,11 @@ export interface ProposalsByStatusResponse {
   proposals: ProposalWithVoteResult[]
 }
 
-export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<ProposalsData>({
-    queryKey: ['proposals', network],
+    queryKey: ['proposals', network, pageType],
     queryFn: async () => {
       // Add small delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 200))
@@ -233,11 +233,11 @@ export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethe
   })
 }
 
-export function useActiveProposalsData(currentBlockNumber?: number, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useActiveProposalsData(currentBlockNumber?: number, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<ProposalsData>({
-    queryKey: ['activeProposals', currentBlockNumber, network],
+    queryKey: ['activeProposals', currentBlockNumber, network, pageType],
     queryFn: async () => {
       try {
         let blockNumberToUse: string
@@ -272,16 +272,23 @@ export function useActiveProposalsData(currentBlockNumber?: number, network: 'et
   })
 }
 
-export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  
   
   return useQuery<ProposalVoteResultResponse>({
-    queryKey: ['proposalVoteResult', proposalId, network],
+    queryKey: ['proposalVoteResult', proposalId, network, pageType],
     queryFn: async () => {
+      
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 300))
-      const result = await request(subgraphUrl, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
-      return result
+      
+      try {
+        const result = await request(subgraphUrl, getProposalVoteResultQuery(proposalId), {}, headers) as ProposalVoteResultResponse
+        return result
+      } catch (error) {
+        throw error
+      }
     },
     enabled: !!proposalId, // Only run query if proposalId is provided
     refetchInterval: 2 * 60 * 1000, // Increase to 2 minutes
@@ -290,11 +297,11 @@ export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 
   })
 }
 
-export function useMultipleProposalVoteResults(proposalIds: string[], network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useMultipleProposalVoteResults(proposalIds: string[], network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<MultipleProposalVoteResultsResponse>({
-    queryKey: ['multipleProposalVoteResults', proposalIds, network],
+    queryKey: ['multipleProposalVoteResults', proposalIds, network, pageType],
     queryFn: async () => {
       if (proposalIds.length === 0) {
         return { proposalVoteResults: [] }
@@ -314,12 +321,13 @@ export function useMultipleProposalVoteResults(proposalIds: string[], network: '
 // New hook for proposals by status with vote results
 export function useProposalsByStatus(
   statuses: string[] = ['ACTIVE'],
-  network: 'ethereum' | 'arbitrum' | null = 'ethereum'
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum',
+  pageType: 'challenge' | 'fund' = 'challenge'
 ) {
-  const subgraphUrl = getSubgraphUrl(network)
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<ProposalsByStatusResponse>({
-    queryKey: ['proposalsByStatus', statuses, network],
+    queryKey: ['proposalsByStatus', statuses, network, pageType],
     queryFn: async () => {
       const variables = {
         statuses
@@ -384,13 +392,14 @@ export function useProposalsByStatusPaginated(
   page: number = 1,
   pageSize: number = 10,
   network: 'ethereum' | 'arbitrum' | null = 'ethereum',
-  enabled: boolean = true
+  enabled: boolean = true,
+  pageType: 'challenge' | 'fund' = 'challenge'
 ) {
   const skip = (page - 1) * pageSize
-  const subgraphUrl = getSubgraphUrl(network)
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<ProposalsByStatusResponse>({
-    queryKey: ['proposalsByStatusPaginated', statuses, page, pageSize, network],
+    queryKey: ['proposalsByStatusPaginated', statuses, page, pageSize, network, pageType],
     queryFn: async () => {
       const variables = {
         statuses,
@@ -408,7 +417,7 @@ export function useProposalsByStatusPaginated(
         headers
       ) as ProposalsByStatusResponse
       
-      return result
+      return result || { proposals: [] }
     },
     enabled: enabled && statuses.length > 0, // Only run query if enabled and statuses array is not empty
     refetchInterval: 60 * 1000, // Refetch every 1 minute
@@ -436,12 +445,13 @@ export interface ProposalsCountResponse {
 export function useProposalsCountByStatus(
   statuses: string[] = ['ACTIVE'], 
   network: 'ethereum' | 'arbitrum' | null = 'ethereum',
-  enabled: boolean = true
+  enabled: boolean = true,
+  pageType: 'challenge' | 'fund' = 'challenge'
 ) {
-  const subgraphUrl = getSubgraphUrl(network)
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
   
   return useQuery<ProposalsCountResponse>({
-    queryKey: ['proposalsCountByStatus', statuses, network],
+    queryKey: ['proposalsCountByStatus', statuses, network, pageType],
     queryFn: async () => {
       const variables = { statuses }
       
@@ -455,7 +465,7 @@ export function useProposalsCountByStatus(
         headers
       ) as ProposalsCountResponse
       
-      return result
+      return result || { proposals: [] }
     },
     enabled: enabled && statuses.length > 0, // Only run query if enabled and statuses array is not empty
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (less frequent)
@@ -465,16 +475,23 @@ export function useProposalsCountByStatus(
 }
 
 // New hook for proposal details
-export function useProposalDetails(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useProposalDetails(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  
   
   return useQuery<ProposalDetailsResponse>({
-    queryKey: ['proposalDetails', proposalId, network],
+    queryKey: ['proposalDetails', proposalId, network, pageType],
     queryFn: async () => {
+      
       // Add delay to prevent overwhelming requests
       await new Promise(resolve => setTimeout(resolve, Math.random() * 600 + 200))
-      const result = await request(subgraphUrl, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
-      return result
+      
+      try {
+        const result = await request(subgraphUrl, getProposalDetailsQuery(proposalId), {}, headers) as ProposalDetailsResponse
+        return result || { proposalCreateds: [] }
+      } catch (error) {
+        throw error
+      }
     },
     enabled: !!proposalId, // Only run query if proposalId is provided
     staleTime: 15 * 60 * 1000, // 15 minutes (proposal details rarely change)

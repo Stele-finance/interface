@@ -45,6 +45,13 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
+  // Helper function to format profit ratio
+  const formatProfitRatio = (profitRatio: string) => {
+    const ratioValue = parseFloat(profitRatio || '0')
+    const truncated = Math.floor(ratioValue * 10000) / 10000
+    return `${truncated.toFixed(4)}%`
+  }
+
   // Helper function to handle wallet click
   const handleWalletClick = (walletAddress: string) => {
     router.push(`/challenge/${routeNetwork}/${challengeId}/${walletAddress}`)
@@ -73,7 +80,7 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
                     <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
                       <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('wallet')}</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('register')}</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profit')}</th>
                       <th className="text-right py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('updated')}</th>
                     </tr>
                   </thead>
@@ -114,24 +121,13 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
                             </div>
                           </td>
 
-                          {/* Registered column */}
+                          {/* Profit column */}
                           <td className="py-6 px-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {investor.isRegistered ? (
-                                <Badge 
-                                  variant="default"
-                                  className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
-                                >
-                                  {t('yes')}
-                                </Badge>
-                              ) : (
-                                <Badge 
-                                  variant="secondary"
-                                  className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs"
-                                >
-                                  {t('no')}
-                                </Badge>
-                              )}
+                            <div className={`font-medium text-sm ${
+                              parseFloat(investor.profitRatio || '0') >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {parseFloat(investor.profitRatio || '0') >= 0 ? '+' : ''}
+                              {formatProfitRatio(investor.profitRatio)}
                             </div>
                           </td>
 
@@ -193,7 +189,6 @@ export function InvestorsTab({ challengeId, subgraphNetwork, routeNetwork }: Inv
           <div className="text-center py-8 text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>{t('noInvestorsFound')}</p>
-            <p className="text-sm mt-2">{t('noInvestorsFoundDescription')}</p>
           </div>
         )}
       </CardContent>

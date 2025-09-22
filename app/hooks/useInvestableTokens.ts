@@ -35,11 +35,11 @@ export interface InvestableTokenInfo {
   isInvestable: boolean
 }
 
-export function useInvestableTokens(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
+export function useInvestableTokens(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, context === 'fund' ? 'fund' : undefined)
   
   return useQuery<InvestableTokensData>({
-    queryKey: ['investable-tokens', network],
+    queryKey: ['investable-tokens', network, context],
     queryFn: async () => {
       return await request(subgraphUrl, INVESTABLE_TOKENS_QUERY, {}, headers)
     },
@@ -49,8 +49,8 @@ export function useInvestableTokens(network: 'ethereum' | 'arbitrum' | null = 'e
 }
 
 // Helper hook to get formatted token info for swap components
-export function useInvestableTokensForSwap(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const { data, isLoading, error } = useInvestableTokens(network)
+export function useInvestableTokensForSwap(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
+  const { data, isLoading, error } = useInvestableTokens(network, context)
   
   const tokenOptions: InvestableTokenInfo[] = data?.investableTokens?.map(token => ({
     address: token.tokenAddress,

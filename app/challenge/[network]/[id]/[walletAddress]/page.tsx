@@ -4,16 +4,19 @@ import React, { useState, use, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BarChart3, Activity, Users, Loader2 } from "lucide-react"
+import { ArrowLeft, BarChart3, Activity, Loader2, Calendar, ChevronDown } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AssetSwap } from "../../../../swap/components/AssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/hooks/useInvestorData"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
-import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
+import { useTokenPrices } from "@/lib/token-price-context"
 import { useChallenge } from "@/app/hooks/useChallenge"
 import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
+import { usePerformanceNFT } from "../../hooks/usePerformanceNFT"
+import { useRanking } from "@/app/hooks/useRanking"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -35,8 +38,8 @@ import { PortfolioSummary } from "./components/PortfolioSummary"
 import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
-import { InvestorsTab } from "../components/InvestorsTab"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { isUserInTop5 } from "./utils/rankingUtils"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
@@ -55,12 +58,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: userTokens = [], error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
   const { data: challengeData, error: challengeError } = useChallenge(challengeId, subgraphNetwork)
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
+  const { data: performanceNFT } = usePerformanceNFT(challengeId, walletAddress, subgraphNetwork)
+  const { data: rankingData } = useRanking(challengeId, subgraphNetwork)
   
-  // Get real-time prices for user's tokens using Uniswap V3 onchain data - only if not closed
-  const { data: uniswapPrices, isLoading: isLoadingUniswap } = useUserTokenPrices(
-    investorData?.investor?.isRegistered === true ? [] : userTokens,
-    subgraphNetwork
-  )
+  // Get token prices from global context
+  const { getTokenPriceBySymbol, isLoading: isLoadingUniswap } = useTokenPrices()
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -69,44 +71,42 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isSwapMode, setIsSwapMode] = useState(false)
-  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly'>('daily')
+  const [chartInterval, setChartInterval] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isMinting, setIsMinting] = useState(false)
 
-  // Calculate real-time portfolio value - Use lenient conditions like Portfolio tab
+  // Calculate real-time portfolio value using global token prices
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
-    // Only check basic conditions - calculate if tokens and price data exist
-    if (!userTokens.length || !uniswapPrices?.tokens) {
+    if (!userTokens.length) {
       return null
     }
     
     let totalValue = 0
     let tokensWithPrices = 0
     
-    // Process individual tokens the same way as Portfolio tab
+    // Process individual tokens using global token prices
     userTokens.forEach(token => {
-      const tokenPrice = uniswapPrices.tokens[token.symbol]?.priceUSD || 0
+      const priceData = getTokenPriceBySymbol(token.symbol)
+      const tokenPrice = priceData?.priceUSD || 0
       const tokenAmount = parseFloat(token.amount) || 0
       
-      // Only include tokens with price in calculation (same as Portfolio tab)
+      // Only include tokens with price in calculation
       if (tokenPrice > 0 && tokenAmount > 0) {
         totalValue += tokenPrice * tokenAmount
         tokensWithPrices++
       }
     })
     
-    // Display if at least one token has price (same leniency as Portfolio tab)
     return {
       totalValue,
       tokensWithPrices,
       totalTokens: userTokens.length,
-      timestamp: uniswapPrices.timestamp || Date.now(),
-      // Add flag to allow display regardless of registration status
-      isRegistered: investorData?.investor?.isRegistered === true
+      timestamp: Date.now(),
+      isRegistered: investorData?.investor !== null && investorData?.investor !== undefined
     }
-  }, [userTokens, uniswapPrices, investorData])
+  }, [userTokens, getTokenPriceBySymbol, investorData])
 
   // Remove useCallback for immediate reaction (same as Portfolio tab)
   const realTimePortfolio = calculateRealTimePortfolioValue()
@@ -379,8 +379,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Get signer after ensuring correct network
       const signer = await provider.getSigner();
 
-      // Create contract instance
-      const contract = new ethers.Contract(contractAddress, SteleABI as any, signer);
+      // Create contract instance - use .abi property from Hardhat artifact
+      const contract = new ethers.Contract(contractAddress, SteleABI.abi, signer);
 
       // Call mintPerformanceNFT function
       const transaction = await contract.mintPerformanceNFT(challengeId);
@@ -438,6 +438,25 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const challengeDetails = getChallengeDetails(challengeData)
   const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
   const isChallengeEnded = challengeDetails && new Date() > challengeDetails.endTime;
+  
+  // Determine challenge state
+  const getChallengeState = () => {
+    if (!challengeData?.challenge) return 'unknown';
+    const isActive = challengeData.challenge.isActive === true;
+    const hasTimePassed = challengeDetails && new Date() > challengeDetails.endTime;
+    
+    if (isActive && !hasTimePassed) return 'active';
+    if (isActive && hasTimePassed) return 'pending';
+    return 'end';
+  };
+  
+  const challengeState = getChallengeState();
+  
+  // Check if user is in top 5 for mint NFT eligibility
+  const userInTop5 = isUserInTop5(rankingData ?? null, walletAddress)
+  
+  // Check if NFT has been minted (disable mint button if already minted)
+  const hasNFTMinted = !!performanceNFT
 
   // Handle loading and error states - removed main loading state for better UX
 
@@ -505,46 +524,50 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               interval={chartInterval}
             />
             
-            {/* Interval selector */}
+            {/* Time interval dropdown - same style as fund investor page */}
             <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
-              <div className="inline-flex bg-gray-800/60 p-1 rounded-full border border-gray-700/50 shadow-lg backdrop-blur-sm">
-                <button
-                  onClick={() => setChartInterval('daily')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    chartInterval === 'daily' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('daily')}
-                </button>
-                <button
-                  onClick={() => setChartInterval('weekly')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ease-in-out ${
-                    chartInterval === 'weekly' 
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md shadow-gray-500/25' 
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                  }`}
-                >
-                  {t('weekly')}
-                </button>
-              </div>
+              <DropdownMenu modal={true}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <Calendar className="h-4 w-4" />
+                    {chartInterval === 'daily' ? t('daily') : chartInterval === 'weekly' ? t('weekly') : t('monthly')}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={() => setChartInterval('daily')}>
+                    {t('daily')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('weekly')}>
+                    {t('weekly')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setChartInterval('monthly')}>
+                    {t('monthly')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             {/* Separator Bar */}
             <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger 
+                  value="portfolio" 
+                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                >
                   <BarChart3 className="h-4 w-4" />
                   {t('portfolio')}
                 </TabsTrigger>
-                <TabsTrigger value="investors" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  {t('investor')}
-                </TabsTrigger>
-                <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="transactions" 
+                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                >
                   <Activity className="h-4 w-4" />
                   {t('transactions')}
                 </TabsTrigger>
@@ -553,22 +576,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               <TabsContent value="portfolio" className="space-y-4">
                 <PortfolioTab 
                   userTokens={userTokens}
-                  uniswapPrices={uniswapPrices}
                   isLoadingUniswap={isLoadingUniswap}
                   subgraphNetwork={subgraphNetwork}
                   onTokenClick={handleTokenClick}
                 />
               </TabsContent>
 
-              <TabsContent value="investors" className="space-y-4">
-                <InvestorsTab 
-                  challengeId={challengeId}
-                  subgraphNetwork={subgraphNetwork}
-                  routeNetwork={routeNetwork}
-                />
-              </TabsContent>
-
-                            <TabsContent value="transactions" className="space-y-4">
+              <TabsContent value="transactions" className="space-y-4">
                 <TransactionsTab 
                   challengeId={challengeId}
                   investorTransactions={investorTransactions}
@@ -591,23 +605,17 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <ActionButtons 
                     connectedAddress={connectedAddress}
                     walletAddress={walletAddress}
-                    isRegistered={investorData?.investor?.isRegistered === true}
+                    challengeState={challengeState}
+                    userInTop5={userInTop5}
+                    hasNFTMinted={hasNFTMinted}
                     isSwapMode={isSwapMode}
                     isRegistering={isRegistering}
                     isAssetSwapping={isAssetSwapping}
+                    isMinting={isMinting}
                     onSwapModeToggle={() => setIsSwapMode(!isSwapMode)}
                     onRegister={handleRegisterClick}
+                    onMintNFT={handleMintNFT}
                   />
-                   
-                   {/* Desktop Registered status - Show on desktop, hide on mobile */}
-                  {investorData?.investor?.isRegistered === true && (
-                    <RegisteredStatus 
-                      challengeId={challengeId}
-                      onMintNFT={handleMintNFT}
-                      isMinting={isMinting}
-                      isChallengeEnded={!!isChallengeEnded}
-                    />
-                  )}
                  </div>
               </div>
               
@@ -649,6 +657,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   challengeData={challengeData}
                   network={routeNetwork || 'ethereum'}
                   investorData={investorData}
+                  walletAddress={walletAddress}
                 />
               )}
 
@@ -675,7 +684,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     </div>
 
       {/* Mobile Mint NFT Button - Show only when registered and challenge ended */}
-      {investorData?.investor?.isRegistered === true && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
+      {investorData?.investor && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <div className="p-4">
             <Button 

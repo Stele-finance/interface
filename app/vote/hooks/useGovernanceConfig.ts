@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
-import { getGovernanceContractAddress, getRPCUrl } from '@/lib/constants'
+import { getGovernanceContractAddress, getSteleFundGovernanceAddress } from '@/lib/constants'
+import { getManagedProvider } from '@/lib/provider-manager'
 import GovernorABI from '@/app/abis/SteleGovernor.json'
 
 interface GovernanceConfig {
@@ -11,20 +12,21 @@ interface GovernanceConfig {
   quorumDenominator: number
 }
 
-export const useGovernanceConfig = (network: 'ethereum' | 'arbitrum' = 'ethereum', enabled: boolean = true) => {
+export const useGovernanceConfig = (network: 'ethereum' | 'arbitrum' = 'ethereum', enabled: boolean = true, pageType: 'challenge' | 'fund' = 'challenge') => {
   const { data: config, isLoading, error, refetch } = useQuery<GovernanceConfig>({
-    queryKey: ['governanceConfig', network],
+    queryKey: ['governanceConfig', network, pageType],
     enabled: enabled, // Allow disabling the query
     queryFn: async () => {
       // Add small fixed delay to prevent overwhelming RPC
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Use the specified network for governance
+      // Use managed provider to prevent multiple connections
       const defaultNetwork = network
-      const rpcUrl = getRPCUrl(defaultNetwork)
-        
-      const provider = new ethers.JsonRpcProvider(rpcUrl)
-      const governanceContract = new ethers.Contract(getGovernanceContractAddress(defaultNetwork), GovernorABI.abi, provider)
+      const provider = getManagedProvider(defaultNetwork)
+      const governanceAddress = pageType === 'fund' 
+        ? getSteleFundGovernanceAddress(defaultNetwork)
+        : getGovernanceContractAddress(defaultNetwork)
+      const governanceContract = new ethers.Contract(governanceAddress, GovernorABI.abi, provider)
 
       // Fetch all governance parameters in parallel
       const [

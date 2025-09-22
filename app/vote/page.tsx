@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { usePageType } from "@/lib/page-type-context"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -39,7 +40,18 @@ import { getTotalPages } from "./utils/pagination"
 export default function VotePage() {
   const { t } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
+  const { pageType } = usePageType()
   const router = useRouter()
+  
+  // Get page type from localStorage to determine redirect
+  useEffect(() => {
+    const savedPageType = localStorage.getItem('selected-page-type')
+    if (savedPageType === 'fund') {
+      router.replace('/vote/fund')
+    } else {
+      router.replace('/vote/challenge')
+    }
+  }, [router])
   // Use global wallet hook instead of local state
   const { address, isConnected, walletType, getProvider } = useWallet()
   const walletAddress = address ?? undefined
@@ -72,7 +84,7 @@ export default function VotePage() {
   const subgraphNetwork = selectedNetwork
   
   // Fetch governance configuration from smart contract (temporarily disabled to prevent rate limiting)
-  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false)
+  const { config: governanceConfig, isLoading: isLoadingGovernanceConfig, error: governanceConfigError } = useGovernanceConfig(subgraphNetwork, false, pageType)
   
   // Debug: Log governance config when it loads
   useEffect(() => {
@@ -87,8 +99,8 @@ export default function VotePage() {
   // Get current block number with global caching
   const { data: blockInfo, isLoading: isLoadingBlockNumber } = useBlockNumber()
 
-  // Get wallet token info with global caching (use network-specific token)
-  const { data: walletTokenInfo, isLoading: isLoadingWalletTokenInfo, refetch: refetchWalletTokenInfo } = useWalletTokenInfo(address, subgraphNetwork)
+  // Get wallet token info with global caching (use network-specific token and page type)
+  const { data: walletTokenInfo, isLoading: isLoadingWalletTokenInfo, refetch: refetchWalletTokenInfo } = useWalletTokenInfo(address, selectedNetwork, pageType)
 
   // State for current block info (for timestamp calculation)
   const [currentBlockInfo, setCurrentBlockInfo] = useState<BlockInfo | null>(null)
@@ -120,7 +132,8 @@ export default function VotePage() {
     activeProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchActive
+    shouldFetchActive,
+    pageType
   )
   
   const { data: completedProposalsByStatus, isLoading: isLoadingCompletedByStatus, error: errorCompletedByStatus, refetch: refetchCompletedByStatus } = useProposalsByStatusPaginated(
@@ -128,7 +141,8 @@ export default function VotePage() {
     completedProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchCompleted
+    shouldFetchCompleted,
+    pageType
   )
   
   const { data: allProposalsByStatus, isLoading: isLoadingAllByStatus, error: errorAllByStatus, refetch: refetchAllByStatus } = useProposalsByStatusPaginated(
@@ -136,13 +150,14 @@ export default function VotePage() {
     allProposalsPage, 
     ITEMS_PER_PAGE,
     subgraphNetwork,
-    shouldFetchAll
+    shouldFetchAll,
+    pageType
   )
   
   // Fetch total counts for pagination - only for current tab
-  const { data: actionableCount } = useProposalsCountByStatus(activeStatuses, subgraphNetwork, shouldFetchActive)
-  const { data: completedCount } = useProposalsCountByStatus(completedStatuses, subgraphNetwork, shouldFetchCompleted)
-  const { data: allCount } = useProposalsCountByStatus(allStatuses, subgraphNetwork, shouldFetchAll)
+  const { data: actionableCount } = useProposalsCountByStatus(activeStatuses, subgraphNetwork, shouldFetchActive, pageType)
+  const { data: completedCount } = useProposalsCountByStatus(completedStatuses, subgraphNetwork, shouldFetchCompleted, pageType)
+  const { data: allCount } = useProposalsCountByStatus(allStatuses, subgraphNetwork, shouldFetchAll, pageType)
   
   // Get proposal IDs only for current tab to reduce API calls
   const getCurrentTabProposalIds = () => {
@@ -161,10 +176,10 @@ export default function VotePage() {
   const currentTabProposalIds = getCurrentTabProposalIds()
   
   // Fetch vote results only for current tab's proposals
-  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds, subgraphNetwork)
+  const { data: voteResultsData, isLoading: isLoadingVoteResults } = useMultipleProposalVoteResults(currentTabProposalIds, subgraphNetwork, pageType)
 
   // Get current Ethereum mainnet block info from RPC (called only once)
-  const getCurrentBlockInfo = async () => {
+  const getCurrentBlockInfo = useCallback(async () => {
     if (currentBlockInfo || isLoadingBlockInfo) return
     
     setIsLoadingBlockInfo(true)
@@ -185,7 +200,7 @@ export default function VotePage() {
     } finally {
       setIsLoadingBlockInfo(false)
     }
-  }
+  }, [currentBlockInfo, isLoadingBlockInfo])
 
   // Process proposals data using useMemo
   const processedProposals = useMemo(() => {
@@ -194,7 +209,7 @@ export default function VotePage() {
         processStatusBasedProposalData(proposal, currentBlockInfo, governanceConfig, subgraphNetwork, isLoadingGovernanceConfig))
     }
     return []
-  }, [shouldFetchAll, allProposalsByStatus?.proposals, currentBlockInfo, governanceConfig])
+  }, [shouldFetchAll, allProposalsByStatus?.proposals, currentBlockInfo, governanceConfig, isLoadingGovernanceConfig, subgraphNetwork])
 
   const processedActiveProposals = useMemo(() => {
     if (shouldFetchActive && actionableProposals?.proposals && actionableProposals.proposals.length > 0) {
@@ -206,7 +221,7 @@ export default function VotePage() {
         })
     }
     return []
-  }, [shouldFetchActive, actionableProposals?.proposals, currentBlockInfo, governanceConfig])
+  }, [shouldFetchActive, actionableProposals?.proposals, currentBlockInfo, governanceConfig, subgraphNetwork])
 
   const processedCompletedProposals = useMemo(() => {
     if (shouldFetchCompleted && completedProposalsByStatus?.proposals && completedProposalsByStatus.proposals.length > 0) {
@@ -215,7 +230,7 @@ export default function VotePage() {
         .filter((proposal: any) => proposal.status === 'executed')
     }
     return []
-  }, [shouldFetchCompleted, completedProposalsByStatus?.proposals, currentBlockInfo, governanceConfig])
+  }, [shouldFetchCompleted, completedProposalsByStatus?.proposals, currentBlockInfo, governanceConfig, subgraphNetwork])
 
   // Update state when processed data changes
   useEffect(() => {
@@ -240,8 +255,8 @@ export default function VotePage() {
 
   // Handle proposal click
   const handleProposalClick = useCallback((proposal: Proposal) => {
-    router.push(createProposalUrl(proposal, walletTokenInfo, selectedNetwork))
-  }, [router, walletTokenInfo, selectedNetwork])
+    router.push(createProposalUrl(proposal, walletTokenInfo, selectedNetwork, pageType))
+  }, [router, walletTokenInfo, selectedNetwork, pageType])
 
   // Handle delegate wrapper
   const handleDelegateWrapper = useCallback(async () => {
@@ -250,17 +265,18 @@ export default function VotePage() {
       await handleDelegate(
         walletAddress,
         walletType ?? undefined,
-        subgraphNetwork,
+        selectedNetwork,  // Use selectedNetwork from dropdown instead of subgraphNetwork
         getProvider,
         refetchWalletTokenInfo,
-        t
+        t,
+        pageType  // Pass the pageType to determine which contract to use
       )
     } catch (error) {
       // Error is already handled in the utility function
     } finally {
       setIsDelegating(false)
     }
-  }, [walletAddress, walletType, subgraphNetwork, getProvider, refetchWalletTokenInfo, t])
+  }, [walletAddress, walletType, selectedNetwork, getProvider, refetchWalletTokenInfo, t, pageType])
 
   // Manual refresh function
   const handleRefresh = async () => {
@@ -309,7 +325,7 @@ export default function VotePage() {
   // Get current Ethereum block info on page load
   useEffect(() => {
     getCurrentBlockInfo()
-  }, [])
+  }, [getCurrentBlockInfo])
 
   // Initialization effect
   useEffect(() => {
@@ -335,7 +351,7 @@ export default function VotePage() {
     }
 
     initializePageData()
-  }, [])
+  }, [queryClient, refetchActionable])
 
   // Check for recently created proposal on page load
   useEffect(() => {
@@ -463,7 +479,7 @@ export default function VotePage() {
           
           {/* Desktop Create button - hidden on mobile */}
           <div className="hidden md:flex items-center">
-            <Link href={`/vote/create/${selectedNetwork}`}>
+            <Link href={`/vote/create/${pageType}/${selectedNetwork}`}>
               <Button 
                 variant="default" 
                 size="lg"
@@ -613,7 +629,7 @@ export default function VotePage() {
       {!isMobileMenuOpen && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <div className="p-4">
-            <Link href={`/vote/create/${selectedNetwork}`}>
+            <Link href={`/vote/create/${pageType}/${selectedNetwork}`}>
               <Button 
                 variant="default" 
                 size="lg"

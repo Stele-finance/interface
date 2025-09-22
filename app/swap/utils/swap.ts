@@ -144,8 +144,8 @@ export const getSwapAmountUSD = (
 ): number => {
   if (!fromAmount || !fromToken || parseFloat(fromAmount) <= 0) return 0;
   
-  // Priority: 1. Accurate price data 2. Individual token price 3. Zero
-  const tokenPrice = priceData?.tokens?.[fromToken]?.priceUSD || fromTokenPrice;
+  // Priority: 1. Dynamic token price 2. Static price data 3. Zero
+  const tokenPrice = fromTokenPrice || priceData?.tokens?.[fromToken]?.priceUSD;
   if (!tokenPrice) return 0;
   
   return parseFloat(fromAmount) * tokenPrice;
@@ -204,9 +204,9 @@ export const calculateOutputAmount = (
 ): string => {
   const outputAmount = fromAmount && parseFloat(fromAmount) > 0 
     ? (swapQuote 
-        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(Math.min(6, getTokenDecimals(toToken)))
+        ? (parseFloat(fromAmount) * swapQuote.exchangeRate).toFixed(Math.min(5, getTokenDecimals(toToken)))
         : (simpleSwapQuote 
-            ? simpleSwapQuote.toAmount.toFixed(Math.min(6, getTokenDecimals(toToken)))
+            ? simpleSwapQuote.toAmount.toFixed(Math.min(5, getTokenDecimals(toToken)))
             : "0"))
     : "0";
   

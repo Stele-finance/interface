@@ -127,8 +127,9 @@ export const calculateProposalTimestamps = (
   currentBlockTimestamp?: number,
   network: NetworkType | null = 'ethereum'
 ): ProposalTimestamps => {
-  // Get network-specific block time
-  const BLOCK_TIME_SECONDS = getBlockTimeSeconds(network || 'ethereum')
+  // Always use Ethereum block time for Cross-Chain Governance
+  // Block numbers from governance contracts are based on Ethereum mainnet
+  const BLOCK_TIME_SECONDS = getBlockTimeSeconds('ethereum')
   
   // If we have current block info, calculate based on block differences
   if (currentBlockNumber && currentBlockTimestamp) {
