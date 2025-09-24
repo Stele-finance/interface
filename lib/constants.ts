@@ -60,12 +60,11 @@ export const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   ethereum_fund: {
-    STELE_CONTRACT_ADDRESS: "0x3A2cB739032175b4Fc66De7F78bddC415972D2ff",
-    STELE_TOKEN_ADDRESS: "0x71c24377e7f24b6d822C9dad967eBC77C04667b5",
+    STELE_FUND_CONTRACT_ADDRESS: "0x5f6FF8A3578B8Cf324DF6740dB0CC5F7BE80b246",
+    STELE_FUND_INFO_ADDRESS: "0x0A3606cA5b8D0e89dC698E3C607706d0C6cCD42E",
+    STELE_TOKEN_ADDRESS: "0xc4f1E00cCfdF3a068e2e6853565107ef59D96089",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    GOVERNANCE_CONTRACT_ADDRESS: "0xb574328BaeEe2E6eB1E9E44665fFF70075Ae1B09",
-    STELE_FUND_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
-    STELE_FUND_INFO_ADDRESS: "0x0000000000000000000000000000000000000000", // TODO: Add correct Ethereum address
+    GOVERNANCE_CONTRACT_ADDRESS: "0x4fd9C134411a7b55B7a77bBF329ab0ce49eAe53a",
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -95,10 +94,9 @@ export const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0xd403D1624DAEF243FbcBd4A80d8A6F36afFe32b2"  // Arbitrum LINK
   },
   arbitrum_fund: {
-    STELE_FUND_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
-    STELE_FUND_SETTING_ADDRESS: "0xeb6dbE88Fa519Fc0213aE3010996a8Af8D32FEa2",
-    STELE_FUND_INFO_ADDRESS: "0x85AD504De384f3512054a9c9fB332dD3623A2ab8",
     STELE_FUND_CONTRACT_ADDRESS: "0xcdd2fDC5946EeB048070E5DdC32Ebd8Af5D6915f",
+    STELE_FUND_INFO_ADDRESS: "0x85AD504De384f3512054a9c9fB332dD3623A2ab8",
+    STELE_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
     STELE_FUND_GOVERNANCE_ADDRESS: "0x2E7Fbd1E66f51422991b0e42643F08EF346bfbEE",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
@@ -168,7 +166,7 @@ export const getSteleTokenAddress = (network: 'ethereum' | 'arbitrum' | null): s
 };
 
 export const getSteleFundTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_TOKEN_ADDRESS;
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_TOKEN_ADDRESS;
   return NETWORK_CONTRACTS.ethereum_fund.STELE_TOKEN_ADDRESS; // Default to Ethereum - uses STELE_TOKEN_ADDRESS for ethereum_fund
 };
 
@@ -191,9 +189,6 @@ export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | n
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_CONTRACT_ADDRESS;
   // For Ethereum, use the regular STELE_CONTRACT_ADDRESS if STELE_FUND_CONTRACT_ADDRESS is not set
   const ethereumFundAddress = NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_CONTRACT_ADDRESS;
-  if (ethereumFundAddress === "0x0000000000000000000000000000000000000000") {
-    return NETWORK_CONTRACTS.ethereum_fund.STELE_CONTRACT_ADDRESS;
-  }
   return ethereumFundAddress;
 };
 
