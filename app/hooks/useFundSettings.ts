@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { GraphQLClient, gql } from 'graphql-request';
-import { NETWORK_SUBGRAPHS } from '@/lib/constants';
+import { request, gql } from 'graphql-request';
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants';
 
 const GET_FUND_SETTINGS = gql`
   query GetFundSettings {
@@ -41,8 +41,8 @@ export function useFundSettings(network: 'ethereum' | 'arbitrum') {
       }
 
       try {
-        const client = new GraphQLClient(subgraphUrl);
-        const data = await client.request<FundSettingsResponse>(GET_FUND_SETTINGS);
+        const headers = getFundHeaders();
+        const data = await request<FundSettingsResponse>(subgraphUrl, GET_FUND_SETTINGS, {}, headers);
         
         if (data && data.settings && data.settings.length > 0) {
           return data.settings[0];
