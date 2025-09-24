@@ -44,10 +44,10 @@ export const KNOWN_GOVERNANCE_CONFIGS = {
 // Network-specific Contract Addresses
 export const NETWORK_CONTRACTS = {
   ethereum: {
-    STELE_CONTRACT_ADDRESS: "0x88e94435F0F6D66a3D6FCEfb1AdA2286DDA2A929",
+    STELE_CONTRACT_ADDRESS: "0xCC128F9ED90D5c584625d686c1a5d803F65D04Ea",
     STELE_TOKEN_ADDRESS: "0xc4f1E00cCfdF3a068e2e6853565107ef59D96089",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    GOVERNANCE_CONTRACT_ADDRESS: "0xeaeE546f06f52d0657742415d1b950a23E421Ed1",
+    GOVERNANCE_CONTRACT_ADDRESS: "0xC34661C07A787EDDbf2EaD2fDe5E7BF6dD885bc8",
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -96,10 +96,10 @@ export const NETWORK_CONTRACTS = {
   },
   arbitrum_fund: {
     STELE_FUND_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
-    STELE_FUND_SETTING_ADDRESS: "0x4cb8CE80f9E419Ebe2ca190CD904c3302d7E944e",
-    STELE_FUND_INFO_ADDRESS: "0x90F84E40896b5eEEAd5148AEbA70B8B67Cb4886E",
-    STELE_FUND_CONTRACT_ADDRESS: "0x2a8F0603708A71267C2eC7Ec4C6a00050F0A537F",
-    STELE_FUND_GOVERNANCE_ADDRESS: "0x041A131168B1150B8F4c815b39b6dA2Cd3b0878e",
+    STELE_FUND_SETTING_ADDRESS: "0xeb6dbE88Fa519Fc0213aE3010996a8Af8D32FEa2",
+    STELE_FUND_INFO_ADDRESS: "0x85AD504De384f3512054a9c9fB332dD3623A2ab8",
+    STELE_FUND_CONTRACT_ADDRESS: "0xcdd2fDC5946EeB048070E5DdC32Ebd8Af5D6915f",
+    STELE_FUND_GOVERNANCE_ADDRESS: "0x2E7Fbd1E66f51422991b0e42643F08EF346bfbEE",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://arbiscan.io',
@@ -273,10 +273,10 @@ export const STELE_DECIMALS = 18;
 // Network-specific subgraph URLs
 export const NETWORK_SUBGRAPHS = {
   // Use Studio subgraphs for both networks (they have consistent schema)
-  ethereum_challenge: 'https://api.studio.thegraph.com/query/110372/stele/version/latest',
-  arbitrum_challenge: 'https://api.studio.thegraph.com/query/110372/stele-arbit/version/latest',
-  ethereum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund/version/latest',
-  arbitrum_fund: 'https://api.studio.thegraph.com/query/110372/stele-fund-arbit/version/latest'
+  ethereum_challenge: 'https://gateway.thegraph.com/api/subgraphs/id/7u34uNU3D1gyphYGrVdL3KDBLFFBAK57zQKu3yAxwDLh',
+  arbitrum_challenge: 'https://gateway.thegraph.com/api/subgraphs/id/398WFwKPvggr9n5eLd2qkcz6eRKmwe8dBecfUVJpGXyF',
+  ethereum_fund: 'https://gateway.thegraph.com/api/subgraphs/id/DiCAsTJ4qFo5MYXyWACacMUGncERSRjtBjDdcKqeovK3',
+  arbitrum_fund: 'https://gateway.thegraph.com/api/subgraphs/id/26huqqfVGqcDKhduoYBHgFdxxty7Sk3UT18jtqRqQsAW'
 } as const
 
 // Helper function to get subgraph URL based on network
