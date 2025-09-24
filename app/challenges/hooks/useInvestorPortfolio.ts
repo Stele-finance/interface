@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 // GraphQL query for Investor portfolio
 export const INVESTOR_PORTFOLIO_QUERY = gql`
@@ -65,7 +65,7 @@ export function useInvestorPortfolio(investor: string, limit: number = 100, netw
           orderBy: 'updatedAtTimestamp',
           orderDirection: 'desc'
         }, 
-        headers
+        getChallengeHeaders()
       )
     },
     staleTime: 300000, // 5 minutes

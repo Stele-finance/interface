@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 // GraphQL query for Active Challenges snapshots
 export const ACTIVE_CHALLENGES_SNAPSHOTS_QUERY = gql`
@@ -63,7 +63,7 @@ export function useActiveChallengesSnapshots(limit: number = 30, network: 'ether
           orderBy: 'timestamp',
           orderDirection: 'asc'
         }, 
-        headers
+        getChallengeHeaders()
       )
     },
     staleTime: 300000, // 5 minutes - snapshots don't change frequently

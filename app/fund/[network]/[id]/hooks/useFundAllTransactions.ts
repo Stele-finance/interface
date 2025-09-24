@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 
 const GET_FUND_ALL_TRANSACTIONS_QUERY = `
   query GetFundAllTransactions($fundId: BigInt!) {
@@ -200,7 +200,7 @@ export function useFundAllTransactions(fundId: string, network: 'ethereum' | 'ar
       try {
         const data = await request<GraphQLResponse>(subgraphUrl, GET_FUND_ALL_TRANSACTIONS_QUERY, {
           fundId: fundId
-        }, headers)
+        }, getFundHeaders())
 
         // Check if data is valid
         if (!data) {

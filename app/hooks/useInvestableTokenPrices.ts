@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useInvestableTokens } from './useInvestableTokens'
+import { useChallengeInvestableTokens } from './useChallengeInvestableTokens'
 import { useTokenPrices } from '@/lib/token-price-context'
 
 // Challenge-specific investable token prices hook
 export function useChallengeInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   // Get challenge investable tokens data
-  const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useInvestableTokens(network)
+  const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useChallengeInvestableTokens(network)
   
   // Get prices from the global context
   const { 

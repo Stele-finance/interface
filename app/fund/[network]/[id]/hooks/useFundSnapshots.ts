@@ -1,4 +1,4 @@
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getFundHeaders } from '@/lib/constants'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
 
@@ -151,7 +151,7 @@ export function useFundSnapshots({ fundId, type, network, first = 30 }: UseFundS
           orderDirection: 'asc' as const
         }
         
-        const response = await request(subgraphUrl, query, variables, headers) as any
+        const response = await request(subgraphUrl, query, variables, getFundHeaders()) as any
         
         // Check if response is valid
         if (!response) {

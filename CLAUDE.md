@@ -28,6 +28,7 @@ npm run lint
 Required environment variables in `.env`:
 ```bash
 NEXT_PUBLIC_THE_GRAPH_API_KEY=your_the_graph_api_key_here
+NEXT_PUBLIC_THE_GRAPH_API_KEY_FUND=your_the_graph_api_key_for_fund_here
 NEXT_PUBLIC_INFURA_API_KEY=your_infura_api_key_here
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
 NEXT_PUBLIC_ETHERSCAN_API_KEY=your_etherscan_api_here

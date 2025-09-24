@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { request, gql } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getFundHeaders } from '@/lib/constants'
 
 // GraphQL queries for different investor snapshot types
 const INVESTOR_SNAPSHOTS_QUERY = gql`
@@ -133,7 +133,7 @@ export function useInvestorSnapshots({ fundId, investor, type, network, first = 
           orderDirection: 'asc' as const
         }
         
-        const response = await request(subgraphUrl, query, variables, headers) as any
+        const response = await request(subgraphUrl, query, variables, getFundHeaders()) as any
         
         // Check if response is valid
         if (!response) {

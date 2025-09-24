@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers, getRPCUrl } from '@/lib/constants'
+import { getSubgraphUrl, getRPCUrl, getFundHeaders, getChallengeHeaders } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 // New query structure by status with voteResult and voting period info
@@ -219,6 +219,7 @@ export interface ProposalsByStatusResponse {
 
 export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<ProposalsData>({
     queryKey: ['proposals', network, pageType],
@@ -235,6 +236,7 @@ export function useProposalsData(network: 'ethereum' | 'arbitrum' | null = 'ethe
 
 export function useActiveProposalsData(currentBlockNumber?: number, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<ProposalsData>({
     queryKey: ['activeProposals', currentBlockNumber, network, pageType],
@@ -274,7 +276,8 @@ export function useActiveProposalsData(currentBlockNumber?: number, network: 'et
 
 export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
-  
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
+
   
   return useQuery<ProposalVoteResultResponse>({
     queryKey: ['proposalVoteResult', proposalId, network, pageType],
@@ -299,6 +302,7 @@ export function useProposalVoteResult(proposalId: string, network: 'ethereum' | 
 
 export function useMultipleProposalVoteResults(proposalIds: string[], network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<MultipleProposalVoteResultsResponse>({
     queryKey: ['multipleProposalVoteResults', proposalIds, network, pageType],
@@ -325,6 +329,7 @@ export function useProposalsByStatus(
   pageType: 'challenge' | 'fund' = 'challenge'
 ) {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<ProposalsByStatusResponse>({
     queryKey: ['proposalsByStatus', statuses, network, pageType],
@@ -397,6 +402,7 @@ export function useProposalsByStatusPaginated(
 ) {
   const skip = (page - 1) * pageSize
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<ProposalsByStatusResponse>({
     queryKey: ['proposalsByStatusPaginated', statuses, page, pageSize, network, pageType],
@@ -443,12 +449,13 @@ export interface ProposalsCountResponse {
 
 // Hook to get total count of proposals by status
 export function useProposalsCountByStatus(
-  statuses: string[] = ['ACTIVE'], 
+  statuses: string[] = ['ACTIVE'],
   network: 'ethereum' | 'arbitrum' | null = 'ethereum',
   enabled: boolean = true,
   pageType: 'challenge' | 'fund' = 'challenge'
 ) {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
   
   return useQuery<ProposalsCountResponse>({
     queryKey: ['proposalsCountByStatus', statuses, network, pageType],
@@ -477,7 +484,8 @@ export function useProposalsCountByStatus(
 // New hook for proposal details
 export function useProposalDetails(proposalId: string, network: 'ethereum' | 'arbitrum' | null = 'ethereum', pageType: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, pageType === 'fund' ? 'fund' : undefined)
-  
+  const headers = pageType === 'fund' ? getFundHeaders() : getChallengeHeaders()
+
   
   return useQuery<ProposalDetailsResponse>({
     queryKey: ['proposalDetails', proposalId, network, pageType],

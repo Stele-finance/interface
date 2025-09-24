@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 
 const GET_FUND_INVESTORS_QUERY = `
   query GetFundInvestors($fundId: String!) {
@@ -56,7 +56,7 @@ export function useFundInvestors(fundId: string, network: 'ethereum' | 'arbitrum
       try {
         const data = await request<FundInvestorsResponse>(subgraphUrl, GET_FUND_INVESTORS_QUERY, {
           fundId: fundId
-        }, headers)
+        }, getFundHeaders())
 
         // Check if data is valid
         if (!data) {

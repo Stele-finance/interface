@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 
 const GET_INVESTABLE_TOKENS_QUERY = `
   query GetInvestableTokens {
@@ -46,7 +46,7 @@ export function useFundInvestableTokens(network: 'ethereum' | 'arbitrum' = 'arbi
     queryKey: ['fundInvestableTokens', network],
     queryFn: async () => {      
       try {
-        const data = await request<InvestableTokensResponse>(subgraphUrl, GET_INVESTABLE_TOKENS_QUERY, {}, headers)
+        const data = await request<InvestableTokensResponse>(subgraphUrl, GET_INVESTABLE_TOKENS_QUERY, {}, getFundHeaders())
 
         // Check if data is valid
         if (!data) {

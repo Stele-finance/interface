@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 import { useFundInvestorData } from './useFundInvestorData'
 
 // Query single fundShare by ID (fundId)
@@ -68,7 +68,7 @@ export function useFundSharePercentage(fundId: string, investor: string, network
       try {
         const data = await request(subgraphUrl, GET_FUND_SHARE_QUERY, {
           fundId: fundId
-        }, headers)
+        }, getFundHeaders())
         
         return data
       } catch (error) {
@@ -89,7 +89,7 @@ export function useFundSharePercentage(fundId: string, investor: string, network
       try {        
         const data = await request(subgraphUrl, GET_INVESTOR_SHARE_QUERY, {
           investorShareId: investorShareId
-        }, headers)
+        }, getFundHeaders())
         
         return data
       } catch (error) {

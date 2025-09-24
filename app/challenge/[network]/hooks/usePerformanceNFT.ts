@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 const GET_PERFORMANCE_NFT_QUERY = `
   query GetPerformanceNFT($challengeId: String!, $user: String!) {
@@ -49,7 +49,7 @@ export function usePerformanceNFT(challengeId: string, userAddress: string, netw
         const data = await request<GraphQLResponse>(subgraphUrl, GET_PERFORMANCE_NFT_QUERY, {
           challengeId: challengeId,
           user: userAddress.toLowerCase()
-        }, headers)
+        }, getChallengeHeaders())
 
         if (!data || !data.performanceNFTs) {
           return null

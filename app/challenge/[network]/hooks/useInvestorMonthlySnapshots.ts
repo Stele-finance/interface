@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 // GraphQL query for investor monthly snapshots
 export const INVESTOR_MONTHLY_SNAPSHOTS_QUERY = gql`
@@ -60,7 +60,7 @@ export function useInvestorMonthlySnapshots(challengeId: string, investor: strin
           orderBy: 'timestamp',
           orderDirection: 'asc'
         }, 
-        headers
+        getChallengeHeaders()
       )
     },
     staleTime: 1800000, // 30 minutes - monthly snapshots don't change frequently
