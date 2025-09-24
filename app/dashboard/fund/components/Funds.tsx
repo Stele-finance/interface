@@ -152,7 +152,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
       const signer = await updatedProvider.getSigner()
       
       // Get the correct contract address for the selected network
-      const contractAddress = selectedNetwork === 'arbitrum' 
+      const contractAddress = selectedNetwork === 'arbitrum'
         ? NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_INFO_ADDRESS
         : NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_INFO_ADDRESS
 
