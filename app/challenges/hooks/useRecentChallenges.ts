@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 // GraphQL query for recent challenges (last 10)
 export const RECENT_CHALLENGES_QUERY = gql`{
@@ -50,7 +50,7 @@ export function useRecentChallenges(network: 'ethereum' | 'arbitrum' | null = 'e
   return useQuery<RecentChallengesData>({
     queryKey: ['recentChallenges', network],
     queryFn: async () => {
-      return await request(subgraphUrl, RECENT_CHALLENGES_QUERY, {}, headers)
+      return await request(subgraphUrl, RECENT_CHALLENGES_QUERY, {}, getChallengeHeaders())
     },
     staleTime: 60000, // 1 minute
     gcTime: 300000, // 5 minutes

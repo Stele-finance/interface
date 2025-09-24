@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers, BYTE_ZERO } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders, BYTE_ZERO } from '@/lib/constants'
 
 // GraphQL query for active challenges
 export const ACTIVE_CHALLENGES_QUERY = gql`{
@@ -81,7 +81,7 @@ export function useActiveChallenges(network: 'ethereum' | 'arbitrum' | null = 'e
   return useQuery<ActiveChallengesData>({
     queryKey: ['activeChallenges', network],
     queryFn: async () => {
-      return await request(subgraphUrl, ACTIVE_CHALLENGES_QUERY, {}, headers)
+      return await request(subgraphUrl, ACTIVE_CHALLENGES_QUERY, {}, getChallengeHeaders())
     },
     staleTime: 60000, // 1 minute - reduce frequency of refetches
     gcTime: 300000, // 5 minutes - keep data in cache longer

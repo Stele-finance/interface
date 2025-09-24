@@ -1,4 +1,4 @@
-import { NETWORK_SUBGRAPHS } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
 
@@ -25,9 +25,7 @@ const getSubgraphUrl = (network: 'ethereum' | 'arbitrum') => {
   return network === 'arbitrum' ? NETWORK_SUBGRAPHS.arbitrum_fund : NETWORK_SUBGRAPHS.ethereum_fund
 }
 
-const headers = { 
-  Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY 
-}
+const headers = getFundHeaders()
 
 export interface InvestableToken {
   id: string

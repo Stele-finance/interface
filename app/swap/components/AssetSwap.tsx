@@ -9,7 +9,8 @@ import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useTokenPrices } from "@/lib/token-price-context"
-import { useInvestableTokensForSwap } from "@/app/hooks/useInvestableTokens"
+import { useChallengeInvestableTokensForSwap } from "@/app/hooks/useChallengeInvestableTokens"
+import { useFundInvestableTokensForSwap } from "@/app/hooks/useFundInvestableTokens"
 import { useFundSettings } from "@/app/hooks/useFundSettings"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -62,7 +63,13 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const isFundSwap = pathParts.includes('fund');
   
   // Use external investableTokens if provided, otherwise fetch from subgraph
-  const { tokens: fetchedInvestableTokens, isLoading: isLoadingInvestableTokens, error: investableTokensError } = useInvestableTokensForSwap(subgraphNetwork, isFundSwap ? 'fund' : 'challenge');
+  const { tokens: challengeTokens, isLoading: isLoadingChallengeTokens, error: challengeTokensError } = useChallengeInvestableTokensForSwap(subgraphNetwork);
+  const { tokens: fundTokens, isLoading: isLoadingFundTokens, error: fundTokensError } = useFundInvestableTokensForSwap(subgraphNetwork);
+
+  const fetchedInvestableTokens = isFundSwap ? fundTokens : challengeTokens;
+  const isLoadingInvestableTokens = isFundSwap ? isLoadingFundTokens : isLoadingChallengeTokens;
+  const investableTokensError = isFundSwap ? fundTokensError : challengeTokensError;
+
   const investableTokens = externalInvestableTokens || fetchedInvestableTokens;
   
   // If externalInvestableTokens are provided, we're not loading from the hook

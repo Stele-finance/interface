@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { request, gql } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getFundHeaders } from '@/lib/constants'
 
 // GraphQL queries for different snapshot types - orderBy as direct parameter
 const INFO_SNAPSHOTS_QUERY = gql`
@@ -94,7 +94,7 @@ export function useInfoSnapshots({ type, network, first = 30 }: UseInfoSnapshots
         subgraphUrl, 
         query, 
         variables, 
-        headers.Authorization ? headers : undefined
+        getFundHeaders().Authorization ? getFundHeaders() : undefined
       ) as any
       
       // Check if response is valid

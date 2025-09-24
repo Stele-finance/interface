@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { NETWORK_SUBGRAPHS, headers } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 const GET_FUND_TRANSACTIONS_QUERY = `
@@ -223,7 +223,7 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
         const data = await request<GraphQLResponse>(subgraphUrl, GET_FUND_TRANSACTIONS_QUERY, {
           fundId: fundId,
           userAddress: walletAddress.toLowerCase() // Ensure lowercase for address matching
-        }, headers)
+        }, getFundHeaders())
 
         // Check if data is valid
         if (!data) {

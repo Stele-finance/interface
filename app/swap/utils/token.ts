@@ -1,6 +1,7 @@
 import { ethers } from "ethers"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
-import { getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useInvestableTokens"
+import { getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useChallengeInvestableTokens"
+import { getFundTokenAddressBySymbol, getFundTokenDecimalsBySymbol } from "@/app/hooks/useFundInvestableTokens"
 
 // Get token address by symbol - enhanced with investable tokens
 export const getTokenAddress = (

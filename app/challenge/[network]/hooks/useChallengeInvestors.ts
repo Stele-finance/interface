@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 const GET_CHALLENGE_INVESTORS_QUERY = `
   query GetChallengeInvestors($challengeId: String!, $first: Int!) {
@@ -76,7 +76,7 @@ export function useChallengeInvestors(challengeId: string, limit: number = 5, ne
         const data = await request<GraphQLResponse>(subgraphUrl, GET_CHALLENGE_INVESTORS_QUERY, {
           challengeId: challengeId,
           first: limit
-        }, headers)
+        }, getChallengeHeaders())
 
         // Check if data is valid
         if (!data || !data.investors) {

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
-import { useInvestableTokens } from '@/app/hooks/useInvestableTokens'
+import { useChallengeInvestableTokens } from '@/app/hooks/useChallengeInvestableTokens'
+import { useFundInvestableTokens } from '@/app/hooks/useFundInvestableTokens'
 import { useUniswapBatchPrices } from '@/app/hooks/useUniswapBatchPrices'
 import { useWallet } from '@/app/hooks/useWallet'
 
@@ -44,7 +45,11 @@ export function TokenPriceProvider({
   const actualContext = context || (pathParts.includes('fund') ? 'fund' : 'challenge')
 
   // Get investable tokens based on context
-  const { data: investableTokens, isLoading: isLoadingTokens } = useInvestableTokens(network, actualContext)
+  const { data: challengeTokens, isLoading: isLoadingChallengeTokens } = useChallengeInvestableTokens(network)
+  const { data: fundTokens, isLoading: isLoadingFundTokens } = useFundInvestableTokens(network)
+
+  const investableTokens = actualContext === 'fund' ? fundTokens : challengeTokens
+  const isLoadingTokens = actualContext === 'fund' ? isLoadingFundTokens : isLoadingChallengeTokens
 
   // Prepare token infos for batch price fetching
   const tokenInfos = useMemo(() => {

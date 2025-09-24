@@ -1,4 +1,4 @@
-import { NETWORK_SUBGRAPHS } from '@/lib/constants'
+import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
 
@@ -26,9 +26,7 @@ const FUND_QUERY = gql`
   }
 `
 
-const headers = { 
-  Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY 
-}
+const headers = getFundHeaders()
 
 export interface Fund {
   id: string

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { gql, request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 // GraphQL query for individual challenge
 export const getChallengeQuery = (challengeId: string) => gql`{
@@ -43,7 +43,7 @@ export function useChallenge(challengeId: string, network: 'ethereum' | 'arbitru
   return useQuery<ChallengeData>({
     queryKey: ['challenge', challengeId, network],
     queryFn: async () => {
-      return await request(subgraphUrl, getChallengeQuery(challengeId), {}, headers)
+      return await request(subgraphUrl, getChallengeQuery(challengeId), {}, getChallengeHeaders())
     },
     staleTime: 30 * 1000, // 30 seconds (more frequent updates for individual challenges)
     gcTime: 5 * 60 * 1000, // 5 minutes

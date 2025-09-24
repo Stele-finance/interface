@@ -280,13 +280,13 @@ export const NETWORK_SUBGRAPHS = {
 } as const
 
 // Helper function to get subgraph URL based on network
-export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: 'fund'): string => {
+export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type: 'fund' | 'challenge' = 'challenge'): string => {
   // Filter to supported networks (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  
+
   let url: string
   let key: string
-  
+
   if (type === 'fund') {
     key = `${subgraphNetwork}_fund`
     url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
@@ -294,10 +294,31 @@ export const getSubgraphUrl = (network: 'ethereum' | 'arbitrum' | null, type?: '
     key = `${subgraphNetwork}_challenge`
     url = NETWORK_SUBGRAPHS[key as keyof typeof NETWORK_SUBGRAPHS]
   }
-  
+
   return url
 }
-export const headers = { Authorization: `Bearer ${process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY}` }
+
+// Helper function to get appropriate headers based on subgraph type
+export const getSubgraphHeaders = (type: 'fund' | 'challenge' = 'challenge') => {
+  if (type === 'fund') {
+    return getFundHeaders()
+  }
+  return getChallengeHeaders()
+}
+
+// API keys for different subgraph types
+export const NEXT_PUBLIC_THE_GRAPH_API_KEY = process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY
+export const NEXT_PUBLIC_THE_GRAPH_API_KEY_FUND = process.env.NEXT_PUBLIC_THE_GRAPH_API_KEY_FUND
+
+// Headers for different subgraph types
+export const getChallengeHeaders = () => ({
+  Authorization: `Bearer ${NEXT_PUBLIC_THE_GRAPH_API_KEY}`
+})
+
+export const getFundHeaders = () => ({
+  Authorization: `Bearer ${NEXT_PUBLIC_THE_GRAPH_API_KEY_FUND}`
+})
+
 export const BYTE_ZERO = "0x00000000"
 
 // STELE Token total supply (1 billion tokens = 100,000,000 * 10^18)

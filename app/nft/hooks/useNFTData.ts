@@ -1,14 +1,15 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders, getFundHeaders } from '@/lib/constants'
 import { getAllNFTsQuery, NFTData, PerformanceNFT } from '../queries/nftQueries'
 
-export function useNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const subgraphUrl = getSubgraphUrl(network)
-  
+export function useNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
+  const subgraphUrl = getSubgraphUrl(network, context)
+  const headers = context === 'fund' ? getFundHeaders() : getChallengeHeaders()
+
   return useQuery<NFTData>({
-    queryKey: ['allNfts', network],
+    queryKey: ['allNfts', network, context],
     queryFn: async () => {
       return await request(subgraphUrl, getAllNFTsQuery(), {}, headers)
     },
@@ -23,8 +24,8 @@ export function useNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum')
   })
 }
 
-export function useFormattedNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
-  const { data, isLoading, error, refetch } = useNFTData(network)
+export function useFormattedNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
+  const { data, isLoading, error, refetch } = useNFTData(network, context)
   
   const formattedNFTs = data?.performanceNFTs.map((nft: PerformanceNFT) => {
     // Convert returnRate from raw BigInt string to percentage
@@ -39,8 +40,8 @@ export function useFormattedNFTData(network: 'ethereum' | 'arbitrum' | null = 'e
       dateFormatted: date.toLocaleDateString(),
       timestampFormatted: date.toLocaleString(),
       rankSuffix: getRankSuffix(nft.rank),
-      // Generate NFT image path based on rank
-      imagePath: `/nft/challenge/${getRankImageName(nft.rank)}.png`
+      // Generate NFT image path based on rank and context
+      imagePath: `/nft/${context}/${getRankImageName(nft.rank)}.png`
     }
   }) || []
 

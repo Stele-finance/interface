@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, headers } from '@/lib/constants'
+import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 const GET_TOTAL_RANKING_QUERY = `
   query GetTotalRanking($first: Int = 5, $orderBy: TotalRanking_orderBy = profitRatio, $orderDirection: OrderDirection = desc) {
@@ -47,7 +47,7 @@ export function useTotalRanking(network: 'ethereum' | 'arbitrum' | null = 'ether
             orderBy: 'profitRatio',
             orderDirection: 'desc'
           },
-          headers
+          getChallengeHeaders()
         )
         
         return data.totalRankings || []

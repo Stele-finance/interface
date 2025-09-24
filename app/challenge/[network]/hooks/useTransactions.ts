@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
-import { getSubgraphUrl, USDC_DECIMALS, headers } from '@/lib/constants'
+import { getSubgraphUrl, USDC_DECIMALS, getChallengeHeaders } from '@/lib/constants'
 import { ethers } from 'ethers'
 
 const GET_TRANSACTIONS_QUERY = `
@@ -264,7 +264,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
       try {
         const data = await request<GraphQLResponse>(subgraphUrl, GET_TRANSACTIONS_QUERY, {
           challengeId: challengeId
-        }, headers)
+        }, getChallengeHeaders())
 
         // Check if data is valid
         if (!data) {
@@ -393,7 +393,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
         // If no transactions found for this challengeId, let's also try to fetch some general data
         if (allTransactions.length === 0) {          
           try {
-            const allData = await request<GraphQLResponse>(subgraphUrl, GET_ALL_TRANSACTIONS_QUERY, {}, headers) 
+            const allData = await request<GraphQLResponse>(subgraphUrl, GET_ALL_TRANSACTIONS_QUERY, {}, getChallengeHeaders()) 
             if (allData) {
               // Show what challengeIds are available
               const availableChallengeIds = new Set()
