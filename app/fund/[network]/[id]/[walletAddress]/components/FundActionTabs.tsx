@@ -286,11 +286,11 @@ export function FundActionTabs({
       // Get SteleFund contract address based on network
       const contractKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund'
       const contractAddress = NETWORK_CONTRACTS[contractKey]?.STELE_FUND_CONTRACT_ADDRESS
-      
-      if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+
+      if (!contractAddress) {
         throw new Error(`SteleFund contract not configured for ${network} network`)
       }
-      
+
       // Create contract instance
       const steleFundContract = new ethers.Contract(
         contractAddress,
@@ -448,11 +448,11 @@ export function FundActionTabs({
       // Get SteleFund contract address based on network
       const contractKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund'
       const contractAddress = NETWORK_CONTRACTS[contractKey]?.STELE_FUND_CONTRACT_ADDRESS
-      
-      if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+
+      if (!contractAddress) {
         throw new Error(`SteleFund contract not configured for ${network} network`)
       }
-      
+
       // Create contract instance
       const steleFundContract = new ethers.Contract(
         contractAddress,
@@ -640,8 +640,8 @@ export function FundActionTabs({
       // Get SteleFund contract address based on network
       const contractKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund'
       const contractAddress = NETWORK_CONTRACTS[contractKey]?.STELE_FUND_CONTRACT_ADDRESS
-      
-      if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+
+      if (!contractAddress) {
         throw new Error(`SteleFund contract not configured for ${network} network`)
       }
       
