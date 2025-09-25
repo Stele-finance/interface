@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Trophy, DollarSign, Plus, PieChart } from "lucide-react"
+import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Image as ImageIcon, DollarSign, Plus, PieChart, Wallet } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { ethers } from "ethers"
@@ -45,7 +45,6 @@ import { useAppKitProvider } from '@reown/appkit/react'
 import { useUSDCBalance } from "@/app/hooks/useUSDCBalance"
 import { getTokenLogo } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Wallet } from "lucide-react"
 import { InvestorsTab } from "./InvestorsTab"
 import { useFundInvestorData } from "../hooks/useFundInvestorData"
 import { useFundInvestors } from "../hooks/useFundInvestors"
@@ -1147,7 +1146,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                          </>
                        ) : (
                          <>
-                           <Trophy className="mr-3 h-6 w-6" />
+                           <ImageIcon className="mr-3 h-6 w-6" />
                            Mint NFT
                          </>
                        )}
@@ -1424,6 +1423,80 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Mobile Floating Action Buttons */}
+      {isClient && isMounted && createPortal(
+        <>
+          {isConnected && hasInvestedInFund && (
+            <div className="fixed bottom-4 right-4 z-50 lg:hidden flex flex-col gap-3">
+              {/* Mint NFT Button for Manager */}
+              {isManager && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleMintNFT}
+                  disabled={isMintingNFT}
+                  className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  {isMintingNFT ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ImageIcon className="h-5 w-5" />
+                  )}
+                  <span className="ml-2">Mint NFT</span>
+                </Button>
+              )}
+              {/* My Account Button */}
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleNavigateToAccount}
+                className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <User className="h-5 w-5" />
+                <span className="ml-2">{t('myAccount')}</span>
+              </Button>
+            </div>
+          )}
+          {/* Join/Connect Button for users who haven't joined */}
+          {isClient && !hasInvestedInFund && (
+            <div className="fixed bottom-4 right-4 z-50 lg:hidden">
+              {!isConnected ? (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setWalletSelectOpen(true)}
+                  className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  <Wallet className="h-5 w-5" />
+                  <span className="ml-2">Connect</span>
+                </Button>
+              ) : !isFundClosed && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleJoinClick}
+                  disabled={isJoining || isLoading || !data?.fund}
+                  className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  {isJoining ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span className="ml-2">Joining...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-5 w-5" />
+                      <span className="ml-2">Join</span>
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          )}
+        </>,
+        document.body
+      )}
     </div>
   )
 }
