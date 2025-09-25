@@ -104,7 +104,7 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
     getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
 
   // Get token prices from global context
-  const { getTokenPriceBySymbol, isLoading, error, refetch } = useTokenPrices()
+  const { getTokenPriceBySymbol, error } = useTokenPrices()
   
   // Get individual token prices
   const fromTokenPrice = fromToken ? getTokenPriceBySymbol(fromToken)?.priceUSD || 0 : 0
@@ -177,7 +177,8 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
 
   // Simplified data ready check - focus on essential conditions
   // For fund swaps with external tokens, check if we have the essential data
-  const isDataReady = externalInvestableTokens 
+  // Only check price loading for selected tokens, not all tokens
+  const isDataReady = externalInvestableTokens
     ? !investableTokensError && investableTokens.length > 0 && userTokens.length > 0
     : !effectiveIsLoadingInvestableTokens && !investableTokensError;
 
@@ -564,9 +565,6 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
 
         // Clear the form
         setFromAmount("");
-        
-        // Refresh price data
-        refetch();
       } else {
         throw new Error('Transaction failed');
       }
