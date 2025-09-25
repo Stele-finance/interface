@@ -1078,9 +1078,9 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                  {!isConnected ? (
                    <Dialog open={walletSelectOpen} onOpenChange={setWalletSelectOpen}>
                      <DialogTrigger asChild>
-                       <Button 
-                         variant="outline" 
-                         size="lg" 
+                       <Button
+                         variant="outline"
+                         size="lg"
                          className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
                        >
                          <Wallet className="mr-3 h-6 w-6" />
@@ -1102,7 +1102,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                            onClick={() => handleConnectWallet()}
                            disabled={isConnecting}
                          >
-                           <Image 
+                           <Image
                              src="/wallets/walletconnect.png"
                              alt="WalletConnect"
                              width={24}
@@ -1122,36 +1122,38 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 ) : hasInvestedInFund ? (
                   <>
                     {/* My Account Button Only for Funds */}
-                   <Button 
-                     variant="outline" 
-                     size="lg" 
-                     onClick={handleNavigateToAccount}
-                     className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                   >
-                     <User className="mr-3 h-6 w-6" />
-                     {t('myAccount')}
-                   </Button>
-                   {isManager && (
-                     <Button 
-                       variant="outline" 
-                       size="lg" 
-                       onClick={handleMintNFT}
-                       disabled={isMintingNFT}
-                       className="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                   <div className={isManager ? "flex gap-3" : ""}>
+                     <Button
+                       variant="outline"
+                       size="lg"
+                       onClick={handleNavigateToAccount}
+                       className={`${isManager ? "flex-1" : "w-full"} bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg`}
                      >
-                       {isMintingNFT ? (
-                         <>
-                           <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                           Minting...
-                         </>
-                       ) : (
-                         <>
-                           <ImageIcon className="mr-3 h-6 w-6" />
-                           Mint NFT
-                         </>
-                       )}
+                       <User className="mr-3 h-6 w-6" />
+                       {t('myAccount')}
                      </Button>
-                   )}
+                     {isManager && (
+                       <Button
+                         variant="outline"
+                         size="lg"
+                         onClick={handleMintNFT}
+                         disabled={isMintingNFT}
+                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                       >
+                         {isMintingNFT ? (
+                           <>
+                             <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                             Minting...
+                           </>
+                         ) : (
+                           <>
+                             <ImageIcon className="mr-3 h-6 w-6" />
+                             Mint NFT
+                           </>
+                         )}
+                       </Button>
+                     )}
+                   </div>
                  </>
                 ) : !isFundClosed ? (
                    /* Invest Button */
@@ -1428,70 +1430,81 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       {isClient && isMounted && createPortal(
         <>
           {isConnected && hasInvestedInFund && (
-            <div className="fixed bottom-4 right-4 z-50 lg:hidden flex flex-col gap-3">
-              {/* Mint NFT Button for Manager */}
-              {isManager && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleMintNFT}
-                  disabled={isMintingNFT}
-                  className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 hover:border-purple-700 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                >
-                  {isMintingNFT ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <ImageIcon className="h-5 w-5" />
+            <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+              <div className="p-4">
+                <div className={isManager ? "grid grid-cols-2 gap-3" : ""}>
+                  {/* My Account Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleNavigateToAccount}
+                    className={`${isManager ? "" : "w-full"} bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base`}
+                  >
+                    <User className="mr-2 h-5 w-5" />
+                    {t('myAccount')}
+                  </Button>
+                  {/* Mint NFT Button for Manager */}
+                  {isManager && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleMintNFT}
+                      disabled={isMintingNFT}
+                      className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                    >
+                      {isMintingNFT ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Minting...
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon className="mr-2 h-5 w-5" />
+                          Mint NFT
+                        </>
+                      )}
+                    </Button>
                   )}
-                  <span className="ml-2">Mint NFT</span>
-                </Button>
-              )}
-              {/* My Account Button */}
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleNavigateToAccount}
-                className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              >
-                <User className="h-5 w-5" />
-                <span className="ml-2">{t('myAccount')}</span>
-              </Button>
+                </div>
+              </div>
             </div>
           )}
           {/* Join/Connect Button for users who haven't joined */}
           {isClient && !hasInvestedInFund && (
-            <div className="fixed bottom-4 right-4 z-50 lg:hidden">
-              {!isConnected ? (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setWalletSelectOpen(true)}
-                  className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                >
-                  <Wallet className="h-5 w-5" />
-                  <span className="ml-2">Connect</span>
-                </Button>
-              ) : !isFundClosed && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleJoinClick}
-                  disabled={isJoining || isLoading || !data?.fund}
-                  className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                >
-                  {isJoining ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span className="ml-2">Joining...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-5 w-5" />
-                      <span className="ml-2">Join</span>
-                    </>
-                  )}
-                </Button>
-              )}
+            <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+              <div className="p-4">
+                {!isConnected ? (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setWalletSelectOpen(true)}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    <Wallet className="mr-2 h-5 w-5" />
+                    Connect
+                  </Button>
+                ) : !isFundClosed && (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleJoinClick}
+                    disabled={isJoining || isLoading || !data?.fund}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
+                  >
+                    {isJoining ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Joining...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="mr-2 h-5 w-5" />
+                        Join
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </>,
