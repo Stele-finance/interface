@@ -35,7 +35,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                className="group bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold px-8 py-4 text-lg rounded-xl cursor-pointer flex items-center transition-all duration-300 hover:from-blue-600 hover:to-purple-700 hover:shadow-2xl hover:scale-105 transform"
+                className="group bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold px-8 py-4 text-lg rounded-xl cursor-pointer flex items-center transition-all duration-300 hover:from-amber-600 hover:to-orange-700 hover:shadow-2xl hover:scale-105 transform"
                 onClick={handleGetStarted}
               >
                 {t('virtualTradingChallenge')}
