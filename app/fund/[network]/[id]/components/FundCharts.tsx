@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
-import { DollarSign, Plus, User, Loader2, Wallet, Share2, Copy, Trophy, Coins, ChevronDown, Calendar } from 'lucide-react'
+import { DollarSign, Plus, Loader2, Wallet, Share2, Copy, Trophy, Coins, ChevronDown, Calendar } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -751,21 +751,7 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
                   );
                 }
                 
-                // My Account Button
-                if (investButton.hasInvestedInFund) {
-                  buttons.push(
-                    <Button 
-                      key="my-account"
-                      variant="outline" 
-                      size="lg" 
-                      onClick={investButton.handleNavigateToAccount}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-                    >
-                      <User className="mr-2 h-5 w-5" />
-                      {investButton.t('myAccount')}
-                    </Button>
-                  );
-                }
+                // My Account Button - Removed to avoid duplication with FundDetail component
                 
                 // Invest Button
                 if (!investButton.hasInvestedInFund && !investButton.isFundClosed) {
