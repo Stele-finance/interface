@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Zap } from 'lucide-react'
-import { AssetSwap } from '../../components/AssetSwap'
+import { ChallengeAssetSwap } from '../../components/ChallengeAssetSwap'
 import { useUserTokens } from '@/app/hooks/useUserTokens'
 import { useWallet } from '@/app/hooks/useWallet'
 import { Loader2 } from 'lucide-react'
@@ -109,7 +109,7 @@ export default function SwapPage({ params }: SwapPageProps) {
           Live pricing from Uniswap V3
         </div>
         
-        <AssetSwap userTokens={userTokens} />
+        <ChallengeAssetSwap userTokens={userTokens} />
       </div>
     </div>
   );

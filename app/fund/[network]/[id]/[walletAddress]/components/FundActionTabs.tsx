@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowUpDown, ArrowDownCircle, DollarSign, Loader2, PieChart } from "lucide-react"
-import { AssetSwap } from "@/app/swap/components/AssetSwap"
+import { FundAssetSwap } from "@/app/swap/components/FundAssetSwap"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
 import { useFundUserTokens } from "../../hooks/useFundUserTokens"
@@ -759,7 +759,7 @@ export function FundActionTabs({
                 </div>
               </div>
             ) : investableTokens.length > 0 ? (
-              <AssetSwap 
+              <FundAssetSwap 
                 userTokens={fundUserTokens.map(token => ({
                   symbol: token.symbol,
                   balance: token.amount || '0',
