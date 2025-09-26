@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
-import { 
+import {
   getSteleFundContractAddress,
   getSteleFundGovernanceAddress,
+  getSteleFundSettingAddress,
   getExplorerName,
   getExplorerUrl
 } from "@/lib/constants"
@@ -60,7 +61,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       name: t('setManagerFeeTemplate'),
       description: t('setManagerFeeDesc'),
       icon: <DollarSign className="h-5 w-5" />,
-      targetContract: getSteleFundContractAddress(contractNetwork),
+      targetContract: getSteleFundSettingAddress(contractNetwork),
       functionSignature: 'setManagerFee(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('managerFeeLabel')],
@@ -72,7 +73,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       name: t('setMaxTokensTemplate'),
       description: t('setMaxTokensDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: getSteleFundContractAddress(contractNetwork),
+      targetContract: getSteleFundSettingAddress(contractNetwork),
       functionSignature: 'setMaxTokens(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('maxTokensCountLabel')],
@@ -84,7 +85,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       name: t('setMaxSlippageTemplate'),
       description: t('setMaxSlippageDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: getSteleFundContractAddress(contractNetwork),
+      targetContract: getSteleFundSettingAddress(contractNetwork),
       functionSignature: 'setMaxSlippage(uint256)',
       parameterTypes: ['uint256'],
       parameterLabels: [t('maxSlippageLabel')],
@@ -96,7 +97,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       name: t('setInvestableTokenTemplate'),
       description: t('setInvestableTokenDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: getSteleFundContractAddress(contractNetwork),
+      targetContract: getSteleFundSettingAddress(contractNetwork),
       functionSignature: 'setToken(address)',
       parameterTypes: ['address'],
       parameterLabels: [t('tokenAddressLabel')],
@@ -108,7 +109,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
       name: t('resetInvestableTokenTemplate'),
       description: t('resetInvestableTokenDesc'),
       icon: <Settings className="h-5 w-5" />,
-      targetContract: getSteleFundContractAddress(contractNetwork),
+      targetContract: getSteleFundSettingAddress(contractNetwork),
       functionSignature: 'resetToken(address)',
       parameterTypes: ['address'],
       parameterLabels: [t('tokenAddressLabel')],

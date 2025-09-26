@@ -62,6 +62,7 @@ export const NETWORK_CONTRACTS = {
   ethereum_fund: {
     STELE_FUND_CONTRACT_ADDRESS: "0x5f6FF8A3578B8Cf324DF6740dB0CC5F7BE80b246",
     STELE_FUND_INFO_ADDRESS: "0x0A3606cA5b8D0e89dC698E3C607706d0C6cCD42E",
+    STELE_FUND_SETTING_ADDRESS: "0x00747F32F6424a4b97A20A206CdC454DeB34aaBC",
     STELE_TOKEN_ADDRESS: "0xc4f1E00cCfdF3a068e2e6853565107ef59D96089",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     GOVERNANCE_CONTRACT_ADDRESS: "0x4fd9C134411a7b55B7a77bBF329ab0ce49eAe53a",
@@ -79,6 +80,7 @@ export const NETWORK_CONTRACTS = {
   arbitrum: {
     STELE_CONTRACT_ADDRESS: "0xD017dd389c0F07B9bC382aBA8467F00efE285FD8",
     STELE_TOKEN_ADDRESS: "0xb4fb28a64c946c909d86388be279f8222fd42599",
+    STELE_FUND_SETTING_ADDRESS: "0x00747F32F6424a4b97A20A206CdC454DeB34aaBC",
     USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum USDC
     GOVERNANCE_CONTRACT_ADDRESS: "0x7680ba5FC79f28e053b7AAa77787C1912ED4Eb30",
     RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
@@ -190,6 +192,11 @@ export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | n
   // For Ethereum, use the regular STELE_CONTRACT_ADDRESS if STELE_FUND_CONTRACT_ADDRESS is not set
   const ethereumFundAddress = NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_CONTRACT_ADDRESS;
   return ethereumFundAddress;
+};
+
+export const getSteleFundSettingAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.STELE_FUND_SETTING_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_SETTING_ADDRESS; // Default to Ethereum
 };
 
 export const getRPCUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
