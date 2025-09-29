@@ -60,12 +60,12 @@ export const NETWORK_CONTRACTS = {
     LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   ethereum_fund: {
-    STELE_FUND_CONTRACT_ADDRESS: "0x5f6FF8A3578B8Cf324DF6740dB0CC5F7BE80b246",
-    STELE_FUND_INFO_ADDRESS: "0x0A3606cA5b8D0e89dC698E3C607706d0C6cCD42E",
-    STELE_FUND_SETTING_ADDRESS: "0x00747F32F6424a4b97A20A206CdC454DeB34aaBC",
+    STELE_FUND_CONTRACT_ADDRESS: "0x2Ac2A044552A185f9d9d5C4cA6d31EA128a522B8",
+    STELE_FUND_INFO_ADDRESS: "0x017A08b722EbD89Cc1d58c6C69cBe76fCEa5e0EE",
+    STELE_FUND_SETTING_ADDRESS: "0xAFbEf3B2D0eE5bD7fE551b4a633Af476B3333c67",
     STELE_TOKEN_ADDRESS: "0xc4f1E00cCfdF3a068e2e6853565107ef59D96089",
     USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    GOVERNANCE_CONTRACT_ADDRESS: "0x4fd9C134411a7b55B7a77bBF329ab0ce49eAe53a",
+    GOVERNANCE_CONTRACT_ADDRESS: "0x1F5f1c74ccbA1cb3a0AdF918E6538fD494a7Fa6c",
     RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
     EXPLORER_URL: 'https://etherscan.io',
     EXPLORER_NAME: 'Etherscan',
@@ -184,7 +184,7 @@ export const getGovernanceContractAddress = (network: 'ethereum' | 'arbitrum' | 
 
 export const getSteleFundGovernanceAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
   if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_GOVERNANCE_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS; // Default to Ethereum - uses regular governance for ethereum_fund
+  return NETWORK_CONTRACTS.ethereum_fund.GOVERNANCE_CONTRACT_ADDRESS; // Use ethereum_fund governance
 };
 
 export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
