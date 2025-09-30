@@ -2,35 +2,46 @@
 
 import { useMemo } from 'react'
 import { useChallengeInvestableTokens } from './useChallengeInvestableTokens'
-import { useTokenPrices } from '@/lib/token-price-context'
+import { useUniswapBatchPrices } from './useUniswapBatchPrices'
 
 // Challenge-specific investable token prices hook
 export function useChallengeInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   // Get challenge investable tokens data
   const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useChallengeInvestableTokens(network)
-  
-  // Get prices from the global context
-  const { 
-    getTokenPrice, 
-    getTokenPriceBySymbol, 
-    isLoading: isLoadingPrices, 
+
+  // Prepare token infos for direct price fetching (network-specific)
+  const tokenInfos = useMemo(() => {
+    if (!tokensData?.investableTokens || tokensData.investableTokens.length === 0) return []
+
+    return tokensData.investableTokens.map(token => ({
+      address: token.tokenAddress,
+      symbol: token.symbol,
+      decimals: Number(token.decimals)
+    }))
+  }, [tokensData])
+
+  // Fetch prices directly for this specific network (not using global context)
+  const {
+    data: priceData,
+    isLoading: isLoadingPrices,
     error: priceError,
     refetch: refetchPrices
-  } = useTokenPrices()
+  } = useUniswapBatchPrices(tokenInfos, network)
 
   // Combine challenge token info with price data
   const challengeTokensWithPrices = useMemo(() => {
     if (!tokensData?.investableTokens) return []
 
     return tokensData.investableTokens.map(token => {
-      const priceInfo = getTokenPrice(token.tokenAddress) || getTokenPriceBySymbol(token.symbol)
+      // Get price from network-specific price data
+      const priceInfo = priceData?.tokens?.[token.symbol]
       return {
         ...token,
         price: priceInfo?.priceUSD || null,
-        priceLastUpdated: priceInfo?.timestamp ? new Date(priceInfo.timestamp) : null
+        priceLastUpdated: priceInfo?.lastUpdated || null
       }
     })
-  }, [tokensData, getTokenPrice, getTokenPriceBySymbol])
+  }, [tokensData, priceData])
 
   // Helper function to get token price by symbol (for challenge context)
   const getChallengeTokenPriceBySymbol = (symbol: string) => {

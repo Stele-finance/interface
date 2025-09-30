@@ -16,8 +16,6 @@ import { ethers } from "ethers"
 import { 
   getSteleContractAddress,
   getGovernanceContractAddress,
-  getExplorerName,
-  getExplorerUrl
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { useLanguage } from "@/lib/language-context"

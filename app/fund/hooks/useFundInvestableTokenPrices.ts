@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useFundInvestableTokens } from '../[network]/[id]/hooks/useFundInvestableTokens'
-import { useTokenPrices } from '@/lib/token-price-context'
+import { useUniswapBatchPrices } from '@/app/hooks/useUniswapBatchPrices'
 
 // Fund-specific investable token prices hook
 export function useFundInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | null = 'arbitrum') {
@@ -10,32 +10,42 @@ export function useFundInvestableTokenPrices(network: 'ethereum' | 'arbitrum' | 
   const { data: tokensData, isLoading: isLoadingTokens, error: tokensError } = useFundInvestableTokens(
     network === 'ethereum' || network === 'arbitrum' ? network : 'arbitrum'
   )
-  
-  // Get prices from the global context
-  const { 
-    getTokenPrice, 
-    getTokenPriceBySymbol, 
-    isLoading: isLoadingPrices, 
+
+  // Prepare token infos for direct price fetching (network-specific)
+  const tokenInfos = useMemo(() => {
+    if (!tokensData || tokensData.length === 0) return []
+
+    return tokensData.map(token => ({
+      address: token.address,
+      symbol: token.symbol,
+      decimals: Number(token.decimals)
+    }))
+  }, [tokensData])
+
+  // Fetch prices directly for this specific network (not using global context)
+  const {
+    data: priceData,
+    isLoading: isLoadingPrices,
     error: priceError,
     refetch: refetchPrices
-  } = useTokenPrices()
+  } = useUniswapBatchPrices(tokenInfos, network)
 
   // Combine fund token info with price data
   const fundTokensWithPrices = useMemo(() => {
     if (!tokensData || tokensData.length === 0) return []
 
     return tokensData.map(token => {
-      // Try to get price by address first, then by symbol
-      const priceInfo = getTokenPrice(token.address) || getTokenPriceBySymbol(token.symbol)
+      // Get price from network-specific price data
+      const priceInfo = priceData?.tokens?.[token.symbol]
       return {
         ...token,
         tokenAddress: token.address, // Map address to tokenAddress for consistency
         price: priceInfo?.priceUSD || null,
-        priceLastUpdated: priceInfo?.timestamp ? new Date(priceInfo.timestamp) : null,
+        priceLastUpdated: priceInfo?.lastUpdated || null,
         isRealTime: priceInfo?.priceUSD ? true : false // Indicate if we have real-time price data
       }
     })
-  }, [tokensData, getTokenPrice, getTokenPriceBySymbol])
+  }, [tokensData, priceData])
 
   // Helper function to get token price by symbol (for fund context)
   const getFundTokenPriceBySymbol = (symbol: string) => {
