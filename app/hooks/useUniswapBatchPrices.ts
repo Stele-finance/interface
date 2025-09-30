@@ -135,25 +135,67 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     const wethAddress = getWETHAddress(network)
     const quoterAddress = getUniswapQuoterAddress(network)
     const multicallAddress = getMulticallAddress(network)
-    
+
     const processedTokens: Record<string, TokenPrice> = {}
-    
-    // Get real ETH price first
-    let cachedEthPrice = 3500 // Default fallback
-    try {
-      const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
-      const ethToUsdcParams = {
-        tokenIn: wethAddress,
-        tokenOut: usdcAddress,
-        amountIn: ethers.parseEther('1'),
-        fee: 3000, // 0.3% fee tier
-        sqrtPriceLimitX96: 0
+    const now = Date.now()
+
+    // Check cache for all tokens first and separate cached from uncached
+    const tokensNeedingFetch: TokenInfo[] = []
+    const cachedTokens: Record<string, TokenPrice> = {}
+
+    tokens.forEach(token => {
+      const cacheKey = `${token.symbol}-${network}`
+      const cached = priceCache.get(cacheKey)
+
+      // Use cached price if still valid
+      if (cached && now - cached.timestamp < CACHE_DURATION && cached.price !== null) {
+        cachedTokens[token.symbol] = {
+          symbol: token.symbol,
+          address: token.address,
+          priceUSD: cached.price,
+          decimals: token.decimals,
+          lastUpdated: new Date(cached.timestamp)
+        }
+        processedTokens[token.symbol] = cachedTokens[token.symbol]
+      } else {
+        tokensNeedingFetch.push(token)
       }
-      const [ethAmountOut] = await quoter.quoteExactInputSingle.staticCall(ethToUsdcParams)
-      cachedEthPrice = Number(ethAmountOut) / 1e6 // USDC has 6 decimals
-      //console.log('Fetched real ETH price:', cachedEthPrice)
-    } catch (err) {
-      console.warn('Failed to fetch ETH price, using fallback:', err)
+    })
+
+    // If all tokens are cached, return early
+    if (tokensNeedingFetch.length === 0) {
+      return processedTokens
+    }
+
+    // Get real ETH price first (check cache first)
+    let cachedEthPrice = 3500 // Default fallback
+    const ethCacheKey = `ETH-${network}`
+    const cachedEth = priceCache.get(ethCacheKey)
+
+    if (cachedEth && now - cachedEth.timestamp < CACHE_DURATION && cachedEth.price !== null) {
+      cachedEthPrice = cachedEth.price
+    } else {
+      try {
+        const quoter = new ethers.Contract(quoterAddress, QUOTER_ABI, provider)
+        const ethToUsdcParams = {
+          tokenIn: wethAddress,
+          tokenOut: usdcAddress,
+          amountIn: ethers.parseEther('1'),
+          fee: 3000, // 0.3% fee tier
+          sqrtPriceLimitX96: 0
+        }
+        const [ethAmountOut] = await quoter.quoteExactInputSingle.staticCall(ethToUsdcParams)
+        cachedEthPrice = Number(ethAmountOut) / 1e6 // USDC has 6 decimals
+
+        // Cache ETH price
+        priceCache.set(ethCacheKey, {
+          price: cachedEthPrice,
+          timestamp: now,
+          isLoading: false
+        })
+      } catch (err) {
+        console.warn('Failed to fetch ETH price, using fallback:', err)
+      }
     }
     
     // Always add USDC first
@@ -182,8 +224,8 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       lastUpdated: new Date()
     }
 
-    // Filter out USDC from processing
-    const tokensToProcess = tokens.filter((token: TokenInfo) => 
+    // Filter out USDC from uncached tokens
+    const tokensToProcess = tokensNeedingFetch.filter((token: TokenInfo) =>
       token.address.toLowerCase() !== usdcAddress.toLowerCase()
     ) as TokenInfo[]
 
@@ -329,6 +371,14 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
         
         if (bestPrice) {
           processedTokens[bestPrice.symbol] = bestPrice
+
+          // Store in cache
+          const cacheKey = `${bestPrice.symbol}-${network}`
+          priceCache.set(cacheKey, {
+            price: bestPrice.priceUSD,
+            timestamp: now,
+            isLoading: false
+          })
         } else {
           console.warn(`No price found for ${token.symbol} on ${network}`)
         }

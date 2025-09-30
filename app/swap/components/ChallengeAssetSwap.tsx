@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
-import { useTokenPrices } from "@/lib/token-price-context"
+import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallengeInvestableTokensForSwap } from "@/app/hooks/useChallengeInvestableTokens"
 // Fund hooks not needed for challenge swaps
 // Fund settings not needed for challenge swaps
@@ -49,14 +49,14 @@ import {
 import SteleABI from "@/app/abis/Stele.json"
 // Fund ABI not needed for challenge swaps
 
-export function ChallengeAssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, ...props }: AssetSwapProps) {
+export function ChallengeAssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, network: propNetwork, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, getProvider, isConnected } = useWallet()
-  
-  // Get network from URL path instead of wallet
+
+  // Use network prop if provided, otherwise get from URL path
   const pathParts = window.location.pathname.split('/');
   const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'ethereum';
-  const subgraphNetwork = networkFromUrl as 'ethereum' | 'arbitrum';
+  const subgraphNetwork = (propNetwork || networkFromUrl) as 'ethereum' | 'arbitrum';
   
   // This is always a challenge swap
   const isFundSwap = false;
@@ -96,15 +96,26 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
   const getTokenDecimalsUtil = useCallback((tokenSymbol: string) => 
     getTokenDecimals(tokenSymbol, userTokens, investableTokens), [userTokens, investableTokens])
 
-  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) => 
+  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) =>
     getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
 
-  // Get token prices from global context
-  const { getTokenPriceBySymbol, error } = useTokenPrices()
-  
-  // Get individual token prices
-  const fromTokenPrice = fromToken ? getTokenPriceBySymbol(fromToken)?.priceUSD || 0 : 0
-  const toTokenPrice = toToken ? getTokenPriceBySymbol(toToken)?.priceUSD || 0 : 0
+  // Get token prices for swap tokens (network-specific, only 2 tokens needed)
+  const {
+    fromTokenPrice: fromPrice,
+    toTokenPrice: toPrice,
+    isLoading: isPricesLoading,
+    error: pricesError
+  } = useSwapTokenPricesIndependent(
+    fromToken,
+    toToken,
+    getTokenAddressUtil,
+    getTokenDecimalsUtil,
+    subgraphNetwork
+  )
+
+  // Use 0 as fallback if price is null
+  const fromTokenPrice = fromPrice || 0
+  const toTokenPrice = toPrice || 0
   
   // Simple swap quote calculator (used by the component)
   const calculateSimpleSwapQuote = useCallback((amount: number): SimpleSwapQuote | null => {
@@ -403,7 +414,17 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
       }
       
       const amountInWei = ethers.parseUnits(adjustedAmount, Number(fromTokenDecimals));
-      
+
+      // Debug logging
+      console.log('🔍 Swap Debug Info:');
+      console.log('  Network:', subgraphNetwork);
+      console.log('  Contract Address:', contractAddress);
+      console.log('  Challenge ID:', challengeId);
+      console.log('  From Token:', fromToken, '→', fromTokenAddress);
+      console.log('  To Token:', toToken, '→', toTokenAddress);
+      console.log('  Amount:', adjustedAmount, '→', amountInWei.toString());
+      console.log('  Wallet ChainId:', walletChainId);
+
       // Execute challenge swap
       const tx = await steleContract.swap(
         challengeId,

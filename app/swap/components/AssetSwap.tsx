@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
-import { useTokenPrices } from "@/lib/token-price-context"
+import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallengeInvestableTokensForSwap } from "@/app/hooks/useChallengeInvestableTokens"
 import { useFundInvestableTokensForSwap } from "@/app/hooks/useFundInvestableTokens"
 import { useFundSettings } from "@/app/hooks/useFundSettings"
@@ -100,15 +100,26 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const getTokenDecimalsUtil = useCallback((tokenSymbol: string) => 
     getTokenDecimals(tokenSymbol, userTokens, investableTokens), [userTokens, investableTokens])
 
-  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) => 
+  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) =>
     getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
 
-  // Get token prices from global context
-  const { getTokenPriceBySymbol, error } = useTokenPrices()
-  
-  // Get individual token prices
-  const fromTokenPrice = fromToken ? getTokenPriceBySymbol(fromToken)?.priceUSD || 0 : 0
-  const toTokenPrice = toToken ? getTokenPriceBySymbol(toToken)?.priceUSD || 0 : 0
+  // Get token prices for swap tokens (network-specific, only 2 tokens needed)
+  const {
+    fromTokenPrice: fromPrice,
+    toTokenPrice: toPrice,
+    isLoading: isPricesLoading,
+    error: pricesError
+  } = useSwapTokenPricesIndependent(
+    fromToken,
+    toToken,
+    getTokenAddressUtil,
+    getTokenDecimalsUtil,
+    subgraphNetwork
+  )
+
+  // Use 0 as fallback if price is null
+  const fromTokenPrice = fromPrice || 0
+  const toTokenPrice = toPrice || 0
   
   // Simple swap quote calculator (used by the component)
   const calculateSimpleSwapQuote = useCallback((amount: number): SimpleSwapQuote | null => {
