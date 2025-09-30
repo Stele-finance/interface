@@ -17,8 +17,6 @@ import {
   getSteleFundContractAddress,
   getSteleFundGovernanceAddress,
   getSteleFundSettingAddress,
-  getExplorerName,
-  getExplorerUrl
 } from "@/lib/constants"
 import GovernorABI from "@/app/abis/SteleGovernor.json"
 import { useLanguage } from "@/lib/language-context"
