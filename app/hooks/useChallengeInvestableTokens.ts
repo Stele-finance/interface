@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { request, gql } from 'graphql-request'
+import { ethers } from 'ethers'
 import { getSubgraphUrl, getChallengeHeaders } from '@/lib/constants'
 
 const INVESTABLE_TOKENS_QUERY = gql`{
@@ -70,7 +71,15 @@ export function useChallengeInvestableTokensForSwap(network: 'ethereum' | 'arbit
 // Helper function to get token address by symbol
 export function getTokenAddressBySymbol(tokens: InvestableTokenInfo[], symbol: string): string {
   const token = tokens.find(t => t.symbol === symbol)
-  return token?.address || ''
+  if (!token?.address) return ''
+
+  // Ensure address is in checksum format for smart contract compatibility
+  try {
+    return ethers.getAddress(token.address)
+  } catch (error) {
+    console.error(`Invalid address for token ${symbol}:`, token.address, error)
+    return token.address
+  }
 }
 
 // Helper function to get token decimals by symbol
