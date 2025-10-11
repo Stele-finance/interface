@@ -478,11 +478,45 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
           minOutputAmount = BigInt(1);
         }
 
-        // Prepare swap params structure for SteleFund
+        // Find best swap path using Uniswap Smart Order Router (V3 only)
+        console.log('Finding best swap path...');
+        const { findBestSwapPath } = await import('../utils/pathFinder');
+        const bestPath = await findBestSwapPath(
+          fromTokenAddress,
+          toTokenAddress,
+          amountInWei,
+          subgraphNetwork,
+          Number(fromTokenDecimals),
+          Number(toTokenDecimals),
+          fromToken,
+          toToken
+        );
+
+        if (!bestPath) {
+          throw new Error('No valid swap path found. The pool may not exist or have insufficient liquidity.');
+        }
+
+        console.log(`Best path found: ${bestPath.swapType === 0 ? 'Single-hop' : 'Multi-hop'}`);
+        console.log(`Expected output: ${ethers.formatUnits(bestPath.amountOut, Number(toTokenDecimals))} ${toToken}`);
+
+        // Recalculate minOutputAmount based on router's quote
+        minOutputAmount = bestPath.amountOut;
+        if (fundSettings?.maxSlippage) {
+          const maxSlippageBP = parseInt(fundSettings.maxSlippage);
+          const reducedSlippage = Math.floor(maxSlippageBP * 0.8);
+          minOutputAmount = (bestPath.amountOut * (BigInt(10000) - BigInt(reducedSlippage))) / BigInt(10000);
+        } else {
+          minOutputAmount = (bestPath.amountOut * BigInt(9900)) / BigInt(10000);
+        }
+        if (minOutputAmount === BigInt(0)) minOutputAmount = BigInt(1);
+
+        // Prepare swap params using best path found
         const swapParams = {
+          swapType: bestPath.swapType, // 0 = single-hop, 1 = multi-hop
           tokenIn: fromTokenAddress,
           tokenOut: toTokenAddress,
-          fee: 3000, // Default Uniswap V3 0.3% fee tier
+          path: bestPath.path, // Encoded path for multi-hop, "0x" for single-hop
+          fee: bestPath.fee, // Fee tier for single-hop
           amountIn: amountInWei,
           amountOutMinimum: minOutputAmount
         };

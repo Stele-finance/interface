@@ -65,10 +65,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Get investable tokens for swap (network-specific)
   const { data: investableTokensData } = useChallengeInvestableTokens(subgraphNetwork)
   const investableTokens = investableTokensData?.investableTokens.map(token => ({
+    id: token.id,
     address: token.tokenAddress,
     symbol: token.symbol,
-    decimals: parseInt(token.decimals),
-    isInvestable: token.isInvestable
+    decimals: token.decimals,
+    isInvestable: token.isInvestable,
+    updatedTimestamp: token.updatedTimestamp
   })) || []
 
   // Get token prices for user's tokens (network-specific)
