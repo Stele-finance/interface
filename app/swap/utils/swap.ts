@@ -1,7 +1,7 @@
 import { ethers } from "ethers"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
 import { SwapQuote, PriceData } from "../components/types"
-import { getFromTokenBalance, getFormattedBalanceNumber } from "./token"
+import { getFromTokenBalance } from "./token"
 
 // Minimum swap amount in USD (greater than or equal to)
 export const MINIMUM_SWAP_USD = 10.0;
@@ -160,16 +160,41 @@ export const handlePercentageClick = (
   setFromAmount: (amount: string) => void
 ) => {
   if (!fromToken) return;
-  
-  const balance = getFormattedBalanceNumber(fromToken, userTokens);
-  if (balance <= 0) return;
-  
-  const amount = balance * (percentage / 100);
+
+  const userToken = userTokens.find(token => token.symbol === fromToken);
+  if (!userToken || !userToken.amount) return;
+
+  const balanceString = userToken.amount;
   const tokenDecimals = getTokenDecimals(fromToken);
-  
-  // Adjust to token decimals
-  const adjustedAmount = parseFloat(amount.toFixed(tokenDecimals));
-  setFromAmount(adjustedAmount.toString());
+
+  // For max (100%), use exact balance string without any conversion
+  if (percentage === 100) {
+    setFromAmount(balanceString);
+    return;
+  }
+
+  // For partial percentages (25%, 50%, 75%), use BigInt arithmetic to preserve precision
+  try {
+    // Convert string balance to BigInt (wei units)
+    const balanceWei = ethers.parseUnits(balanceString, tokenDecimals);
+
+    // Calculate percentage amount: floor(balance * percentage / 100)
+    const percentageAmount = (balanceWei * BigInt(percentage)) / BigInt(100);
+
+    // Convert back to string with proper decimals
+    const result = ethers.formatUnits(percentageAmount, tokenDecimals);
+    setFromAmount(result);
+  } catch (error) {
+    console.error('Error calculating percentage amount:', error);
+    // Fallback to number-based calculation if BigInt fails
+    const balance = parseFloat(balanceString);
+    if (balance <= 0) return;
+
+    const amount = balance * (percentage / 100);
+    const multiplier = Math.pow(10, tokenDecimals);
+    const adjustedAmount = Math.floor(amount * multiplier) / multiplier;
+    setFromAmount(adjustedAmount.toString());
+  }
 };
 
 // Get the reason why data is not ready

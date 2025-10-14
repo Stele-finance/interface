@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
-import { useTokenPrices } from "@/lib/token-price-context"
+import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallengeInvestableTokensForSwap } from "@/app/hooks/useChallengeInvestableTokens"
 import { useFundInvestableTokensForSwap } from "@/app/hooks/useFundInvestableTokens"
 import { useFundSettings } from "@/app/hooks/useFundSettings"
@@ -100,15 +100,26 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
   const getTokenDecimalsUtil = useCallback((tokenSymbol: string) => 
     getTokenDecimals(tokenSymbol, userTokens, investableTokens), [userTokens, investableTokens])
 
-  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) => 
+  const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) =>
     getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
 
-  // Get token prices from global context
-  const { getTokenPriceBySymbol, error } = useTokenPrices()
-  
-  // Get individual token prices
-  const fromTokenPrice = fromToken ? getTokenPriceBySymbol(fromToken)?.priceUSD || 0 : 0
-  const toTokenPrice = toToken ? getTokenPriceBySymbol(toToken)?.priceUSD || 0 : 0
+  // Get token prices for swap tokens (network-specific, only 2 tokens needed)
+  const {
+    fromTokenPrice: fromPrice,
+    toTokenPrice: toPrice,
+    isLoading: isPricesLoading,
+    error: pricesError
+  } = useSwapTokenPricesIndependent(
+    fromToken,
+    toToken,
+    getTokenAddressUtil,
+    getTokenDecimalsUtil,
+    subgraphNetwork
+  )
+
+  // Use 0 as fallback if price is null
+  const fromTokenPrice = fromPrice || 0
+  const toTokenPrice = toPrice || 0
   
   // Simple swap quote calculator (used by the component)
   const calculateSimpleSwapQuote = useCallback((amount: number): SimpleSwapQuote | null => {
@@ -467,11 +478,45 @@ export function AssetSwap({ className, userTokens = [], investableTokens: extern
           minOutputAmount = BigInt(1);
         }
 
-        // Prepare swap params structure for SteleFund
+        // Find best swap path using Uniswap Smart Order Router (V3 only)
+        console.log('Finding best swap path...');
+        const { findBestSwapPath } = await import('../utils/pathFinder');
+        const bestPath = await findBestSwapPath(
+          fromTokenAddress,
+          toTokenAddress,
+          amountInWei,
+          subgraphNetwork,
+          Number(fromTokenDecimals),
+          Number(toTokenDecimals),
+          fromToken,
+          toToken
+        );
+
+        if (!bestPath) {
+          throw new Error('No valid swap path found. The pool may not exist or have insufficient liquidity.');
+        }
+
+        console.log(`Best path found: ${bestPath.swapType === 0 ? 'Single-hop' : 'Multi-hop'}`);
+        console.log(`Expected output: ${ethers.formatUnits(bestPath.amountOut, Number(toTokenDecimals))} ${toToken}`);
+
+        // Recalculate minOutputAmount based on router's quote
+        minOutputAmount = bestPath.amountOut;
+        if (fundSettings?.maxSlippage) {
+          const maxSlippageBP = parseInt(fundSettings.maxSlippage);
+          const reducedSlippage = Math.floor(maxSlippageBP * 0.8);
+          minOutputAmount = (bestPath.amountOut * (BigInt(10000) - BigInt(reducedSlippage))) / BigInt(10000);
+        } else {
+          minOutputAmount = (bestPath.amountOut * BigInt(9900)) / BigInt(10000);
+        }
+        if (minOutputAmount === BigInt(0)) minOutputAmount = BigInt(1);
+
+        // Prepare swap params using best path found
         const swapParams = {
+          swapType: bestPath.swapType, // 0 = single-hop, 1 = multi-hop
           tokenIn: fromTokenAddress,
           tokenOut: toTokenAddress,
-          fee: 3000, // Default Uniswap V3 0.3% fee tier
+          path: bestPath.path, // Encoded path for multi-hop, "0x" for single-hop
+          fee: bestPath.fee, // Fee tier for single-hop
           amountIn: amountInWei,
           amountOutMinimum: minOutputAmount
         };

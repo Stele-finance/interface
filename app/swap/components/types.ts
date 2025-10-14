@@ -14,6 +14,7 @@ export interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
   investableTokens?: InvestableToken[];
   onSwappingStateChange?: (isSwapping: boolean) => void;
+  network?: 'ethereum' | 'arbitrum';
 }
 
 export interface SwapQuote {

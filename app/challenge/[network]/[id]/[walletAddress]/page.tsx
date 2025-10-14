@@ -6,14 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, BarChart3, Activity, Loader2, Calendar, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { AssetSwap } from "../../../../swap/components/AssetSwap"
+import { ChallengeAssetSwap } from "../../../../swap/components/ChallengeAssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/hooks/useChallengeInvestorData"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
-import { useTokenPrices } from "@/lib/token-price-context"
+import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallenge } from "@/app/hooks/useChallenge"
+import { useChallengeInvestableTokens } from "@/app/hooks/useChallengeInvestableTokens"
 import { useInvestorTransactions } from "../../hooks/useInvestorTransactions"
 import { usePerformanceNFT } from "../../hooks/usePerformanceNFT"
 import { useRanking } from "@/app/hooks/useRanking"
@@ -60,9 +61,20 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const { data: investorTransactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useInvestorTransactions(challengeId, walletAddress, subgraphNetwork)
   const { data: performanceNFT } = usePerformanceNFT(challengeId, walletAddress, subgraphNetwork)
   const { data: rankingData } = useRanking(challengeId, subgraphNetwork)
-  
-  // Get token prices from global context
-  const { getTokenPriceBySymbol, isLoading: isLoadingUniswap } = useTokenPrices()
+
+  // Get investable tokens for swap (network-specific)
+  const { data: investableTokensData } = useChallengeInvestableTokens(subgraphNetwork)
+  const investableTokens = investableTokensData?.investableTokens.map(token => ({
+    id: token.id,
+    address: token.tokenAddress,
+    symbol: token.symbol,
+    decimals: token.decimals,
+    isInvestable: token.isInvestable,
+    updatedTimestamp: token.updatedTimestamp
+  })) || []
+
+  // Get token prices for user's tokens (network-specific)
+  const { data: tokenPricesData, isLoading: isLoadingUniswap } = useUserTokenPrices(userTokens, subgraphNetwork)
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -77,28 +89,28 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [isMinting, setIsMinting] = useState(false)
 
-  // Calculate real-time portfolio value using global token prices
+  // Calculate real-time portfolio value using network-specific token prices
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
-    if (!userTokens.length) {
+    if (!userTokens.length || !tokenPricesData) {
       return null
     }
-    
+
     let totalValue = 0
     let tokensWithPrices = 0
-    
-    // Process individual tokens using global token prices
+
+    // Process individual tokens using network-specific token prices
     userTokens.forEach(token => {
-      const priceData = getTokenPriceBySymbol(token.symbol)
-      const tokenPrice = priceData?.priceUSD || 0
+      const priceInfo = tokenPricesData.tokens?.[token.symbol]
+      const tokenPrice = priceInfo?.priceUSD || 0
       const tokenAmount = parseFloat(token.amount) || 0
-      
+
       // Only include tokens with price in calculation
       if (tokenPrice > 0 && tokenAmount > 0) {
         totalValue += tokenPrice * tokenAmount
         tokensWithPrices++
       }
     })
-    
+
     return {
       totalValue,
       tokensWithPrices,
@@ -106,7 +118,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       timestamp: Date.now(),
       isRegistered: investorData?.investor !== null && investorData?.investor !== undefined
     }
-  }, [userTokens, getTokenPriceBySymbol, investorData])
+  }, [userTokens, tokenPricesData, investorData])
 
   // Remove useCallback for immediate reaction (same as Portfolio tab)
   const realTimePortfolio = calculateRealTimePortfolioValue()
@@ -623,9 +635,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               {/* Desktop version - static position */}
               {isSwapMode && (
                 <div className="hidden md:block">
-                  <AssetSwap 
-                    userTokens={userTokens} 
+                  <ChallengeAssetSwap
+                    userTokens={userTokens}
+                    investableTokens={investableTokens}
                     onSwappingStateChange={setIsAssetSwapping}
+                    network={subgraphNetwork}
                   />
                 </div>
               )}
@@ -637,9 +651,11 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   <div className="fixed inset-0 flex items-center justify-center p-4" onClick={() => setIsSwapMode(false)}>
                     <div className="w-full max-w-md max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                       <div className="bg-muted rounded-2xl p-6 shadow-2xl">
-                        <AssetSwap 
-                          userTokens={userTokens} 
+                        <ChallengeAssetSwap
+                          userTokens={userTokens}
+                          investableTokens={investableTokens}
                           onSwappingStateChange={setIsAssetSwapping}
+                          network={subgraphNetwork}
                         />
                       </div>
                     </div>
