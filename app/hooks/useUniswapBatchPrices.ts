@@ -193,6 +193,9 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
           timestamp: now,
           isLoading: false
         })
+
+        // Save to localStorage
+        saveCacheToStorage()
       } catch (err) {
         console.warn('Failed to fetch ETH price, using fallback:', err)
       }
@@ -298,25 +301,46 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       }
 
       // Execute multicall with Multicall3 (standardized across all networks)
-      // Limit batch size to prevent gas issues
-      const MAX_BATCH_SIZE = 50
+      // Limit batch size to prevent gas issues and rate limiting
+      const MAX_BATCH_SIZE = 20 // Reduced from 50 to prevent rate limiting
       const allResults: Array<{success: boolean, returnData: string}> = []
-      
+
+      // Helper function to delay between requests
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
       for (let i = 0; i < calls.length; i += MAX_BATCH_SIZE) {
         const batchCalls = calls.slice(i, i + MAX_BATCH_SIZE)
-        
+        const batchNumber = Math.floor(i / MAX_BATCH_SIZE) + 1
+        const totalBatches = Math.ceil(calls.length / MAX_BATCH_SIZE)
+
         try {
           const multicallContract = new ethers.Contract(multicallAddress, MULTICALL3_ABI, provider)
           const response = await multicallContract.tryAggregate.staticCall(false, batchCalls)
-          
+
           const batchResults = response.map((result: any) => ({
             success: result.success,
             returnData: result.returnData
           }))
-          
+
           allResults.push(...batchResults)
-        } catch (batchError) {
-          console.error(`Batch ${Math.floor(i / MAX_BATCH_SIZE) + 1} failed:`, batchError)
+
+          // Add delay between batches to prevent rate limiting (except for last batch)
+          if (i + MAX_BATCH_SIZE < calls.length) {
+            await delay(200) // 200ms delay between batches
+          }
+        } catch (batchError: any) {
+          console.error(`Batch ${batchNumber}/${totalBatches} failed:`, batchError)
+
+          // Check if it's a rate limit error
+          const isRateLimitError = batchError?.message?.includes('Too Many Requests') ||
+                                   batchError?.code === -32005
+
+          if (isRateLimitError) {
+            console.warn('Rate limit hit, adding longer delay...')
+            // Wait longer before continuing if rate limited
+            await delay(2000) // 2 second delay for rate limit
+          }
+
           // Add failed results for this batch
           const failedResults = batchCalls.map(() => ({
             success: false,
@@ -383,6 +407,9 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
           console.warn(`No price found for ${token.symbol} on ${network}`)
         }
       }
+
+      // Save updated cache to localStorage
+      saveCacheToStorage()
 
       return processedTokens
 
@@ -550,7 +577,57 @@ interface PriceCacheItem {
 }
 
 const priceCache = new Map<string, PriceCacheItem>()
-const CACHE_DURATION = 120000 // 2 minutes cache for aggressive caching
+const CACHE_DURATION = 180000 // 3 minutes cache
+
+// LocalStorage key for persistent cache
+const STORAGE_KEY = 'uniswap_token_prices'
+const STORAGE_CACHE_DURATION = 300000 // 5 minutes for localStorage cache
+
+// Load cache from localStorage on initialization
+function loadCacheFromStorage() {
+  if (typeof window === 'undefined') return
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      const data = JSON.parse(stored)
+      const now = Date.now()
+
+      // Load valid cached prices into memory
+      Object.entries(data).forEach(([key, item]: [string, any]) => {
+        if (now - item.timestamp < STORAGE_CACHE_DURATION && item.price !== null) {
+          priceCache.set(key, {
+            price: item.price,
+            timestamp: item.timestamp,
+            isLoading: false
+          })
+        }
+      })
+
+      console.log(`Loaded ${priceCache.size} cached prices from localStorage`)
+    }
+  } catch (error) {
+    console.warn('Failed to load price cache from localStorage:', error)
+  }
+}
+
+// Save cache to localStorage
+function saveCacheToStorage() {
+  if (typeof window === 'undefined') return
+
+  try {
+    const cacheObject: Record<string, PriceCacheItem> = {}
+    priceCache.forEach((value, key) => {
+      cacheObject[key] = value
+    })
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheObject))
+  } catch (error) {
+    console.warn('Failed to save price cache to localStorage:', error)
+  }
+}
+
+// Initialize cache from localStorage
+loadCacheFromStorage()
 
 // Hook for getting individual token price immediately with caching
 export function useTokenPrice(
@@ -702,6 +779,9 @@ export function useTokenPrice(
         isLoading: false
       })
 
+      // Save to localStorage
+      saveCacheToStorage()
+
       setPrice(tokenPrice)
     } catch (err) {
       console.error(`Error fetching price for ${tokenSymbol}:`, err)
@@ -828,6 +908,7 @@ export function useSwapTokenPricesIndependent(
               timestamp: now,
               isLoading: false
             })
+            saveCacheToStorage()
           }
         }
       }
@@ -871,6 +952,7 @@ export function useSwapTokenPricesIndependent(
               timestamp: now,
               isLoading: false
             })
+            saveCacheToStorage()
           }
         }
       }

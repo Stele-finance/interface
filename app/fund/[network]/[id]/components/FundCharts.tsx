@@ -402,64 +402,36 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
               </div>
             </div>
             
-            {/* Second row: $72K amount + Interval selector + Share button */}
+            {/* Second row: $72K amount + Share button */}
             <div className="flex items-baseline justify-between gap-3 mt-2">
               <CardTitle className="text-4xl font-bold text-gray-100">
                 ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </CardTitle>
-              
-              <div className="flex items-center gap-2">
-                {/* Interval selector */}
-                <DropdownMenu modal={true}>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[28px]"
-                      onMouseDown={(e) => e.preventDefault()}
-                    >
-                      <Calendar className="h-3 w-3" />
-                      {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="w-24 bg-muted/80 border-gray-600 z-[60]">
-                    <DropdownMenuItem onClick={() => setIntervalType('daily')}>
-                      {t('daily')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
-                      {t('weekly')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
-                      {t('monthly')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                {/* Share button */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
-                    <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
-                      <Copy className="mr-2 h-4 w-4" />
-                      {t('copyLink')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
-                      <Image 
-                        src="/x.png" 
-                        alt="X (Twitter)"
-                        width={16}
-                        height={16}
-                        className="mr-2"
-                      />
-                      {t('shareToTwitter')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+
+              {/* Share button */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-muted/80 border-gray-600 z-[60]">
+                  <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                    <Copy className="mr-2 h-4 w-4" />
+                    {t('copyLink')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareToTwitter} className="cursor-pointer whitespace-nowrap">
+                    <Image
+                      src="/x.png"
+                      alt="X (Twitter)"
+                      width={16}
+                      height={16}
+                      className="mr-2"
+                    />
+                    {t('shareToTwitter')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           
