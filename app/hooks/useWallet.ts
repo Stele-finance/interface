@@ -254,7 +254,8 @@ export const useWallet = () => {
 
   // Get provider
   const getProvider = useCallback(async () => {
-    if (globalState.walletType === 'walletconnect' && appKitProvider?.walletProvider) {
+    // Return provider if available, regardless of walletType
+    if (appKitProvider?.walletProvider) {
       return new BrowserProvider(appKitProvider.walletProvider as any)
     }
     return null
