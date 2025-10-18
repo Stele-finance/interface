@@ -560,12 +560,29 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
     setIsJoining(true);
 
     try {
+      toast({
+        title: "DEBUG: Step 1",
+        description: `Wallet: ${isConnected ? 'Connected' : 'Not connected'}, Type: ${walletType || 'None'}`,
+      });
+
       // Check if wallet is connected
       if (!isConnected || !walletType) {
         throw new Error("No wallet connected. Please connect your wallet first.");
       }
+
+      toast({
+        title: "DEBUG: Step 2",
+        description: "Getting provider...",
+      });
+
       // Get provider using useWallet hook
       const browserProvider = await getProvider();
+
+      toast({
+        title: "DEBUG: Step 3",
+        description: `Provider: ${browserProvider ? 'OK' : 'NULL'}`,
+      });
+
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
