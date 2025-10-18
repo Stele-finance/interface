@@ -229,33 +229,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Call register function with challengeId
       const tx = await steleContract.register(challengeId);
 
-      // Show toast notification for transaction submitted
-      const registerExplorerName = getExplorerName(contractNetwork);
-      const registerExplorerUrl = getExplorerUrl(contractNetwork, tx.hash);
-      
-      toast({
-        title: "Registration Submitted",
-        description: "Your investor registration transaction has been sent to the network.",
-        action: (
-          <ToastAction altText={`View on ${registerExplorerName}`} onClick={() => window.open(registerExplorerUrl, '_blank')}>
-            View on {registerExplorerName}
-          </ToastAction>
-        ),
-      });
-      
       // Wait for transaction to be mined
       await tx.wait();
-      
-      // Show toast notification for transaction confirmed
-      toast({
-        title: "Registration Complete!",
-        description: "Your investor information has been successfully registered!",
-        action: (
-          <ToastAction altText={`View on ${registerExplorerName}`} onClick={() => window.open(registerExplorerUrl, '_blank')}>
-            View on {registerExplorerName}
-          </ToastAction>
-        ),
-      });
 
       // Start refreshing process
       setIsRefreshing(true);
@@ -268,17 +243,9 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork] });
         setIsRefreshing(false);
       }, 3000);
-      
+
     } catch (error: any) {
       console.error("Error registering investor:", error);
-      
-      // Show toast notification for error
-      toast({
-        variant: "destructive",
-        title: "Registration Failed",
-        description: error.message || "An unknown error occurred",
-      });
-      
     } finally {
       setIsRegistering(false);
     }
@@ -362,54 +329,15 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       // Call mintPerformanceNFT function
       const transaction = await contract.mintPerformanceNFT(challengeId);
 
-      const explorerName = routeNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan';
-      const explorerUrl = routeNetwork === 'arbitrum'
-        ? `https://arbiscan.io/tx/${transaction.hash}`
-        : `https://etherscan.io/tx/${transaction.hash}`;
-
-      // Show toast notification
-      toast({
-        title: t('mintingNFT'),
-        description: `Transaction sent: ${transaction.hash}`,
-        action: (
-          <ToastAction
-            altText={t('viewOnExplorer')}
-            onClick={() => window.open(explorerUrl, '_blank')}
-          >
-            {t('viewOnExplorer')}
-          </ToastAction>
-        ),
-      });
-
       // Wait for transaction confirmation
       const receipt = await transaction.wait();
 
-      if (receipt.status === 1) {
-        // Show success toast
-        toast({
-          title: t('nftMintedSuccessfully'),
-          description: `NFT minted successfully! Transaction: ${transaction.hash}`,
-          action: (
-            <ToastAction
-              altText={t('viewOnExplorer')}
-              onClick={() => window.open(explorerUrl, '_blank')}
-            >
-              {t('viewOnExplorer')}
-            </ToastAction>
-          ),
-        });
+      if (receipt.status !== 1) {
+        throw new Error('Transaction failed');
       }
-      
+
     } catch (error: any) {
       console.error("Error minting NFT:", error);
-      
-      // Show toast notification for error
-      toast({
-        variant: "destructive",
-        title: "NFT Minting Failed",
-        description: error.message || "An unknown error occurred",
-      });
-      
     } finally {
       setIsMinting(false);
     }
