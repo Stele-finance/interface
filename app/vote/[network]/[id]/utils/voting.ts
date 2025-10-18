@@ -61,10 +61,10 @@ export const handleVote = async (
         throw new Error("No WalletConnect address available")
       }
       currentConnectedAddress = walletAddress
-      browserProvider = getProvider()
+      browserProvider = await getProvider()
     } else {
       // For MetaMask and Phantom, use provider method
-      browserProvider = getProvider()
+      browserProvider = await getProvider()
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.")
       }
@@ -246,7 +246,7 @@ export const handleDelegate = async (
     }
 
     // WalletConnect only - use getProvider from useWallet hook
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider || walletType !== 'walletconnect') {
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
@@ -338,7 +338,7 @@ export const getVotingPowerAtBlock = async (
   getProvider: () => any
 ): Promise<string> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider) {
       throw new Error("No provider available")
     }
@@ -366,7 +366,7 @@ export const checkUserVote = async (
   getProvider: () => any
 ): Promise<{ hasVoted: boolean; userVote?: any }> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider || !walletAddress) {
       return { hasVoted: false }
     }
