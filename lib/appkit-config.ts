@@ -45,7 +45,11 @@ export function initializeAppKit() {
       name: 'Stele Finance',
       description: 'Stele Finance DeFi Platform',
       url: window.location.origin,
-      icons: [`${window.location.origin}/stele_logo.png`]
+      icons: [`${window.location.origin}/stele_logo.png`],
+      redirect: {
+        native: window.location.origin,
+        universal: window.location.origin,
+      }
     }
 
     // 3. Create the Ethers adapter
