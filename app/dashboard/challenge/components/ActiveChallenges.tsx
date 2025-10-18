@@ -177,31 +177,10 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
     setIsCreating(true);
 
     try {
-      toast({
-        title: "DEBUG CREATE: Step 1",
-        description: `Wallet: ${isConnected ? 'Connected' : 'Not connected'}, Type: ${walletType || 'None'}`,
-      });
-
-      // Check if wallet is connected
-      if (!isConnected || !walletType) {
-        throw new Error("No wallet connected. Please connect your wallet first.");
-      }
-
-      toast({
-        title: "DEBUG CREATE: Step 2",
-        description: "Getting provider...",
-      });
-
-      // WalletConnect only - use getProvider from useWallet hook
+      // Get provider - same approach as Fund Create
       const provider = await getProvider();
-
-      toast({
-        title: "DEBUG CREATE: Step 3",
-        description: `Provider: ${provider ? 'OK' : 'NULL'}`,
-      });
-
       if (!provider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Try to get address from signer first before requesting accounts
