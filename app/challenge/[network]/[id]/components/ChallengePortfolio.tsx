@@ -557,104 +557,60 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         throw new Error("No provider available. Please connect your wallet first.");
       }
 
-      // Use connected address from useWallet hook first, fallback to currentWalletAddress
-      let userAddress = connectedAddress || currentWalletAddress;
-      
-      if (!userAddress) {
-        // Try to get address from signer first before requesting accounts
-        try {
-          const signer = await browserProvider.getSigner();
-          userAddress = await signer.getAddress();
-        } catch (error: any) {
-          console.warn('Could not get address from signer, requesting accounts:', error);
-          
-          // Check if user rejected the request
-          if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
-            throw new Error("Connection request was rejected by user");
-          }
-          
-          // Only request accounts if we can't get address from signer
-          const accounts = await browserProvider.send('eth_requestAccounts', []);
-
-          if (!accounts || accounts.length === 0) {
-            throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
-          }
-          userAddress = accounts[0];
-        }
-      }
-
-      if (!userAddress) {
-        throw new Error('Could not determine user address');
-      }
-
       if (!entryFee) {
         throw new Error("Entry fee not loaded yet. Please try again later.");
       }
 
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
-      
+
+      // Always switch to the selected network before making the transaction
+      const targetChainId = contractNetwork === 'arbitrum' ? 42161 : 1;
+
+      // Try to switch to the selected network
+      try {
+        await browserProvider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ]);
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          // Network not added to wallet, add it
+          const networkConfig = contractNetwork === 'arbitrum' ? {
+            chainId: '0xa4b1',
+            chainName: 'Arbitrum One',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io/']
+          } : {
+            chainId: '0x1',
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.infura.io/v3/'],
+            blockExplorerUrls: ['https://etherscan.io/']
+          };
+
+          await browserProvider.send('wallet_addEthereumChain', [networkConfig]);
+        } else if (switchError.code === 4001) {
+          // User rejected the network switch
+          const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Please switch to ${networkName} network to join challenge.`);
+        } else {
+          throw switchError;
+        }
+      }
+
+      // Get a fresh provider after network switch to ensure we're on the correct network
+      const updatedProvider = await getProvider();
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch');
+      }
+
+      const signer = await updatedProvider.getSigner();
+      const userAddress = await signer.getAddress();
+
       // Create a provider for the network from URL (not from wallet)
       const rpcUrl = getRPCUrl(contractNetwork);
       const networkProvider = new ethers.JsonRpcProvider(rpcUrl);
-      
-      // Get wallet's current network
-      let walletChainId = await browserProvider.send('eth_chainId', []);
-      const expectedChainId = contractNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-      
-      // If wallet is on wrong network, switch to URL-based network
-      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-        try {
-          // Request network switch
-          await browserProvider.send('wallet_switchEthereumChain', [
-            { chainId: expectedChainId }
-          ]);
-          // Update walletChainId after switching
-          walletChainId = expectedChainId;
-        } catch (switchError: any) {
-          // If network doesn't exist in wallet (error 4902), add it
-          if (switchError.code === 4902) {
-            try {
-              const networkParams = contractNetwork === 'arbitrum' ? {
-                chainId: expectedChainId,
-                chainName: 'Arbitrum One',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-                blockExplorerUrls: ['https://arbiscan.io']
-              } : {
-                chainId: expectedChainId,
-                chainName: 'Ethereum Mainnet',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-                blockExplorerUrls: ['https://etherscan.io']
-              };
-              
-              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
-              walletChainId = expectedChainId;
-            } catch (addError) {
-              const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-            }
-          } else if (switchError.code === 4001) {
-            // User rejected the switch
-            const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Please switch to ${networkName} network to continue.`);
-          } else {
-            throw switchError;
-          }
-        }
-      }
-      
-      // Get signer after ensuring correct network
-      const signer = await browserProvider.getSigner();
       
       // Create contract instances
       const steleContract = new ethers.Contract(
@@ -709,8 +665,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
             });
                         
             // Show toast notification for approve transaction submitted
-            const explorerName = getExplorerName(walletChainId);
-            const explorerUrl = getExplorerUrl(walletChainId, approveTx.hash);
+            const explorerName = getExplorerName(contractNetwork);
+            const explorerUrl = getExplorerUrl(contractNetwork, approveTx.hash);
             
             toast({
               title: "Approval Submitted",
@@ -757,8 +713,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         });
                 
         // Show toast notification for transaction submitted
-        const joinExplorerName = getExplorerName(walletChainId);
-        const joinExplorerUrl = getExplorerUrl(walletChainId, tx.hash);
+        const joinExplorerName = getExplorerName(contractNetwork);
+        const joinExplorerUrl = getExplorerUrl(contractNetwork, tx.hash);
         
         toast({
           title: "Transaction Submitted",
@@ -975,8 +931,8 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       const tx = await steleContract.getRewards(challengeId);
       
       // Show toast notification for transaction submitted
-      const rewardExplorerName = getExplorerName(walletChainId);
-      const rewardExplorerUrl = getExplorerUrl(walletChainId, tx.hash);
+      const rewardExplorerName = getExplorerName(contractNetwork);
+      const rewardExplorerUrl = getExplorerUrl(contractNetwork, tx.hash);
       
       toast({
         title: t('transactionSubmitted'),

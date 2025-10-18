@@ -81,7 +81,7 @@ export const handleQueue = async (
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
 
-    // WalletConnect only - use getProvider from useWallet hook
+    // Get provider - same approach as Fund Create
     const provider = await getProvider()
     if (!provider) {
       throw new Error("No provider available. Please connect your wallet first.")
@@ -89,9 +89,14 @@ export const handleQueue = async (
 
     // Switch to correct network if needed
     await switchToNetwork(provider, network);
-    
-    // Get signer after ensuring correct network
-    const signer = await provider.getSigner()
+
+    // Get a fresh provider after network switch to ensure we're on the correct network
+    const updatedProvider = await getProvider();
+    if (!updatedProvider) {
+      throw new Error('Failed to get provider after network switch');
+    }
+
+    const signer = await updatedProvider.getSigner()
     const governanceContract = new ethers.Contract(getGovernanceContractAddress(network), GovernorABI.abi, signer)
 
     // Prepare queue parameters
@@ -183,7 +188,7 @@ export const handleExecute = async (
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
 
-    // WalletConnect only - use getProvider from useWallet hook
+    // Get provider - same approach as Fund Create
     const provider = await getProvider()
     if (!provider) {
       throw new Error("No provider available. Please connect your wallet first.")
@@ -191,9 +196,14 @@ export const handleExecute = async (
 
     // Switch to correct network if needed
     await switchToNetwork(provider, network);
-    
-    // Get signer after ensuring correct network
-    const signer = await provider.getSigner()
+
+    // Get a fresh provider after network switch to ensure we're on the correct network
+    const updatedProvider = await getProvider();
+    if (!updatedProvider) {
+      throw new Error('Failed to get provider after network switch');
+    }
+
+    const signer = await updatedProvider.getSigner()
     const governanceContract = new ethers.Contract(getGovernanceContractAddress(network), GovernorABI.abi, signer)
 
     // Double-check proposal state before executing

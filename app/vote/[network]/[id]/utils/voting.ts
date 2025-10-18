@@ -47,93 +47,54 @@ export const handleVote = async (
       return { success: false, error: "No voting power" }
     }
 
-    if (!walletConnected || !walletType) {
-      throw new Error("No wallet connected. Please connect your wallet first.")
-    }
-
-    // Get current connected address from wallet and provider
-    let currentConnectedAddress: string
-    let browserProvider: any
-    
-    if (walletType === 'walletconnect') {
-      // For WalletConnect, use the address from useWallet hook
-      if (!walletAddress) {
-        throw new Error("No WalletConnect address available")
-      }
-      currentConnectedAddress = walletAddress
-      browserProvider = await getProvider()
-    } else {
-      // For MetaMask and Phantom, use provider method
-      browserProvider = await getProvider()
-      if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.")
-      }
-
-      const accounts = await browserProvider.send('eth_requestAccounts', [])
-      if (!accounts || accounts.length === 0) {
-        throw new Error(`No accounts connected in ${walletType} wallet`)
-      }
-      currentConnectedAddress = accounts[0]
-    }
-
+    // Get provider - same approach as Fund Create
+    const browserProvider = await getProvider()
     if (!browserProvider) {
-      throw new Error("Failed to get wallet provider. Please reconnect your wallet.")
+      throw new Error("No provider available. Please connect your wallet first.")
     }
-    
-    // Get wallet's current network
-    const walletChainId = await browserProvider.send('eth_chainId', []);
-    const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
-    
-    // If wallet is on wrong network, switch to URL-based network
-    if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-      try {
-        // Request network switch
-        await browserProvider.send('wallet_switchEthereumChain', [
-          { chainId: expectedChainId }
-        ]);
-      } catch (switchError: any) {
-        // If network doesn't exist in wallet (error 4902), add it
-        if (switchError.code === 4902) {
-          try {
-            const networkParams = network === 'arbitrum' ? {
-              chainId: expectedChainId,
-              chainName: 'Arbitrum One',
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18
-              },
-              rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-              blockExplorerUrls: ['https://arbiscan.io']
-            } : {
-              chainId: expectedChainId,
-              chainName: 'Ethereum Mainnet',
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18
-              },
-              rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-              blockExplorerUrls: ['https://etherscan.io']
-            };
-            
-            await browserProvider.send('wallet_addEthereumChain', [networkParams]);
-          } catch (addError) {
-            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-          }
-        } else if (switchError.code === 4001) {
-          // User rejected the switch
-          const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-          throw new Error(`Please switch to ${networkName} network to vote.`);
-        } else {
-          throw switchError;
-        }
+
+    // Always switch to the selected network before making the transaction
+    const targetChainId = network === 'arbitrum' ? 42161 : 1;
+
+    // Try to switch to the selected network
+    try {
+      await browserProvider.send('wallet_switchEthereumChain', [
+        { chainId: `0x${targetChainId.toString(16)}` }
+      ]);
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        // Network not added to wallet, add it
+        const networkConfig = network === 'arbitrum' ? {
+          chainId: '0xa4b1',
+          chainName: 'Arbitrum One',
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+          blockExplorerUrls: ['https://arbiscan.io/']
+        } : {
+          chainId: '0x1',
+          chainName: 'Ethereum Mainnet',
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://mainnet.infura.io/v3/'],
+          blockExplorerUrls: ['https://etherscan.io/']
+        };
+
+        await browserProvider.send('wallet_addEthereumChain', [networkConfig]);
+      } else if (switchError.code === 4001) {
+        // User rejected the network switch
+        const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+        throw new Error(`Please switch to ${networkName} network to vote.`);
+      } else {
+        throw switchError;
       }
     }
-    
-    // Get signer after ensuring correct network
-    const signer = await browserProvider.getSigner()
+
+    // Get a fresh provider after network switch to ensure we're on the correct network
+    const updatedProvider = await getProvider();
+    if (!updatedProvider) {
+      throw new Error('Failed to get provider after network switch');
+    }
+
+    const signer = await updatedProvider.getSigner()
     const contract = new ethers.Contract(getGovernanceContractAddress(network), GovernorABI.abi, signer)
 
     // Convert vote option to support value
@@ -245,29 +206,54 @@ export const handleDelegate = async (
       throw new Error("No wallet address available")
     }
 
-    // WalletConnect only - use getProvider from useWallet hook
+    // Get provider - same approach as Fund Create
     const provider = await getProvider()
     if (!provider) {
       throw new Error("No provider available. Please connect your wallet first.")
     }
 
-    // Try to get signer first, only request accounts if needed
-    let signer
+    // Always switch to the selected network before making the transaction
+    const targetChainId = network === 'arbitrum' ? 42161 : 1;
+
+    // Try to switch to the selected network
     try {
-      signer = await provider.getSigner()
-      await signer.getAddress() // Verify we can get address
-    } catch (error: any) {
-      console.warn('Could not get signer, requesting accounts:', error)
-      
-      // Check if user rejected the request
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
-        throw new Error("Connection request was rejected by user")
+      await provider.send('wallet_switchEthereumChain', [
+        { chainId: `0x${targetChainId.toString(16)}` }
+      ]);
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        // Network not added to wallet, add it
+        const networkConfig = network === 'arbitrum' ? {
+          chainId: '0xa4b1',
+          chainName: 'Arbitrum One',
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+          blockExplorerUrls: ['https://arbiscan.io/']
+        } : {
+          chainId: '0x1',
+          chainName: 'Ethereum Mainnet',
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://mainnet.infura.io/v3/'],
+          blockExplorerUrls: ['https://etherscan.io/']
+        };
+
+        await provider.send('wallet_addEthereumChain', [networkConfig]);
+      } else if (switchError.code === 4001) {
+        // User rejected the network switch
+        const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+        throw new Error(`Please switch to ${networkName} network to delegate.`);
+      } else {
+        throw switchError;
       }
-      
-      // Request wallet connection as fallback
-      await provider.send('eth_requestAccounts', [])
-      signer = await provider.getSigner()
     }
+
+    // Get a fresh provider after network switch to ensure we're on the correct network
+    const updatedProvider = await getProvider();
+    if (!updatedProvider) {
+      throw new Error('Failed to get provider after network switch');
+    }
+
+    const signer = await updatedProvider.getSigner()
     
     const steleTokenAddress = getSteleTokenAddress(network)
     const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
