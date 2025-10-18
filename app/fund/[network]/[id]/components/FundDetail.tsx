@@ -192,50 +192,44 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         throw new Error("No provider available. Please connect your wallet first.");
       }
 
-      // Request account access
-      const accounts = await provider.send('eth_requestAccounts', []);
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect your wallet first.");
-      }
+      const targetChainId = network === 'arbitrum' ? 42161 : 1;
 
-      // Get wallet's current network
-      const walletChainId = await provider.send('eth_chainId', []);
-      const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
-      
-      // If wallet is on wrong network, switch to URL-based network
-      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-        try {
-          await provider.send('wallet_switchEthereumChain', [
-            { chainId: expectedChainId }
-          ]);
-        } catch (switchError: any) {
-          if (switchError.code === 4902) {
-            const networkParams = network === 'arbitrum' ? {
-              chainId: expectedChainId,
-              chainName: 'Arbitrum One',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-              blockExplorerUrls: ['https://arbiscan.io']
-            } : {
-              chainId: expectedChainId,
-              chainName: 'Ethereum Mainnet',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-              blockExplorerUrls: ['https://etherscan.io']
-            };
-            
-            await provider.send('wallet_addEthereumChain', [networkParams]);
-          } else if (switchError.code === 4001) {
-            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Please switch to ${networkName} network to mint NFT.`);
-          } else {
-            throw switchError;
-          }
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ]);
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          const networkParams = network === 'arbitrum' ? {
+            chainId: `0x${targetChainId.toString(16)}`,
+            chainName: 'Arbitrum One',
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io']
+          } : {
+            chainId: `0x${targetChainId.toString(16)}`,
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+            blockExplorerUrls: ['https://etherscan.io']
+          };
+
+          await provider.send('wallet_addEthereumChain', [networkParams]);
+        } else if (switchError.code === 4001) {
+          const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Please switch to ${networkName} network to mint NFT.`);
+        } else {
+          throw switchError;
         }
       }
 
-      // Get signer
-      const signer = await provider.getSigner();
+      // Get fresh provider after network switch
+      const updatedProvider = await getProvider();
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch');
+      }
+
+      const signer = await updatedProvider.getSigner();
 
       // Get SteleFund contract address
       const networkKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund';

@@ -294,98 +294,87 @@ export default function InvestorPage({ params }: InvestorPageProps) {
     setIsMinting(true);
 
     try {
-      // Get provider - same approach as Fund Create
       const provider = await getProvider();
       if (!provider) {
         throw new Error("No provider available. Please connect your wallet first.");
       }
 
-      // Request account access
-      const accounts = await provider.send('eth_requestAccounts', []);
+      const targetChainId = routeNetwork === 'arbitrum' ? 42161 : 1;
 
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found. Please connect your wallet first.");
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ]);
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          const networkParams = routeNetwork === 'arbitrum' ? {
+            chainId: `0x${targetChainId.toString(16)}`,
+            chainName: 'Arbitrum One',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io']
+          } : {
+            chainId: `0x${targetChainId.toString(16)}`,
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+            blockExplorerUrls: ['https://etherscan.io']
+          };
+
+          await provider.send('wallet_addEthereumChain', [networkParams]);
+        } else if (switchError.code === 4001) {
+          const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Please switch to ${networkName} network to mint NFT.`);
+        } else {
+          throw switchError;
+        }
       }
 
+      // Get fresh provider after network switch
+      const updatedProvider = await getProvider();
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch');
+      }
+
+      const signer = await updatedProvider.getSigner();
+      const userAddress = await signer.getAddress();
+
       // Verify the connected wallet matches the investor address
-      const connectedWalletAddress = accounts[0].toLowerCase();
-      if (connectedWalletAddress !== walletAddress.toLowerCase()) {
+      if (userAddress.toLowerCase() !== walletAddress.toLowerCase()) {
         throw new Error(`Please connect with the correct wallet address: ${walletAddress}`);
       }
 
-      // Get wallet's current network
-      const walletChainId = await provider.send('eth_chainId', []);
-      const expectedChainId = routeNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-      
-      // If wallet is on wrong network, switch to URL-based network
-      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-        try {
-          // Request network switch
-          await provider.send('wallet_switchEthereumChain', [
-            { chainId: expectedChainId }
-          ]);
-        } catch (switchError: any) {
-          // If network doesn't exist in wallet (error 4902), add it
-          if (switchError.code === 4902) {
-            try {
-              const networkParams = routeNetwork === 'arbitrum' ? {
-                chainId: expectedChainId,
-                chainName: 'Arbitrum One',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-                blockExplorerUrls: ['https://arbiscan.io']
-              } : {
-                chainId: expectedChainId,
-                chainName: 'Ethereum Mainnet',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-                blockExplorerUrls: ['https://etherscan.io']
-              };
-              
-              await provider.send('wallet_addEthereumChain', [networkParams]);
-            } catch (addError) {
-              const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-            }
-          } else if (switchError.code === 4001) {
-            // User rejected the switch
-            const networkName = routeNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Please switch to ${networkName} network to mint NFT.`);
-          } else {
-            throw switchError;
-          }
-        }
-      }
-      
       // Get contract address for URL network parameter
       const networkParam = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum';
       const contractAddress = getSteleContractAddress(networkParam);
-      
-      // Get signer after ensuring correct network
-      const signer = await provider.getSigner();
 
       // Create contract instance - use .abi property from Hardhat artifact
       const contract = new ethers.Contract(contractAddress, SteleABI.abi, signer);
 
       // Call mintPerformanceNFT function
       const transaction = await contract.mintPerformanceNFT(challengeId);
-      
+
+      const explorerName = routeNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan';
+      const explorerUrl = routeNetwork === 'arbitrum'
+        ? `https://arbiscan.io/tx/${transaction.hash}`
+        : `https://etherscan.io/tx/${transaction.hash}`;
+
       // Show toast notification
       toast({
         title: t('mintingNFT'),
         description: `Transaction sent: ${transaction.hash}`,
         action: (
-          <ToastAction 
-            altText={t('viewOnExplorer')} 
-            onClick={() => window.open(getExplorerUrl(walletChainId, transaction.hash), '_blank')}
+          <ToastAction
+            altText={t('viewOnExplorer')}
+            onClick={() => window.open(explorerUrl, '_blank')}
           >
             {t('viewOnExplorer')}
           </ToastAction>
@@ -394,16 +383,16 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
       // Wait for transaction confirmation
       const receipt = await transaction.wait();
-      
+
       if (receipt.status === 1) {
         // Show success toast
         toast({
           title: t('nftMintedSuccessfully'),
           description: `NFT minted successfully! Transaction: ${transaction.hash}`,
           action: (
-            <ToastAction 
-              altText={t('viewOnExplorer')} 
-              onClick={() => window.open(getExplorerUrl(walletChainId, transaction.hash), '_blank')}
+            <ToastAction
+              altText={t('viewOnExplorer')}
+              onClick={() => window.open(explorerUrl, '_blank')}
             >
               {t('viewOnExplorer')}
             </ToastAction>
