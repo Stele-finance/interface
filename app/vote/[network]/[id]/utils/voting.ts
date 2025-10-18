@@ -130,11 +130,6 @@ export const handleDelegate = async (
 ): Promise<BlockchainActionResult> => {
   try {
     if (!walletConnected) {
-      toast({
-        variant: "destructive",
-        title: "Wallet Not Connected",
-        description: "Please connect your wallet to delegate",
-      })
       return { success: false, error: "Wallet not connected" }
     }
 
@@ -197,58 +192,14 @@ export const handleDelegate = async (
     // Delegate to self
     const tx = await votesContract.delegate(walletAddress)
 
-    toast({
-      title: "Transaction Submitted",
-      description: "Delegation is being processed...",
-    })
-
     // Wait for transaction confirmation
     const receipt = await tx.wait()
-
-    toast({
-      title: "Delegation Successful",
-      description: "You have successfully delegated your tokens to yourself",
-    })
-
-    // Open transaction in explorer
-    const explorerUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-    window.open(`${explorerUrl}/tx/${receipt.hash}`, '_blank')
 
     return { success: true, transactionHash: receipt.hash }
 
   } catch (error: any) {
     console.error("Delegation error:", error)
-    
-    let errorMessage = "There was an error delegating your tokens. Please try again."
-    let isUserRejection = false
-    
-    // Check for various user rejection patterns
-    if (error.code === 4001 || 
-        error.code === "ACTION_REJECTED" ||
-        error.message?.includes('rejected') || 
-        error.message?.includes('denied') || 
-        error.message?.includes('cancelled') ||
-        error.message?.includes('User rejected') ||
-        error.message?.includes('User denied') ||
-        error.message?.includes('Connection request was rejected')) {
-      errorMessage = "Transaction was rejected by user"
-      isUserRejection = true
-    } else if (error.message?.includes("insufficient funds")) {
-      errorMessage = "Insufficient funds for gas fees"
-    } else if (error.message?.includes("Phantom wallet is not installed")) {
-      errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-    }
-
-    // Only show error toast for non-user-rejection errors
-    if (!isUserRejection) {
-      toast({
-        variant: "destructive",
-        title: "Delegation Failed",
-        description: errorMessage,
-      })
-    }
-    
-    return { success: false, error: errorMessage }
+    return { success: false, error: error.message || "Delegation failed" }
   }
 }
 

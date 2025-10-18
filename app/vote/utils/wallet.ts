@@ -15,11 +15,6 @@ export const handleDelegate = async (
   pageType: 'challenge' | 'fund' = 'challenge'
 ): Promise<void> => {
   if (!walletAddress) {
-    toast({
-      variant: "destructive",
-      title: t('walletNotConnected'),
-      description: t('connectWallet'),
-    })
     return
   }
 
@@ -110,22 +105,8 @@ export const handleDelegate = async (
     // Delegate to self
     const tx = await votesContract.delegate(walletAddress)
 
-    toast({
-      title: t('transactionSubmitted'),
-      description: t('delegationProcessing'),
-    })
-
     // Wait for transaction confirmation
-    const receipt = await tx.wait()
-
-    toast({
-      title: t('delegationSuccessful'),
-      description: t('delegationSuccessfulMessage'),
-    })
-    
-    // Open transaction in explorer
-    const explorerUrl = subgraphNetwork === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-    window.open(`${explorerUrl}/tx/${receipt.hash}`, '_blank')
+    await tx.wait()
 
     // Refresh wallet token info after delegation
     setTimeout(() => {
@@ -135,38 +116,6 @@ export const handleDelegate = async (
 
   } catch (error: any) {
     console.error("Delegation error:", error)
-    
-    let errorMessage = t('errorDelegatingTokens')
-    let toastVariant: "destructive" | "default" = "destructive"
-    let toastTitle = t('delegationFailed')
-    let isUserRejection = false
-    
-    // Check for various user rejection patterns
-    if (error.code === 4001 || 
-        error.code === "ACTION_REJECTED" ||
-        error.message?.includes('rejected') || 
-        error.message?.includes('denied') || 
-        error.message?.includes('cancelled') ||
-        error.message?.includes('User rejected') ||
-        error.message?.includes('User denied') ||
-        error.message?.includes('Connection request was rejected')) {
-      errorMessage = t('transactionRejected')
-      toastVariant = "default"
-      toastTitle = "Request Cancelled"
-      isUserRejection = true
-    } else if (error.message?.includes("insufficient funds")) {
-      errorMessage = t('insufficientFundsGas')
-    } else if (error.message?.includes("Phantom wallet is not installed")) {
-      errorMessage = t('phantomWalletNotInstalled')
-    }
-
-    // Show toast for all cases (user rejection gets a neutral variant)
-    toast({
-      variant: toastVariant,
-      title: toastTitle,
-      description: errorMessage,
-    })
-    
     throw error // Re-throw to handle loading state in calling component
   }
 } 

@@ -223,30 +223,15 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
   // Execute swap on blockchain - using dynamic import for ethers
   const handleSwapTransaction = async () => {
     if (!fromAmount || !fromToken || !toToken) {
-      toast({
-        variant: "destructive",
-        title: "Missing Information",
-        description: "Please select tokens and enter an amount.",
-      });
       return;
     }
 
     if (parseFloat(fromAmount) <= 0) {
-      toast({
-        variant: "destructive",
-        title: t('invalidAmount'),
-        description: t('enterValidAmount'),
-      });
       return;
     }
 
     // Check if user has sufficient balance - use same logic as isAmountExceedsBalance
     if (isAmountExceedsBalanceUtil()) {
-      toast({
-        variant: "destructive",
-        title: "Insufficient Balance",
-        description: `You don't have enough ${fromToken}.`,
-      });
       return;
     }
 
@@ -254,11 +239,6 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
     const userToken = userTokens.find(token => token.symbol === fromToken);
 
     if (!userToken) {
-      toast({
-        variant: "destructive",
-        title: "Token Not Found",
-        description: `The fund doesn't hold any ${fromToken} tokens.`,
-      });
       return;
     }
 
@@ -266,11 +246,6 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
     const requestedAmount = parseFloat(fromAmount);
 
     if (availableAmount < requestedAmount) {
-      toast({
-        variant: "destructive",
-        title: "Insufficient Fund Balance",
-        description: `The fund only has ${availableAmount.toFixed(5)} ${fromToken}, but ${requestedAmount} ${fromToken} is requested.`,
-      });
       return;
     }
 
@@ -550,66 +525,18 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
         );
       }
 
-      // Get network-specific explorer info
-      const explorerName = getExplorerName(subgraphNetwork);
-      const submittedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
-      
-      toast({
-        title: "Transaction Submitted",
-        description: "Your swap transaction has been sent to the network.",
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(submittedTxUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      });
-
       // Wait for transaction confirmation
       const receipt = await tx.wait();
 
-      if (receipt.status === 1) {
-        const confirmedTxUrl = buildTransactionUrl(subgraphNetwork, receipt.hash);
-        
-        toast({
-          title: "Swap Successful",
-          description: `Successfully swapped ${fromAmount} ${fromToken} for ${toToken}!`,
-          action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(confirmedTxUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-          ),
-        });
-
-        // Clear the form
-        setFromAmount("");
-      } else {
+      if (receipt.status !== 1) {
         throw new Error('Transaction failed');
       }
 
+      // Clear the form
+      setFromAmount("");
+
     } catch (error: any) {
       console.error("Swap error:", error);
-      
-      let errorMessage = "An error occurred while swapping. Please try again.";
-      let toastVariant: "destructive" | "default" = "destructive";
-      let toastTitle = "Swap Failed";
-      
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
-        errorMessage = "Transaction was cancelled by user";
-        toastVariant = "default";
-        toastTitle = "Transaction Cancelled";
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees";
-      } else if (error.message?.includes("Could not find token addresses")) {
-        errorMessage = error.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      toast({
-        variant: toastVariant,
-        title: toastTitle, 
-        description: errorMessage,
-      });
     } finally {
       setIsSwapping(false);
     }

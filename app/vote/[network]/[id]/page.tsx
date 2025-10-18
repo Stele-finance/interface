@@ -483,26 +483,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
       // Delegate to self (current connected address)
       const tx = await votesContract.delegate(currentConnectedAddress)
 
-      toast({
-        title: "Transaction Submitted",
-        description: "Your delegation is being processed...",
-      })
-
       // Wait for transaction confirmation
-      const receipt = await tx.wait()
-
-      toast({
-        title: "Delegation Successful",
-        description: `You have successfully delegated your tokens to yourself (${currentConnectedAddress.slice(0, 6)}...${currentConnectedAddress.slice(-4)}). Your voting power should now be available.`,
-        action: (
-          <ToastAction 
-            altText={`View on ${contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}`}
-            onClick={() => openScanSite(contractNetwork, 'tx', receipt.hash)}
-          >
-            View on {contractNetwork === 'arbitrum' ? 'Arbiscan' : 'Etherscan'}
-          </ToastAction>
-        ),
-      })
+      await tx.wait()
 
       // Refresh voting power after delegation
       setTimeout(() => {
@@ -511,37 +493,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
     } catch (error: any) {
       console.error("Delegation error:", error)
-      
-      let errorMessage = "There was an error delegating your tokens. Please try again."
-      let isUserRejection = false
-      
-      // Check for various user rejection patterns
-      if (error.code === 4001 || 
-          error.code === "ACTION_REJECTED" ||
-          error.message?.includes("rejected") ||
-          error.message?.includes("denied") ||
-          error.message?.includes("cancelled") ||
-          error.message?.includes("User rejected") ||
-          error.message?.includes("User denied") ||
-          error.message?.includes("Transaction was rejected")) {
-        errorMessage = "Transaction was rejected by user"
-        isUserRejection = true
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees"
-      } else if (error.message?.includes("Phantom wallet is not installed")) {
-        errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-      } else if (error.message?.includes("No accounts connected")) {
-        errorMessage = "No accounts connected in Phantom wallet. Please connect your wallet first."
-      }
-
-      // Only show error toast for non-user-rejection errors
-      if (!isUserRejection) {
-        toast({
-          variant: "destructive",
-          title: "Delegation Failed",
-          description: errorMessage,
-        })
-      }
     } finally {
       // Always ensure loading state is cleared, even if there are unexpected errors
       setIsDelegating(false)
@@ -551,31 +502,16 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   // Vote function
   const handleVote = async () => {
     if (!voteOption) {
-      toast({
-        variant: "destructive",
-        title: "Vote Option Required",
-        description: "Please select a vote option",
-      })
       return
     }
 
     // Wallet connection check
     if (!walletConnected) {
-      toast({
-        variant: "destructive",
-        title: "Wallet Not Connected",
-        description: "Please connect your wallet to vote",
-      })
       return
     }
 
     // Check if user has voting power
     if (Number(votingPower) === 0) {
-      toast({
-        variant: "destructive",
-        title: "No Voting Power",
-        description: "You don't have any voting power for this proposal",
-      })
       return
     }
 
@@ -728,11 +664,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
   // Handle queue operation
   const handleQueue = async () => {
     if (!walletConnected || !proposalDetailsData?.proposalCreateds?.[0]) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Wallet not connected or proposal data not available.",
-      })
       return
     }
 
@@ -763,73 +694,21 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       // Call queue function
       const tx = await governanceContract.queue(targets, values, calldatas, descriptionHash)
-      
-      toast({
-        title: "Transaction Submitted",
-        description: "Your queue transaction has been submitted. Please wait for confirmation.",
-      })
 
       // Wait for transaction confirmation
       const receipt = await tx.wait()
-      
-      if (receipt.status === 1) {
-        toast({
-          title: "Proposal Queued Successfully",
-          description: `Proposal #${id} has been queued for execution.`,
-          action: (
-            <ToastAction altText="View transaction">
-              <a 
-                href={`https://etherscan.io/tx/${receipt.hash}`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                View Transaction
-              </a>
-            </ToastAction>
-          ),
-        })
-        
-        // Redirect to appropriate vote page based on pageType
-        setTimeout(() => {
-          router.push(`/vote/${pageType}`)
-        }, 2000) // 2초 후 리다이렉트
-      } else {
+
+      if (receipt.status !== 1) {
         throw new Error('Transaction failed')
       }
 
+      // Redirect to appropriate vote page based on pageType
+      setTimeout(() => {
+        router.push(`/vote/${pageType}`)
+      }, 2000) // 2초 후 리다이렉트
+
     } catch (error: any) {
       console.error("Queue error:", error)
-      
-      let errorMessage = "There was an error queuing the proposal. Please try again."
-      let isUserRejection = false
-      
-      // Check for various user rejection patterns
-      if (error.code === 4001 || 
-          error.code === "ACTION_REJECTED" ||
-          error.message?.includes("rejected") ||
-          error.message?.includes("denied") ||
-          error.message?.includes("cancelled") ||
-          error.message?.includes("User rejected") ||
-          error.message?.includes("User denied") ||
-          error.message?.includes("Transaction was rejected")) {
-        errorMessage = "Transaction was rejected by user"
-        isUserRejection = true
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees"
-      } else if (error.message?.includes("Phantom wallet is not installed")) {
-        errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-      } else if (error.message?.includes("Governor: proposal not successful")) {
-        errorMessage = "Proposal has not succeeded yet and cannot be queued"
-      }
-
-      // Only show error toast for non-user-rejection errors
-      if (!isUserRejection) {
-        toast({
-          variant: "destructive",
-          title: "Queue Failed",
-          description: errorMessage,
-        })
-      }
     } finally {
       // Always ensure loading state is cleared, even if there are unexpected errors
       setIsQueuing(false)

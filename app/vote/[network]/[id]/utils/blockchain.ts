@@ -73,11 +73,6 @@ export const handleQueue = async (
 ): Promise<BlockchainActionResult> => {
   try {
     if (!walletConnected || !proposalDetails) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Wallet not connected or proposal data not available.",
-      })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
 
@@ -134,11 +129,6 @@ export const handleExecute = async (
 ): Promise<BlockchainActionResult> => {
   try {
     if (!walletConnected || !proposalDetails) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Wallet not connected or proposal data not available.",
-      })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
 
@@ -203,11 +193,6 @@ export const handleCancel = async (
 ): Promise<BlockchainActionResult> => {
   try {
     if (!walletConnected || !proposalDetails) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Wallet not connected or proposal data not available.",
-      })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
 
