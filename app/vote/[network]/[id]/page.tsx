@@ -38,7 +38,6 @@ import { useBlockNumber } from "@/app/hooks/useBlockNumber"
 import { useLanguage } from "@/lib/language-context"
 import { usePageType } from "@/lib/page-type-context"
 import { useWallet } from "@/app/hooks/useWallet"
-import { useAppKitProvider } from '@reown/appkit/react'
 import { ClientOnly } from "@/components/ClientOnly"
 
 // Import separated components and utilities
@@ -743,8 +742,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     try {
       // WalletConnect only - use getProvider from useWallet hook
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Connect to provider with signer
@@ -854,8 +853,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     try {
       // WalletConnect only - use getProvider from useWallet hook
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Connect to provider with signer

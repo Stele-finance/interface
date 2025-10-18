@@ -188,8 +188,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
     try {
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Request account access

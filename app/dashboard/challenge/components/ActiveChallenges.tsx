@@ -26,7 +26,6 @@ import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
-import { useAppKitProvider } from '@reown/appkit/react'
 
 interface ChallengeCardProps {
   id?: string
@@ -129,11 +128,8 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
   const [isMounted, setIsMounted] = useState(false);
   
   // Use wallet hook to get current wallet info
-  const { walletType, network, getProvider, isConnected } = useWallet();
-  
-  // Use AppKit provider for WalletConnect
-  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
-  
+  const { getProvider, isConnected } = useWallet();
+
   // Use React Query client for better data management
   const queryClient = useQueryClient();
   

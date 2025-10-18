@@ -247,8 +247,8 @@ export const handleDelegate = async (
 
     // WalletConnect only - use getProvider from useWallet hook
     const provider = await getProvider()
-    if (!provider || walletType !== 'walletconnect') {
-      throw new Error("WalletConnect not available. Please connect your wallet first.")
+    if (!provider) {
+      throw new Error("No provider available. Please connect your wallet first.")
     }
 
     // Try to get signer first, only request accounts if needed
