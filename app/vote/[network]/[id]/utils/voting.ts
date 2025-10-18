@@ -21,29 +21,14 @@ export const handleVote = async (
   try {
     // Validation checks
     if (!voteOption) {
-      toast({
-        variant: "destructive",
-        title: "Vote Option Required",
-        description: "Please select a vote option",
-      })
       return { success: false, error: "No vote option selected" }
     }
 
     if (!walletConnected) {
-      toast({
-        variant: "destructive",
-        title: "Wallet Not Connected",
-        description: "Please connect your wallet to vote",
-      })
       return { success: false, error: "Wallet not connected" }
     }
 
     if (Number(votingPower) === 0) {
-      toast({
-        variant: "destructive",
-        title: "No Voting Power",
-        description: "You don't have any voting power for this proposal",
-      })
       return { success: false, error: "No voting power" }
     }
 
@@ -123,63 +108,14 @@ export const handleVote = async (
       tx = await contract.castVote(proposalId, support)
     }
 
-    toast({
-      title: "Transaction Submitted",
-      description: "Your vote is being processed...",
-    })
-
     // Wait for transaction confirmation
     const receipt = await tx.wait()
-    
-    // Vote success message
-    toast({
-      title: "Vote Cast Successfully",
-      description: `You have voted ${voteOption} on proposal ${proposalId} with ${Number(votingPower).toLocaleString()} voting power`,
-    })
-
-    // Open transaction in explorer
-    const explorerUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-    window.open(`${explorerUrl}/tx/${receipt.hash}`, '_blank')
 
     return { success: true, transactionHash: receipt.hash }
 
   } catch (error: any) {
     console.error("Voting error:", error)
-    
-    let errorMessage = "There was an error casting your vote. Please try again."
-    let isUserRejection = false
-    
-    // Check for various user rejection patterns
-    if (error.code === 4001 || 
-        error.code === "ACTION_REJECTED" ||
-        error.message?.includes("rejected") ||
-        error.message?.includes("denied") ||
-        error.message?.includes("cancelled") ||
-        error.message?.includes("User rejected") ||
-        error.message?.includes("User denied") ||
-        error.message?.includes("Transaction was rejected")) {
-      errorMessage = "Transaction was rejected by user"
-      isUserRejection = true
-    } else if (error.message?.includes("insufficient funds")) {
-      errorMessage = "Insufficient funds for gas fees"
-    } else if (error.message?.includes("already voted")) {
-      errorMessage = "You have already voted on this proposal"
-    } else if (error.message?.includes("Phantom wallet is not installed")) {
-      errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-    } else if (error.message?.includes("No accounts connected")) {
-      errorMessage = "No accounts connected in Phantom wallet. Please connect your wallet first."
-    }
-
-    // Only show error toast for non-user-rejection errors
-    if (!isUserRejection) {
-      toast({
-        variant: "destructive",
-        title: "Voting Failed",
-        description: errorMessage,
-      })
-    }
-
-    return { success: false, error: errorMessage }
+    return { success: false, error: error.message || "Voting failed" }
   }
 }
 

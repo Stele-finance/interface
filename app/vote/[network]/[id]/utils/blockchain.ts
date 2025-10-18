@@ -107,65 +107,19 @@ export const handleQueue = async (
 
     // Call queue function
     const tx = await governanceContract.queue(targets, values, calldatas, descriptionHash)
-    
-    toast({
-      title: "Transaction Submitted",
-      description: "Your queue transaction has been submitted. Please wait for confirmation.",
-    })
 
     // Wait for transaction confirmation
     const receipt = await tx.wait()
-    
-    if (receipt.status === 1) {
-      toast({
-        title: "Proposal Queued Successfully",
-        description: `Proposal #${proposalDetails.proposalId} has been queued for execution.`,
-      })
-      
-      // Open transaction in explorer
-      const explorerUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-      window.open(`${explorerUrl}/tx/${receipt.hash}`, '_blank')
-      
-      return { success: true, transactionHash: receipt.hash }
-    } else {
+
+    if (receipt.status !== 1) {
       throw new Error('Transaction failed')
     }
 
+    return { success: true, transactionHash: receipt.hash }
+
   } catch (error: any) {
     console.error("Queue error:", error)
-    
-    let errorMessage = "There was an error queuing the proposal. Please try again."
-    let isUserRejection = false
-    
-    // Check for various user rejection patterns
-    if (error.code === 4001 || 
-        error.code === "ACTION_REJECTED" ||
-        error.message?.includes("rejected") ||
-        error.message?.includes("denied") ||
-        error.message?.includes("cancelled") ||
-        error.message?.includes("User rejected") ||
-        error.message?.includes("User denied") ||
-        error.message?.includes("Transaction was rejected")) {
-      errorMessage = "Transaction was rejected by user"
-      isUserRejection = true
-    } else if (error.message?.includes("insufficient funds")) {
-      errorMessage = "Insufficient funds for gas fees"
-    } else if (error.message?.includes("Phantom wallet is not installed")) {
-      errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-    } else if (error.message?.includes("Governor: proposal not successful")) {
-      errorMessage = "Proposal has not succeeded yet and cannot be queued"
-    }
-
-    // Only show error toast for non-user-rejection errors
-    if (!isUserRejection) {
-      toast({
-        variant: "destructive",
-        title: "Queue Failed",
-        description: errorMessage,
-      })
-    }
-
-    return { success: false, error: errorMessage }
+    return { success: false, error: error.message || "Queue failed" }
   }
 }
 
@@ -222,65 +176,19 @@ export const handleExecute = async (
 
     // Call execute function
     const tx = await governanceContract.execute(targets, values, calldatas, descriptionHash)
-    
-    toast({
-      title: "Transaction Submitted",
-      description: "Your execute transaction has been submitted. Please wait for confirmation.",
-    })
 
     // Wait for transaction confirmation
     const receipt = await tx.wait()
-    
-    if (receipt.status === 1) {
-      toast({
-        title: "Proposal Executed Successfully",
-        description: `Proposal #${proposalDetails.proposalId} has been executed successfully.`,
-      })
-      
-      // Open transaction in explorer
-      const explorerUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-      window.open(`${explorerUrl}/tx/${receipt.hash}`, '_blank')
-      
-      return { success: true, transactionHash: receipt.hash }
-    } else {
+
+    if (receipt.status !== 1) {
       throw new Error('Transaction failed')
     }
 
+    return { success: true, transactionHash: receipt.hash }
+
   } catch (error: any) {
     console.error("Execute error:", error)
-    
-    let errorMessage = "There was an error executing the proposal. Please try again."
-    let isUserRejection = false
-    
-    // Check for various user rejection patterns
-    if (error.code === 4001 || 
-        error.code === "ACTION_REJECTED" ||
-        error.message?.includes("rejected") ||
-        error.message?.includes("denied") ||
-        error.message?.includes("cancelled") ||
-        error.message?.includes("User rejected") ||
-        error.message?.includes("User denied") ||
-        error.message?.includes("Transaction was rejected")) {
-      errorMessage = "Transaction was rejected by user"
-      isUserRejection = true
-    } else if (error.message?.includes("insufficient funds")) {
-      errorMessage = "Insufficient funds for gas fees"
-    } else if (error.message?.includes("Phantom wallet is not installed")) {
-      errorMessage = "Phantom wallet is not installed or Ethereum support is not enabled"
-    } else if (error.message?.includes("Governor: proposal not in execution state")) {
-      errorMessage = "Proposal is not ready for execution. Please ensure it has been queued and the timelock has passed."
-    }
-
-    // Only show error toast for non-user-rejection errors
-    if (!isUserRejection) {
-      toast({
-        variant: "destructive",
-        title: "Execute Failed",
-        description: errorMessage,
-      })
-    }
-
-    return { success: false, error: errorMessage }
+    return { success: false, error: error.message || "Execute failed" }
   }
 }
 

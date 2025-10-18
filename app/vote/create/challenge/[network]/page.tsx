@@ -542,21 +542,6 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
         
         // Show toast notification for transaction submitted
         const explorerName = getExplorerName(contractNetwork);
-        const explorerUrl = getExplorerUrl(contractNetwork, tx.hash);
-        
-        toast({
-          title: "Transaction Submitted",
-          description: "Your proposal transaction has been sent to the network.",
-          action: (
-            <ToastAction 
-              altText={`View on ${explorerName}`} 
-              onClick={() => window.open(explorerUrl, '_blank')}
-            >
-              View on {explorerName}
-            </ToastAction>
-          ),
-        });
-        
         // Store the recently created proposal info for real-time update detection
         const recentlyCreatedProposal = {
           transactionHash: tx.hash,
@@ -565,25 +550,11 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
           timestamp: Date.now()
         };
         localStorage.setItem('recentlyCreatedProposal', JSON.stringify(recentlyCreatedProposal));
-        
+
         // Continue processing transaction in background
         try {
           // Wait for transaction to be mined
-          const receipt = await tx.wait();
-          
-          // Show toast notification for transaction confirmed
-          toast({
-            title: "Proposal Created Successfully",
-            description: "Your proposal has been confirmed on the blockchain",
-            action: (
-              <ToastAction 
-                altText={`View on ${explorerName}`} 
-                onClick={() => window.open(explorerUrl, '_blank')}
-              >
-                View on {explorerName}
-              </ToastAction>
-            ),
-          });
+          await tx.wait();
         } catch (confirmationError) {
           console.error("Error waiting for transaction confirmation:", confirmationError);
           // Still navigate to vote page even if confirmation fails
@@ -598,37 +569,6 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
         code: error.code,
         reason: error.reason,
         stack: error.stack
-      });
-      
-      let errorMessage = error.message || "An unknown error occurred";
-      let toastVariant: "destructive" | "default" = "destructive";
-      let toastTitle = "Proposal Creation Failed";
-      
-      // Provide more specific error messages based on error type
-      // Check for various user rejection patterns
-      if (error.code === 4001 || 
-          error.code === "ACTION_REJECTED" ||
-          error.message?.includes('rejected') || 
-          error.message?.includes('denied') || 
-          error.message?.includes('cancelled') ||
-          error.message?.includes('User rejected') ||
-          error.message?.includes('User denied') ||
-          error.message?.includes('Connection request was rejected')) {
-        errorMessage = "Transaction was cancelled by user";
-        toastVariant = "default";
-        toastTitle = "Transaction Cancelled";
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees";
-      } else if (error.message?.includes("Failed to get wallet provider")) {
-        errorMessage = "Wallet connection lost. Please reconnect your wallet.";
-      } else if (error.message?.includes("No accounts found")) {
-        errorMessage = "No wallet accounts found. Please check your wallet connection.";
-      }
-      
-      toast({
-        variant: toastVariant,
-        title: toastTitle,
-        description: errorMessage,
       });
     } finally {
       // Always ensure loading state is cleared, even if there are unexpected errors
