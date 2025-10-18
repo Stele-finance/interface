@@ -46,7 +46,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       name: 'Stele Finance',
       description: 'Stele Finance DeFi Platform',
       url: typeof window !== 'undefined' ? window.location.origin : 'https://stele.finance',
-      icons: [typeof window !== 'undefined' ? `${window.location.origin}/stele_logo.png` : 'https://stele.finance/stele_logo.png']
+      icons: [typeof window !== 'undefined' ? `${window.location.origin}/stele_logo.png` : 'https://stele.finance/stele_logo.png'],
+      redirect: {
+        native: typeof window !== 'undefined' ? window.location.origin : 'https://stele.finance',
+        universal: typeof window !== 'undefined' ? window.location.origin : 'https://stele.finance',
+      }
     }
 
     const ethersAdapter = new EthersAdapter()
