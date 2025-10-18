@@ -25,7 +25,7 @@ export const handleDelegate = async (
 
   try {
     // WalletConnect only - use getProvider from useWallet hook
-    const provider = getProvider();
+    const provider = await getProvider();
     if (!provider || walletType !== 'walletconnect') {
       throw new Error("WalletConnect not available. Please connect your wallet first.");
     }

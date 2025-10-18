@@ -491,14 +491,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       }
 
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Try to get address from signer first before requesting accounts
       let userAddress: string | null = null;
-      
+
       try {
         const signer = await provider.getSigner();
         userAddress = await signer.getAddress();
@@ -885,18 +885,18 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       }
 
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
 
       // Use connected address from useWallet hook first, fallback to currentWalletAddress
       const addressToUse = connectedAddress || currentWalletAddress;
-      
+
       if (!addressToUse) {
         // Try to get address from signer first before requesting accounts
         let userAddress: string | null = null;
-        
+
         try {
           const signer = await provider.getSigner();
           userAddress = await signer.getAddress();

@@ -249,7 +249,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         currentConnectedAddress = address;
       } else {
         // For MetaMask and Phantom, use provider method
-        const browserProvider = getProvider();
+        const browserProvider = await getProvider();
         if (!browserProvider) {
           throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
         }
@@ -742,7 +742,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsQueuing(true)
     try {
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
@@ -853,7 +853,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsExecuting(true)
     try {
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }

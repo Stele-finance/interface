@@ -400,7 +400,7 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
     
     try {
       // Get provider using useWallet hook
-      const browserProvider = getProvider();
+      const browserProvider = await getProvider();
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
