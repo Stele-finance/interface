@@ -165,27 +165,11 @@ export function Header() {
 
   const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
-    
+
     try {
       await connectWallet() // No parameters needed - WalletConnect only
-      
-      // Success toast
-      toast({
-        variant: "default",
-        title: "✅ Connection Successful",
-        description: "Successfully connected to WalletConnect",
-        duration: 3000,
-      })
     } catch (error) {
       console.error("Wallet connection error:", error)
-      
-      // Show error toast
-      toast({
-        variant: "destructive",
-        title: "🚫 Connection Failed",
-        description: error instanceof Error ? error.message : "Failed to connect wallet",
-        duration: 5000,
-      })
     }
   }
 
@@ -198,38 +182,8 @@ export function Header() {
   const switchWalletNetwork = async (targetNetwork: 'ethereum' | 'arbitrum') => {
     try {
       await switchNetwork(targetNetwork)
-      
-      // Success feedback
-      toast({
-        variant: "default",
-        title: `✅ ${t('networkSwitched')}`,
-        description: targetNetwork === 'ethereum' ? t('successfullySwitchedToEthereum') : t('successfullySwitchedToArbitrum'),
-        duration: 3000,
-      })
-      
     } catch (error) {
       console.error("Wallet switch error:", error)
-      // Show user-friendly error message
-      let title = t('networkSwitchFailed')
-      let description = "Failed to switch network. Please try again."
-      
-      if (error instanceof Error) {
-        if (error.message.includes("cancelled by user")) {
-          title = t('networkSwitchCancelled')
-          description = t('youCancelledNetworkSwitch')
-        } else if (error.message.includes("manually")) {
-          title = t('manualActionRequired')
-          description = error.message
-        } else {
-          description = error.message
-        }
-      }
-      
-      toast({
-        variant: "destructive",
-        title,
-        description,
-      })
     }
   }
 

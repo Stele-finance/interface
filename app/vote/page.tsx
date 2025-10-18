@@ -302,21 +302,10 @@ export default function VotePage() {
       } else {
         refetchPromises = refetchActionable()
       }
-      
+
       await Promise.all([minLoadingTime, refetchPromises])
-      
-      toast({
-        title: t('success'),
-        description: t('dataRefreshedSuccessfully'),
-        variant: "default",
-      })
     } catch (error) {
       console.error('Error refreshing data:', error)
-      toast({
-        title: "Error",
-        description: t('failedToRefreshData'),
-        variant: "destructive",
-      })
     } finally {
       setIsInitialLoading(false)
     }
