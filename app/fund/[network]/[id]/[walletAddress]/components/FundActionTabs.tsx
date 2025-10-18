@@ -230,14 +230,14 @@ export function FundActionTabs({
     }
     
     setIsWithdrawing(true)
-    
+
     try {
       // WalletConnect only
-      const provider = getProvider()
+      const provider = await getProvider()
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.")
       }
-      
+
       // Request account access
       const accounts = await provider.send('eth_requestAccounts', [])
       if (!accounts || accounts.length === 0) {
@@ -392,14 +392,14 @@ export function FundActionTabs({
   // Handle collect fees from SteleFund contract
   const handleCollectFees = async () => {
     setIsCollectingFees(true)
-    
+
     try {
       // WalletConnect only
-      const provider = getProvider()
+      const provider = await getProvider()
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.")
       }
-      
+
       // Request account access
       const accounts = await provider.send('eth_requestAccounts', [])
       if (!accounts || accounts.length === 0) {
@@ -584,14 +584,14 @@ export function FundActionTabs({
     }
     
     setIsDepositing(true)
-    
+
     try {
       // WalletConnect only
-      const provider = getProvider()
+      const provider = await getProvider()
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.")
       }
-      
+
       // Request account access
       const accounts = await provider.send('eth_requestAccounts', [])
       if (!accounts || accounts.length === 0) {

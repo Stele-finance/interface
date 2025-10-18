@@ -159,10 +159,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const handleConfirmRegister = async () => {
     setShowRegisterModal(false)
     setIsRegistering(true);
-    
+
     try {
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }
@@ -311,10 +311,10 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Handle mint NFT
   const handleMintNFT = async () => {
     setIsMinting(true);
-    
+
     try {
       // WalletConnect only - use getProvider from useWallet hook
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider || walletType !== 'walletconnect') {
         throw new Error("WalletConnect not available. Please connect your wallet first.");
       }

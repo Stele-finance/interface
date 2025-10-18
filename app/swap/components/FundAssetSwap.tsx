@@ -283,14 +283,14 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
 
     try {
       // Get provider using useWallet hook
-      const browserProvider = getProvider();
+      const browserProvider = await getProvider();
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
-        
+
       // Try to get address from signer first before requesting accounts
       let userAddress: string | null = null;
-    
+
       try {
         const signer = await browserProvider.getSigner();
         userAddress = await signer.getAddress();
