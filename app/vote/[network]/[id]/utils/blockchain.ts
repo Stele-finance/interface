@@ -80,9 +80,9 @@ export const handleQueue = async (
       })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
-    
+
     // WalletConnect only - use getProvider from useWallet hook
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider || walletType !== 'walletconnect') {
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
@@ -182,9 +182,9 @@ export const handleExecute = async (
       })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
-    
+
     // WalletConnect only - use getProvider from useWallet hook
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider || walletType !== 'walletconnect') {
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
@@ -292,9 +292,9 @@ export const handleCancel = async (
       })
       return { success: false, error: "Wallet not connected or no proposal data" }
     }
-    
+
     // WalletConnect only - use getProvider from useWallet hook
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider || walletType !== 'walletconnect') {
       throw new Error("WalletConnect not available. Please connect your wallet first.")
     }
@@ -380,7 +380,7 @@ export const checkProposalState = async (
   getProvider: () => any
 ): Promise<ProposalStatus> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider) {
       throw new Error("No provider available")
     }
@@ -406,7 +406,7 @@ export const getProposalDeadline = async (
   getProvider: () => any
 ): Promise<Date | null> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider) {
       return null
     }
@@ -437,7 +437,7 @@ export const getProposalSnapshot = async (
   getProvider: () => any
 ): Promise<number | null> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider) {
       return null
     }
@@ -465,7 +465,7 @@ export const estimateGas = async (
   walletAddress?: string
 ): Promise<{ gasLimit: string; gasPrice: string } | null> => {
   try {
-    const provider = getProvider()
+    const provider = await getProvider()
     if (!provider) {
       return null
     }
