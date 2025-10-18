@@ -667,30 +667,9 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
             // Show toast notification for approve transaction submitted
             const explorerName = getExplorerName(contractNetwork);
             const explorerUrl = getExplorerUrl(contractNetwork, approveTx.hash);
-            
-            toast({
-              title: "Approval Submitted",
-              description: "Your USDC approval transaction has been sent to the network.",
-              action: (
-                <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-                  View on {explorerName}
-                </ToastAction>
-              ),
-            });
-            
+
             // Wait for approve transaction to be mined
             await approveTx.wait();
-            
-            // Show toast notification for approve transaction confirmed
-            toast({
-              title: "Approval Confirmed",
-              description: `You have successfully approved ${entryFee} USDC for Stele contract.`,
-              action: (
-                <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-                  View on {explorerName}
-                </ToastAction>
-              ),
-            });
           } catch (approveError: any) {
             console.error("❌ Approval failed:", approveError);
             throw new Error(`Failed to approve USDC: ${approveError.message}`);
@@ -711,34 +690,9 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         const tx = await steleContract.joinChallenge(challengeId, {
           gasLimit: joinGasEstimate + BigInt(20000) // Add 20k gas buffer
         });
-                
-        // Show toast notification for transaction submitted
-        const joinExplorerName = getExplorerName(contractNetwork);
-        const joinExplorerUrl = getExplorerUrl(contractNetwork, tx.hash);
-        
-        toast({
-          title: "Transaction Submitted",
-          description: "Your join challenge transaction has been sent to the network.",
-          action: (
-            <ToastAction altText={`View on ${joinExplorerName}`} onClick={() => window.open(joinExplorerUrl, '_blank')}>
-              {t('view')} on {joinExplorerName}
-            </ToastAction>
-          ),
-        });
-        
+
         // Wait for transaction to be mined
         await tx.wait();
-        
-        // Show toast notification for transaction confirmed
-        toast({
-          title: t('joinChallenge'),
-          description: "You have successfully joined the challenge!",
-          action: (
-            <ToastAction altText={`View on ${joinExplorerName}`} onClick={() => window.open(joinExplorerUrl, '_blank')}>
-              {t('view')} on {joinExplorerName}
-            </ToastAction>
-          ),
-        });
 
         // Update local state immediately for instant UI feedback
         setHasJoinedLocally(true);
@@ -789,22 +743,6 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       
     } catch (error: any) {
       console.error("❌ Error in confirmJoinChallenge:", error);
-      
-      // Check if user rejected the request
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
-        toast({
-          variant: "default",
-          title: "Transaction Cancelled",
-          description: "Transaction was cancelled by user",
-        });
-      } else {
-        // Show error toast
-        toast({
-          title: "Error",
-          description: `Failed to join challenge: ${error.message}`,
-          variant: "destructive",
-        });
-      }
     } finally {
       setIsJoining(false);
     }
@@ -929,54 +867,12 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
 
       // Call getRewards function
       const tx = await steleContract.getRewards(challengeId);
-      
-      // Show toast notification for transaction submitted
-      const rewardExplorerName = getExplorerName(contractNetwork);
-      const rewardExplorerUrl = getExplorerUrl(contractNetwork, tx.hash);
-      
-      toast({
-        title: t('transactionSubmitted'),
-        description: t('rewardClaimTransactionSent'),
-        action: (
-          <ToastAction altText={`View on ${rewardExplorerName}`} onClick={() => window.open(rewardExplorerUrl, '_blank')}>
-            View on {rewardExplorerName}
-          </ToastAction>
-        ),
-      });
-      
+
       // Wait for transaction to be mined
       await tx.wait();
-      
-      // Show toast notification for transaction confirmed
-      toast({
-        title: t('rewardClaimed'),
-        description: t('rewardsClaimedSuccessfully'),
-        action: (
-          <ToastAction altText={`View on ${rewardExplorerName}`} onClick={() => window.open(rewardExplorerUrl, '_blank')}>
-            View on {rewardExplorerName}
-          </ToastAction>
-        ),
-      });
-      
+
     } catch (error: any) {
       console.error("Error claiming rewards:", error);
-      
-      // Check if user rejected the request
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
-        toast({
-          variant: "default",
-          title: t('requestCancelled'),
-          description: t('rewardClaimCancelled'),
-        });
-      } else {
-        // Show toast notification for error
-                  toast({
-            variant: "destructive",
-            title: t('errorClaimingRewards'),
-            description: error.message || t('unknownError'),
-          });
-      }
-      
     } finally {
       setIsGettingRewards(false);
     }

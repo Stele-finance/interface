@@ -232,35 +232,8 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
       // Call createChallenge with the selected challenge type
       const tx = await steleContract.createChallenge(challengeType);
       
-      // Show toast notification for transaction submitted
-      const explorerName = getExplorerName(subgraphNetwork);
-      const submittedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
-      
-      toast({
-        title: "Transaction Submitted",
-        description: "Your challenge creation transaction has been sent to the network.",
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(submittedTxUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      });
-      
       // Wait for transaction to be mined
       await tx.wait();
-      
-      // Show toast notification for transaction confirmed
-      const confirmedTxUrl = buildTransactionUrl(subgraphNetwork, tx.hash);
-      
-      toast({
-        title: "Challenge Created",
-        description: "Your challenge has been created successfully!",
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(confirmedTxUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      });
 
       // Start refreshing process
       setIsRefreshing(true);
@@ -270,28 +243,10 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
         queryClient.invalidateQueries({ queryKey: ['activeChallenges', subgraphNetwork] });
         setIsRefreshing(false);
       }, 3000);
-      
+
     } catch (error: any) {
       console.error("Error creating challenge:", error);
-      
-      // Check if user rejected the request
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('Connection request was rejected')) {
-        toast({
-          variant: "default",
-          title: "Request Cancelled",
-          description: "Challenge creation was cancelled by user",
-        });
-      } else {
-        // Show toast notification for error
-        toast({
-          variant: "destructive",
-          title: "Error Creating Challenge",
-          description: error.message || "An unknown error occurred",
-        });
-        
-        // Re-throw the error to be handled by the modal
-        throw error;
-      }
+
     } finally {
       setIsCreating(false);
     }

@@ -308,62 +308,14 @@ export function FundActionTabs({
         }
       )
 
-      // Get explorer info
-      const explorerName = getExplorerName(network)
-      const explorerUrl = getExplorerUrl(network, tx.hash)
-      
-      toast({
-        title: "Withdrawal Submitted",
-        description: `Withdrawing ${withdrawAmount}% from fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
-      
       // Wait for transaction to be mined
       await tx.wait()
-      
-      // Show success toast
-      toast({
-        title: "Withdrawal Successful!",
-        description: `Successfully withdrew ${withdrawAmount}% from fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
-      
+
       // Clear the input
       setWithdrawAmount("0")
       
     } catch (error: any) {
       console.error("Error withdrawing from fund:", error)
-      
-      let errorMessage = "An error occurred while withdrawing. Please try again."
-      
-      if (error.code === 4001 || error.message?.includes('rejected')) {
-        errorMessage = "Transaction was cancelled by user"
-      } else if (error.message?.includes("US")) {
-        errorMessage = "You are not an investor in this fund"
-      } else if (error.message?.includes("IP")) {
-        errorMessage = "Invalid percentage. Must be between 0.01% and 100%"
-      } else if (error.message?.includes("NS")) {
-        errorMessage = "You have no shares in this fund"
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees"
-      } else if (error.message) {
-        errorMessage = error.message
-      }
-      
-      toast({
-        variant: "destructive",
-        title: "Withdrawal Failed",
-        description: errorMessage,
-      })
-      
     } finally {
       setIsWithdrawing(false)
     }
@@ -527,42 +479,12 @@ export function FundActionTabs({
       }
       
       // Report results
-      if (successfulCollections.length > 0) {
-        const message = failedCollections.length > 0
-          ? `Successfully collected fees for: ${successfulCollections.join(', ')}. Failed for: ${failedCollections.map(f => f.symbol).join(', ')}`
-          : `Successfully collected fees for all tokens: ${successfulCollections.join(', ')}`
-          
-        toast({
-          title: "Fee Collection Complete",
-          description: message,
-        })
-      } else {
+      if (successfulCollections.length === 0) {
         throw new Error('Failed to collect fees from any token')
       }
-      
+
     } catch (error: any) {
       console.error("Error collecting fees:", error)
-      
-      let errorMessage = "An error occurred while collecting fees. Please try again."
-      
-      if (error.code === 4001 || error.message?.includes('rejected')) {
-        errorMessage = "Transaction was cancelled by user"
-      } else if (error.message?.includes("NF")) {
-        errorMessage = "No fees available to collect"
-      } else if (error.message?.includes("OM")) {
-        errorMessage = "Only the fund manager can collect fees"
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees"
-      } else if (error.message) {
-        errorMessage = error.message
-      }
-      
-      toast({
-        variant: "destructive",
-        title: "Fee Collection Failed",
-        description: errorMessage,
-      })
-      
     } finally {
       setIsCollectingFees(false)
     }
@@ -571,11 +493,6 @@ export function FundActionTabs({
   // Handle deposit ETH to SteleFund contract
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Amount",
-        description: "Please enter a valid deposit amount.",
-      })
       return
     }
     
@@ -652,46 +569,14 @@ export function FundActionTabs({
         data: fundIdBytes
       })
 
-      // Show toast notification for transaction submitted
-      const explorerName = getExplorerName(network)
-      const explorerUrl = getExplorerUrl(network, tx.hash)
-      
-      toast({
-        title: "Deposit Submitted",
-        description: `Depositing ${depositAmount} ETH to fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
-      
       // Wait for transaction to be mined
       await tx.wait()
-      
-      // Show success toast
-      toast({
-        title: "Deposit Successful!",
-        description: `Successfully deposited ${depositAmount} ETH to fund ${fundId}`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      })
-      
+
       // Clear the input
       setDepositAmount("")
       
     } catch (error: any) {
       console.error("Error depositing ETH:", error)
-      
-      toast({
-        variant: "destructive",
-        title: "Deposit Failed",
-        description: error.message || "An unknown error occurred",
-      })
-      
     } finally {
       setIsDepositing(false)
     }

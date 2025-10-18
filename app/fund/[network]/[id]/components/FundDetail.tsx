@@ -260,64 +260,15 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         gasLimit: gasLimit
       });
 
-      const explorerName = network === 'arbitrum' ? 'Arbiscan' : 'Etherscan';
-      const explorerUrl = network === 'arbitrum' 
-        ? `https://arbiscan.io/tx/${tx.hash}`
-        : `https://etherscan.io/tx/${tx.hash}`;
-
-      toast({
-        title: "NFT Mint Submitted",
-        description: `Manager NFT minting transaction has been sent to the network.`,
-        action: (
-          <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-            View on {explorerName}
-          </ToastAction>
-        ),
-      });
-
       // Wait for transaction confirmation
       const receipt = await tx.wait();
 
-      if (receipt.status === 1) {
-        toast({
-          title: "NFT Minted Successfully!",
-          description: `Manager NFT has been minted successfully for Fund ${fundId}.`,
-          action: (
-            <ToastAction altText={`View on ${explorerName}`} onClick={() => window.open(explorerUrl, '_blank')}>
-              View on {explorerName}
-            </ToastAction>
-          ),
-        });
-      } else {
+      if (receipt.status !== 1) {
         throw new Error('Transaction failed');
       }
 
     } catch (error: any) {
       console.error("Error minting NFT:", error);
-      
-      let errorMessage = "An error occurred while minting NFT. Please try again.";
-      let toastVariant: "destructive" | "default" = "destructive";
-      let toastTitle = "NFT Mint Failed";
-      
-      if (error.code === 4001 || error.message?.includes('rejected')) {
-        errorMessage = "Transaction was cancelled by user";
-        toastVariant = "default";
-        toastTitle = "Transaction Cancelled";
-      } else if (error.message?.includes("insufficient funds")) {
-        errorMessage = "Insufficient funds for gas fees";
-      } else if (error.message?.includes("NM")) {
-        errorMessage = "Only the fund manager can mint NFTs";
-      } else if (error.message?.includes("NNC")) {
-        errorMessage = "NFT contract is not set";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      toast({
-        variant: toastVariant,
-        title: toastTitle,
-        description: errorMessage,
-      });
     } finally {
       setIsMintingNFT(false);
     }
@@ -666,55 +617,25 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
             
       // Call join function with fundId as number
       const tx = await fundInfoContract.join(parseInt(fundId));
-      
+
       // Wait for transaction confirmation
-      const receipt = await tx.wait();
-      
-      toast({
-        title: t('success'),
-        description: 'Successfully joined the fund!',
-        action: (
-          <ToastAction 
-            altText="View transaction"
-            onClick={() => {
-              const explorerUrl = routeNetwork === 'arbitrum' 
-                ? `https://arbiscan.io/tx/${receipt.hash}`
-                : `https://etherscan.io/tx/${receipt.hash}`;
-              window.open(explorerUrl, '_blank');
-            }}
-          >
-            View
-          </ToastAction>
-        ),
-      });
-      
+      await tx.wait();
+
       // Refresh data
       if (typeof refetchFundInvestorData === 'function') {
         refetchFundInvestorData();
       }
-      
+
       // Also refresh the React Query cache
       queryClient.invalidateQueries({
         queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork]
       });
-      
+
       // Set local joined state to immediately update UI
       setHasJoinedLocally(true);
-      
-      
+
     } catch (error: any) {
       console.error('Join fund error:', error);
-      
-      // Handle user rejection
-      if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
-        return;
-      }
-      
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to join fund',
-        variant: "destructive",
-      });
     } finally {
       setIsJoining(false);
     }
