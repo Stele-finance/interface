@@ -234,8 +234,8 @@ export function FundActionTabs({
     try {
       // WalletConnect only
       const provider = await getProvider()
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.")
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.")
       }
 
       // Request account access
@@ -396,8 +396,8 @@ export function FundActionTabs({
     try {
       // WalletConnect only
       const provider = await getProvider()
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.")
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.")
       }
 
       // Request account access
@@ -588,8 +588,8 @@ export function FundActionTabs({
     try {
       // WalletConnect only
       const provider = await getProvider()
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.")
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.")
       }
 
       // Request account access

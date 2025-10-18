@@ -83,8 +83,8 @@ export const handleQueue = async (
 
     // WalletConnect only - use getProvider from useWallet hook
     const provider = await getProvider()
-    if (!provider || walletType !== 'walletconnect') {
-      throw new Error("WalletConnect not available. Please connect your wallet first.")
+    if (!provider) {
+      throw new Error("No provider available. Please connect your wallet first.")
     }
 
     // Switch to correct network if needed
@@ -185,8 +185,8 @@ export const handleExecute = async (
 
     // WalletConnect only - use getProvider from useWallet hook
     const provider = await getProvider()
-    if (!provider || walletType !== 'walletconnect') {
-      throw new Error("WalletConnect not available. Please connect your wallet first.")
+    if (!provider) {
+      throw new Error("No provider available. Please connect your wallet first.")
     }
 
     // Switch to correct network if needed
@@ -295,8 +295,8 @@ export const handleCancel = async (
 
     // WalletConnect only - use getProvider from useWallet hook
     const provider = await getProvider()
-    if (!provider || walletType !== 'walletconnect') {
-      throw new Error("WalletConnect not available. Please connect your wallet first.")
+    if (!provider) {
+      throw new Error("No provider available. Please connect your wallet first.")
     }
 
     // Connect to provider with signer

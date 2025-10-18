@@ -31,7 +31,6 @@ import { useInvestorData } from "@/app/hooks/useChallengeInvestorData"
 import Image from "next/image"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
-import { useAppKitProvider } from '@reown/appkit/react'
 import { useUSDCBalance } from "@/app/hooks/useUSDCBalance"
 import { getTokenLogo } from "@/lib/utils"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -78,10 +77,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
   
   // Use wallet hook to get current wallet info
   const { address: connectedAddress, isConnected, walletType, network: walletNetwork, connectWallet, getProvider } = useWallet();
-  
-  // Use AppKit provider for WalletConnect
-  const { walletProvider: appKitProvider } = useAppKitProvider('eip155');
-  
+
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
 
@@ -485,15 +481,10 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         return;
       }
 
-      // Only request accounts if wallet is not connected or no address available
-      if (!isConnected) {
-        throw new Error("Please connect your wallet first.");
-      }
-
-      // WalletConnect only - use getProvider from useWallet hook
+      // Get provider - same approach as Fund Create
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Try to get address from signer first before requesting accounts
@@ -874,15 +865,10 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
     setIsGettingRewards(true);
     
     try {
-      // Check if wallet is connected
-      if (!isConnected || !walletType) {
-        throw new Error("No wallet connected. Please connect your wallet first.");
-      }
-
-      // WalletConnect only - use getProvider from useWallet hook
+      // Get provider - same approach as Fund Create
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
       // Use connected address from useWallet hook first, fallback to currentWalletAddress
