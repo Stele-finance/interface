@@ -556,15 +556,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
 
   // Confirm Join Challenge - Actual transaction
   const confirmJoinChallenge = async () => {
-    // Check if wallet is connected
-    if (!isConnected || !walletType) {
-      throw new Error("No wallet connected. Please connect your wallet first.");
-    }
-
-    setIsJoining(true);
     setShowJoinModal(false);
-    
+    setIsJoining(true);
+
     try {
+      // Check if wallet is connected
+      if (!isConnected || !walletType) {
+        throw new Error("No wallet connected. Please connect your wallet first.");
+      }
       // Get provider using useWallet hook
       const browserProvider = await getProvider();
       if (!browserProvider) {

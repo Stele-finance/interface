@@ -175,12 +175,17 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
   // Handle Create Challenge with selected type
   const handleCreateChallenge = async (challengeType: number) => {
     setIsCreating(true);
-    
+
     try {
+      // Check if wallet is connected
+      if (!isConnected || !walletType) {
+        throw new Error("No wallet connected. Please connect your wallet first.");
+      }
+
       // WalletConnect only - use getProvider from useWallet hook
       const provider = await getProvider();
-      if (!provider || walletType !== 'walletconnect') {
-        throw new Error("WalletConnect not available. Please connect your wallet first.");
+      if (!provider) {
+        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
       // Try to get address from signer first before requesting accounts
