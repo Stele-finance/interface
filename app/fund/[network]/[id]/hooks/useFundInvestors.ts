@@ -7,7 +7,7 @@ import { NETWORK_SUBGRAPHS, getFundHeaders } from '@/lib/constants'
 const GET_FUND_INVESTORS_QUERY = `
   query GetFundInvestors($fundId: String!) {
     investors(
-      where: { 
+      where: {
         fundId: $fundId
       }
       orderBy: amountUSD
@@ -21,6 +21,7 @@ const GET_FUND_INVESTORS_QUERY = `
       investor
       isManager
       share
+      investmentUSD
       amountUSD
       profitUSD
       profitRatio
@@ -36,6 +37,7 @@ export interface FundInvestor {
   investor: string
   isManager: boolean
   share: string | null
+  investmentUSD: string
   amountUSD: string
   profitUSD: string
   profitRatio: string
