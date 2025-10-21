@@ -17,6 +17,7 @@ const INVESTOR_SNAPSHOTS_QUERY = gql`
       manager
       investor
       share
+      investmentUSD
       amountUSD
       profitUSD
       profitRatio
@@ -38,6 +39,7 @@ const INVESTOR_WEEKLY_SNAPSHOTS_QUERY = gql`
       manager
       investor
       share
+      investmentUSD
       amountUSD
       profitUSD
       profitRatio
@@ -59,6 +61,7 @@ const INVESTOR_MONTHLY_SNAPSHOTS_QUERY = gql`
       manager
       investor
       share
+      investmentUSD
       amountUSD
       profitUSD
       profitRatio
@@ -73,6 +76,7 @@ export interface InvestorSnapshot {
   manager: string
   investor: string
   share: string  // BigInt from subgraph but treated as string in GraphQL
+  investmentUSD: string  // Total invested amount (cumulative deposits)
   amountUSD: string
   profitUSD: string
   profitRatio: string

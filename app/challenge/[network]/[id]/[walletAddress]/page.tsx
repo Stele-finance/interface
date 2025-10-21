@@ -597,36 +597,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
       </div>
     </div>
 
-      {/* Mobile Mint NFT Button - Show only when registered and challenge ended */}
-      {investorData?.investor && isChallengeEnded && !isMobileMenuOpen && isMounted && createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-          <div className="p-4">
-            <Button 
-              variant="default" 
-              size="lg" 
-              onClick={handleMintNFT}
-              disabled={isMinting}
-              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:hover:bg-orange-500/50 text-white border-orange-500 hover:border-orange-600 disabled:border-orange-500/50 font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-base"
-            >
-              {isMinting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Minting...
-                </>
-              ) : (
-                <>
-                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('mintNFT')}
-                </>
-              )}
-            </Button>
-          </div>
-        </div>,
-        document.body
-      )}
-
       {/* Registration Confirmation Modal */}
       <AlertDialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
         <AlertDialogContent>
