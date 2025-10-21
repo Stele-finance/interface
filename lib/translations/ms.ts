@@ -7,6 +7,7 @@ export const ms = {
   againstVotes: "Menentang",
   airdrop: "Airdrop",
   all: "Semua",
+  allFunds: "Semua Dana",
   allProposals: "Semua Cadangan",
   alreadyActive: "Sudah Aktif",
   alreadyVoted: "Sudah Mengundi",
@@ -211,6 +212,7 @@ export const ms = {
   monthly: "Bulanan",
   months: "bulan",
   myAccount: "Akaun Saya",
+  myFunds: "Dana Saya",
   myNFTs: "NFT Saya",
   myPortfolio: "Portfolio",
   myPortfolios: "Portfolio Saya",
@@ -225,11 +227,13 @@ export const ms = {
   nftMintedSuccessfully: "NFT Berjaya Dicipta",
   no: "Tidak",
   noActiveProposalsFound: "Tiada cadangan aktif dijumpai.",
+  noActiveFundsAvailable: "Tiada dana aktif tersedia.",
   noChallengesFound: "Tiada cabaran dijumpai",
   noChallengesFoundPortfolio: "Tiada cabaran dijumpai",
   noCompletedProposalsFound: "Tiada cadangan selesai dijumpai.",
   noCreditAccess: "Ketidakupayaan untuk mengakses perkhidmatan kewangan bagi mereka yang tidak mempunyai sejarah kredit",
   noDataAvailable: "Tiada data tersedia",
+  noFundsFound: "Tiada dana dijumpai",
   noInvestableTokensFound: "Tiada token pelaburan dijumpai",
   noInvestorsFound: "Tiada pelabur dijumpai untuk dana ini",
   noNFTsFound: "Tiada NFT Dijumpai",
@@ -470,5 +474,6 @@ export const ms = {
   yourPositionLive: "Kedudukan anda (langsung)",
   yourPositionRegistered: "Kedudukan anda (berdaftar)",
   yourUSDCBalance: "Baki USDC anda",
-  yes: "Ya"
+  yes: "Ya",
+  youHaventCreatedAnyFunds: "Anda belum mencipta sebarang dana lagi."
 } as const;

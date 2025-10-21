@@ -7,6 +7,7 @@ export const jp = {
   againstVotes: "反対",
   airdrop: "エアドロップ",
   all: "すべて",
+  allFunds: "すべてのファンド",
   allProposals: "すべての提案",
   alreadyActive: "既にアクティブ",
   alreadyVoted: "既に投票済み",
@@ -211,6 +212,7 @@ export const jp = {
   monthShort: "月",
   months: "月",
   myAccount: "マイアカウント",
+  myFunds: "マイファンド",
   myNFTs: "マイNFT",
   myPortfolio: "ポートフォリオ",
   myPortfolios: "マイポートフォリオ",
@@ -225,11 +227,13 @@ export const jp = {
   nftMintedSuccessfully: "NFTが正常に作成されました",
   no: "いいえ",
   noActiveProposalsFound: "アクティブな提案が見つかりません。",
+  noActiveFundsAvailable: "アクティブなファンドがありません。",
   noChallengesFound: "チャレンジが見つかりません",
   noChallengesFoundPortfolio: "チャレンジが見つかりません",
   noCompletedProposalsFound: "完了した提案が見つかりません。",
   noCreditAccess: "クレジット履歴のない人々の金融サービスアクセス不能",
   noDataAvailable: "データがありません",
+  noFundsFound: "ファンドが見つかりません",
   noInvestableTokensFound: "投資可能トークンが見つかりません",
   noInvestorsFound: "このファンドで投資家が見つかりません",
   noNFTsFound: "NFTが見つかりません",
@@ -470,5 +474,6 @@ export const jp = {
   yourPositionLive: "あなたのポジション（ライブ）",
   yourPositionRegistered: "あなたのポジション（登録済み）",
   yourUSDCBalance: "あなたのUSDC残高",
-  yes: "はい"
+  yes: "はい",
+  youHaventCreatedAnyFunds: "まだファンドを作成していません。"
 } as const;

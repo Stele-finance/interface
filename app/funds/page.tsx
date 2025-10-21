@@ -1,26 +1,20 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import { Coins } from "lucide-react"
+import dynamicImport from "next/dynamic"
+
+// Force dynamic rendering to avoid SSR issues with wallet hooks
+export const dynamic = 'force-dynamic'
+
+const FundsClientComponents = dynamicImport(
+  () => import("./components/FundsClientComponents").then(mod => ({ default: mod.FundsClientComponents })),
+  { ssr: false }
+)
 
 export default function FundsPage() {
-  const router = useRouter()
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <Coins className="h-16 w-16 text-blue-500" />
-        <h1 className="text-3xl font-bold">Funds</h1>
-        <p className="text-muted-foreground text-center max-w-md">
-          Funds page is under development. Please check back later.
-        </p>
-        <Button 
-          onClick={() => router.push('/dashboard/fund')}
-          className="bg-blue-500 hover:bg-blue-600"
-        >
-          Go to Fund Dashboard
-        </Button>
+    <div className="container mx-auto p-6 py-16">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <FundsClientComponents />
       </div>
     </div>
   )
