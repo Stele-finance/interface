@@ -7,6 +7,7 @@ export const it = {
   address: "Indirizzo",
   againstVotes: "Contrari",
   all: "Tutti",
+  allFunds: "Tutti i Fondi",
   allProposals: "Tutte le Proposte",
   alreadyActive: "Già Attivo",
   alreadyVoted: "Già Votato",
@@ -209,6 +210,7 @@ export const it = {
   months: "mesi",
   monthShort: "m",
   myAccount: "Il Mio Account",
+  myFunds: "I Miei Fondi",
   myNFTs: "I Miei NFT",
   myPortfolio: "Portafoglio",
   myPortfolios: "I Miei Portafogli",
@@ -223,11 +225,13 @@ export const it = {
   nftMintedSuccessfully: "NFT Creato con Successo",
   no: "No",
   noActiveProposalsFound: "Nessuna proposta attiva trovata.",
+  noActiveFundsAvailable: "Nessun fondo attivo disponibile.",
   noChallengesFound: "Nessuna sfida trovata",
   noChallengesFoundPortfolio: "Nessuna sfida trovata",
   noCreditAccess: "Incapacità di accedere ai servizi finanziari per coloro senza storia creditizia",
   noCompletedProposalsFound: "Nessuna proposta completata trovata.",
   noDataAvailable: "Nessun dato disponibile",
+  noFundsFound: "Nessun fondo trovato",
   noInvestableTokensFound: "Nessun token investibile trovato",
   noInvestorsFound: "Nessun investitore trovato per questa sfida",
   noNFTsFound: "Nessun NFT Trovato",
@@ -470,5 +474,6 @@ export const it = {
   yourPositionLive: "La tua posizione (live)",
   yourPositionRegistered: "La tua posizione (registrata)",
   yourUSDCBalance: "Il tuo saldo USDC",
-  yes: "Sì"
+  yes: "Sì",
+  youHaventCreatedAnyFunds: "Non hai ancora creato nessun fondo."
 } as const; 

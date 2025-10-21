@@ -7,6 +7,7 @@ export const zhTw = {
   againstVotes: "反對票",
   airdrop: "空投",
   all: "全部",
+  allFunds: "所有基金",
   allProposals: "所有提案",
   alreadyActive: "已經活躍",
   alreadyVoted: "已經投票",
@@ -211,6 +212,7 @@ export const zhTw = {
   months: "個月",
   monthShort: "月",
   myAccount: "我的帳戶",
+  myFunds: "我的基金",
   myNFTs: "我的 NFT",
   myPortfolio: "投資組合",
   myPortfolios: "我的投資組合",
@@ -225,11 +227,13 @@ export const zhTw = {
   nftMintedSuccessfully: "NFT 鑄造成功",
   no: "否",
   noActiveProposalsFound: "未找到活躍提案。",
+  noActiveFundsAvailable: "無可用活躍基金",
   noChallengesFound: "未找到挑戰",
   noChallengesFoundPortfolio: "未找到挑戰",
   noCompletedProposalsFound: "未找到已完成的提案。",
   noCreditAccess: "沒有信用記錄的人無法獲得金融服務",
   noDataAvailable: "無可用數據",
+  noFundsFound: "未找到基金",
   noInvestableTokensFound: "未找到可投資代幣",
   noInvestorsFound: "未找到此基金的投資者",
   noNFTsFound: "未找到 NFT",
@@ -470,5 +474,6 @@ export const zhTw = {
   yourPositionActive: "您的倉位（活躍）",
   yourPositionLive: "您的倉位（即時）",
   yourPositionRegistered: "您的倉位（已註冊）",
-  yourUSDCBalance: "您的 USDC 餘額"
+  yourUSDCBalance: "您的 USDC 餘額",
+  youHaventCreatedAnyFunds: "您還未創建任何基金"
 } as const;

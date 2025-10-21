@@ -7,6 +7,7 @@ export const nl = {
   address: "Adres",
   againstVotes: "Tegen",
   all: "Alle",
+  allFunds: "Alle Fondsen",
   allProposals: "Alle Voorstellen",
   alreadyActive: "Al Actief",
   alreadyVoted: "Al Gestemd",
@@ -212,6 +213,7 @@ export const nl = {
   months: "maanden",
   monthShort: "mnd",
   myAccount: "Mijn Account",
+  myFunds: "Mijn Fondsen",
   myPortfolio: "Portfolio",
   myPortfolios: "Mijn Portfolio's",
   myNFTs: "Mijn NFT's",
@@ -228,11 +230,13 @@ export const nl = {
   next: "Volgende",
   no: "Nee",
   noActiveProposalsFound: "Geen actieve voorstellen gevonden.",
+  noActiveFundsAvailable: "Geen actieve fondsen beschikbaar.",
   noChallengesFound: "Geen uitdagingen gevonden",
   noChallengesFoundPortfolio: "Geen Uitdagingen Gevonden",
   noCompletedProposalsFound: "Geen voltooide voorstellen gevonden.",
   noCreditAccess: "Onmogelijkheid om toegang te krijgen tot financiële diensten voor degenen zonder kredietgeschiedenis",
   noDataAvailable: "Geen gegevens beschikbaar",
+  noFundsFound: "Geen fondsen gevonden",
   noInvestableTokensFound: "Geen investeerbare tokens gevonden",
   noInvestorsFound: "Geen investeerders gevonden voor dit fonds",
   noPortfolioData: "Geen portfolio gegevens beschikbaar",
@@ -470,5 +474,6 @@ export const nl = {
   yourPositionLive: "Uw Positie (Live)",
   yourPositionRegistered: "Uw Positie (Geregistreerd)",
   yourUSDCBalance: "Uw USDC Saldo",
-  yes: "Ja"
+  yes: "Ja",
+  youHaventCreatedAnyFunds: "U heeft nog geen fondsen aangemaakt."
 } as const;

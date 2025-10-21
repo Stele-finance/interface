@@ -52,19 +52,22 @@ export interface InvestorPortfolioData {
 
 export function useInvestorPortfolio(investor: string, limit: number = 100, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
   const subgraphUrl = getSubgraphUrl(network)
-  
+
   return useQuery<InvestorPortfolioData>({
     queryKey: ['investorPortfolio', investor, limit, network],
     queryFn: async () => {
+      // Convert address to lowercase for subgraph query
+      const lowercaseInvestor = investor.toLowerCase()
+
       return await request(
-        subgraphUrl, 
-        INVESTOR_PORTFOLIO_QUERY, 
+        subgraphUrl,
+        INVESTOR_PORTFOLIO_QUERY,
         {
-          investor,
+          investor: lowercaseInvestor,
           first: limit,
           orderBy: 'updatedAtTimestamp',
           orderDirection: 'desc'
-        }, 
+        },
         getChallengeHeaders()
       )
     },
