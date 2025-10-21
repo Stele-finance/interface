@@ -800,64 +800,52 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         setWalletAddress(userAddress);
       }
 
-      // Get wallet's current network
-      const walletChainId = await provider.send('eth_chainId', []);
-      const expectedChainId = network === 'arbitrum' ? '0xa4b1' : '0x1';
-      
-      // If wallet is on wrong network, switch to URL-based network
-      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-        try {
-          // Request network switch
-          await provider.send('wallet_switchEthereumChain', [
-            { chainId: expectedChainId }
-          ]);
-        } catch (switchError: any) {
-          // If network doesn't exist in wallet (error 4902), add it
-          if (switchError.code === 4902) {
-            try {
-              const networkParams = network === 'arbitrum' ? {
-                chainId: expectedChainId,
-                chainName: 'Arbitrum One',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-                blockExplorerUrls: ['https://arbiscan.io']
-              } : {
-                chainId: expectedChainId,
-                chainName: 'Ethereum Mainnet',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-                blockExplorerUrls: ['https://etherscan.io']
-              };
-              
-              await provider.send('wallet_addEthereumChain', [networkParams]);
-            } catch (addError) {
-              const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-            }
-          } else if (switchError.code === 4001) {
-            // User rejected the switch
-            const networkName = network === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Please switch to ${networkName} network to claim rewards.`);
-          } else {
-            throw switchError;
-          }
-        }
-      }
-      
-      // Get signer after ensuring correct network
-      const signer = await provider.getSigner()
-
       // Filter network to supported types for contracts (exclude 'solana')
       const contractNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum';
-      
+
+      // Always switch to the selected network before making the transaction
+      const targetChainId = contractNetwork === 'arbitrum' ? 42161 : 1;
+
+      // Try to switch to the selected network
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ]);
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          // Network not added to wallet, add it
+          const networkConfig = contractNetwork === 'arbitrum' ? {
+            chainId: '0xa4b1',
+            chainName: 'Arbitrum One',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io/']
+          } : {
+            chainId: '0x1',
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.infura.io/v3/'],
+            blockExplorerUrls: ['https://etherscan.io/']
+          };
+
+          await provider.send('wallet_addEthereumChain', [networkConfig]);
+        } else if (switchError.code === 4001) {
+          // User rejected the network switch
+          const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Please switch to ${networkName} network to claim rewards.`);
+        } else {
+          throw switchError;
+        }
+      }
+
+      // Get a fresh provider after network switch to ensure we're on the correct network
+      const updatedProvider = await getProvider();
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch');
+      }
+
+      const signer = await updatedProvider.getSigner()
+
       // Create contract instance
       const steleContract = new ethers.Contract(
         getSteleContractAddress(contractNetwork),
