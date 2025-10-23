@@ -25,24 +25,6 @@ export const handleDelegate = async (
       throw new Error("No provider available. Please connect your wallet first.");
     }
 
-    // Get wallet's current network to ensure it matches selected network
-    const walletChainId = await provider.send('eth_chainId', []);
-    const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-
-    // Check if wallet is on the correct network
-    if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-      const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-      const currentNetworkName = walletChainId === '0xa4b1' ? 'Arbitrum' : walletChainId === '0x1' ? 'Ethereum' : 'Unknown';
-
-      toast({
-        variant: "destructive",
-        title: t('wrongNetwork'),
-        description: `${t('pleaseSwitchTo')} ${networkName}. ${t('currentNetwork')}: ${currentNetworkName}`,
-      });
-
-      throw new Error(`Please switch to ${networkName} network. Current network: ${currentNetworkName}`);
-    }
-
     // Connect to provider with signer (same as create proposal)
     const signer = await provider.getSigner()
 
