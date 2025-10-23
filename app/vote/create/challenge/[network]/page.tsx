@@ -399,54 +399,14 @@ export default function CreateProposalPage({ params }: CreateProposalPageProps) 
     setIsSubmitting(true)
     
     try {
-      // Get provider and signer
-      const provider = await getProvider()
+      // Get provider - same as queue transaction
+      const provider = await getProvider();
       if (!provider) {
-        throw new Error('No provider available')
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
-      // Always switch to the selected network before making the transaction
-      const targetChainId = contractNetwork === 'arbitrum' ? 42161 : 1
-
-      // Try to switch to the selected network
-      try {
-        await provider.send('wallet_switchEthereumChain', [
-          { chainId: `0x${targetChainId.toString(16)}` }
-        ])
-      } catch (switchError: any) {
-        if (switchError.code === 4902) {
-          // Network not added to wallet, add it
-          const networkConfig = contractNetwork === 'arbitrum' ? {
-            chainId: '0xa4b1',
-            chainName: 'Arbitrum One',
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-            blockExplorerUrls: ['https://arbiscan.io/']
-          } : {
-            chainId: '0x1',
-            chainName: 'Ethereum Mainnet',
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://mainnet.infura.io/v3/'],
-            blockExplorerUrls: ['https://etherscan.io/']
-          }
-
-          await provider.send('wallet_addEthereumChain', [networkConfig])
-        } else if (switchError.code === 4001) {
-          // User rejected the network switch
-          const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'
-          throw new Error(`Please switch to ${networkName} network to create proposal.`)
-        } else {
-          throw switchError
-        }
-      }
-
-      // Get a fresh provider after network switch to ensure we're on the correct network
-      const updatedProvider = await getProvider()
-      if (!updatedProvider) {
-        throw new Error('Failed to get provider after network switch')
-      }
-
-      const signer = await updatedProvider.getSigner()
+      // Connect to provider with signer
+      const signer = await provider.getSigner()
 
       // Create contract instance with URL-based network
       const governorContract = new ethers.Contract(
