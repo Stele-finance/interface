@@ -617,7 +617,7 @@ export function Header() {
                   <ImageIcon className="h-5 w-5 mr-3" />
                   NFTs
                 </Link>
-                
+{/*                 
                 <Link 
                   href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -630,7 +630,7 @@ export function Header() {
                 >
                   <Vote className="h-5 w-5 mr-3" />
                   {t('vote')}
-                </Link>
+                </Link> */}
               </div>
                
               {/* Separator */}
