@@ -300,7 +300,7 @@ export function Header() {
             {pageType === 'fund' ? t('funds') : t('challenges')}
           </Link>
           
-          <Link 
+          <Link
             href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
@@ -312,8 +312,8 @@ export function Header() {
             <ImageIcon className="h-5 w-5" />
             NFTs
           </Link>
-          
-          <Link 
+
+          <Link
             href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
@@ -325,7 +325,7 @@ export function Header() {
             <Vote className="h-5 w-5" />
             {t('vote')}
           </Link>
-          
+
         </nav>
       </div>
 
@@ -509,8 +509,8 @@ export function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-16 bg-muted/80 border-gray-600 z-[60]">
-            <DropdownMenuItem asChild>
-              <Link 
+            {/* <DropdownMenuItem asChild>
+              <Link
                 href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                 className="cursor-pointer"
               >
@@ -518,7 +518,7 @@ export function Header() {
                 {t('vote')}
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator /> */}
             <DropdownMenuItem asChild>
               <Link 
                 href="https://github.com/Stele-finance/interface"
