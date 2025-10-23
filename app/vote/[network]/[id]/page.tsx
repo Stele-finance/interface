@@ -447,20 +447,20 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsDelegating(true)
 
     try {
-      // Get wallet provider (already wrapped in BrowserProvider by useWallet)
-      const browserProvider = await getProvider();
-      if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+      // Get provider and signer
+      const provider = await getProvider()
+      if (!provider) {
+        throw new Error('No provider available')
       }
 
       // Always switch to the selected network before making the transaction
-      const targetChainId = contractNetwork === 'arbitrum' ? 42161 : 1;
+      const targetChainId = contractNetwork === 'arbitrum' ? 42161 : 1
 
       // Try to switch to the selected network
       try {
-        await browserProvider.send('wallet_switchEthereumChain', [
+        await provider.send('wallet_switchEthereumChain', [
           { chainId: `0x${targetChainId.toString(16)}` }
-        ]);
+        ])
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           // Network not added to wallet, add it
@@ -476,39 +476,40 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
             nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
             rpcUrls: ['https://mainnet.infura.io/v3/'],
             blockExplorerUrls: ['https://etherscan.io/']
-          };
+          }
 
-          await browserProvider.send('wallet_addEthereumChain', [networkConfig]);
+          await provider.send('wallet_addEthereumChain', [networkConfig])
         } else if (switchError.code === 4001) {
           // User rejected the network switch
-          const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-          throw new Error(`Please switch to ${networkName} network to delegate tokens.`);
+          const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'
+          throw new Error(`Please switch to ${networkName} network to delegate tokens.`)
         } else {
-          throw switchError;
+          throw switchError
         }
       }
 
       // Get a fresh provider after network switch to ensure we're on the correct network
-      const updatedProvider = await getProvider();
+      const updatedProvider = await getProvider()
       if (!updatedProvider) {
-        throw new Error('Failed to get provider after network switch');
+        throw new Error('Failed to get provider after network switch')
       }
 
-      const signer = await updatedProvider.getSigner();
-      const userAddress = await signer.getAddress();
+      const signer = await updatedProvider.getSigner()
 
       // Get the correct token address based on page type
       const steleTokenAddress = pageType === 'fund'
         ? getSteleFundTokenAddress(contractNetwork)
         : getSteleTokenAddress(contractNetwork)
 
+      // Create contract instance
       const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
-      // Delegate to self
-      const tx = await votesContract.delegate(userAddress)
+      // Delegate to self - get address from signer
+      const signerAddress = await signer.getAddress()
+      const tx = await votesContract.delegate(signerAddress)
 
       // Wait for transaction confirmation
-      await tx.wait()
+      const receipt = await tx.wait()
 
       // Refresh voting power after delegation
       setTimeout(() => {
@@ -517,6 +518,27 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
     } catch (error: any) {
       console.error("Delegation error:", error)
+
+      // Show user-friendly error message
+      let errorMessage = 'Failed to delegate tokens'
+
+      if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+        // User rejected transaction - this is normal, don't show error
+        return // Exit without showing error
+      } else if (error.message) {
+        if (error.message.includes('user denied') || error.message.includes('rejected')) {
+          return // Exit without showing error
+        }
+        errorMessage = error.message
+      } else if (error.code === -32603) {
+        errorMessage = 'Internal error occurred'
+      } else if (error.code === -32000) {
+        errorMessage = 'Insufficient funds for gas'
+      }
+
+      // Log error to console
+      console.error(`Delegation Error: ${errorMessage}`)
+      alert(`Delegation failed: ${errorMessage}`)
     } finally {
       // Always ensure loading state is cleared, even if there are unexpected errors
       setIsDelegating(false)
