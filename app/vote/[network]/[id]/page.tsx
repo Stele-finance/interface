@@ -453,6 +453,33 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
+      // Try to get address from signer first before requesting accounts
+      let userAddress: string | null = null;
+
+      try {
+        const signer = await browserProvider.getSigner();
+        userAddress = await signer.getAddress();
+      } catch (error: any) {
+        console.warn('Could not get address from signer, requesting accounts:', error);
+
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
+        }
+
+        // Only request accounts if we can't get address from signer
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
+
+        if (!accounts || accounts.length === 0) {
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
+        }
+        userAddress = accounts[0];
+      }
+
+      if (!userAddress) {
+        throw new Error('Could not determine user address');
+      }
+
       // Get wallet's current network and switch if needed
       const walletChainId = await browserProvider.send('eth_chainId', []);
       const expectedChainId = contractNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
@@ -513,7 +540,6 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       // Get signer from updated provider
       const signer = await updatedProvider.getSigner()
-      const userAddress = await signer.getAddress();
 
       // Get the correct token address based on page type
       const steleTokenAddress = pageType === 'fund'
@@ -522,7 +548,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
 
       const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
-      // Delegate to self (use userAddress from signer)
+      // Delegate to self (use userAddress obtained earlier)
       const tx = await votesContract.delegate(userAddress)
 
       // Wait for transaction confirmation
