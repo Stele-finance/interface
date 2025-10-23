@@ -532,14 +532,8 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         }
       }
 
-      // Get a fresh provider after network switch to ensure we're on the correct network
-      const updatedProvider = await getProvider();
-      if (!updatedProvider) {
-        throw new Error('Failed to get provider after network switch');
-      }
-
-      // Get signer from updated provider
-      const signer = await updatedProvider.getSigner()
+      // Use existing browserProvider and get signer
+      const signer = await browserProvider.getSigner();
 
       // Get the correct token address based on page type
       const steleTokenAddress = pageType === 'fund'
