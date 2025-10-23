@@ -449,22 +449,21 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     try {
       // Get current connected address from wallet and provider
       let currentConnectedAddress: string;
-      let browserProvider: any;
-      
+
+      // Get wallet provider (already wrapped in BrowserProvider by useWallet)
+      const browserProvider = await getProvider();
+      if (!browserProvider) {
+        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+      }
+
       if (walletType === 'walletconnect') {
         // For WalletConnect, use the address from useWallet hook
         if (!address) {
           throw new Error("No WalletConnect address available")
         }
         currentConnectedAddress = address;
-        browserProvider = getProvider();
       } else {
-        // For MetaMask and Phantom, use provider method
-        browserProvider = getProvider();
-        if (!browserProvider) {
-          throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-        }
-
+        // For other wallets, get accounts from provider
         const accounts = await browserProvider.send('eth_requestAccounts', [])
         if (!accounts || accounts.length === 0) {
           throw new Error(`No accounts connected in ${walletType} wallet. Please connect your wallet first.`)
@@ -472,11 +471,7 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         currentConnectedAddress = accounts[0];
       }
 
-      if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-      }
-
-      // Use browserProvider and get signer
+      // Get signer from BrowserProvider
       const signer = await browserProvider.getSigner()
       const votesContract = new ethers.Contract(getSteleTokenAddress(contractNetwork), ERC20VotesABI.abi, signer)
 
@@ -525,22 +520,21 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     try {
       // Get current connected address from wallet and provider
       let currentConnectedAddress: string;
-      let browserProvider: any;
-      
+
+      // Get wallet provider (already wrapped in BrowserProvider by useWallet)
+      const browserProvider = await getProvider();
+      if (!browserProvider) {
+        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+      }
+
       if (walletType === 'walletconnect') {
         // For WalletConnect, use the address from useWallet hook
         if (!address) {
           throw new Error("No WalletConnect address available")
         }
         currentConnectedAddress = address;
-        browserProvider = getProvider();
       } else {
-        // For MetaMask and Phantom, use provider method
-        browserProvider = getProvider();
-        if (!browserProvider) {
-          throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-        }
-
+        // For other wallets, get accounts from provider
         const accounts = await browserProvider.send('eth_requestAccounts', [])
         if (!accounts || accounts.length === 0) {
           throw new Error(`No accounts connected in ${walletType} wallet`)
@@ -548,14 +542,10 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
         currentConnectedAddress = accounts[0];
       }
 
-      if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
-      }
-      
-      // Use browserProvider and get signer
+      // Get signer from BrowserProvider
       const signer = await browserProvider.getSigner()
       // Get the correct governance contract address based on pageType
-      const governanceAddress = pageType === 'fund' 
+      const governanceAddress = pageType === 'fund'
         ? getSteleFundGovernanceAddress(contractNetwork)
         : getGovernanceContractAddress(contractNetwork)
       
