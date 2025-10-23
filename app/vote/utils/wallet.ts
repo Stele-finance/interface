@@ -19,87 +19,20 @@ export const handleDelegate = async (
   }
 
   try {
-    // WalletConnect only - use getProvider from useWallet hook
+    // Get provider - same as create proposal
     const provider = await getProvider();
     if (!provider) {
       throw new Error("No provider available. Please connect your wallet first.");
     }
 
-    // Get wallet's current network
-    const walletChainId = await provider.send('eth_chainId', []);
-    const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-    
-    // If wallet is on wrong network, switch to selected network
-    if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-      try {
-        // Request network switch
-        await provider.send('wallet_switchEthereumChain', [
-          { chainId: expectedChainId }
-        ]);
-      } catch (switchError: any) {
-        // If network doesn't exist in wallet (error 4902), add it
-        if (switchError.code === 4902) {
-          try {
-            const networkParams = subgraphNetwork === 'arbitrum' ? {
-              chainId: expectedChainId,
-              chainName: 'Arbitrum One',
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18
-              },
-              rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-              blockExplorerUrls: ['https://arbiscan.io']
-            } : {
-              chainId: expectedChainId,
-              chainName: 'Ethereum Mainnet',
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18
-              },
-              rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-              blockExplorerUrls: ['https://etherscan.io']
-            };
-            
-            await provider.send('wallet_addEthereumChain', [networkParams]);
-          } catch (addError) {
-            const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-          }
-        } else if (switchError.code === 4001) {
-          // User rejected the switch
-          const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-          throw new Error(`Please switch to ${networkName} network to delegate tokens.`);
-        } else {
-          throw switchError;
-        }
-      }
-    }
-    
-    // Try to get signer first, only request accounts if needed
-    let signer;
-    try {
-      signer = await provider.getSigner();
-      await signer.getAddress(); // Verify we can get address
-    } catch (error: any) {
-      console.warn('Could not get signer, requesting accounts:', error);
-      
-      // Check if user rejected the request
-      if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
-        throw new Error("Connection request was rejected by user");
-      }
-      
-      // Request wallet connection as fallback
-      await provider.send('eth_requestAccounts', [])
-      signer = await provider.getSigner();
-    }
-    
+    // Connect to provider with signer (same as create proposal)
+    const signer = await provider.getSigner()
+
     // Get the correct token address based on page type
-    const steleTokenAddress = pageType === 'fund' 
+    const steleTokenAddress = pageType === 'fund'
       ? getSteleFundTokenAddress(subgraphNetwork)
       : getSteleTokenAddress(subgraphNetwork)
-    
+
     const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
     // Delegate to self
