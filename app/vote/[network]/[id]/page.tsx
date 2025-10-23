@@ -447,33 +447,99 @@ export default function ProposalDetailPage({ params }: ProposalDetailPageProps) 
     setIsDelegating(true)
 
     try {
-      // Get current connected address from wallet and provider
-      let currentConnectedAddress: string;
-
       // Get wallet provider (already wrapped in BrowserProvider by useWallet)
       const browserProvider = await getProvider();
       if (!browserProvider) {
         throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
       }
 
-      if (walletType === 'walletconnect') {
-        // For WalletConnect, use the address from useWallet hook
-        if (!address) {
-          throw new Error("No WalletConnect address available")
+      // Try to get address from signer first before requesting accounts
+      let currentConnectedAddress: string | null = null;
+
+      try {
+        const signer = await browserProvider.getSigner();
+        currentConnectedAddress = await signer.getAddress();
+      } catch (error: any) {
+        console.warn('Could not get address from signer, requesting accounts:', error);
+
+        // Check if user rejected the request
+        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
+          throw new Error("Connection request was rejected by user");
         }
-        currentConnectedAddress = address;
-      } else {
-        // For other wallets, get accounts from provider
-        const accounts = await browserProvider.send('eth_requestAccounts', [])
+
+        // Only request accounts if we can't get address from signer
+        const accounts = await browserProvider.send('eth_requestAccounts', []);
         if (!accounts || accounts.length === 0) {
-          throw new Error(`No accounts connected in ${walletType} wallet. Please connect your wallet first.`)
+          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
         }
         currentConnectedAddress = accounts[0];
       }
 
+      if (!currentConnectedAddress) {
+        throw new Error('Could not determine user address');
+      }
+
+      // Get wallet's current network and switch if needed
+      const walletChainId = await browserProvider.send('eth_chainId', []);
+      const expectedChainId = contractNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
+
+      // If wallet is on wrong network, switch to correct network
+      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
+        try {
+          // Request network switch
+          await browserProvider.send('wallet_switchEthereumChain', [
+            { chainId: expectedChainId }
+          ]);
+        } catch (switchError: any) {
+          // If network doesn't exist in wallet (error 4902), add it
+          if (switchError.code === 4902) {
+            try {
+              const networkParams = contractNetwork === 'arbitrum' ? {
+                chainId: expectedChainId,
+                chainName: 'Arbitrum One',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+                blockExplorerUrls: ['https://arbiscan.io']
+              } : {
+                chainId: expectedChainId,
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
+                blockExplorerUrls: ['https://etherscan.io']
+              };
+
+              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
+            } catch (addError) {
+              const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
+            }
+          } else if (switchError.code === 4001) {
+            // User rejected the switch
+            const networkName = contractNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+            throw new Error(`Please switch to ${networkName} network to delegate tokens.`);
+          } else {
+            throw switchError;
+          }
+        }
+      }
+
       // Get signer from BrowserProvider
       const signer = await browserProvider.getSigner()
-      const votesContract = new ethers.Contract(getSteleTokenAddress(contractNetwork), ERC20VotesABI.abi, signer)
+
+      // Get the correct token address based on page type
+      const steleTokenAddress = pageType === 'fund'
+        ? getSteleFundTokenAddress(contractNetwork)
+        : getSteleTokenAddress(contractNetwork)
+
+      const votesContract = new ethers.Contract(steleTokenAddress, ERC20VotesABI.abi, signer)
 
       // Delegate to self (current connected address)
       const tx = await votesContract.delegate(currentConnectedAddress)
