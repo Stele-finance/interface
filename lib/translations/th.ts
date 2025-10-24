@@ -213,6 +213,7 @@ export const th = {
   monthShort: 'เดือน',
   months: 'เดือน',
   myAccount: 'บัญชีของฉัน',
+  myChallenge: 'ความท้าทายของฉัน',
   myFunds: 'กองทุนของฉัน',
   myNFTs: 'NFT ของฉัน',
   myPortfolio: 'พอร์ตโฟลิโอของฉัน',

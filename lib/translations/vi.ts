@@ -213,6 +213,7 @@ export const vi = {
   monthShort: 'th',
   months: 'tháng',
   myAccount: 'Tài khoản của tôi',
+  myChallenge: 'Thử thách của tôi',
   myFunds: 'Quỹ của tôi',
   myNFTs: 'NFT của tôi',
   myPortfolio: 'Danh mục đầu tư của tôi',

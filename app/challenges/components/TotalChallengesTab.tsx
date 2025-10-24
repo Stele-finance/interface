@@ -26,7 +26,7 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
             onClick={() => setActiveTab('portfolio')}
             className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
           >
-            {t('myPortfolio')}
+            {t('myChallenge')}
           </button>
           <h2 className="text-3xl text-gray-100 cursor-default">{t('totalChallenges')}</h2>
         </div>
@@ -97,7 +97,7 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
             onClick={() => setActiveTab('portfolio')}
             className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
           >
-            {t('myPortfolio')}
+            {t('myChallenge')}
           </button>
           <h2 className="text-3xl text-gray-100 cursor-default">{t('totalChallenges')}</h2>
         </div>
