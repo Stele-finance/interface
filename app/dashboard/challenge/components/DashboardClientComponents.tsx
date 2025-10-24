@@ -36,9 +36,10 @@ const InvestableTokens = dynamic(
 
 interface DashboardClientComponentsProps {
   network?: 'ethereum' | 'arbitrum' | 'solana' | null
+  onNetworkChange?: (network: 'ethereum' | 'arbitrum') => void
 }
 
-export function DashboardClientComponents({ network }: DashboardClientComponentsProps) {
+export function DashboardClientComponents({ network, onNetworkChange }: DashboardClientComponentsProps) {
   const [activeTab, setActiveTab] = useState<'challenges' | 'tokens'>('challenges')
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
   const { t } = useLanguage()
@@ -51,10 +52,21 @@ export function DashboardClientComponents({ network }: DashboardClientComponents
     }
   }, [])
 
+  // Sync with parent network prop
+  useEffect(() => {
+    if (network === 'ethereum' || network === 'arbitrum') {
+      setSelectedNetwork(network)
+    }
+  }, [network])
+
   // Save network selection to localStorage when it changes
   const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
     setSelectedNetwork(network)
     localStorage.setItem('selected-network', network)
+    // Notify parent component
+    if (onNetworkChange) {
+      onNetworkChange(network)
+    }
   }
 
   return (
