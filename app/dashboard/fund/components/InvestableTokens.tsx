@@ -364,17 +364,19 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
                               {token.symbol.slice(0, 2)}
                             </div>
                           )}
-                            {/* Show network icon based on selected network */}
-                            <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                              <Image 
-                                src={`/networks/small/${subgraphNetwork}.png`} 
-                                alt={subgraphNetwork}
-                                width={12}
-                                height={12}
-                                className="rounded-full"
-                                style={{ width: 'auto', height: 'auto' }}
-                              />
-                            </div>
+                            {/* Show Arbitrum network icon only when on Arbitrum */}
+                            {selectedNetwork === 'arbitrum' && (
+                              <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
+                                <Image
+                                  src="/networks/small/arbitrum.png"
+                                  alt="Arbitrum"
+                                  width={12}
+                                  height={12}
+                                  className="rounded-full"
+                                  style={{ width: 'auto', height: 'auto' }}
+                                />
+                              </div>
+                            )}
                           </div>
                           <span>{token.symbol}</span>
                         </div>

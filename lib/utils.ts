@@ -117,6 +117,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
       },
       arbitrum: {
         '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'usdc',
+        '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9': 'usdt',
         '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'weth',
         '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'wbtc',
         '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0': 'uni',
@@ -160,7 +161,7 @@ export function getTokenLogo(addressOrSymbol: string, network?: 'ethereum' | 'ar
     'ETH': 'eth',
     'WETH': 'weth',
     'USDC': 'usdc',
-    'USDT': 'usdt',
+    'USD₮0': 'usdt',
     'WBTC': 'wbtc',
     'UNI': 'uni',
     'DAI': 'dai',
