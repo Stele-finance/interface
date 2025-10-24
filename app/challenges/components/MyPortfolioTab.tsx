@@ -166,14 +166,6 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
         </td>
         <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
           <div className="flex items-center gap-2">
-            {investor.isRegistered && (
-              <Badge 
-                variant="default"
-                className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs whitespace-nowrap hover:bg-blue-500/20 hover:text-blue-400 hover:border-blue-500/30"
-              >
-                {t('registered')}
-              </Badge>
-            )}
             {(() => {
               switch (challengeStatus) {
                 case 'active':
@@ -367,7 +359,7 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
       {/* Desktop Layout */}
       <div className="hidden md:flex items-center justify-between">
         <div className="flex gap-4">
-          <h2 className="text-3xl text-gray-100 cursor-default">{t('myPortfolio')}</h2>
+          <h2 className="text-3xl text-gray-100 cursor-default">{t('myChallenge')}</h2>
           <button
             onClick={() => setActiveTab('challenges')}
             className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
@@ -438,7 +430,7 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
       <div className="md:hidden space-y-4">
         {/* Title and Tab */}
         <div className="flex gap-4">
-          <h2 className="text-3xl text-gray-100 cursor-default">{t('myPortfolio')}</h2>
+          <h2 className="text-3xl text-gray-100 cursor-default">{t('myChallenge')}</h2>
           <button
             onClick={() => setActiveTab('challenges')}
             className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"

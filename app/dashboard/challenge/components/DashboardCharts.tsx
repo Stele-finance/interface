@@ -201,7 +201,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
         <CardHeader className="pb-2 px-2 sm:px-6">
           {/* Title only */}
           <h3 className="text-3xl text-gray-100 mb-2">
-            {chartType === 'participants' ? t('users') : t('rewards')}
+            {chartType === 'participants' ? t('users') : t('totalPrize')}
           </h3>
           <div className="flex items-center justify-between">
             <CardTitle className="text-4xl text-gray-100">
@@ -230,7 +230,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     ) : (
                       <>
                         {/* <DollarSign className="h-4 w-4" /> */}
-                        {t('rewards')}
+                        {t('totalPrize')}
                       </>
                     )}
                     <ChevronDown className="h-4 w-4" />
@@ -239,7 +239,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
                   <DropdownMenuItem onClick={() => setChartType('rewards')}>
                     <DollarSign className="h-4 w-4 mr-2" />
-                    {t('rewards')}
+                    {t('totalPrize')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setChartType('participants')}>
                     <Users className="h-4 w-4 mr-2" />
@@ -387,7 +387,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                     </>
                   ) : (
                     <>
-                      {t('rewards')}
+                      {t('totalPrize')}
                     </>
                   )}
                   <ChevronDown className="h-4 w-4" />
@@ -396,7 +396,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
               <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
                 <DropdownMenuItem onClick={() => setChartType('rewards')}>
                   <DollarSign className="h-4 w-4 mr-2" />
-                  {t('rewards')}
+                  {t('totalPrize')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setChartType('participants')}>
                   <Users className="h-4 w-4 mr-2" />
