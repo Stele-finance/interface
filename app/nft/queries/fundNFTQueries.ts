@@ -17,7 +17,7 @@ export const getAllFundNFTsQuery = () => gql`{
     fundCreated
     mintedAt
     lastUpdatedAt
-    transferCount
+    transactionHash
   }
 }`
 
@@ -33,7 +33,7 @@ export interface ManagerNFT {
   fundCreated: string
   mintedAt: string
   lastUpdatedAt: string
-  transferCount: string
+  transactionHash: string
 }
 
 export interface FundNFTData {

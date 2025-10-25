@@ -1,6 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Hash } from "lucide-react"
 import { ethers } from "ethers"
 
 interface FundNFTCardProps {
@@ -19,7 +20,7 @@ interface FundNFTCardProps {
     fundCreated: string
     mintedAt: string
     lastUpdatedAt: string
-    transferCount: string
+    transactionHash: string
   }
 }
 
@@ -142,8 +143,11 @@ export function FundNFTCard({ nft }: FundNFTCardProps) {
         />
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="text-xs text-muted-foreground text-center">
-          NFT Token ID: {nft.tokenId} | Transfers: {nft.transferCount}
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <Hash className="h-3 w-3" />
+          <span className="font-mono">
+            {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
+          </span>
         </div>
       </CardContent>
     </Card>
