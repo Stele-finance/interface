@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, TrendingUp, Calendar, Hash } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
 import Image from "next/image"
 
 interface NFTCardProps {
@@ -26,8 +25,6 @@ interface NFTCardProps {
 }
 
 export function NFTCard({ nft }: NFTCardProps) {
-  const { t } = useLanguage()
-
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1: return "bg-yellow-500 text-yellow-50" // Gold
@@ -49,13 +46,13 @@ export function NFTCard({ nft }: NFTCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-4">
-        <div className="relative">
+        <div className="relative bg-black rounded-lg">
           <Image
             src={nft.imagePath}
             alt={`Performance NFT - ${nft.rank}${nft.rankSuffix} Place`}
             width={300}
-            height={200}
-            className="w-full h-48 object-cover rounded-lg"
+            height={300}
+            className="w-full h-auto object-contain rounded-lg"
             onError={(e) => {
               // Fallback to a default NFT image if the rank-specific image doesn't exist
               e.currentTarget.src = "/nft/challenge/5th.png"
