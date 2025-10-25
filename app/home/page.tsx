@@ -59,24 +59,24 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-              {t('traditionalFinanceLimitations')}:
+              {t('traditionalFinanceLimitations')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
                 <Shield className="h-8 w-8 text-red-400 mx-auto mb-4" />
-                <p className="text-red-200 text-lg">- {t('complexBankProcedures')}</p>
+                <p className="text-red-200 text-lg">{t('complexBankProcedures')}</p>
               </div>
               <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
                 <Star className="h-8 w-8 text-red-400 mx-auto mb-4" />
-                <p className="text-red-200 text-lg">- {t('highMinimumInvestment')}</p>
+                <p className="text-red-200 text-lg">{t('highMinimumInvestment')}</p>
               </div>
               <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
                 <Globe className="h-8 w-8 text-red-400 mx-auto mb-4" />
-                <p className="text-red-200 text-lg">- {t('thirdWorldInfrastructure')}</p>
+                <p className="text-red-200 text-lg">{t('thirdWorldInfrastructure')}</p>
               </div>
               <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
                 <Clock className="h-8 w-8 text-red-400 mx-auto mb-4" />
-                <p className="text-red-200 text-lg">- {t('noCreditAccess')}</p>
+                <p className="text-red-200 text-lg">{t('noCreditAccess')}</p>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
-              {t('steleInnovation')}:
+              {t('steleInnovation')}
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -151,13 +151,6 @@ export default function HomePage() {
       <section className="py-16 bg-gradient-to-br from-purple-900/30 to-blue-900/30">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              {t('userBenefits')}
-            </h2>
-            <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-12">
-              💰 {t('whatYouGet')}
-            </h3>
-
             <Card className="bg-gradient-to-br from-yellow-900/30 to-amber-900/30 border border-yellow-500/30 p-8">
               <CardContent className="space-y-8">
                 <h4 className="text-xl md:text-2xl font-bold text-yellow-300 mb-6">
@@ -176,12 +169,6 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
-
-            <div className="mt-12">
-              <h3 className="text-2xl md:text-3xl font-bold text-white">
-                {t('trueFreedom')}
-              </h3>
-            </div>
           </div>
         </div>
       </section>
