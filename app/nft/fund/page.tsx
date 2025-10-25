@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ImageIcon, ChevronDown } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useFormattedNFTData } from "../hooks/useNFTData"
-import { NFTCard } from "../components/NFTCard"
+import { useFormattedFundNFTData } from "../hooks/useFundNFTData"
+import { FundNFTCard } from "../components/FundNFTCard"
 import Image from "next/image"
 
 export default function NFTFundPage() {
@@ -34,7 +34,7 @@ export default function NFTFundPage() {
     isLoading,
     error,
     refetch
-  } = useFormattedNFTData(selectedNetwork, 'fund')
+  } = useFormattedFundNFTData(selectedNetwork)
 
   if (error) {
     return (
@@ -151,7 +151,7 @@ export default function NFTFundPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {nfts.map((nft) => (
-              <NFTCard key={nft.id} nft={nft} />
+              <FundNFTCard key={nft.id} nft={nft} />
             ))}
           </div>
         </>
