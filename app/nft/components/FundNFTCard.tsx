@@ -135,9 +135,9 @@ export function FundNFTCard({ nft }: FundNFTCardProps) {
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-      <CardHeader className="pb-0">
+      <CardHeader className="pb-0 p-0">
         <div
-          className="w-full rounded-lg overflow-hidden"
+          className="w-full aspect-[3/4] flex items-center justify-center"
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
       </CardHeader>
