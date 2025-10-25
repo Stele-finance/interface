@@ -35,9 +35,7 @@ export function useFormattedFundNFTData(network: 'ethereum' | 'arbitrum' | null 
       ...nft,
       returnRateFormatted: returnRatePercentage.toFixed(2),
       dateFormatted: date.toLocaleDateString(),
-      timestampFormatted: date.toLocaleString(),
-      // Generate NFT image path for fund
-      imagePath: `/nft/fund/1st.png`
+      timestampFormatted: date.toLocaleString()
     }
   }) || []
 
