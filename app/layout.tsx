@@ -20,8 +20,8 @@ export const dynamic = 'force-dynamic'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Stele - Decentralized Investment Challenge Platform",
-  description: "A decentralized investment challenge platform for testing cryptocurrency investment strategies",
+  title: "Stele | Become a Legend in Crypto Investment",
+  description: "Crypto investment competition and manage your own crypto funds in Blockchain",
   generator: 'v0.dev',
 }
 
