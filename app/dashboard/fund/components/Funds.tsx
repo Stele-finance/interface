@@ -17,7 +17,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useFunds } from "../hooks/useFunds"
 import { useQueryClient } from '@tanstack/react-query'
-import { Users, ChevronDown, Plus, Loader2 } from "lucide-react"
+import { Users, ChevronDown, Plus, Loader2, Coins } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -395,7 +395,10 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
                 <TableHeader>
                   <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
-                      {t('fund')}
+                      <div className="flex items-center gap-2">
+                        <Coins className="h-4 w-4 text-blue-500" />
+                        {t('fund')}
+                      </div>
                     </TableHead>
                     <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">TVL</TableHead>
                     <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
