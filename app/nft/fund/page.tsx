@@ -151,7 +151,7 @@ export default function NFTFundPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {nfts.map((nft) => (
-              <FundNFTCard key={nft.id} nft={nft} />
+              <FundNFTCard key={nft.id} nft={nft} network={selectedNetwork} />
             ))}
           </div>
         </>

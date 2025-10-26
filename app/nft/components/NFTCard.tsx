@@ -22,9 +22,15 @@ interface NFTCardProps {
     blockTimestamp: string
     transactionHash: string
   }
+  network?: 'ethereum' | 'arbitrum'
 }
 
-export function NFTCard({ nft }: NFTCardProps) {
+export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
+  const getExplorerUrl = (txHash: string) => {
+    const baseUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
+    return `${baseUrl}/tx/${txHash}`
+  }
+
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1: return "bg-yellow-500 text-yellow-50" // Gold
@@ -101,12 +107,17 @@ export function NFTCard({ nft }: NFTCardProps) {
         </div>
 
         <div className="pt-2 border-t border-border">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <a
+            href={getExplorerUrl(nft.transactionHash)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
             <Hash className="h-3 w-3" />
             <span className="font-mono">
               {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
             </span>
-          </div>
+          </a>
         </div>
       </CardContent>
     </Card>

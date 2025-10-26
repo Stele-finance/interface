@@ -22,9 +22,15 @@ interface FundNFTCardProps {
     lastUpdatedAt: string
     transactionHash: string
   }
+  network?: 'ethereum' | 'arbitrum'
 }
 
-export function FundNFTCard({ nft }: FundNFTCardProps) {
+export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
+  const getExplorerUrl = (txHash: string) => {
+    const baseUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
+    return `${baseUrl}/tx/${txHash}`
+  }
+
   const formatReturnRate = (returnRate: string) => {
     const rate = parseFloat(returnRate)
     const sign = rate >= 0 ? "+" : ""
@@ -143,12 +149,17 @@ export function FundNFTCard({ nft }: FundNFTCardProps) {
         />
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <a
+          href={getExplorerUrl(nft.transactionHash)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
           <Hash className="h-3 w-3" />
           <span className="font-mono">
             {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
           </span>
-        </div>
+        </a>
       </CardContent>
     </Card>
   )
