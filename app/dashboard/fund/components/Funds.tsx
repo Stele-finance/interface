@@ -3,6 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   Dialog,
@@ -447,8 +448,12 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
                           router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
                         }}
                       >
-                        <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
-                          <span className="whitespace-nowrap">{fund.fundId}</span>
+                        <TableCell className="pl-6 py-6 min-w-[120px] whitespace-nowrap">
+                          <div className="ml-6">
+                            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
+                              #{fund.fundId}
+                            </Badge>
+                          </div>
                         </TableCell>
                         <TableCell className="font-medium text-green-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
                           {formatCurrency(fund.tvl)}
