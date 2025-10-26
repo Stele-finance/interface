@@ -205,6 +205,7 @@ export const bn = {
   loadingVoteResults: "ভোটের ফলাফল লোড করা হচ্ছে...",
   loadingVotingPower: "ভোটিং শক্তি লোড করা হচ্ছে...",
   loadingWalletTokenInfo: "ওয়ালেট টোকেন তথ্য লোড করা হচ্ছে...",
+  manager: "ম্যানেজার",
   managerAndInvestor: "ম্যানেজার এবং বিনিয়োগকারী",
   managerAndInvestorDesc: "যে কেউ তাদের নিজস্ব ফান্ড তৈরি এবং পরিচালনা করতে পারে",
   manualActionRequired: "ম্যানুয়াল অ্যাকশন প্রয়োজন",

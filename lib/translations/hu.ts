@@ -205,6 +205,7 @@ export const hu = {
   loadingVoteResults: "Szavazási eredmények betöltése...",
   loadingVotingPower: "Szavazati jog betöltése...",
   loadingWalletTokenInfo: "Tárca token információ betöltése...",
+  manager: "Kezelő",
   managerAndInvestor: "Kezelő és befektető",
   managerAndInvestorDesc: "Bárki létrehozhatja és működtetheti saját alapját",
   manualActionRequired: "Kézi Műveletre Van Szükség",

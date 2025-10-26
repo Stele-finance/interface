@@ -205,6 +205,7 @@ export const he = {
   loadingVoteResults: "טוען תוצאות הצבעה...",
   loadingVotingPower: "טוען כוח הצבעה...",
   loadingWalletTokenInfo: "טוען מידע על טוקן בארנק...",
+  manager: "מנהל",
   managerAndInvestor: "מנהל ומשקיע",
   managerAndInvestorDesc: "כל אחד יכול ליצור ולנהל את הקרן שלו",
   manualActionRequired: "נדרשת פעולה ידנית",

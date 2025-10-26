@@ -205,6 +205,7 @@ export const fi = {
   loadingVoteResults: "Ladataan äänestystuloksia...",
   loadingVotingPower: "Ladataan äänioikeutta...",
   loadingWalletTokenInfo: "Ladataan lompakon token-tietoja...",
+  manager: "Johtaja",
   managerAndInvestor: "Johtaja ja sijoittaja",
   managerAndInvestorDesc: "Kuka tahansa voi luoda ja hallita omaa rahastoaan",
   manualActionRequired: "Manuaalinen Toiminta Vaaditaan",

@@ -205,6 +205,7 @@ export const ru = {
   loadingVoteResults: 'Загрузка результатов голосования',
   loadingVotingPower: 'Загрузка силы голоса',
   loadingWalletTokenInfo: 'Загрузка информации о токенах кошелька',
+  manager: "Управляющий",
   managerAndInvestor: "Управляющий и Инвестор",
   managerAndInvestorDesc: "Любой может создать и управлять своим собственным фондом",
   managerFeeLabel: 'Метка комиссии управляющего',

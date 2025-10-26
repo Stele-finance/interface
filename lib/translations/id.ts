@@ -205,6 +205,7 @@ export const id = {
   loadingVoteResults: "Memuat hasil voting...",
   loadingVotingPower: "Memuat kekuatan voting...",
   loadingWalletTokenInfo: "Memuat info token wallet...",
+  manager: "Manajer",
   managerAndInvestor: "Manajer & Investor",
   managerAndInvestorDesc: "Siapa saja dapat membuat dan mengoperasikan dana mereka sendiri",
   manualActionRequired: "Tindakan Manual Diperlukan",

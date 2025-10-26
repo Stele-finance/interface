@@ -205,6 +205,7 @@ export const fr = {
   loadingVoteResults: "Chargement des résultats de vote...",
   loadingVotingPower: "Chargement du pouvoir de vote...",
   loadingWalletTokenInfo: "Chargement des informations de token du portefeuille...",
+  manager: "Gestionnaire",
   managerAndInvestor: "Gestionnaire et Investisseur",
   managerAndInvestorDesc: "N'importe qui peut créer et gérer son propre fonds",
   manualActionRequired: "Action Manuelle Requise",

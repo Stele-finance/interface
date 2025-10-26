@@ -205,6 +205,7 @@ export const es = {
   loadingVoteResults: "Cargando resultados de votación...",
   loadingVotingPower: "Cargando poder de voto...",
   loadingWalletTokenInfo: "Cargando información de tokens de billetera...",
+  manager: "Gestor",
   managerAndInvestor: "Gestor e Inversor",
   managerAndInvestorDesc: "Cualquiera puede crear y operar su propio fondo",
   manualActionRequired: "Acción Manual Requerida",

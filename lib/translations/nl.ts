@@ -202,6 +202,7 @@ export const nl = {
   loadingVoteResults: "Stemresultaten laden...",
   loadingVotingPower: "Stemkracht laden...",
   loadingWalletTokenInfo: "Wallet token informatie laden...",
+  manager: "Beheerder",
   managerAndInvestor: "Beheerder & Investeerder",
   managerAndInvestorDesc: "Iedereen kan zijn eigen fonds aanmaken en beheren",
   manualActionRequired: "Handmatige Actie Vereist",

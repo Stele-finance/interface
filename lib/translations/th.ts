@@ -205,6 +205,7 @@ export const th = {
   loadingVoteResults: 'กำลังโหลดผลการโหวต',
   loadingVotingPower: 'กำลังโหลดอำนาจการโหวต',
   loadingWalletTokenInfo: 'กำลังโหลดข้อมูลโทเค็นในกระเป๋าเงิน',
+  manager: "ผู้จัดการ",
   managerAndInvestor: "ผู้จัดการและนักลงทุน",
   managerAndInvestorDesc: "ทุกคนสามารถสร้างและดำเนินการกองทุนของตนเองได้",
   managerFeeLabel: 'ป้ายค่าธรรมเนียมผู้จัดการ',

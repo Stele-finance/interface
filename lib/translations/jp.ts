@@ -205,6 +205,7 @@ export const jp = {
   loadingVoteResults: "投票結果を読み込み中...",
   loadingVotingPower: "投票権を読み込み中...",
   loadingWalletTokenInfo: "ウォレットトークン情報を読み込み中...",
+  manager: "マネージャー",
   managerAndInvestor: "マネージャーと投資家",
   managerAndInvestorDesc: "誰でも自分のファンドを作成して運営できます",
   managerFeeLabel: "管理手数料 (ベーシスポイント)",
