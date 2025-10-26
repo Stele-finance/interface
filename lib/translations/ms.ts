@@ -205,6 +205,7 @@ export const ms = {
   loadingVoteResults: "Memuatkan keputusan mengundi...",
   loadingVotingPower: "Memuatkan kuasa mengundi...",
   loadingWalletTokenInfo: "Memuatkan maklumat token dompet...",
+  manager: "Pengurus",
   managerAndInvestor: "Pengurus & Pelabur",
   managerAndInvestorDesc: "Sesiapa sahaja boleh mencipta dan mengendalikan dana mereka sendiri",
   managerFeeLabel: "Yuran Pengurus (mata asas)",

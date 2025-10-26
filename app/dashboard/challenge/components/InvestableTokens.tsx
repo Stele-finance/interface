@@ -214,21 +214,21 @@ export function InvestableTokens({ network, setActiveTab, selectedNetwork = 'eth
       {/* Mobile Layout */}
       <div className="md:hidden space-y-4">
         {/* Title and Tab */}
-        <div className="flex gap-4">
+        <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
           {setActiveTab && (
             <button
               type="button"
               onClick={() => setActiveTab('challenges')}
-              className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+              className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
             >
               {t('challenge')}
             </button>
           )}
-          <h2 className="text-3xl text-gray-100 cursor-default">
+          <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">
             {setActiveTab ? t('token') : t('investableTokens')}
           </h2>
           {!setActiveTab && (
-            <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border">
+            <Badge variant="secondary" className="bg-gray-700/20 text-gray-300 border-gray-500/30 text-base px-4 py-2 rounded-full border whitespace-nowrap">
               <Coins className="h-4 w-4 mr-2" />
               {tokens.length} {t('token')}
             </Badge>

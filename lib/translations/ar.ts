@@ -205,6 +205,7 @@ export const ar = {
   loadingVoteResults: "تحميل نتائج التصويت...",
   loadingVotingPower: "تحميل قوة التصويت...",
   loadingWalletTokenInfo: "تحميل معلومات رموز المحفظة...",
+  manager: "المدير",
   managerAndInvestor: "المدير والمستثمر",
   managerAndInvestorDesc: "يمكن لأي شخص إنشاء وتشغيل صندوقه الخاص",
   manualActionRequired: "مطلوب إجراء يدوي",

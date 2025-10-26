@@ -205,6 +205,7 @@ export const hi = {
   loadingVoteResults: "वोट परिणाम लोड हो रहे हैं...",
   loadingVotingPower: "वोटिंग पावर लोड हो रही है...",
   loadingWalletTokenInfo: "वॉलेट टोकन की जानकारी लोड हो रही है...",
+  manager: "प्रबंधक",
   managerAndInvestor: "प्रबंधक और निवेशक",
   managerAndInvestorDesc: "कोई भी अपना फंड बना और संचालित कर सकता है",
   manualActionRequired: "मैन्युअल कार्य आवश्यक",

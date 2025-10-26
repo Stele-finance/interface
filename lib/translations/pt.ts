@@ -202,6 +202,7 @@ export const pt = {
   loadingVoteResults: "Carregando resultados de votação...",
   loadingVotingPower: "Carregando poder de voto...",
   loadingWalletTokenInfo: "Carregando informações de tokens da carteira...",
+  manager: "Gestor",
   managerAndInvestor: "Gestor e Investidor",
   managerAndInvestorDesc: "Qualquer pessoa pode criar e operar seu próprio fundo",
   manualActionRequired: "Ação Manual Necessária",

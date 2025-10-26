@@ -205,6 +205,7 @@ export const el = {
   loadingVoteResults: "Φόρτωση αποτελεσμάτων ψηφοφορίας...",
   loadingVotingPower: "Φόρτωση ισχύος ψήφου...",
   loadingWalletTokenInfo: "Φόρτωση πληροφοριών token wallet...",
+  manager: "Διαχειριστής",
   managerAndInvestor: "Διαχειριστής & Επενδυτής",
   managerAndInvestorDesc: "Ο καθένας μπορεί να δημιουργήσει και να λειτουργήσει το δικό του ταμείο",
   manualActionRequired: "Απαιτείται Χειροκίνητη Ενέργεια",

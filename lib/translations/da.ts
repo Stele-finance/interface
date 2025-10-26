@@ -205,6 +205,7 @@ export const da = {
   loadingVoteResults: "Indlæser stemme resultater...",
   loadingVotingPower: "Indlæser stemme kraft...",
   loadingWalletTokenInfo: "Indlæser wallet token information...",
+  manager: "Forvalter",
   managerAndInvestor: "Forvalter & Investor",
   managerAndInvestorDesc: "Alle kan oprette og drive deres egen fond",
   managerFeeLabel: "Manager Fee (basis points)",

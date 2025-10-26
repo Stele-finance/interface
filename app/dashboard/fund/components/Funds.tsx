@@ -206,7 +206,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
         {/* Desktop Layout */}
         <div className="hidden md:flex items-center justify-between">
           <div className="flex gap-4">
-            <h2 className="text-3xl text-gray-100 cursor-default">Fund</h2>
+            <h2 className="text-3xl text-gray-100 cursor-default">{t('fund')}</h2>
             {setActiveTab && (
               <button
                 type="button"
@@ -291,7 +291,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
                 ) : (
                   <>
                     <Plus className="mr-3 h-5 w-5" />
-                    New
+                    {t('create')}
                   </>
                 )}
               </Button>
@@ -302,13 +302,13 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
         {/* Mobile Layout */}
         <div className="md:hidden space-y-4">
           {/* Title and Tab */}
-          <div className="flex gap-4">
-            <h2 className="text-3xl text-gray-100 cursor-default">Fund</h2>
+          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
+            <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('fund')}</h2>
             {setActiveTab && (
               <button
                 type="button"
                 onClick={() => setActiveTab('tokens')}
-                className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+                className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
               >
                 {t('token')}
               </button>
@@ -375,14 +375,14 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
             
             {/* Create Fund Button Mobile - same style as Challenge page */}
             {showCreateButton && (
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 size="lg"
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
                 onClick={handleCreateFund}
               >
                 <Plus className="mr-3 h-5 w-5" />
-                New
+                {t('create')}
               </Button>
             )}
           </div>
@@ -394,13 +394,13 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
                 <TableHeader>
                   <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
                     <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
-                      Fund
+                      {t('fund')}
                     </TableHead>
                     <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">TVL</TableHead>
                     <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
-                      Investors
+                      {t('investor')}
                     </TableHead>
-                    <TableHead className="text-gray-300 min-w-[100px] pr-6 whitespace-nowrap">Manager</TableHead>
+                    <TableHead className="text-gray-300 min-w-[100px] pr-6 whitespace-nowrap">{t('manager')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

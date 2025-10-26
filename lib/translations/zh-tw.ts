@@ -205,6 +205,7 @@ export const zhTw = {
   loadingVoteResults: "載入投票結果中...",
   loadingVotingPower: "載入投票權力中...",
   loadingWalletTokenInfo: "載入錢包代幣信息中...",
+  manager: "經理",
   managerAndInvestor: "經理與投資者",
   managerAndInvestorDesc: "任何人都可以創建和運營自己的基金",
   managerFeeLabel: "管理費（基點）",

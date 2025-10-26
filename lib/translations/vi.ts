@@ -205,6 +205,7 @@ export const vi = {
   loadingVoteResults: 'Đang tải kết quả bỏ phiếu',
   loadingVotingPower: 'Đang tải quyền bỏ phiếu',
   loadingWalletTokenInfo: 'Đang tải thông tin token ví',
+  manager: "Người quản lý",
   managerAndInvestor: "Người quản lý & Nhà đầu tư",
   managerAndInvestorDesc: "Bất kỳ ai cũng có thể tạo và vận hành quỹ của riêng mình",
   managerFeeLabel: 'Nhãn phí quản lý',

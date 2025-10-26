@@ -202,6 +202,7 @@ export const en = {
   loadingVoteResults: "Loading vote results...",
   loadingVotingPower: "Loading voting power...",
   loadingWalletTokenInfo: "Loading wallet token information...",
+  manager: "Manager",
   managerAndInvestor: "Manager & Investor",
   managerAndInvestorDesc: "Anyone can create and operate their own fund",
   manualActionRequired: "Manual Action Required",

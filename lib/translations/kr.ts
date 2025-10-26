@@ -206,6 +206,7 @@ export const kr = {
   loadingVoteResults: "투표 결과 로딩 중...",
   loadingVotingPower: "투표권 로딩 중...",
   loadingWalletTokenInfo: "지갑 토큰 정보 로딩 중...",
+  manager: "매니저",
   managerAndInvestor: "매니저 & 투자자",
   managerAndInvestorDesc: "누구나 펀드를 개설하고 운영할 수 있습니다",
   manualActionRequired: "수동 조치 필요",

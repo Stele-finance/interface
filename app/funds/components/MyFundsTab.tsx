@@ -277,11 +277,11 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
 
       {/* Mobile Layout */}
       <div className="md:hidden space-y-4">
-        <div className="flex gap-4">
-          <h2 className="text-3xl text-gray-100 cursor-default">{t('myFunds')}</h2>
+        <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
+          <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('myFunds')}</h2>
           <button
             onClick={() => setActiveTab('all-funds')}
-            className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
+            className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
           >
             {t('allFunds')}
           </button>

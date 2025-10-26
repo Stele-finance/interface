@@ -205,6 +205,7 @@ export const zhCn = {
   loadingVoteResults: '加载投票结果',
   loadingVotingPower: '加载投票权',
   loadingWalletTokenInfo: '加载钱包代币信息',
+  manager: "经理",
   managerAndInvestor: "经理和投资者",
   managerAndInvestorDesc: "任何人都可以创建和运营自己的基金",
   managerFeeLabel: '管理费标签',
