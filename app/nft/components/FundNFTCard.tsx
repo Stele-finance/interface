@@ -15,12 +15,8 @@ interface FundNFTCardProps {
     currentTVL: string
     returnRate: string
     returnRateFormatted: string
-    dateFormatted: string
-    timestampFormatted: string
     fundCreated: string
-    fundCreatedFormatted?: string
     mintedAt: string
-    mintedAtFormatted?: string
     lastUpdatedAt: string
     transactionHash: string
   }
@@ -126,10 +122,10 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
         <text x="276" y="165" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAddressShort(nft.manager)}</text>
 
         <text x="24" y="190" font-size="14" font-weight="500" fill="#9ca3af">Created</text>
-        <text x="276" y="190" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.fundCreatedFormatted || nft.fundCreated}</text>
+        <text x="276" y="190" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.fundCreated}</text>
 
         <text x="24" y="215" font-size="14" font-weight="500" fill="#9ca3af">Minted</text>
-        <text x="276" y="215" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.mintedAtFormatted || nft.dateFormatted}</text>
+        <text x="276" y="215" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.mintedAt}</text>
 
         <text x="24" y="240" font-size="14" font-weight="500" fill="#9ca3af">Return Rate</text>
         <text x="276" y="240" font-size="16" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.returnRateFormatted)}</text>
