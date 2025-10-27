@@ -30,7 +30,9 @@ export function useFormattedFundNFTData(network: 'ethereum' | 'arbitrum' | null 
 
     return {
       ...nft,
-      returnRateFormatted: returnRatePercentage.toFixed(2)
+      returnRateFormatted: returnRatePercentage.toFixed(2),
+      fundCreatedFormatted: nft.fundCreated,
+      mintedAtFormatted: nft.mintedAt
     }
   }) || []
 
