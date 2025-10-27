@@ -28,9 +28,15 @@ export function useFormattedFundNFTData(network: 'ethereum' | 'arbitrum' | null 
     // Convert returnRate: if data is 138, it should be displayed as 1.38%
     const returnRatePercentage = parseFloat(nft.returnRate) / 100
 
+    // Format timestamps to readable dates
+    const fundCreatedDate = new Date(parseInt(nft.fundCreated) * 1000)
+    const mintedAtDate = new Date(parseInt(nft.mintedAt) * 1000)
+
     return {
       ...nft,
-      returnRateFormatted: returnRatePercentage.toFixed(2)
+      returnRateFormatted: returnRatePercentage.toFixed(2),
+      fundCreatedFormatted: fundCreatedDate.toLocaleDateString(),
+      mintedAtFormatted: mintedAtDate.toLocaleDateString()
     }
   }) || []
 
