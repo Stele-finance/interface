@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Hash } from "lucide-react"
-import { ethers } from "ethers"
 
 interface FundNFTCardProps {
   nft: {
@@ -28,11 +27,15 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
     return `${baseUrl}/tx/${txHash}`
   }
 
+  // Format return rate (matches smart contract formatReturnRate)
   const formatReturnRate = (returnRate: string) => {
-    // returnRate is already a percentage string from returnRateFormatted
     const rate = parseFloat(returnRate)
-    const sign = rate >= 0 ? "+" : ""
-    return `${sign}${rate.toFixed(2)}%`
+    const sign = rate >= 0 ? "+" : "-"
+    const absRate = Math.abs(rate)
+    const whole = Math.floor(absRate)
+    const decimals = Math.floor((absRate - whole) * 100)
+    const decimalsStr = decimals < 10 ? `0${decimals}` : `${decimals}`
+    return `${sign}${whole}.${decimalsStr}%`
   }
 
   const getReturnRateSVGColor = (returnRate: string) => {
@@ -40,49 +43,51 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
     return rate >= 0 ? "#10b981" : "#ef4444"
   }
 
+  // Format USDC amount (matches smart contract formatAmount)
   const formatAmount = (amount: string) => {
-    try {
-      const value = parseFloat(ethers.formatUnits(amount, 6)) // USDC has 6 decimals
-      if (value >= 1000000) {
-        return `$${(value / 1000000).toFixed(2)}M`
-      } else if (value >= 1000) {
-        return `$${(value / 1000).toFixed(2)}K`
-      } else {
-        return `$${value.toFixed(2)}`
-      }
-    } catch {
-      return "$0.00"
-    }
-  }
+    const amountNum = parseFloat(amount)
+    const ONE_USDC = 1e6
+    const millionTokens = ONE_USDC * 1e6
+    const thousandTokens = ONE_USDC * 1e3
 
-  const formatAddressShort = (address: string) => {
-    return `${address.slice(0, 6)}...`
-  }
-
-  const calculateProfit = () => {
-    try {
-      const currentValue = parseFloat(ethers.formatUnits(nft.currentTVL, 6))
-      const investment = parseFloat(ethers.formatUnits(nft.investment, 6))
-      return currentValue - investment
-    } catch {
-      return 0
-    }
-  }
-
-  const formatProfitAmount = (profitValue: number) => {
-    const absProfit = Math.abs(profitValue)
-    if (absProfit >= 1000000) {
-      return `$${(absProfit / 1000000).toFixed(2)}M`
-    } else if (absProfit >= 1000) {
-      return `$${(absProfit / 1000).toFixed(2)}K`
+    if (amountNum >= millionTokens) { // >= 1M USDC
+      const whole = Math.floor(amountNum / millionTokens)
+      const fraction = Math.floor((amountNum % millionTokens) / (millionTokens / 100))
+      const fractionStr = fraction < 10 ? `0${fraction}` : `${fraction}`
+      return `$${whole}.${fractionStr}M`
+    } else if (amountNum >= thousandTokens) { // >= 1K USDC
+      const whole = Math.floor(amountNum / thousandTokens)
+      const fraction = Math.floor((amountNum % thousandTokens) / (thousandTokens / 100))
+      const fractionStr = fraction < 10 ? `0${fraction}` : `${fraction}`
+      return `$${whole}.${fractionStr}K`
+    } else if (amountNum >= ONE_USDC) { // >= 1 USDC
+      const whole = Math.floor(amountNum / ONE_USDC)
+      const fraction = Math.floor((amountNum % ONE_USDC) / (ONE_USDC / 100))
+      const fractionStr = fraction < 10 ? `0${fraction}` : `${fraction}`
+      return `$${whole}.${fractionStr}`
+    } else if (amountNum === 0) {
+      return '$0.00'
     } else {
-      return `$${absProfit.toFixed(2)}`
+      // Less than 1 USDC
+      const fraction = Math.floor((amountNum * 100) / ONE_USDC)
+      const fractionStr = fraction < 10 ? `0${fraction}` : `${fraction}`
+      return `$0.${fractionStr}`
     }
   }
 
-  const profit = calculateProfit()
-  const profitSign = profit >= 0 ? "+" : "-"
-  const profitColor = profit >= 0 ? "#10b981" : "#ef4444"
+  // Format address (matches smart contract addressToString - 0x1234...)
+  const formatAddressShort = (address: string) => {
+    return `${address.slice(0, 10)}...`
+  }
+
+  // Calculate profit
+  const investment = parseFloat(nft.investment)
+  const currentValue = parseFloat(nft.currentTVL)
+  const returnRate = parseFloat(nft.returnRateFormatted)
+
+  const profit = returnRate >= 0 ? currentValue - investment : investment - currentValue
+  const profitSign = returnRate >= 0 ? "+" : "-"
+  const profitColor = returnRate >= 0 ? "#10b981" : "#ef4444"
   const returnRateColor = getReturnRateSVGColor(nft.returnRateFormatted)
 
   const svgContent = `
@@ -96,9 +101,12 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
           <stop offset="0%" style="stop-color:#2a2a2e;stop-opacity:1" />
           <stop offset="100%" style="stop-color:#1f1f23;stop-opacity:1" />
         </linearGradient>
+        <filter id="cardShadow-${nft.id}">
+          <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#000" flood-opacity="0.06"/>
+        </filter>
       </defs>
 
-      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1"/>
+      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1" filter="url(#cardShadow-${nft.id})"/>
       <rect x="0" y="0" width="300" height="4" rx="12" fill="url(#orangeGradient-${nft.id})"/>
 
       <text x="24" y="40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#f9fafb">
@@ -108,8 +116,8 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
         Stele Protocol
       </text>
 
-      <rect x="24" y="85" width="${80 + nft.fundId.length * 4}" height="32" rx="16" fill="url(#orangeGradient-${nft.id})"/>
-      <text x="${64 + nft.fundId.length * 2}" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
+      <rect x="24" y="85" width="80" height="32" rx="16" fill="url(#orangeGradient-${nft.id})"/>
+      <text x="64" y="103" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
         Fund #${nft.fundId}
       </text>
 
@@ -140,7 +148,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
         <text x="276" y="320" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.currentTVL)}</text>
 
         <text x="24" y="345" font-size="14" font-weight="500" fill="#9ca3af">Profit</text>
-        <text x="276" y="345" font-size="14" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatProfitAmount(profit)}</text>
+        <text x="276" y="345" font-size="14" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatAmount(profit.toString())}</text>
       </g>
 
       <text x="150" y="380" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle">
