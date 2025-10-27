@@ -29,14 +29,17 @@ export function useFormattedFundNFTData(network: 'ethereum' | 'arbitrum' | null 
     // So divide by 100
     const returnRatePercentage = parseFloat(nft.returnRate) / 100
 
-    // Format timestamp to readable date
-    const date = new Date(parseInt(nft.mintedAt) * 1000)
+    // Format timestamps to readable dates
+    const mintedDate = new Date(parseInt(nft.mintedAt) * 1000)
+    const fundCreatedDate = new Date(parseInt(nft.fundCreated) * 1000)
 
     return {
       ...nft,
       returnRateFormatted: returnRatePercentage.toFixed(2),
-      dateFormatted: date.toLocaleDateString(),
-      timestampFormatted: date.toLocaleString()
+      dateFormatted: mintedDate.toLocaleDateString(),
+      timestampFormatted: mintedDate.toLocaleString(),
+      fundCreatedFormatted: fundCreatedDate.toLocaleDateString(),
+      mintedAtFormatted: mintedDate.toLocaleDateString()
     }
   }) || []
 
