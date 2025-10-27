@@ -38,7 +38,7 @@ export const fi = {
   challengeJoined: "Haasteeseen Liitytty",
   challengeProgress: "Haasteen Edistyminen",
   challengeProgressDesc: "Seuraa sijoitusten suorituskykyä ja kilpaile muiden sijoittajien kanssa reaaliajassa.",
-  challengeDescription: "Osallistu kryptovaluuttasijoituskilpailuihin ja voita palkintoja TOP 1-5 sijoituksista.",
+  challengeDescription: "Osallistu kryptovaluuttasijoitustaitokilpailuihin ja palkinnot jaetaan TOP 1-5 sijoituksille.",
   challenges: "Haasteet",
   challengeStatus: "Haasteen Tila",
   challengeType: "Haasteen Tyyppi",

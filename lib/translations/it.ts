@@ -38,7 +38,7 @@ export const it = {
   challengeJoined: "Sfida Partecipata",
   challengeProgress: "Progresso della Sfida",
   challengeProgressDesc: "Monitora le performance degli investimenti e competi con altri investitori in tempo reale.",
-  challengeDescription: "Partecipa a competizioni di investimento in criptovalute e vinci premi per le prime 5 posizioni.",
+  challengeDescription: "Partecipa a competizioni di abilità di investimento in criptovalute e i premi vengono distribuiti alle prime 5 posizioni.",
   challenges: "Sfide",
   challengeStatus: "Stato della Sfida",
   challengeType: "Tipo di Sfida",

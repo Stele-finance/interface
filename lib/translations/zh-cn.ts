@@ -38,7 +38,7 @@ export const zhCn = {
   challengeLinkCopiedToClipboard: '挑战链接已复制到剪贴板',
   challengeProgress: '挑战进度',
   challengeProgressDesc: '实时跟踪你的进度',
-  challengeDescription: "参加加密货币投资竞赛，赢取前1-5名奖品。",
+  challengeDescription: "参加加密货币投资技能竞赛，奖金分配给前1-5名。",
   challenges: '挑战',
   challengeStatus: '挑战状态',
   challengeType: '挑战类型',

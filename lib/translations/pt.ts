@@ -40,7 +40,7 @@ export const pt = {
   challengeJoined: "Desafio Participado",
   challengeProgress: "Progresso do Desafio",
   challengeProgressDesc: "Acompanhe o desempenho de investimento e compita com outros investidores em tempo real.",
-  challengeDescription: "Participe de competições de investimento em criptomoedas e ganhe prêmios pelas 5 primeiras colocações.",
+  challengeDescription: "Participe de competições de habilidade de investimento em criptomoedas e os prêmios são distribuídos para as 5 primeiras colocações.",
   challenges: "Desafios",
   challengeStatus: "Status do Desafio",
   challengeType: "Tipo de Desafio",

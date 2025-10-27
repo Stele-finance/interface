@@ -32,6 +32,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
   }
 
   const formatReturnRate = (returnRate: string) => {
+    // returnRate is already a percentage string from returnRateFormatted
     const rate = parseFloat(returnRate)
     const sign = rate >= 0 ? "+" : ""
     return `${sign}${rate.toFixed(2)}%`
@@ -63,16 +64,27 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
 
   const calculateProfit = () => {
     try {
-      const investment = parseFloat(ethers.formatUnits(nft.investment, 6))
       const currentValue = parseFloat(ethers.formatUnits(nft.currentTVL, 6))
+      const investment = parseFloat(ethers.formatUnits(nft.investment, 6))
       return currentValue - investment
     } catch {
       return 0
     }
   }
 
+  const formatProfitAmount = (profitValue: number) => {
+    const absProfit = Math.abs(profitValue)
+    if (absProfit >= 1000000) {
+      return `$${(absProfit / 1000000).toFixed(2)}M`
+    } else if (absProfit >= 1000) {
+      return `$${(absProfit / 1000).toFixed(2)}K`
+    } else {
+      return `$${absProfit.toFixed(2)}`
+    }
+  }
+
   const profit = calculateProfit()
-  const profitSign = profit >= 0 ? "+" : ""
+  const profitSign = profit >= 0 ? "+" : "-"
   const profitColor = profit >= 0 ? "#10b981" : "#ef4444"
   const returnRateColor = getReturnRateSVGColor(nft.returnRateFormatted)
 
@@ -131,7 +143,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
         <text x="276" y="320" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.currentTVL)}</text>
 
         <text x="24" y="345" font-size="14" font-weight="500" fill="#9ca3af">Profit</text>
-        <text x="276" y="345" font-size="14" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatAmount(Math.abs(profit).toFixed(6))}</text>
+        <text x="276" y="345" font-size="14" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatProfitAmount(profit)}</text>
       </g>
 
       <text x="150" y="380" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle">

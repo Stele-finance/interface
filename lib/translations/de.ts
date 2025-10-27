@@ -38,7 +38,7 @@ export const de = {
   challengeJoined: "Herausforderung Beigetreten",
   challengeProgress: "Challenge-Fortschritt",
   challengeProgressDesc: "Verfolgen Sie die Investmentperformance und konkurrieren Sie in Echtzeit mit anderen Investoren.",
-  challengeDescription: "Nehmen Sie an Kryptowährungs-Investitionswettbewerben teil und gewinnen Sie Preise für Top 1-5 Platzierungen.",
+  challengeDescription: "Nehmen Sie an Kryptowährungs-Investitionsfähigkeitswettbewerben teil und Preise werden an die Top 1-5 Platzierungen verteilt.",
   challenges: "Herausforderungen",
   challengeStatus: "Herausforderungs-Status",
   challengeType: "Herausforderungs-Typ",

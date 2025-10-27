@@ -38,7 +38,7 @@ export const id = {
   challengeJoined: "Tantangan Diikuti",
   challengeProgress: "Progres Tantangan",
   challengeProgressDesc: "Lacak kinerja investasi dan bersaing dengan investor lain secara real-time.",
-  challengeDescription: "Bergabunglah dalam kompetisi investasi cryptocurrency dan menangkan hadiah untuk peringkat 1-5 teratas.",
+  challengeDescription: "Bergabunglah dalam kompetisi keterampilan investasi cryptocurrency dan hadiah didistribusikan untuk peringkat 1-5 teratas.",
   challenges: "Tantangan",
   challengeStatus: "Status Tantangan",
   challengeType: "Tipe Tantangan",

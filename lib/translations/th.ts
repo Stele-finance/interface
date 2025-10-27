@@ -38,7 +38,7 @@ export const th = {
   challengeLinkCopiedToClipboard: 'ลิงก์ความท้าทายถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
   challengeProgress: 'ความคืบหน้าความท้าทาย',
   challengeProgressDesc: 'ติดตามความคืบหน้าของคุณแบบเรียลไทม์',
-  challengeDescription: "เข้าร่วมการแข่งขันการลงทุนคริปโตและชนะรางวัลสำหรับอันดับ 1-5 สูงสุด",
+  challengeDescription: "เข้าร่วมการแข่งขันทักษะการลงทุนคริปโตและรางวัลจะแจกจ่ายให้กับอันดับ 1-5 สูงสุด",
   challenges: 'ความท้าทาย',
   challengeStatus: 'สถานะความท้าทาย',
   challengeType: 'ประเภทความท้าทาย',

@@ -38,7 +38,7 @@ export const hu = {
   challengeJoined: "Csatlakozott a kihíváshoz",
   challengeProgress: "Kihívás előrehaladás",
   challengeProgressDesc: "Kövesse nyomon a befektetési teljesítményt és versenyezzen más befektetőkkel valós időben.",
-  challengeDescription: "Csatlakozzon kriptovaluta befektetési versenyekhez és nyerjen díjakat a TOP 1-5 helyezésekért.",
+  challengeDescription: "Csatlakozzon kriptovaluta befektetési készség versenyekhez és a díjak a TOP 1-5 helyezések között kerülnek elosztásra.",
   challenges: "Kihívások",
   challengeStatus: "Kihívás állapota",
   challengeType: "Kihívás típusa",

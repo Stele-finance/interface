@@ -38,7 +38,7 @@ export const ms = {
   challengeLinkCopiedToClipboard: "Pautan cabaran telah disalin ke papan keratan.",
   challengeProgress: "Kemajuan Cabaran",
   challengeProgressDesc: "Jejaki prestasi pelaburan dan bersaing dengan pelabur lain secara masa nyata.",
-  challengeDescription: "Sertai pertandingan pelaburan cryptocurrency dan menangi hadiah untuk kedudukan 1-5 teratas.",
+  challengeDescription: "Sertai pertandingan kemahiran pelaburan cryptocurrency dan hadiah diagihkan kepada kedudukan 1-5 teratas.",
   challenges: "Cabaran",
   challengeStatus: "Status Cabaran",
   challengeType: "Jenis Cabaran",

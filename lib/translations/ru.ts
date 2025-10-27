@@ -38,7 +38,7 @@ export const ru = {
   challengeLinkCopiedToClipboard: 'Ссылка на вызов скопирована в буфер обмена',
   challengeProgress: 'Прогресс вызова',
   challengeProgressDesc: 'Отслеживайте свой прогресс в реальном времени',
-  challengeDescription: "Участвуйте в конкурсах по инвестированию в криптовалюту и выигрывайте призы за топ 1-5 мест.",
+  challengeDescription: "Участвуйте в конкурсах по навыкам инвестирования в криптовалюту и призы распределяются между топ 1-5 местами.",
   challenges: 'Вызовы',
   challengeStatus: 'Статус вызова',
   challengeType: 'Тип вызова',

@@ -41,7 +41,7 @@ export const en = {
   challengeProgress: "Challenge Progress",
   challengeProgressDesc: "Track investment performance and compete with other investors in real-time.",
   challenges: "Challenges",
-  challengeDescription: "Join cryptocurrency investment competitions and win prizes for top 1-5 rankings.",
+  challengeDescription: "Join cryptocurrency investment competitions and prizes are distributed to top 1-5 rankings.",
   challengeStatus: "Challenge Status",
   challengeType: "Challenge Type",
   change24h: "24h Change",

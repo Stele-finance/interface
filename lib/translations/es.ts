@@ -38,7 +38,7 @@ export const es = {
   challengeJoined: "Desafío Unido",
   challengeProgress: "Progreso del Desafío",
   challengeProgressDesc: "Rastrea el rendimiento de las inversiones y compite con otros inversores en tiempo real.",
-  challengeDescription: "Únase a competencias de inversión en criptomonedas y gane premios por los 5 primeros lugares.",
+  challengeDescription: "Participe en competencias de habilidad de inversión en criptomonedas y los premios se distribuyen a los 5 primeros lugares.",
   challenges: "Desafíos",
   challengeStatus: "Estado del Desafío",
   challengeType: "Tipo de Desafío",
