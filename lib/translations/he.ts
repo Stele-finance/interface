@@ -38,7 +38,7 @@ export const he = {
   challengeJoined: "הצטרפות לאתגר",
   challengeProgress: "התקדמות האתגר",
   challengeProgressDesc: "עקוב אחר ביצועי ההשקעות והתחרה עם משקיעים אחרים בזמן אמת.",
-  challengeDescription: "הצטרפו לתחרויות השקעה בקריפטו וזכו בפרסים עבור המקומות 1-5 הראשונים.",
+  challengeDescription: "הצטרפו לתחרויות מיומנות השקעה בקריפטו והפרסים מחולקים למקומות 1-5 הראשונים.",
   challenges: "אתגרים",
   challengeStatus: "סטטוס האתגר",
   challengeType: "סוג האתגר",

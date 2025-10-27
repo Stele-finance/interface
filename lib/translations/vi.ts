@@ -38,7 +38,7 @@ export const vi = {
   challengeLinkCopiedToClipboard: 'Liên kết thử thách đã được sao chép vào clipboard',
   challengeProgress: 'Tiến độ thử thách',
   challengeProgressDesc: 'Theo dõi tiến độ của bạn theo thời gian thực',
-  challengeDescription: "Tham gia các cuộc thi đầu tư tiền điện tử và giành giải thưởng cho top 1-5.",
+  challengeDescription: "Tham gia các cuộc thi kỹ năng đầu tư tiền điện tử và giải thưởng được phân phối cho top 1-5.",
   challenges: 'Thử thách',
   challengeStatus: 'Trạng thái thử thách',
   challengeType: 'Loại thử thách',

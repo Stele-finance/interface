@@ -40,7 +40,7 @@ export const kr = {
   challengeJoined: "챌린지 참가됨",
   challengeProgress: "챌린지 진행 상황",
   challengeProgressDesc: "투자 성과를 추적하고 다른 투자자들과 실시간으로 경쟁하세요.",
-  challengeDescription: "암호화폐 투자 실력을 겨루는 대회에 참가하여 상위 1-5위에게 상금을 획득하세요.",
+  challengeDescription: "암호화폐 투자 실력을 겨루는 대회에 참가하여 상위 1-5위에게 상금을 분배합니다.",
   challenges: "챌린지",
   challengeStatus: "챌린지 상태",
   challengeType: "챌린지 유형",

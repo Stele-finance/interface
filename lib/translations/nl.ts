@@ -40,7 +40,7 @@ export const nl = {
   challengeJoined: "Uitdaging Aangesloten",
   challengeProgress: "Uitdaging Voortgang",
   challengeProgressDesc: "Volg investeringsprestaties en concurreer met andere investeerders in real-time.",
-  challengeDescription: "Doe mee aan cryptocurrency-investeringswedstrijden en win prijzen voor de top 1-5 rankings.",
+  challengeDescription: "Doe mee aan cryptocurrency-investeringsvaardigheidswedstrijden en prijzen worden verdeeld onder de top 1-5 rankings.",
   challenges: "Uitdagingen",
   challengeStatus: "Uitdaging Status",
   challengeType: "Uitdaging Type",

@@ -38,7 +38,7 @@ export const fr = {
   challengeJoined: "Défi Rejoint",
   challengeProgress: "Progrès du Défi",
   challengeProgressDesc: "Suivez les performances d'investissement et concurrencez avec d'autres investisseurs en temps réel.",
-  challengeDescription: "Participez à des concours d'investissement en cryptomonnaie et gagnez des prix pour les 5 premières places.",
+  challengeDescription: "Participez à des concours de compétence en investissement cryptomonnaie et les prix sont distribués aux 5 premières places.",
   challenges: "Défis",
   challengeStatus: "Statut du Défi",
   challengeType: "Type de Défi",

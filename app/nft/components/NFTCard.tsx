@@ -1,9 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Trophy, TrendingUp, Calendar, Hash } from "lucide-react"
-import Image from "next/image"
+import { Hash } from "lucide-react"
 
 interface NFTCardProps {
   nft: {
@@ -31,94 +29,104 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
     return `${baseUrl}/tx/${txHash}`
   }
 
-  const getRankColor = (rank: number) => {
-    switch (rank) {
-      case 1: return "bg-yellow-500 text-yellow-50" // Gold
-      case 2: return "bg-gray-400 text-gray-50" // Silver
-      case 3: return "bg-amber-600 text-amber-50" // Bronze
-      case 4: return "bg-blue-500 text-blue-50"
-      case 5: return "bg-purple-500 text-purple-50"
-      default: return "bg-gray-500 text-gray-50"
-    }
+  const formatReturnRate = (returnRate: string) => {
+    const rate = parseFloat(returnRate)
+    const sign = rate >= 0 ? "+" : ""
+    return `${sign}${rate.toFixed(2)}%`
   }
 
-  const getReturnRateColor = (returnRate: string) => {
+  const getReturnRateSVGColor = (returnRate: string) => {
     const rate = parseFloat(returnRate)
-    if (rate > 0) return "text-green-500"
-    if (rate < 0) return "text-red-500"
-    return "text-gray-500"
+    return rate >= 0 ? "#10b981" : "#ef4444"
   }
+
+  const formatAddressShort = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
+  const returnRateColor = getReturnRateSVGColor(nft.returnRateFormatted)
+
+  const svgContent = `
+    <svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="orangeGradient-${nft.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ff8c42;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#e55100;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="cardBackground-${nft.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#2a2a2e;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#1f1f23;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+
+      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1"/>
+      <rect x="0" y="0" width="300" height="4" rx="12" fill="url(#orangeGradient-${nft.id})"/>
+
+      <text x="24" y="40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#f9fafb">
+        Trading Performance
+      </text>
+      <text x="24" y="60" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#9ca3af">
+        Stele Protocol
+      </text>
+
+      <rect x="24" y="85" width="80" height="32" rx="16" fill="url(#orangeGradient-${nft.id})"/>
+      <text x="64" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
+        Rank ${nft.rank}
+      </text>
+
+      <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+        <text x="24" y="140" font-size="14" font-weight="500" fill="#9ca3af">Challenge</text>
+        <text x="276" y="140" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.challengeId}</text>
+
+        <text x="24" y="165" font-size="14" font-weight="500" fill="#9ca3af">Token ID</text>
+        <text x="276" y="165" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.tokenId}</text>
+
+        <text x="24" y="190" font-size="14" font-weight="500" fill="#9ca3af">Ranking</text>
+        <text x="276" y="190" font-size="14" font-weight="600" fill="url(#orangeGradient-${nft.id})" text-anchor="end">${nft.rank}${nft.rankSuffix}</text>
+
+        <text x="24" y="215" font-size="14" font-weight="500" fill="#9ca3af">Return Rate</text>
+        <text x="276" y="215" font-size="16" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.returnRateFormatted)}</text>
+      </g>
+
+      <line x1="24" y1="245" x2="276" y2="245" stroke="#404040" stroke-width="1"/>
+
+      <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+        <text x="24" y="270" font-size="14" font-weight="500" fill="#9ca3af">Owner</text>
+        <text x="276" y="270" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAddressShort(nft.user)}</text>
+
+        <text x="24" y="295" font-size="14" font-weight="500" fill="#9ca3af">Minted</text>
+        <text x="276" y="295" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.dateFormatted}</text>
+
+        <text x="24" y="320" font-size="14" font-weight="500" fill="#9ca3af">Network</text>
+        <text x="276" y="320" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${network === 'arbitrum' ? 'Arbitrum' : 'Ethereum'}</text>
+      </g>
+
+      <text x="150" y="365" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle">
+        Powered by Stele Protocol
+      </text>
+    </svg>
+  `
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-      <CardHeader className="pb-4">
-        <div className="relative bg-black rounded-lg">
-          <Image
-            src={nft.imagePath}
-            alt={`Performance NFT - ${nft.rank}${nft.rankSuffix} Place`}
-            width={300}
-            height={300}
-            className="w-full h-auto object-contain rounded-lg"
-            onError={(e) => {
-              // Fallback to a default NFT image if the rank-specific image doesn't exist
-              e.currentTarget.src = "/nft/challenge/5th.png"
-            }}
-          />
-          <div className="absolute top-2 right-2">
-            <Badge className={`${getRankColor(nft.rank)} font-bold`}>
-              <Trophy className="h-3 w-3 mr-1" />
-              {nft.rank}{nft.rankSuffix}
-            </Badge>
-          </div>
-        </div>
+      <CardHeader className="pb-0 p-0">
+        <div
+          className="w-full aspect-[3/4] flex items-center justify-center"
+          dangerouslySetInnerHTML={{ __html: svgContent }}
+        />
       </CardHeader>
-
-      <CardContent className="space-y-3">
-        <div>
-          <h3 className="font-semibold text-lg mb-1">
-            Performance NFT #{nft.tokenId}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-1">
-            Challenge #{nft.challengeId}
-          </p>
-          <p className="text-xs text-muted-foreground font-mono">
-            {nft.user.slice(0, 6)}...{nft.user.slice(-4)}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-muted-foreground">Return</p>
-              <p className={`font-semibold ${getReturnRateColor(nft.returnRateFormatted)}`}>
-                {parseFloat(nft.returnRateFormatted) > 0 ? '+' : ''}{nft.returnRateFormatted}%
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-muted-foreground">Earned</p>
-              <p className="font-semibold">{nft.dateFormatted}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-border">
-          <a
-            href={getExplorerUrl(nft.transactionHash)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-          >
-            <Hash className="h-3 w-3" />
-            <span className="font-mono">
-              {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
-            </span>
-          </a>
-        </div>
+      <CardContent className="pt-4">
+        <a
+          href={getExplorerUrl(nft.transactionHash)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Hash className="h-3 w-3" />
+          <span className="font-mono">
+            {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
+          </span>
+        </a>
       </CardContent>
     </Card>
   )

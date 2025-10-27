@@ -38,7 +38,7 @@ export const jp = {
   challengeLinkCopiedToClipboard: "チャレンジリンクがクリップボードにコピーされました。",
   challengeProgress: "チャレンジの進捗",
   challengeProgressDesc: "投資パフォーマンスを追跡し、他の投資家とリアルタイムで競争しましょう。",
-  challengeDescription: "暗号通貨投資コンテストに参加して、トップ1-5のランキングで賞品を獲得しましょう。",
+  challengeDescription: "暗号通貨投資スキル競技に参加し、上位1-5位に賞金を分配します。",
   challenges: "チャレンジ",
   challengeStatus: "チャレンジステータス",
   challengeType: "チャレンジタイプ",

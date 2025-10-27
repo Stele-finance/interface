@@ -38,7 +38,7 @@ export const zhTw = {
   challengeLinkCopiedToClipboard: "挑戰連結已複製到剪貼板。",
   challengeProgress: "挑戰進度",
   challengeProgressDesc: "追蹤投資績效並與其他投資者實時競爭。",
-  challengeDescription: "參加加密貨幣投資競賽，贏取前1-5名獎勵。",
+  challengeDescription: "參加加密貨幣投資技能競賽，獎金分配給前1-5名。",
   challenges: "挑戰",
   challengeStatus: "挑戰狀態",
   challengeType: "挑戰類型",

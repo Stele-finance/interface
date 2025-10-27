@@ -40,7 +40,7 @@ export const da = {
   challengeJoined: "Udfordring Tilmeldt",
   challengeProgress: "Udfordringsforløb",
   challengeProgressDesc: "Spor investeringsresultater og konkurrér med andre investorer i realtid.",
-  challengeDescription: "Deltag i kryptovaluta investeringskonkurrencer og vind præmier for top 1-5 placeringer.",
+  challengeDescription: "Deltag i kryptovaluta investeringsfærdigheds konkurrencer og præmier uddeles til top 1-5 placeringer.",
   challenges: "Udfordringer",
   challengeStatus: "Udfordring Status",
   challengeType: "Udfordring Type",

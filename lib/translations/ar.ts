@@ -40,7 +40,7 @@ export const ar = {
   challengeJoined: "انضم للتحدي",
   challengeProgress: "تقدم التحدي",
   challengeProgressDesc: "تتبع أداء الاستثمار وتنافس مع المستثمرين الآخرين في الوقت الفعلي.",
-  challengeDescription: "انضم إلى مسابقات الاستثمار بالعملات المشفرة واربح جوائز للمراكز 1-5 الأولى.",
+  challengeDescription: "انضم إلى مسابقات مهارات الاستثمار بالعملات المشفرة ويتم توزيع الجوائز على المراكز 1-5 الأولى.",
   challenges: "التحديات",
   challengeStatus: "حالة التحدي",
   challengeType: "نوع التحدي",
