@@ -1,7 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Hash } from "lucide-react"
+import { ExternalLink } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { NETWORK_CONTRACTS } from "@/lib/constants"
 
 interface NFTCardProps {
   nft: {
@@ -30,9 +32,16 @@ interface NFTCardProps {
 }
 
 export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
-  const getExplorerUrl = (txHash: string) => {
+  const router = useRouter()
+
+  const getNFTExplorerUrl = () => {
+    const nftAddress = NETWORK_CONTRACTS[network].STELE_PERFORMANCE_NFT_ADDRESS
     const baseUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
-    return `${baseUrl}/tx/${txHash}`
+    return `${baseUrl}/nft/${nftAddress}/${nft.tokenId}`
+  }
+
+  const handleCardClick = () => {
+    router.push(`/challenge/${network}/${nft.challengeId}/${nft.user}`)
   }
 
   // Format profit/loss percent (17 -> 0.17%)
@@ -134,20 +143,22 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-0 p-0">
         <div
-          className="w-full aspect-[3/4] flex items-center justify-center"
+          onClick={handleCardClick}
+          className="w-full aspect-[3/4] flex items-center justify-center cursor-pointer"
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
       </CardHeader>
       <CardContent className="pt-4">
         <a
-          href={getExplorerUrl(nft.transactionHash)}
+          href={getNFTExplorerUrl()}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
-          <Hash className="h-3 w-3" />
+          <ExternalLink className="h-3 w-3" />
           <span className="font-mono">
-            {nft.transactionHash.slice(0, 10)}...{nft.transactionHash.slice(-8)}
+            Token ID: {nft.tokenId}
           </span>
         </a>
       </CardContent>
