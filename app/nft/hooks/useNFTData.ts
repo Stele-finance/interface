@@ -26,20 +26,29 @@ export function useNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum',
 
 export function useFormattedNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
   const { data, isLoading, error, refetch } = useNFTData(network, context)
-  
+
   const formattedNFTs = data?.performanceNFTs.map((nft: PerformanceNFT) => {
     // Convert returnRate from raw BigInt string to percentage
     const returnRatePercentage = parseFloat(nft.returnRate) / 1e18 * 100
-    
+
+    // Calculate profit/loss percent (as percentage * 100, e.g., 17 = 0.17%)
+    const seedMoney = parseFloat(nft.seedMoney)
+    const finalScore = parseFloat(nft.finalScore)
+    const profitLossPercent = seedMoney > 0
+      ? Math.round(((finalScore - seedMoney) / seedMoney) * 10000)
+      : 0
+
     // Format timestamp to readable date
     const date = new Date(parseInt(nft.blockTimestamp) * 1000)
-    
+
     return {
       ...nft,
       returnRateFormatted: returnRatePercentage.toFixed(2),
+      profitLossPercent,
       dateFormatted: date.toLocaleDateString(),
       timestampFormatted: date.toLocaleString(),
       rankSuffix: getRankSuffix(nft.rank),
+      challengePeriod: getChallengePeriod(nft.challengeType),
       // Generate NFT image path based on rank and context
       imagePath: `/nft/${context}/${getRankImageName(nft.rank)}.png`
     }
@@ -77,5 +86,16 @@ function getRankImageName(rank: number): string {
     case 4: return '4th'
     case 5: return '5th'
     default: return '5th' // Default fallback image
+  }
+}
+
+function getChallengePeriod(challengeType: number): string {
+  switch (challengeType) {
+    case 0: return "1 Week"
+    case 1: return "1 Month"
+    case 2: return "3 Months"
+    case 3: return "6 Months"
+    case 4: return "1 Year"
+    default: return "Unknown"
   }
 }

@@ -8,13 +8,19 @@ interface NFTCardProps {
     id: string
     tokenId: string
     challengeId: string
+    challengeType: number
     user: string
+    totalUsers: number
     rank: number
+    seedMoney: string
+    finalScore: string
     returnRate: string
     returnRateFormatted: string
+    profitLossPercent: number
     dateFormatted: string
     timestampFormatted: string
     rankSuffix: string
+    challengePeriod: string
     imagePath: string
     blockNumber: string
     blockTimestamp: string
@@ -29,22 +35,36 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
     return `${baseUrl}/tx/${txHash}`
   }
 
-  const formatReturnRate = (returnRate: string) => {
-    const rate = parseFloat(returnRate)
-    const sign = rate >= 0 ? "+" : ""
-    return `${sign}${rate.toFixed(2)}%`
+  // Format profit/loss percent (17 -> 0.17%)
+  const formatReturnRate = (profitLossPercent: number) => {
+    const percentValue = profitLossPercent / 100
+    const sign = percentValue >= 0 ? "+" : ""
+    return `${sign}${percentValue.toFixed(2)}%`
   }
 
-  const getReturnRateSVGColor = (returnRate: string) => {
-    const rate = parseFloat(returnRate)
-    return rate >= 0 ? "#10b981" : "#ef4444"
+  const getReturnRateColor = (profitLossPercent: number) => {
+    return profitLossPercent >= 0 ? "#10b981" : "#ef4444"
   }
 
-  const formatAddressShort = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  // Format USDC amount (6 decimals) - floor to integer dollars only
+  const formatUSDC = (amount: string) => {
+    const amountNum = parseFloat(amount)
+    if (amountNum >= 1e12) { // >= 1,000,000 USD (1M)
+      return `${Math.floor(amountNum / 1e12)}M`
+    } else if (amountNum >= 1e11) { // >= 100,000 USD (100K)
+      return `${Math.floor(amountNum / 1e9)}K`
+    } else {
+      // Return integer dollars only (floor)
+      return `${Math.floor(amountNum / 1e6)}`
+    }
   }
 
-  const returnRateColor = getReturnRateSVGColor(nft.returnRateFormatted)
+  const returnRateColor = getReturnRateColor(nft.profitLossPercent)
+  const seedMoneyFormatted = formatUSDC(nft.seedMoney)
+  const finalScoreFormatted = formatUSDC(nft.finalScore)
+
+  const profitLoss = parseFloat(nft.finalScore) - parseFloat(nft.seedMoney)
+  const profitLossFormatted = formatUSDC(Math.abs(profitLoss).toString())
 
   const svgContent = `
     <svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
@@ -57,9 +77,12 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
           <stop offset="0%" style="stop-color:#2a2a2e;stop-opacity:1" />
           <stop offset="100%" style="stop-color:#1f1f23;stop-opacity:1" />
         </linearGradient>
+        <filter id="cardShadow-${nft.id}">
+          <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#000" flood-opacity="0.06"/>
+        </filter>
       </defs>
 
-      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1"/>
+      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1" filter="url(#cardShadow-${nft.id})"/>
       <rect x="0" y="0" width="300" height="4" rx="12" fill="url(#orangeGradient-${nft.id})"/>
 
       <text x="24" y="40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#f9fafb">
@@ -70,7 +93,7 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
       </text>
 
       <rect x="24" y="85" width="80" height="32" rx="16" fill="url(#orangeGradient-${nft.id})"/>
-      <text x="64" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
+      <text x="64" y="103" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
         Rank ${nft.rank}
       </text>
 
@@ -78,27 +101,27 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
         <text x="24" y="140" font-size="14" font-weight="500" fill="#9ca3af">Challenge</text>
         <text x="276" y="140" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.challengeId}</text>
 
-        <text x="24" y="165" font-size="14" font-weight="500" fill="#9ca3af">Token ID</text>
-        <text x="276" y="165" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.tokenId}</text>
+        <text x="24" y="165" font-size="14" font-weight="500" fill="#9ca3af">Duration</text>
+        <text x="276" y="165" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.challengePeriod}</text>
 
         <text x="24" y="190" font-size="14" font-weight="500" fill="#9ca3af">Ranking</text>
-        <text x="276" y="190" font-size="14" font-weight="600" fill="url(#orangeGradient-${nft.id})" text-anchor="end">${nft.rank}${nft.rankSuffix}</text>
+        <text x="276" y="190" font-size="14" font-weight="600" fill="url(#orangeGradient-${nft.id})" text-anchor="end">${nft.rank}${nft.rankSuffix} / ${nft.totalUsers}</text>
 
         <text x="24" y="215" font-size="14" font-weight="500" fill="#9ca3af">Return Rate</text>
-        <text x="276" y="215" font-size="16" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.returnRateFormatted)}</text>
+        <text x="276" y="215" font-size="16" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.profitLossPercent)}</text>
       </g>
 
       <line x1="24" y1="245" x2="276" y2="245" stroke="#404040" stroke-width="1"/>
 
       <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-        <text x="24" y="270" font-size="14" font-weight="500" fill="#9ca3af">Owner</text>
-        <text x="276" y="270" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAddressShort(nft.user)}</text>
+        <text x="24" y="270" font-size="14" font-weight="500" fill="#9ca3af">Initial Investment</text>
+        <text x="276" y="270" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">$${seedMoneyFormatted}</text>
 
-        <text x="24" y="295" font-size="14" font-weight="500" fill="#9ca3af">Minted</text>
-        <text x="276" y="295" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.dateFormatted}</text>
+        <text x="24" y="295" font-size="14" font-weight="500" fill="#9ca3af">Current Value</text>
+        <text x="276" y="295" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">$${finalScoreFormatted}</text>
 
-        <text x="24" y="320" font-size="14" font-weight="500" fill="#9ca3af">Network</text>
-        <text x="276" y="320" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${network === 'arbitrum' ? 'Arbitrum' : 'Ethereum'}</text>
+        <text x="24" y="320" font-size="14" font-weight="500" fill="#9ca3af">Profit/Loss</text>
+        <text x="276" y="320" font-size="14" font-weight="600" fill="${returnRateColor}" text-anchor="end">${profitLoss >= 0 ? '+' : '-'}$${profitLossFormatted}</text>
       </g>
 
       <text x="150" y="365" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle">

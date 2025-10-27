@@ -9,8 +9,12 @@ export const getAllNFTsQuery = () => gql`{
     id
     tokenId
     challengeId
+    challengeType
     user
+    totalUsers
     rank
+    seedMoney
+    finalScore
     returnRate
     blockNumber
     blockTimestamp
@@ -22,8 +26,12 @@ export interface PerformanceNFT {
   id: string
   tokenId: string
   challengeId: string
+  challengeType: number
   user: string
+  totalUsers: number
   rank: number
+  seedMoney: string
+  finalScore: string
   returnRate: string
   blockNumber: string
   blockTimestamp: string
