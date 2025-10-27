@@ -25,8 +25,9 @@ export function useFormattedFundNFTData(network: 'ethereum' | 'arbitrum' | null 
   const { data, isLoading, error, refetch } = useFundNFTData(network)
 
   const formattedNFTs = data?.managerNFTs?.map((nft: ManagerNFT) => {
-    // Convert returnRate from raw BigInt string to percentage
-    const returnRatePercentage = parseFloat(nft.returnRate) / 1e18 * 100
+    // Convert returnRate: if data is 138, it should be displayed as 1.38%
+    // So divide by 100
+    const returnRatePercentage = parseFloat(nft.returnRate) / 100
 
     // Format timestamp to readable date
     const date = new Date(parseInt(nft.mintedAt) * 1000)
