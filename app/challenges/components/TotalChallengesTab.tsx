@@ -22,7 +22,7 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
   const mobileNetworkDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
         setShowNetworkDropdown(false)
       }
@@ -31,13 +31,19 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
+    if (showNetworkDropdown || showMobileNetworkDropdown) {
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('touchstart', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timeoutId)
+        document.removeEventListener('click', handleClickOutside)
+        document.removeEventListener('touchstart', handleClickOutside)
+      }
     }
-  }, [])
+  }, [showNetworkDropdown, showMobileNetworkDropdown])
 
   return (
     <div className="space-y-4 mt-8">
