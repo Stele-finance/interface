@@ -3,6 +3,7 @@ import { getSteleTokenAddress, getSteleFundTokenAddress } from "@/lib/constants"
 import ERC20VotesABI from "@/app/abis/ERC20Votes.json"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import { QueryClient } from "@tanstack/react-query"
 
 // Delegate tokens to self
 export const handleDelegate = async (
@@ -12,7 +13,8 @@ export const handleDelegate = async (
   getProvider: () => any,
   refetchWalletTokenInfo: () => void,
   t: (key: any) => string,
-  pageType: 'challenge' | 'fund' = 'challenge'
+  pageType: 'challenge' | 'fund' = 'challenge',
+  queryClient?: QueryClient
 ): Promise<void> => {
   if (!walletAddress) {
     return
@@ -49,7 +51,11 @@ export const handleDelegate = async (
 
     // Refresh wallet token info after delegation
     setTimeout(() => {
-      // This will trigger a re-fetch of wallet token info
+      // Invalidate wallet token info query to refresh delegated token data
+      if (queryClient) {
+        queryClient.invalidateQueries({ queryKey: ['walletTokenInfo', walletAddress, subgraphNetwork, pageType] });
+      }
+      // Fallback to direct refetch if queryClient is not available
       refetchWalletTokenInfo()
     }, 3000)
 
