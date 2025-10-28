@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Progress } from "@/components/ui/progress"
@@ -51,7 +50,25 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
   const { address, isConnected, connectWallet, network } = useWallet()
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
+  const networkDropdownRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
+
+  // Handle click outside for network dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
+        setShowNetworkDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside as any)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside as any)
+    }
+  }, [])
 
   // Use hooks for portfolio data
   const { data: portfolioData, isLoading, error } = useInvestorPortfolio(address || '', 100, selectedNetwork)
@@ -369,60 +386,69 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
         </div>
         <div className="flex items-center gap-3">
           {/* Network Selector Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork('ethereum')}
-              >
-                <Image
-                  src="/networks/small/ethereum.png"
-                  alt="Ethereum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Ethereum
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork('arbitrum')}
-              >
-                <Image
-                  src="/networks/small/arbitrum.png"
-                  alt="Arbitrum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Arbitrum
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="relative" ref={networkDropdownRef}>
+            <button
+              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
+              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+            >
+              <div className="flex items-center gap-2">
+                {selectedNetwork === 'arbitrum' ? (
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                )}
+                <ChevronDown className="h-5 w-5 text-gray-400" />
+              </div>
+            </button>
+            {showNetworkDropdown && (
+              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                <button
+                  onClick={() => {
+                    setSelectedNetwork('ethereum')
+                    setShowNetworkDropdown(false)
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedNetwork('arbitrum')
+                    setShowNetworkDropdown(false)
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Arbitrum
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -441,60 +467,69 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
         
         {/* Network Dropdown */}
         <div className="flex items-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork('ethereum')}
-              >
-                <Image
-                  src="/networks/small/ethereum.png"
-                  alt="Ethereum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Ethereum
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="cursor-pointer"
-                onClick={() => setSelectedNetwork('arbitrum')}
-              >
-                <Image
-                  src="/networks/small/arbitrum.png"
-                  alt="Arbitrum"
-                  width={16}
-                  height={16}
-                  className="rounded-full mr-2"
-                />
-                Arbitrum
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="relative" ref={networkDropdownRef}>
+            <button
+              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
+              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+            >
+              <div className="flex items-center gap-2">
+                {selectedNetwork === 'arbitrum' ? (
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                )}
+                <ChevronDown className="h-5 w-5 text-gray-400" />
+              </div>
+            </button>
+            {showNetworkDropdown && (
+              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                <button
+                  onClick={() => {
+                    setSelectedNetwork('ethereum')
+                    setShowNetworkDropdown(false)
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                >
+                  <Image
+                    src="/networks/small/ethereum.png"
+                    alt="Ethereum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Ethereum
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedNetwork('arbitrum')
+                    setShowNetworkDropdown(false)
+                  }}
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                >
+                  <Image
+                    src="/networks/small/arbitrum.png"
+                    alt="Arbitrum"
+                    width={16}
+                    height={16}
+                    className="rounded-full mr-2"
+                  />
+                  Arbitrum
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
