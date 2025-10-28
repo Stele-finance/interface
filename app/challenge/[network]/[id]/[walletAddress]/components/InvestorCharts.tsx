@@ -32,9 +32,11 @@ interface InvestorChartsProps {
   realTimePortfolio?: RealTimePortfolio | null
   interval?: 'daily' | 'weekly' | 'monthly'
   actionButtons?: React.ReactNode // Add prop for action buttons (Swap, Register)
+  currentTime?: Date
+  isClient?: boolean
 }
 
-export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily', actionButtons }: InvestorChartsProps) {
+export function InvestorCharts({ challengeId, investor, network, investorData, realTimePortfolio, interval = 'daily', actionButtons, currentTime, isClient }: InvestorChartsProps) {
   const { t, language } = useLanguage()
   const { data, isLoading, error } = useInvestorSnapshots(challengeId, investor, 30, network)
   const { data: weeklyData, isLoading: isLoadingWeekly, error: weeklyError } = useInvestorWeeklySnapshots(challengeId, investor, 12, network)
@@ -42,6 +44,13 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
   const { data: challengeData } = useChallenge(challengeId, network)
   const { data: rankingResponse } = useRanking(challengeId, network)
   const [activeIndexPortfolio, setActiveIndexPortfolio] = useState<number | null>(null)
+
+  // Check if challenge has ended
+  const isChallengeEnded = useMemo(() => {
+    if (!isClient || !currentTime || !challengeData?.challenge) return false;
+    const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000);
+    return currentTime >= endTime;
+  }, [isClient, currentTime, challengeData]);
 
   const chartData = useMemo(() => {
     // Select data source based on interval
@@ -149,7 +158,7 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
     return chartData[chartData.length - 1]?.currentUSD || 0
   }, [chartData, realTimePortfolio])
 
-  // Calculate investor metrics (using real-time data when available)
+  // Calculate investor metrics (using real-time data when available and challenge is not ended)
   const getInvestorMetrics = () => {
     if (!investorData?.investor) {
       return {
@@ -164,10 +173,11 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
 
     const investor = investorData.investor
     const formattedSeedMoney = parseFloat(investor.seedMoneyUSD) || 0
-    
-    // Use real-time portfolio value if available, otherwise use subgraph data
-    const currentValue = realTimePortfolio && realTimePortfolio.totalValue > 0 
-      ? realTimePortfolio.totalValue 
+
+    // Use real-time portfolio value only if challenge is not ended and real-time data is available
+    // If challenge has ended, always use on-chain (subgraph) data
+    const currentValue = !isChallengeEnded && realTimePortfolio && realTimePortfolio.totalValue > 0
+      ? realTimePortfolio.totalValue
       : (parseFloat(investor.currentUSD) || 0)
     
     const gainLoss = currentValue - formattedSeedMoney

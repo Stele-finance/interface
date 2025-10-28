@@ -14,19 +14,45 @@ interface PortfolioSummaryProps {
   network: string
   investorData: any
   walletAddress: string
+  currentTime: Date
+  isClient: boolean
 }
 
-export function PortfolioSummary({ 
-  portfolioMetrics, 
-  realTimePortfolio, 
-  isLoadingUniswap, 
-  challengeData, 
-  network, 
+export function PortfolioSummary({
+  portfolioMetrics,
+  realTimePortfolio,
+  isLoadingUniswap,
+  challengeData,
+  network,
   investorData,
-  walletAddress 
+  walletAddress,
+  currentTime,
+  isClient
 }: PortfolioSummaryProps) {
   const { t } = useLanguage()
   const { currentValue, formattedSeedMoney, gainLoss, gainLossPercentage, isPositive } = portfolioMetrics
+
+  // Get challenge status
+  const getChallengeStatus = () => {
+    if (!isClient || !challengeData?.challenge) return { text: t('loading'), color: 'text-gray-400' };
+
+    const challenge = challengeData.challenge;
+    const endTime = new Date(parseInt(challenge.endTime) * 1000);
+    const hasEnded = currentTime >= endTime;
+
+    if (challenge.isActive && !hasEnded) {
+      return { text: t('active'), color: 'text-green-400' };
+    } else if (challenge.isActive && hasEnded) {
+      return { text: t('pending'), color: 'text-orange-400' };
+    } else {
+      return { text: t('end'), color: 'text-gray-400' };
+    }
+  };
+
+  const challengeStatus = getChallengeStatus();
+
+  // Check if challenge has ended
+  const isChallengeEnded = challengeStatus.text === t('end');
 
   // Mobile tooltip state management
   const [showTypeTooltip, setShowTypeTooltip] = useState(false)
@@ -201,8 +227,13 @@ export function PortfolioSummary({
           <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
             <span className="text-sm text-gray-400">{t('status')}</span>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-400">Active</span>
+              {challengeStatus.text === t('active') && (
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              )}
+              {challengeStatus.text === t('pending') && (
+                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+              )}
+              <span className={`text-sm font-medium ${challengeStatus.color}`}>{challengeStatus.text}</span>
             </div>
           </div>
           
@@ -217,26 +248,26 @@ export function PortfolioSummary({
             <div className="flex justify-between">
               <div>
                 <span className="text-sm text-gray-400 block">{t('onChainValue')}</span>
-                {/* Real-time portfolio value */}
-                {realTimePortfolio && (
+                {/* Real-time portfolio value - only show if challenge is not ended */}
+                {!isChallengeEnded && realTimePortfolio && (
                   <div className="mt-1">
                     {(() => {
                       const realTimeGainLoss = realTimePortfolio.totalValue - formattedSeedMoney
                       const realTimeGainLossPercentage = formattedSeedMoney > 0 ? (realTimeGainLoss / formattedSeedMoney) * 100 : 0
                       const isRealTimePositive = realTimeGainLoss >= 0
-                      
+
                       return (
                         <TooltipProvider>
                           <Tooltip open={showLiveTooltip}>
                             <TooltipTrigger asChild>
-                              <div 
+                              <div
                                 className={`text-sm inline-flex items-center gap-1 cursor-pointer ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}
                                 onClick={(e) => handleTooltipClick(
-                                  e, 
-                                  'live', 
-                                  showLiveTooltip, 
-                                  setShowLiveTooltip, 
-                                  liveTooltipTimer, 
+                                  e,
+                                  'live',
+                                  showLiveTooltip,
+                                  setShowLiveTooltip,
+                                  liveTooltipTimer,
                                   setLiveTooltipTimer
                                 )}
                                 onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
@@ -259,14 +290,14 @@ export function PortfolioSummary({
                 <TooltipProvider>
                   <Tooltip open={showOnChainTooltip}>
                     <TooltipTrigger asChild>
-                      <div 
+                      <div
                         className="cursor-pointer"
                         onClick={(e) => handleTooltipClick(
-                          e, 
-                          'onchain', 
-                          showOnChainTooltip, 
-                          setShowOnChainTooltip, 
-                          onChainTooltipTimer, 
+                          e,
+                          'onchain',
+                          showOnChainTooltip,
+                          setShowOnChainTooltip,
+                          onChainTooltipTimer,
                           setOnChainTooltipTimer
                         )}
                         onMouseLeave={() => handleMouseLeave(setShowOnChainTooltip, onChainTooltipTimer, setOnChainTooltipTimer)}
@@ -286,15 +317,15 @@ export function PortfolioSummary({
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                
-                {/* Real-time portfolio value - right side */}
-                {realTimePortfolio && (
+
+                {/* Real-time portfolio value - right side - only show if challenge is not ended */}
+                {!isChallengeEnded && realTimePortfolio && (
                   <div className="mt-1">
                     {(() => {
                       const realTimeGainLoss = realTimePortfolio.totalValue - formattedSeedMoney
                       const realTimeGainLossPercentage = formattedSeedMoney > 0 ? (realTimeGainLoss / formattedSeedMoney) * 100 : 0
                       const isRealTimePositive = realTimeGainLoss >= 0
-                      
+
                       return (
                         <div className="flex items-baseline gap-2">
                           <span className="text-sm text-white font-medium">
