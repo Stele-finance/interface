@@ -3,16 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Users, DollarSign, ChevronDown, Calendar } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { useLanguage } from '@/lib/language-context'
 import { formatDateWithLocale } from '@/lib/utils'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
 import { useInfoSnapshots, formatSnapshotDataForChart, SnapshotType } from '../hooks/useInfoSnapshots'
 
 interface ChartDataPoint {
@@ -33,11 +26,33 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   const { t, language } = useLanguage()
   // Filter network for subgraph usage (exclude solana)
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  
+
   const [activeIndexTvl, setActiveIndexTvl] = useState<number | null>(null)
   const [activeIndexInvestors, setActiveIndexInvestors] = useState<number | null>(null)
   const [intervalType, setIntervalType] = useState<SnapshotType>('daily')
   const [chartType, setChartType] = useState<'tvl' | 'investors'>('tvl')
+  const [showChartTypeDropdown, setShowChartTypeDropdown] = useState(false)
+  const [showIntervalDropdown, setShowIntervalDropdown] = useState(false)
+  const chartTypeRef = useRef<HTMLDivElement>(null)
+  const intervalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chartTypeRef.current && !chartTypeRef.current.contains(event.target as Node)) {
+        setShowChartTypeDropdown(false)
+      }
+      if (intervalRef.current && !intervalRef.current.contains(event.target as Node)) {
+        setShowIntervalDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside as any)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside as any)
+    }
+  }, [])
 
   // Fetch snapshot data based on interval type
   const { data: snapshotData, isLoading, error } = useInfoSnapshots({
@@ -148,54 +163,88 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
             {/* Desktop Controls - same line as title */}
             <div className="hidden sm:flex items-center gap-4">
               {/* TVL/Investors dropdown */}
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    {chartType === 'investors' ? 'Investors' : 'TVL'}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
-                  <DropdownMenuItem onClick={() => setChartType('tvl')}>
-                    <DollarSign className="h-4 w-4 mr-2" />
-                    TVL
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setChartType('investors')}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Investors
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative" ref={chartTypeRef}>
+                <button
+                  onClick={() => {
+                    setShowChartTypeDropdown(!showChartTypeDropdown)
+                    setShowIntervalDropdown(false)
+                  }}
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                >
+                  {chartType === 'investors' ? 'Investors' : 'TVL'}
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                {showChartTypeDropdown && (
+                  <div className="absolute top-full mt-2 w-32 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                    <button
+                      onClick={() => {
+                        setChartType('tvl')
+                        setShowChartTypeDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      TVL
+                    </button>
+                    <button
+                      onClick={() => {
+                        setChartType('investors')
+                        setShowChartTypeDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      <Users className="h-4 w-4 mr-2" />
+                      Investors
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Time interval dropdown */}
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
-                  <DropdownMenuItem onClick={() => setIntervalType('daily')}>
-                    {t('daily')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
-                    {t('weekly')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
-                    {t('monthly')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative" ref={intervalRef}>
+                <button
+                  onClick={() => {
+                    setShowIntervalDropdown(!showIntervalDropdown)
+                    setShowChartTypeDropdown(false)
+                  }}
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                >
+                  <Calendar className="h-4 w-4" />
+                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                {showIntervalDropdown && (
+                  <div className="absolute top-full mt-2 w-32 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                    <button
+                      onClick={() => {
+                        setIntervalType('daily')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('daily')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIntervalType('weekly')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('weekly')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIntervalType('monthly')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('monthly')}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -297,54 +346,88 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           {/* Mobile Controls - below chart */}
           <div className="flex sm:hidden items-center justify-between w-full -mb-4 px-2 gap-4">
             {/* TVL/Investors dropdown */}
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                  onMouseDown={(e) => e.preventDefault()}
-                >
-                  {chartType === 'investors' ? 'Investors' : 'TVL'}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
-                <DropdownMenuItem onClick={() => setChartType('tvl')}>
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  TVL
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setChartType('investors')}>
-                  <Users className="h-4 w-4 mr-2" />
-                  Investors
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="relative" ref={chartTypeRef}>
+              <button
+                onClick={() => {
+                  setShowChartTypeDropdown(!showChartTypeDropdown)
+                  setShowIntervalDropdown(false)
+                }}
+                className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+              >
+                {chartType === 'investors' ? 'Investors' : 'TVL'}
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {showChartTypeDropdown && (
+                <div className="absolute top-full mt-2 w-32 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                  <button
+                    onClick={() => {
+                      setChartType('tvl')
+                      setShowChartTypeDropdown(false)
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  >
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    TVL
+                  </button>
+                  <button
+                    onClick={() => {
+                      setChartType('investors')
+                      setShowChartTypeDropdown(false)
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Investors
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Time interval dropdown */}
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                  onMouseDown={(e) => e.preventDefault()}
-                >
-                  <Calendar className="h-4 w-4" />
-                  {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
-                <DropdownMenuItem onClick={() => setIntervalType('daily')}>
-                  {t('daily')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIntervalType('weekly')}>
-                  {t('weekly')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIntervalType('monthly')}>
-                  {t('monthly')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="relative" ref={intervalRef}>
+              <button
+                onClick={() => {
+                  setShowIntervalDropdown(!showIntervalDropdown)
+                  setShowChartTypeDropdown(false)
+                }}
+                className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+              >
+                <Calendar className="h-4 w-4" />
+                {intervalType === 'daily' ? t('daily') : intervalType === 'weekly' ? t('weekly') : t('monthly')}
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {showIntervalDropdown && (
+                <div className="absolute top-full mt-2 w-32 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                  <button
+                    onClick={() => {
+                      setIntervalType('daily')
+                      setShowIntervalDropdown(false)
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  >
+                    {t('daily')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIntervalType('weekly')
+                      setShowIntervalDropdown(false)
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  >
+                    {t('weekly')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIntervalType('monthly')
+                      setShowIntervalDropdown(false)
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  >
+                    {t('monthly')}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
