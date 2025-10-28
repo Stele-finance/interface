@@ -48,7 +48,7 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
   const intervalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (chartTypeRef.current && !chartTypeRef.current.contains(event.target as Node)) {
         setShowChartTypeDropdown(false)
       }
@@ -57,13 +57,19 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside as any)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside as any)
+    if (showChartTypeDropdown || showIntervalDropdown) {
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('touchstart', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timeoutId)
+        document.removeEventListener('click', handleClickOutside)
+        document.removeEventListener('touchstart', handleClickOutside)
+      }
     }
-  }, [])
+  }, [showChartTypeDropdown, showIntervalDropdown])
 
   const dailyChartData = useMemo(() => {
     if (!dailyData?.activeChallengesSnapshots) return []
