@@ -1302,7 +1302,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
                      ) : (
                        <>
                          <Plus className="mr-2 h-5 w-5" />
-                         {t('join')} (USDC $10)
+                         {t('join')} {entryFee ? `(USDC $${entryFee})` : '(USDC)'}
                        </>
                      )}
                    </Button>
