@@ -491,7 +491,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-1 h-4 w-4" />
-                          {joinButton.t('join')} (USDC $10)
+                          {joinButton.t('join')} {joinButton.entryFee ? `(USDC $${joinButton.entryFee})` : '(USDC)'}
                         </>
                       )}
                     </Button>
@@ -647,7 +647,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-2 h-5 w-5" />
-                          {joinButton.t('join')} (USDC $10)
+                          {joinButton.t('join')} {joinButton.entryFee ? `(USDC $${joinButton.entryFee})` : '(USDC)'}
                         </>
                       )}
                     </Button>
@@ -1062,7 +1062,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                       ) : (
                         <>
                           <Plus className="mr-2 h-5 w-5" />
-                          {joinButton.t('join')} (USDC $10)
+                          {joinButton.t('join')} {joinButton.entryFee ? `(USDC $${joinButton.entryFee})` : '(USDC)'}
                         </>
                       )}
                     </Button>
