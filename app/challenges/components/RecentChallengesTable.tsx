@@ -135,10 +135,8 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentCh
         <CardContent className="p-0">
           {data.challenges.length === 0 ? (
             <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <Trophy className="h-8 w-8 text-gray-500" />
-                <p className="text-gray-400">{t('noChallengesFound')}</p>
-              </div>
+              <Trophy className="h-8 w-8 text-gray-500 mx-auto" />
+              <p className="text-gray-400 mt-2">{t('noChallengesFound')}</p>
             </div>
           ) : (
             <>
