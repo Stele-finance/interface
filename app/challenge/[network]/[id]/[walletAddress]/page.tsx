@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useState, use, useEffect, useCallback } from "react"
+import React, { useState, use, useEffect, useCallback, useRef } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, BarChart3, Activity, Loader2, Calendar, ChevronDown } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChallengeAssetSwap } from "../../../../swap/components/ChallengeAssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
@@ -88,6 +87,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isMinting, setIsMinting] = useState(false)
+  const [showIntervalDropdown, setShowIntervalDropdown] = useState(false)
+  const intervalDropdownRef = useRef<HTMLDivElement>(null)
 
   // Calculate real-time portfolio value using network-specific token prices
   const calculateRealTimePortfolioValue = useCallback((): RealTimePortfolio | null => {
@@ -144,6 +145,22 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
     return () => clearInterval(timeInterval);
   }, [isClient]);
+
+  // Handle click outside for interval dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (intervalDropdownRef.current && !intervalDropdownRef.current.contains(event.target as Node)) {
+        setShowIntervalDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside as any)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside as any)
+    }
+  }, [])
 
   // Handle token row click
   const handleTokenClick = (tokenAddress: string) => {
@@ -438,30 +455,47 @@ export default function InvestorPage({ params }: InvestorPageProps) {
             
             {/* Time interval dropdown - same style as fund investor page */}
             <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-8 pb-2">
-              <DropdownMenu modal={true}>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    {chartInterval === 'daily' ? t('daily') : chartInterval === 'weekly' ? t('weekly') : t('monthly')}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-32 bg-muted/80 border-gray-600 z-[60]">
-                  <DropdownMenuItem onClick={() => setChartInterval('daily')}>
-                    {t('daily')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setChartInterval('weekly')}>
-                    {t('weekly')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setChartInterval('monthly')}>
-                    {t('monthly')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative" ref={intervalDropdownRef}>
+                <button
+                  onClick={() => setShowIntervalDropdown(!showIntervalDropdown)}
+                  className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
+                >
+                  <Calendar className="h-4 w-4" />
+                  {chartInterval === 'daily' ? t('daily') : chartInterval === 'weekly' ? t('weekly') : t('monthly')}
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                {showIntervalDropdown && (
+                  <div className="absolute top-full mt-2 right-0 w-32 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                    <button
+                      onClick={() => {
+                        setChartInterval('daily')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('daily')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setChartInterval('weekly')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('weekly')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setChartInterval('monthly')
+                        setShowIntervalDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      {t('monthly')}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Separator Bar */}
