@@ -859,6 +859,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
       // Wait for transaction to be mined
       await tx.wait();
 
+      // Invalidate queries to refresh data after successful reward claim
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investor', challengeId, currentWalletAddress, subgraphNetwork] });
+      }, 3000);
+
     } catch (error: any) {
       console.error("Error claiming rewards:", error);
     } finally {

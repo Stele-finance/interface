@@ -9,6 +9,7 @@ import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useTokenPrices } from "@/lib/token-price-context"
+import { useQueryClient } from "@tanstack/react-query"
 // Challenge hooks not needed for fund swaps
 import { useFundInvestableTokensForSwap } from "@/app/hooks/useFundInvestableTokens"
 import { useFundSettings } from "@/app/hooks/useFundSettings"
@@ -52,6 +53,7 @@ import SteleFundABI from "@/app/abis/SteleFund.json"
 export function FundAssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, getProvider, isConnected } = useWallet()
+  const queryClient = useQueryClient()
   
   // Get network from URL path instead of wallet
   const pathParts = window.location.pathname.split('/');
@@ -534,6 +536,14 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
 
       // Clear the form
       setFromAmount("");
+
+      // Invalidate queries to refresh data after successful swap
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+      }, 3000);
 
     } catch (error: any) {
       console.error("Swap error:", error);
