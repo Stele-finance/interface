@@ -59,19 +59,25 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
   const funds = fundsData?.funds || []
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
         setShowNetworkDropdown(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside as any)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside as any)
+    if (showNetworkDropdown) {
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('touchstart', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timeoutId)
+        document.removeEventListener('click', handleClickOutside)
+        document.removeEventListener('touchstart', handleClickOutside)
+      }
     }
-  }, [])
+  }, [showNetworkDropdown])
 
 
 
