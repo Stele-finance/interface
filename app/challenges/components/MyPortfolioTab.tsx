@@ -607,14 +607,9 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
                   <CardContent className="text-center py-12">
                     <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
                     <h3 className="text-lg font-medium text-gray-100 mb-2">{t('noChallengesFoundPortfolio')}</h3>
-                    <p className="text-gray-400 mb-4">
+                    <p className="text-gray-400">
                       {t('thisWalletHasntParticipated')}
                     </p>
-                    <Link href="/challenges">
-                      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                        {t('browseChallenges')}
-                      </Button>
-                    </Link>
                   </CardContent>
                 </Card>
               ) : (
