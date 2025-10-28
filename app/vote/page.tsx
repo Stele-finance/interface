@@ -286,14 +286,15 @@ export default function VotePage() {
         getProvider,
         refetchWalletTokenInfo,
         t,
-        pageType  // Pass the pageType to determine which contract to use
+        pageType,  // Pass the pageType to determine which contract to use
+        queryClient  // Pass queryClient to invalidate queries
       )
     } catch (error) {
       // Error is already handled in the utility function
     } finally {
       setIsDelegating(false)
     }
-  }, [walletAddress, walletType, selectedNetwork, getProvider, refetchWalletTokenInfo, t, pageType])
+  }, [walletAddress, walletType, selectedNetwork, getProvider, refetchWalletTokenInfo, t, pageType, queryClient])
 
   // Manual refresh function
   const handleRefresh = async () => {
