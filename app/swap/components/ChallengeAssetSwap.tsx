@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices"
 import { useChallengeInvestableTokensForSwap } from "@/app/hooks/useChallengeInvestableTokens"
+import { useQueryClient } from "@tanstack/react-query"
 // Fund hooks not needed for challenge swaps
 // Fund settings not needed for challenge swaps
 import { toast } from "@/components/ui/use-toast"
@@ -52,6 +53,7 @@ import SteleABI from "@/app/abis/Stele.json"
 export function ChallengeAssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, network: propNetwork, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, getProvider, isConnected } = useWallet()
+  const queryClient = useQueryClient()
 
   // Use network prop if provided, otherwise get from URL path
   const pathParts = window.location.pathname.split('/');
@@ -388,6 +390,14 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
 
       // Clear the form
       setFromAmount("");
+
+      // Invalidate queries to refresh data after successful swap
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+      }, 3000);
 
     } catch (error: any) {
       console.error("Swap error:", error);

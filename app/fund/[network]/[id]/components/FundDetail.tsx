@@ -626,10 +626,14 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         refetchFundInvestorData();
       }
 
-      // Also refresh the React Query cache
-      queryClient.invalidateQueries({
-        queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork]
-      });
+      // Invalidate all related queries to refresh data after successful join
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['funds', 50] });
+      }, 3000);
 
       // Set local joined state to immediately update UI
       setHasJoinedLocally(true);

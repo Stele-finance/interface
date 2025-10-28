@@ -16,6 +16,7 @@ import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import SteleFundABI from "@/app/abis/SteleFund.json"
 import Image from "next/image"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface FundActionTabsProps {
   isManager: boolean
@@ -25,14 +26,15 @@ interface FundActionTabsProps {
   network: string
 }
 
-export function FundActionTabs({ 
-  isManager, 
-  isInvestor, 
+export function FundActionTabs({
+  isManager,
+  isInvestor,
   connectedAddress,
   fundId,
   network
 }: FundActionTabsProps) {
   const { address, getProvider, walletType } = useWallet()
+  const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState("swap")
   const [isAssetSwapping, setIsAssetSwapping] = useState(false)
   const [depositAmount, setDepositAmount] = useState("")
@@ -313,7 +315,15 @@ export function FundActionTabs({
 
       // Clear the input
       setWithdrawAmount("0")
-      
+
+      // Invalidate queries to refresh data after successful withdraw
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+      }, 3000);
+
     } catch (error: any) {
       console.error("Error withdrawing from fund:", error)
     } finally {
@@ -483,6 +493,14 @@ export function FundActionTabs({
         throw new Error('Failed to collect fees from any token')
       }
 
+      // Invalidate queries to refresh data after successful fee collection
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+      }, 3000);
+
     } catch (error: any) {
       console.error("Error collecting fees:", error)
     } finally {
@@ -574,7 +592,15 @@ export function FundActionTabs({
 
       // Clear the input
       setDepositAmount("")
-      
+
+      // Invalidate queries to refresh data after successful deposit
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+      }, 3000);
+
     } catch (error: any) {
       console.error("Error depositing ETH:", error)
     } finally {
