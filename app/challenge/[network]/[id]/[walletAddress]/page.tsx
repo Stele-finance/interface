@@ -347,13 +347,13 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   const portfolioMetrics = investorData?.investor ? calculatePortfolioMetrics(investorData.investor) : null
   const challengeDetails = getChallengeDetails(challengeData)
   const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
-  const isChallengeEnded = challengeDetails && new Date() > challengeDetails.endTime;
-  
+  const isChallengeEnded = challengeDetails && currentTime >= challengeDetails.endTime;
+
   // Determine challenge state
   const getChallengeState = () => {
     if (!challengeData?.challenge) return 'unknown';
     const isActive = challengeData.challenge.isActive === true;
-    const hasTimePassed = challengeDetails && new Date() > challengeDetails.endTime;
+    const hasTimePassed = challengeDetails && currentTime >= challengeDetails.endTime;
     
     if (isActive && !hasTimePassed) return 'active';
     if (isActive && hasTimePassed) return 'pending';
@@ -425,13 +425,15 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           {/* Left Side - Charts + Tabs */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-4">
             {/* Investor Charts */}
-            <InvestorCharts 
-              challengeId={challengeId} 
-              investor={walletAddress} 
+            <InvestorCharts
+              challengeId={challengeId}
+              investor={walletAddress}
               network={subgraphNetwork}
               investorData={investorData}
               realTimePortfolio={realTimePortfolio}
               interval={chartInterval}
+              currentTime={currentTime}
+              isClient={isClient}
             />
             
             {/* Time interval dropdown - same style as fund investor page */}
@@ -564,7 +566,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               
               {/* Portfolio Summary (always visible) */}
               {portfolioMetrics && (
-                <PortfolioSummary 
+                <PortfolioSummary
                   portfolioMetrics={portfolioMetrics}
                   realTimePortfolio={realTimePortfolio}
                   isLoadingUniswap={isLoadingUniswap}
@@ -572,6 +574,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   network={routeNetwork || 'ethereum'}
                   investorData={investorData}
                   walletAddress={walletAddress}
+                  currentTime={currentTime}
+                  isClient={isClient}
                 />
               )}
 
