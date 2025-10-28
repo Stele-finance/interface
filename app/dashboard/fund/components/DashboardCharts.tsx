@@ -148,10 +148,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
             {/* Desktop Controls - same line as title */}
             <div className="hidden sm:flex items-center gap-4">
               {/* TVL/Investors dropdown */}
-              <DropdownMenu modal={true}>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
                     onMouseDown={(e) => e.preventDefault()}
                   >
@@ -170,12 +170,12 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
+
               {/* Time interval dropdown */}
-              <DropdownMenu modal={true}>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
                     onMouseDown={(e) => e.preventDefault()}
                   >
@@ -297,10 +297,10 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
           {/* Mobile Controls - below chart */}
           <div className="flex sm:hidden items-center justify-between w-full -mb-4 px-2 gap-4">
             {/* TVL/Investors dropdown */}
-            <DropdownMenu modal={true}>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
                   onMouseDown={(e) => e.preventDefault()}
                 >
@@ -319,12 +319,12 @@ export function DashboardCharts({ network }: DashboardChartsProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
             {/* Time interval dropdown */}
-            <DropdownMenu modal={true}>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex items-center gap-2 px-6 py-1.5 text-sm font-medium bg-gray-800/60 border border-gray-700/50 rounded-full shadow-lg backdrop-blur-sm text-gray-400 hover:text-white hover:bg-gray-700/30 h-[38px]"
                   onMouseDown={(e) => e.preventDefault()}
                 >
