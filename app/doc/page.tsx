@@ -296,7 +296,7 @@ export default function DocPage() {
                               <div className="prose dark:prose-invert max-w-none">
                                 {activeSection === "create-challenge" && (
                                   <div className="space-y-6">
-                                    <p>Challenge creation is the process of starting a new investment competition:</p>
+                                    <p>Challenge creation is the process of starting a new investment challenge:</p>
                                     
                                                                         {/* Create Challenge Step 1 */}
                                     <div className="space-y-3">
