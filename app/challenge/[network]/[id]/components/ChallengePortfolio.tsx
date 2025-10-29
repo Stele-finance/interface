@@ -15,13 +15,12 @@ import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ChallengeCharts } from "./ChallengeCharts"
 import { useRouter } from "next/navigation"
-import { 
+import {
   getSteleContractAddress,
   getUSDCTokenAddress,
   getRPCUrl,
   USDC_DECIMALS
 } from "@/lib/constants"
-import { useEntryFee } from "@/lib/hooks/use-entry-fee"
 import SteleABI from "@/app/abis/Stele.json"
 import ERC20ABI from "@/app/abis/ERC20.json"
 import { useChallenge } from "@/app/hooks/useChallenge"
@@ -73,8 +72,7 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
   const [isMounted, setIsMounted] = useState(false)
   const itemsPerPage = 5;
   const maxPages = 5;
-  const { entryFee, isLoading: isLoadingEntryFee } = useEntryFee();
-  
+
   // Use wallet hook to get current wallet info
   const { address: connectedAddress, isConnected, walletType, network: walletNetwork, connectWallet, getProvider } = useWallet();
 
@@ -129,6 +127,12 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
   const { data: challengeData, isLoading: isLoadingChallenge, error: challengeError } = useChallenge(challengeId, subgraphNetwork);
   const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useTransactions(challengeId, subgraphNetwork);
   const { data: rankingData, isLoading: isLoadingRanking, error: rankingError } = useRanking(challengeId, subgraphNetwork);
+
+  // Get entry fee from individual challenge data instead of global Stele contract
+  const entryFee = challengeData?.challenge?.entryFee
+    ? parseInt(challengeData.challenge.entryFee).toString()
+    : null;
+  const isLoadingEntryFee = isLoadingChallenge;
 
   // Set mounted state for Portal
   useEffect(() => {
