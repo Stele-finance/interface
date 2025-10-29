@@ -412,7 +412,7 @@ export const ar = {
   threeMonthsChallenge: "3 أشهر",
   time: "الوقت",
   traditionalFinanceLimitations: "قيود التمويل التقليدي",
-  tradingCompetition: "إثبات مهارات الاستثمار من خلال مسابقات التداول",
+  tradingCompetition: "إثبات مهارات الاستثمار من خلال تحديات التداول",
   transparentRecords: "سجلات شفافة",
   transparentRecordsDesc: "يتم تسجيل جميع سجلات المعاملات بشكل شفاف على البلوك تشين",
   transparentReturns: "الكشف الشفاف عن العوائد والتحقق منها",

@@ -434,7 +434,7 @@ export const da = {
   totalRewards: "Belønninger",
   totalVotes: "Total Stemmer",
   traditionalFinanceLimitations: "Begrænsninger af Traditionel Finansiering",
-  tradingCompetition: "Bevis investeringsfærdigheder gennem handelskonkurrencer",
+  tradingCompetition: "Bevis investeringsfærdigheder gennem handelsudfordringer",
   transactionRejected: "Transaktion afvist af bruger",
   transparentRecords: "Gennemsigtige optegnelser",
   transparentRecordsDesc: "Al transaktionshistorik registreres gennemsigtigt på blockchain",

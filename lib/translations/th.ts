@@ -441,7 +441,7 @@ export const th = {
   totalRewards: 'รางวัลรวม',
   totalVotes: 'คะแนนโหวตทั้งหมด',
   traditionalFinanceLimitations: 'ข้อจำกัดของการเงินแบบดั้งเดิม',
-  tradingCompetition: 'การแข่งขันการเทรด',
+  tradingCompetition: 'ความท้าทายการเทรด',
   transactionRejected: 'ธุรกรรมถูกปฏิเสธ',
   transactions: 'ธุรกรรม',
   transactionSubmitted: 'ส่งธุรกรรมแล้ว',

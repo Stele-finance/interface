@@ -412,7 +412,7 @@ export const bn = {
   threeMonthsChallenge: "৩ মাস",
   time: "সময়",
   traditionalFinanceLimitations: "ঐতিহ্যবাহী অর্থায়নের সীমাবদ্ধতা",
-  tradingCompetition: "ট্রেডিং প্রতিযোগিতার মাধ্যমে বিনিয়োগ দক্ষতা প্রমাণ করুন",
+  tradingCompetition: "ট্রেডিং চ্যালেঞ্জের মাধ্যমে বিনিয়োগ দক্ষতা প্রমাণ করুন",
   transparentRecords: "স্বচ্ছ রেকর্ড",
   transparentRecordsDesc: "সমস্ত লেনদেন ইতিহাস ব্লকচেইনে স্বচ্ছভাবে রেকর্ড করা হয়",
   transparentReturns: "স্বচ্ছ রিটার্ন প্রকাশ এবং যাচাইকরণ",

@@ -434,7 +434,7 @@ export const hu = {
   totalRewards: "Jutalom",
   totalVotes: "Összes szavazat",
   traditionalFinanceLimitations: "Hagyományos pénzügyek korlátai",
-  tradingCompetition: "Befektetési készségek bizonyítása kereskedési versenyek által",
+  tradingCompetition: "Befektetési készségek bizonyítása kereskedési kihívások által",
   transparentRecords: "Átlátható nyilvántartás",
   transparentRecordsDesc: "Minden tranzakciós előzmény átláthatóan rögzítésre kerül a blockchainen",
   transparentReturns: "Átlátható hozam közlés és ellenőrzés",

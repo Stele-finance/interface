@@ -414,7 +414,7 @@ export const pt = {
   threeMonthsChallenge: "3 Meses",
   time: "Tempo",
   traditionalFinanceLimitations: "Limitações das Finanças Tradicionais",
-  tradingCompetition: "Prove habilidades de investimento através de competições de trading",
+  tradingCompetition: "Prove habilidades de investimento através de desafios de trading",
   transparentRecords: "Registros Transparentes",
   transparentRecordsDesc: "Todo o histórico de transações é registrado de forma transparente no blockchain",
   transparentReturns: "Divulgação e verificação transparente de retornos",

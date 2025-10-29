@@ -434,7 +434,7 @@ export const hi = {
   totalRewards: "पुरस्कार",
   totalVotes: "कुल वोट",
   traditionalFinanceLimitations: "पारंपरिक वित्त की सीमाएं",
-  tradingCompetition: "ट्रेडिंग प्रतियोगिताओं के माध्यम से निवेश कौशल साबित करें",
+  tradingCompetition: "ट्रेडिंग चुनौतियों के माध्यम से निवेश कौशल साबित करें",
   transparentRecords: "पारदर्शी रिकॉर्ड",
   transparentRecordsDesc: "सभी लेनदेन इतिहास ब्लॉकचेन पर पारदर्शी रूप से रिकॉर्ड किए जाते हैं",
   transparentReturns: "पारदर्शी रिटर्न प्रकटीकरण और सत्यापन",

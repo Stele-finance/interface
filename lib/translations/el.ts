@@ -434,7 +434,7 @@ export const el = {
   totalRewards: "Ανταμοιβές",
   totalVotes: "Συνολικές ψήφοι",
   traditionalFinanceLimitations: "Περιορισμοί της Παραδοσιακής Χρηματοδότησης",
-  tradingCompetition: "Αποδείξτε τις επενδυτικές δεξιότητες μέσω διαγωνισμών συναλλαγών",
+  tradingCompetition: "Αποδείξτε τις επενδυτικές δεξιότητες μέσω προκλήσεων συναλλαγών",
   transactionRejected: "Η συναλλαγή απορρίφθηκε από τον χρήστη",
   transparentRecords: "Διαφανή Αρχεία",
   transparentRecordsDesc: "Όλο το ιστορικό συναλλαγών καταγράφεται διαφανώς στο blockchain",

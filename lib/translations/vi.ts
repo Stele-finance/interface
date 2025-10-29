@@ -441,7 +441,7 @@ export const vi = {
   totalRewards: 'Tổng phần thưởng',
   totalVotes: 'Tổng phiếu bầu',
   traditionalFinanceLimitations: 'Hạn chế tài chính truyền thống',
-  tradingCompetition: 'Cuộc thi giao dịch',
+  tradingCompetition: 'Thử thách giao dịch',
   transactionRejected: 'Giao dịch bị từ chối',
   transactions: 'Giao dịch',
   transactionSubmitted: 'Giao dịch đã được gửi',

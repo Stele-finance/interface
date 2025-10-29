@@ -441,7 +441,7 @@ export const zhCn = {
   totalRewards: '总奖励',
   totalVotes: '总投票数',
   traditionalFinanceLimitations: '传统金融限制',
-  tradingCompetition: '交易竞赛',
+  tradingCompetition: '交易挑战',
   transactionRejected: '交易被拒绝',
   transactions: '交易',
   transactionSubmitted: '交易已提交',

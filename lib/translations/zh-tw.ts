@@ -440,7 +440,7 @@ export const zhTw = {
   totalRanking: "總排名",
   totalRewards: "獎勵",
   totalVotes: "總票數",
-  tradingCompetition: "通過交易競賽證明投資技能",
+  tradingCompetition: "通過交易挑戰證明投資技能",
   traditionalFinanceLimitations: "傳統金融的限制",
   transactionRejected: "交易被用戶拒絕",
   transactions: "交易",

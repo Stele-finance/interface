@@ -433,7 +433,7 @@ export const fi = {
   totalRanking: "Kokonaissijoitus",
   totalRewards: "Palkinnot",
   totalVotes: "Äänet yhteensä",
-  tradingCompetition: "Kaupankäyntikilpailu",
+  tradingCompetition: "Kaupankäyntihaaste",
   traditionalFinanceLimitations: "Perinteisen rahoituksen rajoitukset",
   transactionRejected: "Käyttäjä hylkäsi transaktion",
   transactions: "Transaktiot",

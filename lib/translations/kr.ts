@@ -410,7 +410,7 @@ export const kr = {
   thisWalletHasntParticipated: "이 지갑 주소는 아직 어떤 챌린지에도 참여하지 않았습니다.",
   threeMonths: "3개월",
   traditionalFinanceLimitations: "기존 금융 시스템의 한계",
-  tradingCompetition: "트레이딩 대회 참가로 투자 실력 증명",
+  tradingCompetition: "트레이딩 챌린지 참가로 투자 실력 증명",
   transparentRecords: "투명한 기록",
   transparentRecordsDesc: "모든 거래 내역이 블록체인에 투명하게 기록됩니다",
   transparentReturns: "투명한 수익률 공개와 검증",

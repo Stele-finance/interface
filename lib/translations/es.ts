@@ -434,7 +434,7 @@ export const es = {
   totalRewards: "Recompensas",
   totalVotes: "Votos Totales",
   traditionalFinanceLimitations: "Limitaciones de las Finanzas Tradicionales",
-  tradingCompetition: "Demuestre habilidades de inversión a través de competencias de trading",
+  tradingCompetition: "Demuestre habilidades de inversión a través de desafíos de trading",
   transactionRejected: "Transacción rechazada por el usuario",
   transparentRecords: "Registros Transparentes",
   transparentRecordsDesc: "Todo el historial de transacciones se registra de forma transparente en blockchain",

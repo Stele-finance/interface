@@ -414,7 +414,7 @@ export const nl = {
   threeMonthsChallenge: "3 Maanden",
   time: "Tijd",
   traditionalFinanceLimitations: "Beperkingen van Traditionele Financiën",
-  tradingCompetition: "Bewijs investeringsvaardigheden door trading competities",
+  tradingCompetition: "Bewijs investeringsvaardigheden door trading uitdagingen",
   transparentRecords: "Transparante records",
   transparentRecordsDesc: "Alle transactiegeschiedenis wordt transparant geregistreerd op de blockchain",
   transparentReturns: "Transparante rendement onthulling en verificatie",

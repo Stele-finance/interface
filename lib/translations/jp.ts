@@ -441,7 +441,7 @@ export const jp = {
   totalRewards: "報酬",
   totalVotes: "総投票数",
   traditionalFinanceLimitations: "従来金融の制限",
-  tradingCompetition: "トレーディング競争を通じて投資スキルを証明",
+  tradingCompetition: "トレーディングチャレンジを通じて投資スキルを証明",
   transactionRejected: "ユーザーによって取引が拒否されました",
   transactions: "取引",
   transactionSubmitted: "取引送信済み",

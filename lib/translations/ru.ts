@@ -441,7 +441,7 @@ export const ru = {
   totalRewards: 'Общие награды',
   totalVotes: 'Общее количество голосов',
   traditionalFinanceLimitations: 'Ограничения традиционных финансов',
-  tradingCompetition: 'Торговое соревнование',
+  tradingCompetition: 'Торговый челлендж',
   transactionRejected: 'Транзакция отклонена',
   transactions: 'Транзакции',
   transactionSubmitted: 'Транзакция отправлена',

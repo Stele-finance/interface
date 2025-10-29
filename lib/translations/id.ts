@@ -434,7 +434,7 @@ export const id = {
   totalRewards: "Hadiah",
   totalVotes: "Total Suara",
   traditionalFinanceLimitations: "Keterbatasan keuangan tradisional",
-  tradingCompetition: "Buktikan keterampilan investasi melalui kompetisi trading",
+  tradingCompetition: "Buktikan keterampilan investasi melalui tantangan trading",
   transparentRecords: "Catatan Transparan",
   transparentRecordsDesc: "Semua riwayat transaksi dicatat secara transparan di blockchain",
   transparentReturns: "Pengungkapan dan verifikasi return yang transparan",

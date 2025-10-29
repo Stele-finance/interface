@@ -441,7 +441,7 @@ export const ms = {
   totalRewards: "Ganjaran",
   totalVotes: "Jumlah Undi",
   traditionalFinanceLimitations: "Had Kewangan Tradisional",
-  tradingCompetition: "Buktikan kemahiran pelaburan melalui pertandingan perdagangan",
+  tradingCompetition: "Buktikan kemahiran pelaburan melalui cabaran perdagangan",
   transactionRejected: "Transaksi ditolak oleh pengguna",
   transactions: "Transaksi",
   transactionSubmitted: "Transaksi dihantar",

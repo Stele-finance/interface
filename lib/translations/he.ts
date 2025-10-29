@@ -434,7 +434,7 @@ export const he = {
   totalRewards: "תגמולים",
   totalVotes: "סך הצבעות",
   traditionalFinanceLimitations: "מגבלות הפיננסים המסורתיים",
-  tradingCompetition: "הוכח כישורי השקעה באמצעות תחרויות מסחר",
+  tradingCompetition: "הוכח כישורי השקעה באמצעות אתגרי מסחר",
   transparentRecords: "רישומים שקופים",
   transparentRecordsDesc: "כל היסטוריית העסקאות מתועדת בצורה שקופה על הבלוקצ'יין",
   transparentReturns: "גילוי ואימות שקוף של תשואות",
