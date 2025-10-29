@@ -490,23 +490,23 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
 
   // Initial fetch using stable tokenKey
   useEffect(() => {
-    if (tokenKey) {
+    if (tokenKey && tokens.length > 0) {
       fetchBatchPrices()
     } else {
       setIsLoading(false)
     }
-  }, [tokenKey, fetchBatchPrices])
+  }, [tokenKey, fetchBatchPrices, tokens.length])
 
-  // Auto-refresh every 2 minutes
+  // Auto-refresh every 2 minutes (only if there are tokens to fetch)
   useEffect(() => {
-    if (!tokenKey) return
-    
+    if (!tokenKey || tokens.length === 0) return
+
     const interval = setInterval(() => {
       fetchBatchPrices(true) // Force refresh for periodic updates
     }, 120000) // 2 minutes
-    
+
     return () => clearInterval(interval)
-  }, [fetchBatchPrices, tokenKey])
+  }, [fetchBatchPrices, tokenKey, tokens.length])
 
   return {
     data: priceData,

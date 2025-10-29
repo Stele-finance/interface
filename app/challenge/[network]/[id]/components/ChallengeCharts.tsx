@@ -131,21 +131,30 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
 
   // Calculate current values for headers (use the most recent snapshot or challenge data)
   const currentRewardAmount = useMemo(() => {
-    // First try to get from the most recent snapshot
+    if (!challengeData?.challenge) return 0;
+
+    const challenge = challengeData.challenge;
+    const endTime = new Date(parseInt(challenge.endTime) * 1000);
+    const hasEnded = currentTime >= endTime;
+    const isChallengeEnded = !challenge.isActive || hasEnded;
+
+    // If challenge has ended, use the final snapshot or challenge data (frozen value)
+    if (isChallengeEnded) {
+      // Use challenge data for final value when ended
+      return parseInt(challenge.rewardAmountUSD);
+    }
+
+    // If challenge is still active, use the most recent snapshot for real-time data
     if (chartData.length > 0) {
       const latestSnapshot = chartData[chartData.length - 1]?.rewardAmountUSD || 0
       if (latestSnapshot > 0) {
         return latestSnapshot
       }
     }
-    
-    // Fallback to challenge data if snapshot data is not available or is 0
-    if (challengeData?.challenge) {
-      return parseInt(challengeData.challenge.rewardAmountUSD)
-    }
-    
-    return 0
-  }, [chartData, challengeData])
+
+    // Fallback to challenge data if snapshot data is not available
+    return parseInt(challenge.rewardAmountUSD)
+  }, [chartData, challengeData, currentTime])
 
   // Get challenge details for the info card
   const getChallengeDetails = () => {
