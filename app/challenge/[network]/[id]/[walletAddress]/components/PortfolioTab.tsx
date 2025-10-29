@@ -12,13 +12,15 @@ interface PortfolioTabProps {
   isLoadingUniswap: boolean
   subgraphNetwork: string
   onTokenClick: (tokenAddress: string) => void
+  isChallengeEnded?: boolean
 }
 
-export function PortfolioTab({ 
-  userTokens, 
-  isLoadingUniswap, 
-  subgraphNetwork, 
-  onTokenClick 
+export function PortfolioTab({
+  userTokens,
+  isLoadingUniswap,
+  subgraphNetwork,
+  onTokenClick,
+  isChallengeEnded = false
 }: PortfolioTabProps) {
   const { t } = useLanguage()
   const { getTokenPriceBySymbol } = useTokenPrices()
@@ -101,13 +103,17 @@ export function PortfolioTab({
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-gray-100">{token.symbol}</p>
                             <p className="text-sm text-gray-400">{token.address.slice(0, 8)}...{token.address.slice(-6)}</p>
-                            {/* Show real-time price */}
-                            {isLoadingPrice ? (
-                              <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
-                            ) : tokenPrice > 0 ? (
-                              <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
-                            ) : (
-                              <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
+                            {/* Show real-time price only if challenge is not ended */}
+                            {!isChallengeEnded && (
+                              <>
+                                {isLoadingPrice ? (
+                                  <p className="text-xs text-gray-500">{t('loadingPrice')}</p>
+                                ) : tokenPrice > 0 ? (
+                                  <p className="text-xs text-green-400">${tokenPrice.toFixed(4)} {t('perToken')}</p>
+                                ) : (
+                                  <p className="text-xs text-gray-500">{t('priceUnavailable')}</p>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
@@ -115,13 +121,17 @@ export function PortfolioTab({
                       <td className="py-6 px-4 sm:px-6">
                         <div className="text-right">
                           <p className="font-medium text-gray-100">{formatTokenAmount(token.amount)}</p>
-                          {/* Show USD value */}
-                          {isLoadingPrice ? (
-                            <p className="text-sm text-gray-500">{t('loading')}</p>
-                          ) : tokenValue > 0 ? (
-                            <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
-                          ) : (
-                            <p className="text-sm text-gray-500">$0.00</p>
+                          {/* Show USD value only if challenge is not ended */}
+                          {!isChallengeEnded && (
+                            <>
+                              {isLoadingPrice ? (
+                                <p className="text-sm text-gray-500">{t('loading')}</p>
+                              ) : tokenValue > 0 ? (
+                                <p className="text-sm text-green-400">${tokenValue.toFixed(2)}</p>
+                              ) : (
+                                <p className="text-sm text-gray-500">$0.00</p>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>

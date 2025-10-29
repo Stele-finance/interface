@@ -110,23 +110,23 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
       })
       .sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp (ascending)
 
-    // Add real-time data point if available (only for daily interval)
-    if (interval === 'daily' && realTimePortfolio && realTimePortfolio.totalValue > 0) {
+    // Add real-time data point if available (only for daily interval and when challenge is not ended)
+    if (interval === 'daily' && realTimePortfolio && realTimePortfolio.totalValue > 0 && !isChallengeEnded) {
       const currentDate = new Date(realTimePortfolio.timestamp)
       const seedMoney = investorData?.investor ? (parseFloat(investorData.investor.seedMoneyUSD) || 0) : 0
-      
+
       const realTimeDataPoint = {
         id: `realtime-${realTimePortfolio.timestamp}-${Date.now()}`,
         timestamp: realTimePortfolio.timestamp,
         currentUSD: realTimePortfolio.totalValue,
         seedMoneyUSD: seedMoney,
         profitRatio: seedMoney > 0 ? ((realTimePortfolio.totalValue - seedMoney) / seedMoney) : 0,
-        formattedDate: formatDateWithLocale(currentDate, language, { 
-          month: 'short', 
+        formattedDate: formatDateWithLocale(currentDate, language, {
+          month: 'short',
           day: 'numeric'
         }),
-        fullDate: `${formatDateWithLocale(currentDate, language, { 
-          month: 'short', 
+        fullDate: `${formatDateWithLocale(currentDate, language, {
+          month: 'short',
           day: 'numeric',
           year: 'numeric',
           hour: 'numeric',
@@ -141,22 +141,29 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
         })(),
         isRealTime: true
       }
-      
+
               // Add real-time point to the end of the chart
         processedData.push(realTimeDataPoint)
     }
 
     return processedData
-  }, [data, weeklyData, monthlyData, interval, realTimePortfolio, investorData, language, t])
+  }, [data, weeklyData, monthlyData, interval, realTimePortfolio, investorData, language, t, isChallengeEnded])
 
-  // Calculate current values for headers (prefer real-time data if available)
+  // Calculate current values for headers (prefer real-time data if available and challenge not ended)
   const currentPortfolioValue = useMemo(() => {
+    // If challenge has ended, use final snapshot data (on-chain data)
+    if (isChallengeEnded) {
+      if (!chartData.length) return 0
+      return chartData[chartData.length - 1]?.currentUSD || 0
+    }
+
+    // If challenge is still active, use real-time data if available
     if (realTimePortfolio && realTimePortfolio.totalValue > 0) {
       return realTimePortfolio.totalValue
     }
     if (!chartData.length) return 0
     return chartData[chartData.length - 1]?.currentUSD || 0
-  }, [chartData, realTimePortfolio])
+  }, [chartData, realTimePortfolio, isChallengeEnded])
 
   // Calculate investor metrics (using real-time data when available and challenge is not ended)
   const getInvestorMetrics = () => {

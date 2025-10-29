@@ -73,7 +73,16 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   })) || []
 
   // Get token prices for user's tokens (network-specific)
-  const { data: tokenPricesData, isLoading: isLoadingUniswap } = useUserTokenPrices(userTokens, subgraphNetwork)
+  // Only fetch prices if challenge is not ended (to avoid rate limiting)
+  const shouldFetchPrices = challengeData?.challenge ? (() => {
+    const endTime = new Date(parseInt(challengeData.challenge.endTime) * 1000)
+    return new Date() < endTime && challengeData.challenge.isActive
+  })() : true
+
+  const { data: tokenPricesData, isLoading: isLoadingUniswap } = useUserTokenPrices(
+    shouldFetchPrices ? userTokens : [],
+    subgraphNetwork
+  )
 
   // State management
   const [activeTab, setActiveTab] = useState("portfolio")
@@ -520,11 +529,12 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </TabsList>
                 
               <TabsContent value="portfolio" className="space-y-4">
-                <PortfolioTab 
+                <PortfolioTab
                   userTokens={userTokens}
                   isLoadingUniswap={isLoadingUniswap}
                   subgraphNetwork={subgraphNetwork}
                   onTokenClick={handleTokenClick}
+                  isChallengeEnded={!!isChallengeEnded}
                 />
               </TabsContent>
 
