@@ -21,7 +21,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Stele | Become a Legend in Crypto Investment",
-  description: "Crypto investment competition and manage your own crypto funds in Blockchain",
+  description: "Crypto investment challenge and manage your own crypto funds in Blockchain",
   generator: 'v0.dev',
 }
 
