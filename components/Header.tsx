@@ -466,8 +466,8 @@ export function Header() {
                   className="h-16 flex items-center justify-start gap-4 p-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                   onClick={() => handleConnectWallet()}
                 >
-                  <Image 
-                    src={getWalletLogo('walletconnect')} 
+                  <Image
+                    src={getWalletLogo('walletconnect')}
                     alt="WalletConnect"
                     width={24}
                     height={24}
@@ -480,6 +480,29 @@ export function Header() {
                     </div>
                   </div>
                 </Button>
+              </div>
+              <div className="border-t border-gray-600 pt-4 pb-2">
+                <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                  {t('byConnectingWalletPrefix')}{' '}
+                  <Link
+                    href="/terms-of-service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                  >
+                    {t('termsOfService')}
+                  </Link>
+                  {' '}{t('byConnectingWalletMiddle')}{' '}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                  >
+                    {t('privacyPolicy')}
+                  </Link>
+                  {t('byConnectingWalletSuffix')}
+                </p>
               </div>
             </DialogContent>
           </Dialog>
