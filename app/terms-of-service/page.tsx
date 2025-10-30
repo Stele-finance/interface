@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 // Force dynamic rendering to avoid SSR issues
@@ -26,7 +27,7 @@ export default function TermsPage() {
         {/* Main Content */}
         <Card className="bg-muted/40 border-border/50">
           <CardContent className="p-6 md:p-8">
-            <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none space-y-6">
+            <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none space-y-6" suppressHydrationWarning>
               <div className="space-y-4">
                 <p>
                   <strong>Stele Finance</strong> (to be incorporated as Stele Finance Pte Ltd in Singapore)<br />
