@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { Trophy, BarChart3, Vote, Image as ImageIcon } from "lucide-react"
 import { cn, getNetworkLogo, getWalletLogo, detectActualWalletType } from "@/lib/utils"
-import { User, Wallet, Menu, Github, FileText, Twitter, Languages } from "lucide-react"
+import { User, Wallet, Menu, Github, FileText, Twitter, Languages, Scale, ExternalLink } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,6 +90,7 @@ export function Header() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [legalDialogOpen, setLegalDialogOpen] = useState(false)
   
   // Track previous network and wallet address for detecting changes
   const prevNetworkRef = useRef<string | null>(null)
@@ -540,7 +541,7 @@ export function Header() {
               </Link>
             </DropdownMenuItem>
                          <DropdownMenuItem asChild>
-               <Link 
+               <Link
                  href="https://x.com/stelefinance"
                  target="_blank"
                  rel="noopener noreferrer"
@@ -550,10 +551,91 @@ export function Header() {
                  X
                </Link>
              </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => setLegalDialogOpen(true)}
+            >
+              <Scale className="mr-2 h-4 w-4" />
+              Legal & Privacy
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
       </div>
+
+      {/* Legal & Privacy Dialog */}
+      <Dialog open={legalDialogOpen} onOpenChange={setLegalDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+          <DialogHeader>
+            <DialogTitle>Legal & Privacy</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Terms and Privacy Buttons */}
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-3 px-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                asChild
+              >
+                <Link href="/terms-of-service" target="_blank" rel="noopener noreferrer">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Terms of Service
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-3 px-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                asChild
+              >
+                <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+                  <Scale className="mr-2 h-4 w-4" />
+                  Privacy Policy
+                </Link>
+              </Button>
+            </div>
+
+            {/* Separator */}
+            <div className="border-t border-gray-600"></div>
+
+            {/* Third-party APIs Section */}
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                This app uses the following third-party APIs:
+              </p>
+
+              {/* API Cards */}
+              <div className="space-y-2">
+                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-sm">Uniswap v3</h4>
+                      <p className="text-xs text-muted-foreground">Decentralized trading protocol</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-sm">The Graph</h4>
+                      <p className="text-xs text-muted-foreground">Indexing protocol for blockchain data</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-sm">Infura</h4>
+                      <p className="text-xs text-muted-foreground">Blockchain infrastructure provider</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && isMounted && createPortal(
@@ -604,7 +686,7 @@ export function Header() {
                   {pageType === 'fund' ? t('funds') : t('challenges')}
                 </Link>
                 
-                <Link 
+                <Link
                   href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
@@ -617,8 +699,22 @@ export function Header() {
                   <ImageIcon className="h-5 w-5 mr-3" />
                   NFTs
                 </Link>
-{/*                 
-                <Link 
+
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    setLegalDialogOpen(true)
+                  }}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors w-full text-left",
+                    "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Scale className="h-5 w-5 mr-3" />
+                  Legal & Privacy
+                </button>
+{/*
+                <Link
                   href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
