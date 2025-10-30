@@ -565,69 +565,97 @@ export function Header() {
 
       {/* Legal & Privacy Dialog */}
       <Dialog open={legalDialogOpen} onOpenChange={setLegalDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-muted/80 border-gray-600">
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-gray-600/50 shadow-2xl">
           <DialogHeader>
-            <DialogTitle>Legal & Privacy</DialogTitle>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Legal & Privacy
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Terms and Privacy Buttons */}
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full justify-start h-auto py-3 px-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                className="w-full justify-start h-auto py-3 px-4 bg-gradient-to-r from-orange-600/20 to-orange-500/20 border-orange-500/50 hover:border-orange-400 hover:from-orange-600/30 hover:to-orange-500/30 transition-all group"
                 asChild
               >
                 <Link href="/terms-of-service" target="_blank" rel="noopener noreferrer">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Terms of Service
+                  <FileText className="mr-3 h-5 w-5 text-orange-400 group-hover:text-orange-300 transition-colors" />
+                  <div className="flex-1">
+                    <div className="font-semibold text-orange-100">Terms of Service</div>
+                    <div className="text-xs text-orange-300/70">Read our terms and conditions</div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-orange-400/60 group-hover:text-orange-300 transition-colors" />
                 </Link>
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start h-auto py-3 px-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
+                className="w-full justify-start h-auto py-3 px-4 bg-gradient-to-r from-orange-600/20 to-orange-500/20 border-orange-500/50 hover:border-orange-400 hover:from-orange-600/30 hover:to-orange-500/30 transition-all group"
                 asChild
               >
                 <Link href="/privacy" target="_blank" rel="noopener noreferrer">
-                  <Scale className="mr-2 h-4 w-4" />
-                  Privacy Policy
+                  <Scale className="mr-3 h-5 w-5 text-orange-400 group-hover:text-orange-300 transition-colors" />
+                  <div className="flex-1">
+                    <div className="font-semibold text-orange-100">Privacy Policy</div>
+                    <div className="text-xs text-orange-300/70">How we protect your data</div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-orange-400/60 group-hover:text-orange-300 transition-colors" />
                 </Link>
               </Button>
             </div>
 
             {/* Separator */}
-            <div className="border-t border-gray-600"></div>
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-600/50"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-gray-800 px-3 text-xs text-gray-400 uppercase tracking-wider">Third-Party Services</span>
+              </div>
+            </div>
 
             {/* Third-party APIs Section */}
             <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                This app uses the following third-party APIs:
-              </p>
-
               {/* API Cards */}
-              <div className="space-y-2">
-                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-sm">Uniswap v3</h4>
-                      <p className="text-xs text-muted-foreground">Decentralized trading protocol</p>
+              <div className="space-y-2.5">
+                <div className="group p-4 rounded-xl bg-gradient-to-br from-pink-600/10 via-pink-500/5 to-transparent border border-pink-500/30 hover:border-pink-400/50 transition-all hover:shadow-lg hover:shadow-pink-500/10">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-pink-500/20 group-hover:bg-pink-500/30 transition-colors">
+                      <svg className="h-5 w-5 text-pink-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm text-pink-100 mb-0.5">Uniswap v3</h4>
+                      <p className="text-xs text-pink-300/70 leading-relaxed">Decentralized trading protocol for token swaps</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-sm">The Graph</h4>
-                      <p className="text-xs text-muted-foreground">Indexing protocol for blockchain data</p>
+                <div className="group p-4 rounded-xl bg-gradient-to-br from-cyan-600/10 via-cyan-500/5 to-transparent border border-cyan-500/30 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-cyan-500/20 group-hover:bg-cyan-500/30 transition-colors">
+                      <svg className="h-5 w-5 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm text-cyan-100 mb-0.5">The Graph</h4>
+                      <p className="text-xs text-cyan-300/70 leading-relaxed">Indexing protocol for blockchain data queries</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-muted/40 border border-gray-600/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-sm">Infura</h4>
-                      <p className="text-xs text-muted-foreground">Blockchain infrastructure provider</p>
+                <div className="group p-4 rounded-xl bg-gradient-to-br from-orange-600/10 via-orange-500/5 to-transparent border border-orange-500/30 hover:border-orange-400/50 transition-all hover:shadow-lg hover:shadow-orange-500/10">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-orange-500/20 group-hover:bg-orange-500/30 transition-colors">
+                      <svg className="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm text-orange-100 mb-0.5">Infura</h4>
+                      <p className="text-xs text-orange-300/70 leading-relaxed">Blockchain infrastructure and API provider</p>
                     </div>
                   </div>
                 </div>
