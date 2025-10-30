@@ -47,12 +47,9 @@ export default function TermsPage() {
                   You further represent that you are not (a) the subject of economic or trade sanctions administered or enforced by any governmental authority or otherwise designated on any list of prohibited or restricted parties (including but not limited to the list maintained by the Office of Foreign Assets Control of the U.S. Department of the Treasury) or (b) a citizen, resident, or organized in a jurisdiction or territory that is the subject of comprehensive country-wide, territory-wide, or regional economic sanctions by the United States. Finally, you represent that your access and use of any of our Products will fully comply with all applicable laws and regulations, and that you will not access or use any of our Products to conduct, promote, or otherwise facilitate any illegal activity.
                 </p>
 
-                <div className="bg-yellow-50 dark:bg-yellow-950/30 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                  <p className="text-yellow-800 dark:text-yellow-200 font-semibold mb-2">NOTICE:</p>
-                  <p className="text-yellow-700 dark:text-yellow-300">
-                    This Agreement contains important information, including a binding arbitration provision and a class action waiver, both of which impact your rights as to how disputes are resolved. Our Products are only available to you — and you should only access any of our Products — if you agree completely with these terms.
-                  </p>
-                </div>
+                <p>
+                  <strong>NOTICE:</strong> This Agreement contains important information, including a binding arbitration provision and a class action waiver, both of which impact your rights as to how disputes are resolved. Our Products are only available to you — and you should only access any of our Products — if you agree completely with these terms.
+                </p>
               </div>
 
               <div className="space-y-4">
