@@ -577,7 +577,7 @@ export function Header() {
                 className="w-full justify-start h-auto py-3 px-4 bg-muted/40 border-gray-600 hover:bg-muted/60"
                 asChild
               >
-                <Link href="/terms" target="_blank" rel="noopener noreferrer">
+                <Link href="/terms-of-service" target="_blank" rel="noopener noreferrer">
                   <FileText className="mr-2 h-4 w-4" />
                   Terms of Service
                 </Link>
