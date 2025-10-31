@@ -488,6 +488,29 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                       </div>
                     </Button>
                   </div>
+                  <div className="border-t border-gray-600 pt-4 pb-2">
+                    <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                      {t('byConnectingWalletPrefix')}{' '}
+                      <a
+                        href="/terms-of-service"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                      >
+                        {t('termsOfService')}
+                      </a>
+                      {' '}{t('byConnectingWalletMiddle')}{' '}
+                      <a
+                        href="/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                      >
+                        {t('privacyPolicy')}
+                      </a>
+                      {t('byConnectingWalletSuffix')}
+                    </p>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
