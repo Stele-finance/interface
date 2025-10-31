@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
@@ -15,7 +16,7 @@ import {
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, CheckCircle, Clock, Trophy, ChevronDown, Calendar, Timer } from "lucide-react"
+import { Users, CheckCircle, Clock, Trophy, ChevronDown, Timer } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -191,21 +192,21 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
-            <Clock className="h-4 w-4" />
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
+            <Clock className="h-3 w-3" />
             {t('active')}
           </Badge>
         )
       case "pending":
         return (
-          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
-            <Clock className="h-4 w-4" />
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
+            <Clock className="h-3 w-3" />
             {t('pending')}
           </Badge>
         )
       case "end":
         return (
-          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
+          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
             <CheckCircle className="h-3 w-3" />
             {t('end')}
           </Badge>
@@ -216,7 +217,7 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
   const formatDate = (timestamp: string) => {
     if (timestamp === "0") return "-"
     const date = new Date(Number(timestamp) * 1000)
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
   }
 
   return (
@@ -235,7 +236,7 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
       <div className="space-y-6">
         {/* Header with Network Dropdown */}
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl text-gray-100">{t('tradingCompetition')}</h2>
+          <h2 className="text-3xl text-gray-100">{t('challenge')}</h2>
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -303,7 +304,14 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
         </div>
 
         {/* Hero Section - Prize Pool and Timer */}
-        <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-0 shadow-xl overflow-hidden">
+        <Card
+          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-0 shadow-xl overflow-hidden cursor-pointer hover:shadow-2xl transition-all"
+          onClick={() => {
+            if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
+              router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
+            }
+          }}
+        >
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left - Total Prize Pool */}
@@ -314,10 +322,6 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
                 </div>
                 <div className="text-6xl font-bold text-yellow-400">
                   ${weekChallenge.prize.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Users className="h-5 w-5" />
-                  <span>{weekChallenge.participants} {t('participants')}</span>
                 </div>
               </div>
 
@@ -358,7 +362,7 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
 
         {/* Challenge Info Card */}
         <Card
-          className="bg-transparent border-0 shadow-lg hover:shadow-xl transition-all cursor-pointer"
+          className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
           onClick={() => {
             if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
               router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
@@ -366,36 +370,34 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
           }}
         >
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {/* Challenge Period */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Calendar className="h-4 w-4" />
-                  <span className="text-sm">{t('period')}</span>
-                </div>
-                <div className="text-gray-100 font-medium text-base">
-                  {formatDate(weekChallenge.startTime)} - {formatDate(weekChallenge.endTime)}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Progress */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="text-sm text-gray-400">{t('progress')}</div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-2">
+                        <Progress value={progress} className="w-20 h-3" />
+                        <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(progress)}%</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{formatDate(weekChallenge.startTime)} - {formatDate(weekChallenge.endTime)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
 
               {/* Status */}
-              <div className="space-y-2">
+              <div className="flex items-center justify-between md:justify-start gap-2">
                 <div className="text-sm text-gray-400">{t('status')}</div>
                 <div>{getStatusBadge(weekChallenge.status)}</div>
               </div>
 
-              {/* Progress */}
-              <div className="space-y-2">
-                <div className="text-sm text-gray-400">{t('progress')}</div>
-                <div className="flex items-center gap-2">
-                  <Progress value={progress} className="flex-1 h-3" />
-                  <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(progress)}%</span>
-                </div>
-              </div>
-
-              {/* Users */}
-              <div className="space-y-2">
-                <div className="text-sm text-gray-400">{t('users')}</div>
+              {/* Participants */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="text-sm text-gray-400">{t('participants')}</div>
                 <div className="flex items-center gap-2 text-gray-100 text-base font-medium">
                   <Users className="h-4 w-4" />
                   <span>{weekChallenge.participants}</span>
@@ -403,7 +405,7 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
               </div>
 
               {/* Challenge ID */}
-              <div className="space-y-2">
+              <div className="flex items-center justify-between md:justify-start gap-2">
                 <div className="flex items-center gap-2 text-gray-400">
                   <Trophy className="h-4 w-4 text-yellow-500" />
                   <span className="text-sm">{t('challenge')} ID</span>

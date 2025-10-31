@@ -250,8 +250,8 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
         </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-1">
-            {isPositive ? 
-              <TrendingUp className="h-3 w-3 text-emerald-400" /> : 
+            {isPositive ?
+              <TrendingUp className="h-3 w-3 text-emerald-400" /> :
               <TrendingDown className="h-3 w-3 text-red-400" />
             }
             <span className={cn(
@@ -261,11 +261,6 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
               {formatPercentage(profitRatio)}
             </span>
           </div>
-        </td>
-        <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
-          <span className="font-medium text-gray-100">
-            {challengeTitle}
-          </span>
         </td>
       </tr>
     )
@@ -300,8 +295,8 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
                           {/* Show network icon only when connected to Arbitrum */}
                           {selectedNetwork === 'arbitrum' && (
                             <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                              <Image 
-                                src="/networks/small/arbitrum.png" 
+                              <Image
+                                src="/networks/small/arbitrum.png"
                                 alt="Arbitrum"
                                 width={8}
                                 height={8}
@@ -322,12 +317,6 @@ export function MyPortfolioTab({ activeTab, setActiveTab, selectedNetwork, setSe
                       </div>
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profit')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">⏰</span>
-                        {t('period')}
-                      </div>
-                    </th>
                   </tr>
                 </thead>
                 <tbody>

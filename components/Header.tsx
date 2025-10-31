@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
-import { Trophy, BarChart3, Vote, Image as ImageIcon } from "lucide-react"
+import { Trophy, BarChart3, Image as ImageIcon } from "lucide-react"
 import { cn, getNetworkLogo, getWalletLogo, detectActualWalletType } from "@/lib/utils"
 import { User, Wallet, Menu, Github, FileText, Twitter, Languages, Scale, ExternalLink } from "lucide-react"
 import {
@@ -312,19 +312,6 @@ export function Header() {
           >
             <ImageIcon className="h-5 w-5" />
             NFTs
-          </Link>
-
-          <Link
-            href={pageType === 'fund' ? '/vote/fund' : '/vote/challenge'}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname.includes("/vote")
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Vote className="h-5 w-5" />
-            {t('vote')}
           </Link>
 
         </nav>

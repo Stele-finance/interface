@@ -179,12 +179,6 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentCh
                         </th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('prize')}</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('users')}</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">⏰</span>
-                            {t('period')}
-                          </div>
-                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -236,11 +230,6 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentCh
                               <Users className="h-4 w-4 text-gray-400" />
                               {challenge.investorCounter}
                             </div>
-                          </td>
-                          <td className="py-6 px-4">
-                            <span className="font-medium text-gray-100 text-base whitespace-nowrap">
-                              {getChallengeTypeName(challenge.challengeType)}
-                            </span>
                           </td>
                         </tr>
                       ))}
