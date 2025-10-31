@@ -20,14 +20,18 @@ interface RecentChallengesTableProps {
 export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentChallengesTableProps) {
   const { t } = useLanguage()
   const router = useRouter()
-  
+
   // Use selected network for subgraph queries
   const subgraphNetwork = selectedNetwork
-  const { data, isLoading, error } = useRecentChallenges(subgraphNetwork)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-  const maxPages = 5
+  const itemsPerPage = 5 // Items per page
+
+  // Fetch data with pagination - queries only current page data
+  const { data, isLoading, error } = useRecentChallenges(subgraphNetwork, currentPage, itemsPerPage)
+
+  // Calculate max pages based on actual total count
+  const maxPages = data?.challengesTotal ? Math.ceil(data.challengesTotal.length / itemsPerPage) : 0
 
   // Update time every second for accurate status calculation
   useEffect(() => {
@@ -184,115 +188,101 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentCh
                       </tr>
                     </thead>
                     <tbody>
-                      {(() => {
-                        // Calculate pagination
-                        const sortedChallenges = data.challenges.sort((a, b) => Number(b.endTime) - Number(a.endTime))
-                        const totalChallenges = Math.min(sortedChallenges.length, maxPages * itemsPerPage);
-                        const startIndex = (currentPage - 1) * itemsPerPage;
-                        const endIndex = Math.min(startIndex + itemsPerPage, totalChallenges);
-                        const paginatedChallenges = sortedChallenges.slice(startIndex, endIndex);
-
-                        return paginatedChallenges.map((challenge) => (
-                          <tr 
-                            key={challenge.id} 
-                            className="hover:bg-gray-800/30 transition-colors cursor-pointer"
-                            onClick={() => router.push(`/challenge/${subgraphNetwork}/${challenge.challengeId}`)}
-                          >
-                            <td className="py-6 pl-6 pr-4">
-                              <div className="ml-6">
-                                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                                  {challenge.challengeId}
-                                </Badge>
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              {getStatusBadge(getChallengeStatus(challenge))}
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className="flex items-center gap-2">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div>
-                                        <Progress 
-                                          value={Math.min(100, Math.max(0, ((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100))} 
-                                          className="w-20 h-3"
-                                        />
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>{Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}% {t('progress')}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <span className="text-sm text-gray-400 font-medium whitespace-nowrap">
-                                  {Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}%
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className="font-medium text-yellow-400 whitespace-nowrap">
-                                {formatUSDAmount(challenge.rewardAmountUSD)}
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
-                                <Users className="h-4 w-4 text-gray-400" />
-                                {challenge.investorCounter}
-                              </div>
-                            </td>
-                            <td className="py-6 px-4">
-                              <span className="font-medium text-gray-100 text-base whitespace-nowrap">
-                                {getChallengeTypeName(challenge.challengeType)}
+                      {data.challenges.map((challenge) => (
+                        <tr
+                          key={challenge.id}
+                          className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+                          onClick={() => router.push(`/challenge/${subgraphNetwork}/${challenge.challengeId}`)}
+                        >
+                          <td className="py-6 pl-6 pr-4">
+                            <div className="ml-6">
+                              <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
+                                {challenge.challengeId}
+                              </Badge>
+                            </div>
+                          </td>
+                          <td className="py-6 px-4">
+                            {getStatusBadge(getChallengeStatus(challenge))}
+                          </td>
+                          <td className="py-6 px-4">
+                            <div className="flex items-center gap-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div>
+                                      <Progress
+                                        value={Math.min(100, Math.max(0, ((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100))}
+                                        className="w-20 h-3"
+                                      />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}% {t('progress')}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <span className="text-sm text-gray-400 font-medium whitespace-nowrap">
+                                {Math.min(100, Math.max(0, Math.round(((new Date().getTime() / 1000 - Number(challenge.startTime)) / (Number(challenge.endTime) - Number(challenge.startTime))) * 100)))}%
                               </span>
-                            </td>
-                          </tr>
-                        ))
-                      })()}
+                            </div>
+                          </td>
+                          <td className="py-6 px-4">
+                            <div className="font-medium text-yellow-400 whitespace-nowrap">
+                              {formatUSDAmount(challenge.rewardAmountUSD)}
+                            </div>
+                          </td>
+                          <td className="py-6 px-4">
+                            <div className="flex items-center gap-1 text-gray-300 whitespace-nowrap">
+                              <Users className="h-4 w-4 text-gray-400" />
+                              {challenge.investorCounter}
+                            </div>
+                          </td>
+                          <td className="py-6 px-4">
+                            <span className="font-medium text-gray-100 text-base whitespace-nowrap">
+                              {getChallengeTypeName(challenge.challengeType)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               </div>
               
               {/* Pagination - outside scrollable area, fixed at bottom */}
-              {(() => {
-                const totalChallenges = Math.min(data.challenges.length, maxPages * itemsPerPage);
-                const totalPages = Math.min(Math.ceil(totalChallenges / itemsPerPage), maxPages);
-                
-                return totalPages > 1 && (
-                  <div className="flex justify-center py-4 px-6 border-t border-gray-600">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
-                          />
+              {maxPages > 1 && (
+                <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                        />
+                      </PaginationItem>
+
+                      {Array.from({ length: maxPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer hover:bg-gray-700"
+                          >
+                            {page}
+                          </PaginationLink>
                         </PaginationItem>
-                        
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={currentPage === page}
-                              className="cursor-pointer hover:bg-gray-700"
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                );
-              })()}
+                      ))}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage(Math.min(maxPages, currentPage + 1))}
+                          className={currentPage === maxPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
             </>
           )}
         </CardContent>

@@ -302,7 +302,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
 
       // Execute multicall with Multicall3 (standardized across all networks)
       // Limit batch size to prevent gas issues and rate limiting
-      const MAX_BATCH_SIZE = 20 // Reduced from 50 to prevent rate limiting
+      const MAX_BATCH_SIZE = 10 // Further reduced to prevent rate limiting
       const allResults: Array<{success: boolean, returnData: string}> = []
 
       // Helper function to delay between requests
@@ -326,19 +326,37 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
 
           // Add delay between batches to prevent rate limiting (except for last batch)
           if (i + MAX_BATCH_SIZE < calls.length) {
-            await delay(200) // 200ms delay between batches
+            await delay(500) // Increased to 500ms delay between batches
           }
         } catch (batchError: any) {
           console.error(`Batch ${batchNumber}/${totalBatches} failed:`, batchError)
 
           // Check if it's a rate limit error
           const isRateLimitError = batchError?.message?.includes('Too Many Requests') ||
-                                   batchError?.code === -32005
+                                   batchError?.code === -32005 ||
+                                   batchError?.error?.code === -32005
 
           if (isRateLimitError) {
-            console.warn('Rate limit hit, adding longer delay...')
-            // Wait longer before continuing if rate limited
-            await delay(2000) // 2 second delay for rate limit
+            console.warn('⚠️ Rate limit hit! Waiting 5 seconds before continuing...')
+            // Wait much longer before continuing if rate limited
+            await delay(5000) // 5 second delay for rate limit
+
+            // Try this batch again once after delay
+            try {
+              const multicallContract = new ethers.Contract(multicallAddress, MULTICALL3_ABI, provider)
+              const response = await multicallContract.tryAggregate.staticCall(false, batchCalls)
+
+              const batchResults = response.map((result: any) => ({
+                success: result.success,
+                returnData: result.returnData
+              }))
+
+              allResults.push(...batchResults)
+              console.log(`✅ Batch ${batchNumber}/${totalBatches} succeeded after retry`)
+              continue
+            } catch (retryError) {
+              console.error(`❌ Batch ${batchNumber}/${totalBatches} failed even after retry`)
+            }
           }
 
           // Add failed results for this batch
