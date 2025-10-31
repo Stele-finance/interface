@@ -11,12 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  RadioGroup,
-  RadioGroupItem
-} from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Loader2, Plus } from "lucide-react"
+import { Loader2, Plus, Trophy, Calendar } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 interface ChallengeTypeModalProps {
@@ -28,68 +23,25 @@ interface ChallengeTypeModalProps {
   }>;
 }
 
-export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChallenges = [] }: ChallengeTypeModalProps) {
+export function ChallengeTypeModal({ onCreateChallenge, isCreating }: ChallengeTypeModalProps) {
   const { t } = useLanguage()
-  const [selectedType, setSelectedType] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
 
-  // Challenge type definitions with translations
-  const CHALLENGE_TYPES = [
-    {
-      id: 0,
-      name: `${t('oneWeek')} ${t('challenge')}`,
-      duration: t('oneWeek')
-    },
-    {
-      id: 1,
-      name: `${t('oneMonth')} ${t('challenge')}`,
-      duration: t('oneMonth')
-    },
-    {
-      id: 2,
-      name: `${t('threeMonths')} ${t('challenge')}`,
-      duration: t('threeMonths')
-    },
-    {
-      id: 3,
-      name: `${t('sixMonths')} ${t('challenge')}`,
-      duration: t('sixMonths')
-    },
-    {
-      id: 4,
-      name: `${t('oneYear')} ${t('challenge')}`,
-      duration: t('oneYear')
-    }
-  ];
-
-  // Check if a challenge type is already active
-  const isTypeActive = (challengeType: number) => {
-    return activeChallenges.some(challenge => 
-      challenge.challengeType === challengeType && challenge.status === "active"
-    );
-  };
-
-  // Check if the selected type is active
-  const selectedTypeIsActive = selectedType !== null ? isTypeActive(selectedType) : false;
-
+  // Always create 1 week challenge (challengeType: 0)
   const handleCreate = async () => {
-    if (selectedType !== null && !selectedTypeIsActive) {
-      try {
-        await onCreateChallenge(selectedType);
-        // Close the modal when transaction is confirmed or rejected
-        setOpen(false);
-      } catch (error) {
-        // Keep the modal open if there's an error to allow retrying
-        console.error("Error creating challenge:", error);
-      }
+    try {
+      await onCreateChallenge(0); // 0 = One Week Challenge
+      setOpen(false);
+    } catch (error) {
+      console.error("Error creating challenge:", error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           size="lg"
           className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
         >
@@ -97,86 +49,59 @@ export function ChallengeTypeModal({ onCreateChallenge, isCreating, activeChalle
           {t('createChallenge')}
         </Button>
       </DialogTrigger>
-      
-      <DialogContent className="sm:max-w-[500px] bg-muted/80 border-gray-600">
+
+      <DialogContent className="sm:max-w-[450px] bg-muted/80 border-gray-600">
         <DialogHeader>
-          <DialogTitle className="text-xl">{t('createNewChallenge')}</DialogTitle>
-          <DialogDescription className="text-base">
-            {t('selectChallengeType')}
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            <Trophy className="h-6 w-6 text-yellow-500" />
+            {t('createNewChallenge')}
+          </DialogTitle>
+          <DialogDescription className="text-base pt-2">
+            {t('createNewChallenge')}
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="py-4">
-          <RadioGroup 
-            value={selectedType?.toString() || ""} 
-            onValueChange={(value) => setSelectedType(parseInt(value))}
-            className="space-y-3"
-          >
-            {CHALLENGE_TYPES.map((type) => {
-              const typeIsActive = isTypeActive(type.id);
-              return (
-                <div
-                  key={type.id}
-                  className={`flex items-start space-x-2 rounded-md border p-3 ${
-                    selectedType === type.id 
-                      ? "border-orange-500 bg-orange-500/10" 
-                      : typeIsActive 
-                      ? "border-gray-600 bg-muted/20 opacity-50" 
-                      : "border-gray-600 bg-muted/30"
-                  }`}
-                >
-                  <RadioGroupItem 
-                    value={type.id.toString()} 
-                    id={`type-${type.id}`} 
-                    className="mt-1"
-                    disabled={typeIsActive}
-                  />
-                  <div className="flex-1 space-y-1">
-                    <Label 
-                      htmlFor={`type-${type.id}`} 
-                      className={`flex items-center justify-between ${
-                        typeIsActive ? "cursor-not-allowed" : "cursor-pointer"
-                      }`}
-                    >
-                      <div className="flex flex-col">
-                        <span className={`font-medium text-base ${typeIsActive ? "text-muted-foreground" : ""}`}>
-                          {type.name}
-                        </span>
-                        {typeIsActive && (
-                          <span className="text-sm text-orange-500 font-medium mt-1">
-                            {t('alreadyActive')}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-sm font-normal text-muted-foreground bg-gray-700 px-2 py-1 rounded-full">
-                        {type.duration}
-                      </span>
-                    </Label>
-                  </div>
+
+        <div className="py-6">
+          <div className="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border-2 border-orange-500/30 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-gray-100">{t('oneWeek')} {t('challenge')}</h3>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Calendar className="h-4 w-4" />
+                  <span className="text-sm">{t('duration')}: 7 {t('days')}</span>
                 </div>
-              );
-            })}
-          </RadioGroup>
+              </div>
+              <div className="bg-orange-500/20 px-4 py-2 rounded-full">
+                <span className="text-orange-400 font-semibold">{t('oneWeek')}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} className="text-base bg-muted/40 border-gray-600 hover:bg-muted/60">
+
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            className="text-base bg-muted/40 border-gray-600 hover:bg-muted/60"
+            disabled={isCreating}
+          >
             {t('cancel')}
           </Button>
-          <Button 
-            onClick={handleCreate} 
-            disabled={selectedType === null || isCreating || selectedTypeIsActive}
-            className="text-base"
+          <Button
+            onClick={handleCreate}
+            disabled={isCreating}
+            className="text-base bg-orange-500 hover:bg-orange-600"
           >
             {isCreating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {t('creating')}...
               </>
-            ) : selectedTypeIsActive ? (
-              t('challengeAlreadyActive')
             ) : (
-              t('createChallenge')
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                {t('create')}
+              </>
             )}
           </Button>
         </DialogFooter>

@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/lib/language-context"
 
 // Loading skeleton component for dynamic imports
 function LoadingSkeleton() {
@@ -42,7 +41,6 @@ interface DashboardClientComponentsProps {
 export function DashboardClientComponents({ network, onNetworkChange }: DashboardClientComponentsProps) {
   const [activeTab, setActiveTab] = useState<'challenges' | 'tokens'>('challenges')
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
-  const { t } = useLanguage()
 
   // Load network selection from localStorage on mount
   useEffect(() => {
@@ -72,10 +70,7 @@ export function DashboardClientComponents({ network, onNetworkChange }: Dashboar
   return (
     <>
       {activeTab === 'challenges' ? (
-        <ActiveChallenges 
-          showCreateButton={true} 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab}
+        <ActiveChallenges
           selectedNetwork={selectedNetwork}
           setSelectedNetwork={handleNetworkChange}
         />

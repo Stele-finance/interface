@@ -1,195 +1,117 @@
 'use client'
 
 import { ChallengeTypeModal } from "./ChallengeTypeModal"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import { ethers } from "ethers"
-import { toast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
-import { 
+import {
   getSteleContractAddress,
-  buildTransactionUrl,
-  getExplorerName
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 import { useActiveChallenges } from "../hooks/useActiveChallenges"
-import { Users, Wallet, CheckCircle, Clock, Trophy, ChevronDown } from "lucide-react"
+import { Users, CheckCircle, Clock, Trophy, ChevronDown, Timer } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useQueryClient } from "@tanstack/react-query"
 
-interface ChallengeCardProps {
-  id?: string
-  title: string
-  type: string
-  participants: number
-  timeLeft: string
-  prize: string
-  progress: number
-  status: "active" | "pending" | "end"
-  startTime: string
-  endTime: string
-  isCompleted: boolean
-  challengeId: string
-}
-
-function calculateTimeLeft(startTime: string, endTime: string, currentTime: Date = new Date(), t: any): string {
-  const start = new Date(Number(startTime) * 1000)
-  const end = new Date(Number(endTime) * 1000)
-  const now = currentTime
-  
-  // If challenge hasn't started yet
-  if (now < start) {
-    return t('notStarted')
-  }
-  
-  // If challenge has ended
-  if (now >= end) {
-    return t('ended')
-  }
-  
-  const diff = end.getTime() - now.getTime()
-  
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-  
-  if (days > 30) {
-    const months = Math.floor(days / 30)
-    const remainingDays = days % 30
-    return `${months} ${t('months')} ${remainingDays} ${t('days')}`
-  }
-  
-  if (days > 0) {
-    return `${days} ${t('days')} ${hours} ${t('hours')}`
-  }
-  
-  if (hours > 0) {
-    return `${hours} ${t('hours')} ${minutes} ${t('minutes')}`
-  }
-  
-  if (minutes > 0) {
-    return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`
-  }
-  
-  return `${seconds} ${t('seconds')}`
-}
-
-function calculateProgress(startTime: string, endTime: string, isCompleted: boolean, currentTime: Date = new Date()): number {
-  if (isCompleted) return 100
-  
-  const start = new Date(Number(startTime) * 1000)
-  const end = new Date(Number(endTime) * 1000)
-  const now = currentTime
-  
-  // If challenge hasn't started yet
-  if (now < start) {
-    return 0
-  }
-  
-  // If challenge has ended
-  if (now >= end) {
-    return 100
-  }
-  
-  const totalDuration = end.getTime() - start.getTime()
-  const elapsed = now.getTime() - start.getTime()
-  
-  const progress = (elapsed / totalDuration) * 100
-  
-  return Math.min(Math.max(progress, 0), 100)
-}
-
 interface ActiveChallengesProps {
-  showCreateButton?: boolean;
-  activeTab?: 'challenges' | 'tokens';
-  setActiveTab?: (tab: 'challenges' | 'tokens') => void;
   selectedNetwork?: 'ethereum' | 'arbitrum';
   setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
 }
 
-export function ActiveChallenges({ showCreateButton = true, activeTab, setActiveTab, selectedNetwork = 'ethereum', setSelectedNetwork }: ActiveChallengesProps) {
-  const { t } = useLanguage()
-  const router = useRouter()
-  const [isCreating, setIsCreating] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  
-  // Use wallet hook to get current wallet info
-  const { getProvider, isConnected } = useWallet();
+function calculateTimeLeft(endTime: string, currentTime: Date = new Date()): { days: number; hours: number; minutes: number; seconds: number; ended: boolean } {
+  const end = new Date(Number(endTime) * 1000)
+  const now = currentTime
 
-  // Use React Query client for better data management
-  const queryClient = useQueryClient();
-  
-  // Use selectedNetwork for data fetching instead of wallet network
-  const subgraphNetwork = selectedNetwork;
-
-  const { data } = useActiveChallenges(subgraphNetwork)
-
-  // Translate time left text
-  const translateTimeLeft = (timeLeft: string): string => {
-    if (timeLeft === "Not started yet") return t('notStarted')
-    if (timeLeft === "Ended") return t('ended')
-    return timeLeft
+  if (now >= end) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, ended: true }
   }
 
-  // Set mounted state for Portal
+  const diff = end.getTime() - now.getTime()
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+  return { days, hours, minutes, seconds, ended: false }
+}
+
+function calculateProgress(startTime: string, endTime: string, isCompleted: boolean, currentTime: Date = new Date()): number {
+  if (isCompleted) return 100
+
+  const start = new Date(Number(startTime) * 1000)
+  const end = new Date(Number(endTime) * 1000)
+  const now = currentTime
+
+  if (now < start) return 0
+  if (now >= end) return 100
+
+  const totalDuration = end.getTime() - start.getTime()
+  const elapsed = now.getTime() - start.getTime()
+
+  return Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100)
+}
+
+export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetwork }: ActiveChallengesProps) {
+  const { t } = useLanguage()
+  const router = useRouter()
+  const [isCreating, setIsCreating] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  const { getProvider, isConnected } = useWallet()
+  const queryClient = useQueryClient()
+
+  const subgraphNetwork = selectedNetwork
+  const { data } = useActiveChallenges(subgraphNetwork)
+
   useEffect(() => {
     setIsMounted(true)
     return () => setIsMounted(false)
   }, [])
 
-  // Ensure client-side rendering for time calculations
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setIsClient(true)
+  }, [])
 
-  // Update time every second for accurate countdown
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient) return
 
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+      setCurrentTime(new Date())
+    }, 1000)
 
-    return () => clearInterval(interval);
-  }, [isClient]);
+    return () => clearInterval(interval)
+  }, [isClient])
 
-
-  // Handle Create Challenge with selected type
   const handleCreateChallenge = async (challengeType: number) => {
-    setIsCreating(true);
+    setIsCreating(true)
 
     try {
-      // Get provider - same approach as Fund Create
-      const provider = await getProvider();
+      const provider = await getProvider()
       if (!provider) {
-        throw new Error("No provider available. Please connect your wallet first.");
+        throw new Error("No provider available. Please connect your wallet first.")
       }
 
-      // Always switch to the selected network before making the transaction
-      const targetChainId = subgraphNetwork === 'arbitrum' ? 42161 : 1;
+      const targetChainId = subgraphNetwork === 'arbitrum' ? 42161 : 1
 
-      // Try to switch to the selected network
       try {
         await provider.send('wallet_switchEthereumChain', [
           { chainId: `0x${targetChainId.toString(16)}` }
-        ]);
+        ])
       } catch (switchError: any) {
         if (switchError.code === 4902) {
-          // Network not added to wallet, add it
           const networkConfig = subgraphNetwork === 'arbitrum' ? {
             chainId: '0xa4b1',
             chainName: 'Arbitrum One',
@@ -202,264 +124,104 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
             nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
             rpcUrls: ['https://mainnet.infura.io/v3/'],
             blockExplorerUrls: ['https://etherscan.io/']
-          };
+          }
 
-          await provider.send('wallet_addEthereumChain', [networkConfig]);
+          await provider.send('wallet_addEthereumChain', [networkConfig])
         } else if (switchError.code === 4001) {
-          // User rejected the network switch
-          const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-          throw new Error(`Please switch to ${networkName} network to create a challenge.`);
+          const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'
+          throw new Error(`Please switch to ${networkName} network to create a challenge.`)
         } else {
-          throw switchError;
+          throw switchError
         }
       }
 
-      // Get a fresh provider after network switch to ensure we're on the correct network
-      const updatedProvider = await getProvider();
+      const updatedProvider = await getProvider()
       if (!updatedProvider) {
-        throw new Error('Failed to get provider after network switch');
+        throw new Error('Failed to get provider after network switch')
       }
 
       const signer = await updatedProvider.getSigner()
-      
-      // Create contract instance with the selected network
+
       const steleContract = new ethers.Contract(
         getSteleContractAddress(subgraphNetwork),
         SteleABI.abi,
         signer
-      );
+      )
 
-      // Call createChallenge with the selected challenge type
-      const tx = await steleContract.createChallenge(challengeType);
-      
-      // Wait for transaction to be mined
-      await tx.wait();
+      const tx = await steleContract.createChallenge(challengeType)
+      await tx.wait()
 
-      // Start refreshing process
-      setIsRefreshing(true);
+      setIsRefreshing(true)
 
-      // Refresh data after 3 seconds using React Query
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['activeChallenges', subgraphNetwork] });
-        setIsRefreshing(false);
-      }, 3000);
+        queryClient.invalidateQueries({ queryKey: ['activeChallenges', subgraphNetwork] })
+        setIsRefreshing(false)
+      }, 3000)
 
     } catch (error: any) {
-      console.error("Error creating challenge:", error);
-
+      console.error("Error creating challenge:", error)
     } finally {
-      setIsCreating(false);
+      setIsCreating(false)
     }
-  };
+  }
 
-  // Create default challenge structure when data is not available
-  const defaultChallenges: ChallengeCardProps[] = [
-    {
-      id: "1 week challenge",
-      title: t('oneWeek'),
-      type: `${t('oneWeek')} challenge`,
-      participants: 0,
-      timeLeft: t('notStarted'),
-      prize: "$0.00",
-      progress: 0,
-      status: "active",
-      startTime: "0",
-      endTime: "0",
-      isCompleted: false,
-      challengeId: ""
-    },
-    {
-      id: "1 month challenge",
-      title: t('oneMonth'),
-      type: `${t('oneMonth')} challenge`,
-      participants: 0,
-      timeLeft: t('notStarted'),
-      prize: "$0.00",
-      progress: 0,
-      status: "active",
-      startTime: "0",
-      endTime: "0",
-      isCompleted: false,
-      challengeId: ""
-    },
-    {
-      id: "3 months challenge",
-      title: t('threeMonths'),
-      type: `${t('threeMonths')} challenge`,
-      participants: 0,
-      timeLeft: t('notStarted'),
-      prize: "$0.00",
-      progress: 0,
-      status: "active",
-      startTime: "0",
-      endTime: "0",
-      isCompleted: false,
-      challengeId: ""
-    },
-    {
-      id: "6 months challenge",
-      title: t('sixMonths'),
-      type: `${t('sixMonths')} challenge`,
-      participants: 0,
-      timeLeft: t('notStarted'),
-      prize: "$0.00",
-      progress: 0,
-      status: "active",
-      startTime: "0",
-      endTime: "0",
-      isCompleted: false,
-      challengeId: ""
-    },
-    {
-      id: "1 year challenge",
-      title: t('oneYear'),
-      type: `${t('oneYear')} challenge`,
-      participants: 0,
-      timeLeft: t('notStarted'),
-      prize: "$0.00",
-      progress: 0,
-      status: "active",
-      startTime: "0",
-      endTime: "0",
-      isCompleted: false,
-      challengeId: ""
-    }
-  ];
+  // Get one week challenge data
+  const weekChallenge = data?.activeChallenges ? {
+    participants: Number(data.activeChallenges.one_week_investorCounter) || 0,
+    prize: Number(data.activeChallenges.one_week_rewardAmountUSD) || 0,
+    startTime: data.activeChallenges.one_week_startTime,
+    endTime: data.activeChallenges.one_week_endTime,
+    isCompleted: data.activeChallenges.one_week_isCompleted,
+    challengeId: data.activeChallenges.one_week_id || "1",
+    status: (data.activeChallenges.one_week_isCompleted ? "end" :
+            isClient && currentTime > new Date(Number(data.activeChallenges.one_week_endTime) * 1000) ? "pending" : "active") as "active" | "pending" | "end"
+  } : {
+    participants: 0,
+    prize: 0,
+    startTime: "0",
+    endTime: "0",
+    isCompleted: false,
+    challengeId: "",
+    status: "active" as "active" | "pending" | "end"
+  }
 
-  // Use actual data if available, otherwise use default challenges
-  const challenges: ChallengeCardProps[] = data?.activeChallenges ? [
-    {
-      id: "one-week-challenge",
-      title: t('oneWeek'),
-      type: `${t('oneWeek')} challenge`,
-      participants: Number(data.activeChallenges.one_week_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, currentTime, t)) : t('loading'),
-      prize: `$${Number(data.activeChallenges.one_week_rewardAmountUSD).toFixed(2)}`,
-      progress: isClient ? calculateProgress(data.activeChallenges.one_week_startTime, data.activeChallenges.one_week_endTime, data.activeChallenges.one_week_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_week_isCompleted ? "end" : 
-              isClient && currentTime > new Date(Number(data.activeChallenges.one_week_endTime) * 1000) ? "pending" : "active",
-      startTime: data.activeChallenges.one_week_startTime,
-      endTime: data.activeChallenges.one_week_endTime,
-      isCompleted: data.activeChallenges.one_week_isCompleted,
-      challengeId: data.activeChallenges.one_week_id || "1"
-    },
-    {
-      id: "one-month-challenge",
-      title: t('oneMonth'),
-      type: `${t('oneMonth')} challenge`,
-      participants: Number(data.activeChallenges.one_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, currentTime, t)) : t('loading'),
-      prize: `$${Number(data.activeChallenges.one_month_rewardAmountUSD).toFixed(2)}`,
-      progress: isClient ? calculateProgress(data.activeChallenges.one_month_startTime, data.activeChallenges.one_month_endTime, data.activeChallenges.one_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_month_isCompleted ? "end" : 
-              isClient && currentTime > new Date(Number(data.activeChallenges.one_month_endTime) * 1000) ? "pending" : "active",
-      startTime: data.activeChallenges.one_month_startTime,
-      endTime: data.activeChallenges.one_month_endTime,
-      isCompleted: data.activeChallenges.one_month_isCompleted,
-      challengeId: data.activeChallenges.one_month_id || "2"
-    },
-    {
-      id: "three-month-challenge",
-      title: t('threeMonths'),
-      type: `${t('threeMonths')} challenge`,
-      participants: Number(data.activeChallenges.three_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, currentTime, t)) : t('loading'),
-      prize: `$${Number(data.activeChallenges.three_month_rewardAmountUSD).toFixed(2)}`,
-      progress: isClient ? calculateProgress(data.activeChallenges.three_month_startTime, data.activeChallenges.three_month_endTime, data.activeChallenges.three_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.three_month_isCompleted ? "end" : 
-              isClient && currentTime > new Date(Number(data.activeChallenges.three_month_endTime) * 1000) ? "pending" : "active",
-      startTime: data.activeChallenges.three_month_startTime,
-      endTime: data.activeChallenges.three_month_endTime,
-      isCompleted: data.activeChallenges.three_month_isCompleted,
-      challengeId: data.activeChallenges.three_month_id || "3"
-    },
-    {
-      id: "six-month-challenge",
-      title: t('sixMonths'),
-      type: `${t('sixMonths')} challenge`,
-      participants: Number(data.activeChallenges.six_month_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, currentTime, t)) : t('loading'),
-      prize: `$${Number(data.activeChallenges.six_month_rewardAmountUSD).toFixed(2)}`,
-      progress: isClient ? calculateProgress(data.activeChallenges.six_month_startTime, data.activeChallenges.six_month_endTime, data.activeChallenges.six_month_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.six_month_isCompleted ? "end" : 
-              isClient && currentTime > new Date(Number(data.activeChallenges.six_month_endTime) * 1000) ? "pending" : "active",
-      startTime: data.activeChallenges.six_month_startTime,
-      endTime: data.activeChallenges.six_month_endTime,
-      isCompleted: data.activeChallenges.six_month_isCompleted,
-      challengeId: data.activeChallenges.six_month_id || "4"
-    },
-    {
-      id: "one-year-challenge",
-      title: t('oneYear'),
-      type: `${t('oneYear')} challenge`,
-      participants: Number(data.activeChallenges.one_year_investorCounter) || 0,
-      timeLeft: isClient ? translateTimeLeft(calculateTimeLeft(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, currentTime, t)) : t('loading'),
-      prize: `$${Number(data.activeChallenges.one_year_rewardAmountUSD).toFixed(2)}`,
-      progress: isClient ? calculateProgress(data.activeChallenges.one_year_startTime, data.activeChallenges.one_year_endTime, data.activeChallenges.one_year_isCompleted, currentTime) : 0,
-      status: data.activeChallenges.one_year_isCompleted ? "end" : 
-              isClient && currentTime > new Date(Number(data.activeChallenges.one_year_endTime) * 1000) ? "pending" : "active",
-      startTime: data.activeChallenges.one_year_startTime,
-      endTime: data.activeChallenges.one_year_endTime,
-      isCompleted: data.activeChallenges.one_year_isCompleted,
-      challengeId: data.activeChallenges.one_year_id || "5"
-    }
-  ] : defaultChallenges;
+  const timeLeft = isClient ? calculateTimeLeft(weekChallenge.endTime, currentTime) : { days: 0, hours: 0, minutes: 0, seconds: 0, ended: false }
+  const progress = isClient ? calculateProgress(weekChallenge.startTime, weekChallenge.endTime, weekChallenge.isCompleted, currentTime) : 0
 
   const getStatusBadge = (status: "active" | "pending" | "end") => {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
-            <Clock className="h-4 w-4" />
+          <Badge className="bg-green-600/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-green-600/20 focus:bg-green-600/20 transition-none">
+            <Clock className="h-3 w-3" />
             {t('active')}
           </Badge>
-        );
+        )
       case "pending":
         return (
-          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
-            <Clock className="h-4 w-4" />
+          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-orange-500/20 focus:bg-orange-500/20 transition-none">
+            <Clock className="h-3 w-3" />
             {t('pending')}
           </Badge>
-        );
+        )
       case "end":
         return (
-          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-3 py-1.5 flex items-center gap-2 w-fit text-sm whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
+          <Badge className="bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full px-2 py-1 flex items-center gap-1.5 w-fit text-xs whitespace-nowrap pointer-events-none hover:bg-gray-500/20 focus:bg-gray-500/20 transition-none">
             <CheckCircle className="h-3 w-3" />
             {t('end')}
           </Badge>
-        );
-      default:
-        return <Badge variant="secondary" className="px-3 py-1.5 text-sm whitespace-nowrap pointer-events-none hover:bg-secondary focus:bg-secondary transition-none">{t('unknown')}</Badge>
+        )
     }
   }
 
-  // Get challenge type number from challenge title
-  const getChallengeTypeFromTitle = (title: string): number => {
-    switch (title) {
-      case t('oneWeek'):
-        return 0;
-      case t('oneMonth'):
-        return 1;
-      case t('threeMonths'):
-        return 2;
-      case t('sixMonths'):
-        return 3;
-      case t('oneYear'):
-        return 4;
-      default:
-        return 0;
-    }
-  };
-
-  // Prepare active challenges data for the modal
-  const activeChallengesData = challenges.map(challenge => ({
-    challengeType: getChallengeTypeFromTitle(challenge.title),
-    status: challenge.status
-  }));
+  const formatDate = (timestamp: string) => {
+    if (timestamp === "0") return "-"
+    const date = new Date(Number(timestamp) * 1000)
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
+  }
 
   return (
     <>
-      {/* Refreshing Spinner Overlay */}
       {isRefreshing && isMounted && createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center justify-center space-y-4">
@@ -471,23 +233,11 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
         document.body
       )}
 
-      <div className="space-y-4 mt-8">
-        {/* Desktop Layout */}
-        <div className="hidden md:flex items-center justify-between">
-          <div className="flex gap-4">
-            <h2 className="text-3xl text-gray-100 cursor-default">{t('activeChallenges')}</h2>
-            {setActiveTab && (
-              <button
-                type="button"
-                onClick={() => setActiveTab('tokens')}
-                className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
-              >
-                {t('token')}
-              </button>
-            )}
-          </div>
+      <div className="space-y-6">
+        {/* Header with Network Dropdown */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl text-gray-100">{t('challenge')}</h2>
           <div className="flex items-center gap-3">
-            {/* Network Selector Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
@@ -514,7 +264,7 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
                 >
@@ -527,7 +277,7 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
                   />
                   Ethereum
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
                 >
@@ -543,204 +293,127 @@ export function ActiveChallenges({ showCreateButton = true, activeTab, setActive
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Create Challenge Button */}
-            {isConnected && (
-              <ChallengeTypeModal 
+            {isConnected && weekChallenge.status === "end" && (
+              <ChallengeTypeModal
                 onCreateChallenge={handleCreateChallenge}
                 isCreating={isCreating}
-                activeChallenges={activeChallengesData}
+                activeChallenges={[{ challengeType: 0, status: weekChallenge.status }]}
               />
             )}
           </div>
         </div>
 
-        {/* Mobile Layout */}
-        <div className="md:hidden space-y-4">
-          {/* Title and Tab */}
-          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
-            <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('activeChallenges')}</h2>
-            {setActiveTab && (
-              <button
-                type="button"
-                onClick={() => setActiveTab('tokens')}
-                className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
-              >
-                {t('token')}
-              </button>
-            )}
-          </div>
-          
-          {/* Network Dropdown and New Button */}
-          <div className="flex items-center gap-3">
-            {/* Network Selector Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                  <div className="flex items-center gap-2">
-                    {selectedNetwork === 'arbitrum' ? (
-                      <Image
-                        src="/networks/small/arbitrum.png"
-                        alt="Arbitrum"
-                        width={24}
-                        height={24}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <Image
-                        src="/networks/small/ethereum.png"
-                        alt="Ethereum"
-                        width={24}
-                        height={24}
-                        className="rounded-full"
-                      />
-                    )}
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
+        {/* Hero Section - Prize Pool and Timer */}
+        <Card
+          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-0 shadow-xl overflow-hidden cursor-pointer hover:shadow-2xl transition-all"
+          onClick={() => {
+            if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
+              router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
+            }
+          }}
+        >
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left - Total Prize Pool */}
+              <div className="flex flex-col justify-center space-y-3">
+                <div className="flex items-center gap-2 text-yellow-400">
+                  <Trophy className="h-6 w-6" />
+                  <span className="text-lg font-medium">{t('totalPrize')}</span>
+                </div>
+                <div className="text-6xl font-bold text-yellow-400">
+                  ${weekChallenge.prize.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+
+              {/* Right - Countdown Timer */}
+              <div className="flex flex-col justify-center space-y-3">
+                <div className="flex items-center gap-2 text-orange-400">
+                  <Timer className="h-6 w-6" />
+                  <span className="text-lg font-medium">{t('timeLeft')}</span>
+                </div>
+                {timeLeft.ended ? (
+                  <div className="text-4xl font-bold text-gray-400">
+                    {t('ended')}
                   </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-                <DropdownMenuItem 
-                  className="cursor-pointer"
-                  onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="cursor-pointer"
-                  onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                      <div className="text-3xl font-bold text-orange-400">{String(timeLeft.days).padStart(2, '0')}</div>
+                      <div className="text-xs text-gray-400 mt-1">{t('days')}</div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                      <div className="text-3xl font-bold text-orange-400">{String(timeLeft.hours).padStart(2, '0')}</div>
+                      <div className="text-xs text-gray-400 mt-1">{t('hours')}</div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                      <div className="text-3xl font-bold text-orange-400">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                      <div className="text-xs text-gray-400 mt-1">{t('minutes')}</div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                      <div className="text-3xl font-bold text-orange-400">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                      <div className="text-xs text-gray-400 mt-1">{t('seconds')}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Create Challenge Button */}
-            {isConnected && (
-              <ChallengeTypeModal 
-                onCreateChallenge={handleCreateChallenge}
-                isCreating={isCreating}
-                activeChallenges={activeChallengesData}
-              />
-            )}
-          </div>
-        </div>
-        <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                    <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
+        {/* Challenge Info Card */}
+        <Card
+          className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
+          onClick={() => {
+            if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
+              router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
+            }
+          }}
+        >
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Progress */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="text-sm text-gray-400">{t('progress')}</div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">⏰</span>
-                        {t('period')}
+                        <Progress value={progress} className="w-20 h-3" />
+                        <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(progress)}%</span>
                       </div>
-                    </TableHead>
-                    <TableHead className="text-gray-300 min-w-[100px] whitespace-nowrap">{t('status')}</TableHead>
-                    <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">⌛</span>
-                        {t('progress')}
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('prize')}</TableHead>
-                    <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">{t('users')}</TableHead>
-                    <TableHead className="text-gray-300 min-w-[80px] pr-6 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <Trophy className="h-4 w-4 text-yellow-500" />
-                          {/* Show network icon only when connected to Arbitrum */}
-                          {selectedNetwork === 'arbitrum' && (
-                            <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                              <Image 
-                                src="/networks/small/arbitrum.png" 
-                                alt="Arbitrum"
-                                width={8}
-                                height={8}
-                                className="rounded-full"
-                                style={{ width: 'auto', height: 'auto' }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        {t('challenge')}
-                      </div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {challenges.map((challenge) => (
-                    <TableRow 
-                      key={challenge.id}
-                      className={`border-0 transition-colors ${
-                        challenge.challengeId && challenge.challengeId !== "" 
-                          ? "hover:bg-gray-800/50 cursor-pointer" 
-                          : "cursor-default"
-                      }`}
-                      onClick={() => {
-                        if (challenge.challengeId && challenge.challengeId !== "") {
-                          router.push(`/challenge/${selectedNetwork}/${challenge.challengeId}`)
-                        }
-                      }}
-                    >
-                      <TableCell className="font-medium text-gray-100 pl-6 py-6 text-lg min-w-[120px] whitespace-nowrap">
-                        <span className="whitespace-nowrap">{challenge.title}</span>
-                      </TableCell>
-                      <TableCell className="py-6 min-w-[100px]">
-                        {getStatusBadge(challenge.status)}
-                      </TableCell>
-                      <TableCell className="py-6 min-w-[120px]">
-                        <div className="flex items-center gap-2">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div>
-                                  <Progress 
-                                    value={challenge.progress} 
-                                    className="w-20 h-3"
-                                  />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{challenge.timeLeft}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <span className="text-sm text-gray-400 font-medium whitespace-nowrap">{Math.round(challenge.progress)}%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium text-yellow-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
-                        {challenge.prize}
-                      </TableCell>
-                      <TableCell className="py-6 min-w-[80px]">
-                        <div className="flex items-center gap-2 text-gray-300 text-base whitespace-nowrap">
-                          <Users className="h-4 w-4" />
-                          <span>{challenge.participants}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="pr-6 py-6 min-w-[80px]">
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap">
-                          {challenge.challengeId}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{formatDate(weekChallenge.startTime)} - {formatDate(weekChallenge.endTime)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="text-sm text-gray-400">{t('status')}</div>
+                <div>{getStatusBadge(weekChallenge.status)}</div>
+              </div>
+
+              {/* Participants */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="text-sm text-gray-400">{t('participants')}</div>
+                <div className="flex items-center gap-2 text-gray-100 text-base font-medium">
+                  <Users className="h-4 w-4" />
+                  <span>{weekChallenge.participants}</span>
+                </div>
+              </div>
+
+              {/* Challenge ID */}
+              <div className="flex items-center justify-between md:justify-start gap-2">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Trophy className="h-4 w-4 text-yellow-500" />
+                  <span className="text-sm">{t('challenge')} ID</span>
+                </div>
+                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                  {weekChallenge.challengeId || "-"}
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>

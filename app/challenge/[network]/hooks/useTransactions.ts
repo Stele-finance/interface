@@ -78,20 +78,6 @@ const GET_TRANSACTIONS_QUERY = `
       blockTimestamp
       transactionHash
     }
-    steleTokenBonuses(
-      where: { challengeId: $challengeId }
-      orderBy: blockTimestamp
-      orderDirection: desc
-      first: 50
-    ) {
-      id
-      challengeId
-      user
-      action
-      amount
-      blockTimestamp
-      transactionHash
-    }
   }
 `
 
@@ -163,19 +149,6 @@ const GET_ALL_TRANSACTIONS_QUERY = `
       blockTimestamp
       transactionHash
     }
-    steleTokenBonuses(
-      orderBy: blockTimestamp
-      orderDirection: desc
-      first: 10
-    ) {
-      id
-      challengeId
-      user
-      action
-      amount
-      blockTimestamp
-      transactionHash
-    }
   }
 `
 
@@ -241,15 +214,6 @@ interface GraphQLResponse {
     challengeId: string
     user: string
     rewardAmount: string
-    blockTimestamp: string
-    transactionHash: string
-  }>
-  steleTokenBonuses?: Array<{
-    id: string
-    challengeId: string
-    user: string
-    action: string
-    amount: string
     blockTimestamp: string
     transactionHash: string
   }>
@@ -357,7 +321,7 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
           data.rewards.forEach((reward) => {
             const rewardValue = parseFloat(ethers.formatUnits(reward.rewardAmount, USDC_DECIMALS));
             const userAddress = `${reward.user.slice(0, 6)}...${reward.user.slice(-4)}`;
-            
+
             allTransactions.push({
               type: 'reward',
               id: reward.id,
@@ -367,25 +331,6 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               details: `Rewarded → ${userAddress}`,
               timestamp: parseInt(reward.blockTimestamp),
               transactionHash: reward.transactionHash,
-            })
-          })
-        }
-
-        // Process steleTokenBonuses
-        if (data.steleTokenBonuses && Array.isArray(data.steleTokenBonuses)) {
-          data.steleTokenBonuses.forEach((steleBonus) => {
-            const userAddress = `${steleBonus.user.slice(0, 6)}...${steleBonus.user.slice(-4)}`;
-            const bonusValue = parseFloat(ethers.formatUnits(steleBonus.amount, 18)); // Stele token has 18 decimals
-            
-            allTransactions.push({
-              type: 'airdrop',
-              id: steleBonus.id,
-              challengeId: steleBonus.challengeId,
-              user: steleBonus.user,
-              amount: `${bonusValue.toFixed(4)}`,
-              details: `${steleBonus.action} → ${userAddress}`,
-              timestamp: parseInt(steleBonus.blockTimestamp),
-              transactionHash: steleBonus.transactionHash,
             })
           })
         }
@@ -402,7 +347,6 @@ export function useTransactions(challengeId: string, network: 'ethereum' | 'arbi
               allData.swaps?.forEach(t => availableChallengeIds.add(t.challengeId))
               allData.registers?.forEach(t => availableChallengeIds.add(t.challengeId))
               allData.rewards?.forEach(t => availableChallengeIds.add(t.challengeId))
-              allData.steleTokenBonuses?.forEach(t => availableChallengeIds.add(t.challengeId))
             }
           } catch (debugError) {
             console.error('🔍 Could not fetch debug data:', debugError)

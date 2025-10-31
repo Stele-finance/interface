@@ -1,6 +1,0 @@
-export * from "./types"
-export { StatusBadge } from "./StatusBadge"
-export { ProgressBar } from "./ProgressBar"
-export { PaginationComponent } from "./PaginationComponent"
-export { WalletTokenInfo } from "./WalletTokenInfo"
-export { ProposalTable } from "./ProposalTable" 
