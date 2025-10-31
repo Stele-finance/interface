@@ -242,7 +242,6 @@ export const getLINKAddress = (network: 'ethereum' | 'arbitrum' | null): string 
 export const STELE_CONTRACT_ADDRESS = NETWORK_CONTRACTS.ethereum.STELE_CONTRACT_ADDRESS;
 export const STELE_TOKEN_ADDRESS = NETWORK_CONTRACTS.ethereum.STELE_TOKEN_ADDRESS;
 export const USDC_TOKEN_ADDRESS = NETWORK_CONTRACTS.ethereum.USDC_TOKEN_ADDRESS;
-export const GOVERNANCE_CONTRACT_ADDRESS = NETWORK_CONTRACTS.ethereum.GOVERNANCE_CONTRACT_ADDRESS;
 export const RPC_URL = NETWORK_CONTRACTS.ethereum.RPC_URL;
 
 // Token decimals
