@@ -749,15 +749,24 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           });
           // Invalidate challenge-level queries for charts and investors tab
           queryClient.invalidateQueries({
-            queryKey: ['challengeSnapshots', challengeId, subgraphNetwork],
+            predicate: (query) =>
+              query.queryKey[0] === 'challengeSnapshots' &&
+              query.queryKey[1] === challengeId &&
+              query.queryKey[3] === subgraphNetwork,
             refetchType: 'active'
           });
           queryClient.invalidateQueries({
-            queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork],
+            predicate: (query) =>
+              query.queryKey[0] === 'challengeWeeklySnapshots' &&
+              query.queryKey[1] === challengeId &&
+              query.queryKey[3] === subgraphNetwork,
             refetchType: 'active'
           });
           queryClient.invalidateQueries({
-            queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork],
+            predicate: (query) =>
+              query.queryKey[0] === 'challengeMonthlySnapshots' &&
+              query.queryKey[1] === challengeId &&
+              query.queryKey[3] === subgraphNetwork,
             refetchType: 'active'
           });
           queryClient.invalidateQueries({
@@ -935,15 +944,24 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeSnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeSnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeWeeklySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeMonthlySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({

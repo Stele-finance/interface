@@ -8,7 +8,7 @@ import { formatTokenAmount, getTokenExplorerUrl } from "../utils"
 import Image from "next/image"
 
 interface PortfolioTabProps {
-  userTokens: any[]
+  investorData: any
   isLoadingUniswap: boolean
   subgraphNetwork: string
   onTokenClick: (tokenAddress: string) => void
@@ -16,7 +16,7 @@ interface PortfolioTabProps {
 }
 
 export function PortfolioTab({
-  userTokens,
+  investorData,
   isLoadingUniswap,
   subgraphNetwork,
   onTokenClick,
@@ -24,6 +24,31 @@ export function PortfolioTab({
 }: PortfolioTabProps) {
   const { t } = useLanguage()
   const { getTokenPriceBySymbol } = useTokenPrices()
+
+  // Extract user tokens directly from investorData
+  interface UserToken {
+    address: string
+    symbol: string
+    amount: string
+    decimals: string
+  }
+
+  const userTokens = React.useMemo((): UserToken[] => {
+    if (!investorData?.investor) return []
+
+    const investor = investorData.investor
+    const tokens = investor.tokens || []
+    const tokensAmount = investor.tokensAmount || []
+    const tokensSymbols = investor.tokensSymbols || []
+    const tokensDecimals = investor.tokensDecimals || []
+
+    return tokens.map((address: string, index: number) => ({
+      address,
+      symbol: tokensSymbols[index] || `TOKEN_${index}`,
+      amount: tokensAmount[index] || '0',
+      decimals: tokensDecimals[index] || '18'
+    }))
+  }, [investorData])
 
   return (
     <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
