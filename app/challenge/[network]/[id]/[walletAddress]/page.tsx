@@ -131,7 +131,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   }, [userTokens, tokenPricesData, investorData])
 
   // Remove useCallback for immediate reaction (same as Portfolio tab)
-  const realTimePortfolio = calculateRealTimePortfolioValue()
+  // Don't show real-time portfolio during swap to avoid incorrect values
+  const realTimePortfolio = isAssetSwapping ? null : calculateRealTimePortfolioValue()
 
   // Set mounted state for Portal
   useEffect(() => {
@@ -626,6 +627,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 <div className="hidden md:block">
                   <ChallengeAssetSwap
                     userTokens={userTokens}
+                    investorData={investorData}
                     investableTokens={investableTokens}
                     onSwappingStateChange={setIsAssetSwapping}
                     network={subgraphNetwork}
@@ -642,6 +644,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                       <div className="bg-muted rounded-2xl p-6 shadow-2xl">
                         <ChallengeAssetSwap
                           userTokens={userTokens}
+                          investorData={investorData}
                           investableTokens={investableTokens}
                           onSwappingStateChange={setIsAssetSwapping}
                           network={subgraphNetwork}
