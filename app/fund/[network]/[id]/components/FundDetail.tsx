@@ -626,31 +626,52 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
         refetchFundInvestorData();
       }
 
-      // Invalidate all related queries to refresh data after successful join
-      setTimeout(() => {
-        // Fund basic data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['funds', 50], refetchType: 'active' });
+      // Invalidate all related queries to refresh data after successful join (similar to FundAssetSwap)
+      setTimeout(async () => {
+        if (connectedAddress) {
+          const investorId = `${fundId}-${connectedAddress.toUpperCase()}`;
 
-        // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork], refetchType: 'active' });
+          // Step 1: Invalidate and refetch fund data first (this is the source for fundUserTokens)
+          await queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.refetchQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
 
-        // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.invalidateQueries({ queryKey: ['funds', 50], refetchType: 'active' });
 
-        // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
+          // Small delay to ensure fund data is updated
+          await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+          // Step 2: Invalidate and refetch fundUserTokens (depends on fund data)
+          await queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.refetchQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
 
-        // User tokens
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
+          // Step 3: Investor data
+          await queryClient.invalidateQueries({ queryKey: ['fundInvestor', investorId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.refetchQueries({ queryKey: ['fundInvestor', investorId, subgraphNetwork] });
+
+          await queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork], refetchType: 'active' });
+
+          // Step 4: Invalidate all other related data
+          // Transactions
+          await queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
+
+          // Snapshots for charts
+          await queryClient.invalidateQueries({
+            predicate: (query) => query.queryKey[0] === 'fundSnapshots' && query.queryKey[1] === fundId,
+            refetchType: 'active'
+          });
+          await queryClient.invalidateQueries({
+            predicate: (query) => query.queryKey[0] === 'fundInvestorSnapshots' && query.queryKey[1] === fundId,
+            refetchType: 'active'
+          });
+
+          // Share data
+          await queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
+          await queryClient.invalidateQueries({
+            predicate: (query) => query.queryKey[0] === 'investorShare',
+            refetchType: 'active'
+          });
+        }
       }, 3000);
 
       // Set local joined state to immediately update UI
