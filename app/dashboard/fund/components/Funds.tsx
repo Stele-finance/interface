@@ -370,20 +370,59 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                 >
                   <CardContent className="p-8">
                     {/* Key Metrics Section - Large and Prominent */}
-                    <div className="space-y-8 mb-8 pb-8 border-b border-gray-700/50">
-                      {/* Manager Profit Ratio */}
-                      <div className="flex flex-col justify-center space-y-3">
-                        <div className="flex items-center gap-2 text-gray-400">
-                          <TrendingUp className="h-6 w-6" />
-                          <span className="text-lg font-medium">{t('profitRatio')}</span>
+                    {/* Mobile: Profit Ratio full width, then Principal + Value in same row */}
+                    {/* PC: All 3 in one row */}
+                    <div className="mb-8 pb-8 border-b border-gray-700/50">
+                      {/* Mobile layout */}
+                      <div className="md:hidden space-y-8">
+                        {/* Profit Ratio - full width */}
+                        <div className="flex flex-col justify-center space-y-3">
+                          <div className="flex items-center gap-2 text-gray-400">
+                            <TrendingUp className="h-6 w-6" />
+                            <span className="text-lg font-medium">{t('profitRatio')}</span>
+                          </div>
+                          <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                            {formatProfitRatio(fund.profitRatio)}
+                          </div>
                         </div>
-                        <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                          {formatProfitRatio(fund.profitRatio)}
+
+                        {/* Principal and Value - same row */}
+                        <div className="grid grid-cols-2 gap-8">
+                          <div className="flex flex-col justify-center space-y-3">
+                            <div className="flex items-center gap-2 text-gray-400">
+                              <DollarSign className="h-6 w-6" />
+                              <span className="text-lg font-medium">{t('principal')}</span>
+                            </div>
+                            <div className="text-4xl font-bold text-blue-400">
+                              {formatCurrency(fund.investment)}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col justify-center space-y-3">
+                            <div className="flex items-center gap-2 text-gray-400">
+                              <DollarSign className="h-6 w-6" />
+                              <span className="text-lg font-medium">{t('value')}</span>
+                            </div>
+                            <div className="text-4xl font-bold text-yellow-400">
+                              {formatCurrency(fund.tvl)}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Principal and Value - Mobile: same row, Desktop: 2 columns */}
-                      <div className="grid grid-cols-2 md:grid-cols-2 gap-8">
+                      {/* Desktop layout - all 3 in one row */}
+                      <div className="hidden md:grid md:grid-cols-3 gap-8">
+                        {/* Profit Ratio */}
+                        <div className="flex flex-col justify-center space-y-3">
+                          <div className="flex items-center gap-2 text-gray-400">
+                            <TrendingUp className="h-6 w-6" />
+                            <span className="text-lg font-medium">{t('profitRatio')}</span>
+                          </div>
+                          <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                            {formatProfitRatio(fund.profitRatio)}
+                          </div>
+                        </div>
+
                         {/* Principal */}
                         <div className="flex flex-col justify-center space-y-3">
                           <div className="flex items-center gap-2 text-gray-400">
