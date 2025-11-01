@@ -1168,7 +1168,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           </div>
           
           {/* Portfolio Allocation Card */}
-          <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
+          <Card className="bg-transparent border-0 rounded-2xl">
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
                 <PieChart className="h-5 w-5" />
