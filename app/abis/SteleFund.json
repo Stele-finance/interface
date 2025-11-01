@@ -7,27 +7,50 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_weth9",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_setting",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
           "name": "_info",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_weth9",
           "type": "address"
         },
         {
           "internalType": "address",
           "name": "_usdToken",
           "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_wbtc",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_uni",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_link",
+          "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "AddToken",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -227,7 +250,39 @@
     },
     {
       "inputs": [],
-      "name": "getManagerNFTContract",
+      "name": "info",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isInvestable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "link",
       "outputs": [
         {
           "internalType": "address",
@@ -240,12 +295,12 @@
     },
     {
       "inputs": [],
-      "name": "info",
+      "name": "managerFee",
       "outputs": [
         {
-          "internalType": "address",
+          "internalType": "uint256",
           "name": "",
-          "type": "address"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -259,6 +314,19 @@
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "maxSlippage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -297,6 +365,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -307,19 +382,6 @@
       "name": "setManagerNFTContract",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "setting",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -405,6 +467,19 @@
     },
     {
       "inputs": [],
+      "name": "uni",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "uniswapV3Factory",
       "outputs": [
         {
@@ -419,6 +494,19 @@
     {
       "inputs": [],
       "name": "usdToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "wbtc",
       "outputs": [
         {
           "internalType": "address",

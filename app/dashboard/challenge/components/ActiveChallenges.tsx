@@ -303,9 +303,9 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
           </div>
         </div>
 
-        {/* Hero Section - Prize Pool and Timer */}
+        {/* Unified Challenge Card */}
         <Card
-          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-0 shadow-xl overflow-hidden cursor-pointer hover:shadow-2xl transition-all"
+          className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
           onClick={() => {
             if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
               router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
@@ -313,7 +313,8 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
           }}
         >
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Prize Pool and Timer Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-700/50">
               {/* Left - Total Prize Pool */}
               <div className="flex flex-col justify-center space-y-3">
                 <div className="flex items-center gap-2 text-yellow-400">
@@ -357,19 +358,8 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Challenge Info Card */}
-        <Card
-          className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
-          onClick={() => {
-            if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
-              router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
-            }
-          }}
-        >
-          <CardContent className="p-6">
+            {/* Challenge Info Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Progress */}
               <div className="flex items-center justify-between md:justify-start gap-2">
