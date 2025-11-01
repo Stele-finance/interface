@@ -288,15 +288,24 @@ export default function InvestorPage({ params }: InvestorPageProps) {
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeSnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeSnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeWeeklySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeMonthlySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({

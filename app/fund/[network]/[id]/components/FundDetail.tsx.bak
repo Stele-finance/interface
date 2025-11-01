@@ -629,28 +629,28 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
       // Invalidate all related queries to refresh data after successful join
       setTimeout(() => {
         // Fund basic data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['funds', 50] });
+        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['funds', 50], refetchType: 'active' });
 
         // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork], refetchType: 'active' });
 
         // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
 
         // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
 
         // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
 
         // User tokens
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
       }, 3000);
 
       // Set local joined state to immediately update UI
