@@ -539,11 +539,25 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
 
       // Invalidate queries to refresh data after successful swap
       setTimeout(() => {
+        // Fund data
         queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
+
+        // Investor data
         queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
+
+        // Transactions
         queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots'] });
+        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork] });
+
+        // Snapshots for charts
+        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork] });
+
+        // Share data
+        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork] });
       }, 3000);
 
     } catch (error: any) {

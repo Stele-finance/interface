@@ -628,11 +628,29 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
       // Invalidate all related queries to refresh data after successful join
       setTimeout(() => {
+        // Fund basic data
         queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['funds', 50] });
+
+        // Investor data
+        queryClient.invalidateQueries({ queryKey: ['fundInvestor', `${fundId}-${connectedAddress?.toUpperCase()}`, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestors', fundId, subgraphNetwork] });
+
+        // Transactions
+        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork] });
+
+        // Snapshots for charts
+        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork] });
+
+        // Share data
+        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork] });
+
+        // User tokens
+        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
       }, 3000);
 
       // Set local joined state to immediately update UI

@@ -723,7 +723,15 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
           queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
           queryClient.invalidateQueries({ queryKey: ['investor', challengeId, currentWalletAddress, subgraphNetwork] });
-          
+          queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, currentWalletAddress, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, currentWalletAddress, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['investorSnapshots', challengeId, currentWalletAddress, subgraphNetwork] });
+          // Invalidate challenge-level queries for charts and investors tab
+          queryClient.invalidateQueries({ queryKey: ['challengeSnapshots', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork] });
+          queryClient.invalidateQueries({ queryKey: ['challengeInvestors', challengeId, subgraphNetwork] });
+
           // Hide spinner
           setIsRefreshing(false);
           setRefreshProgress(0);
@@ -869,6 +877,13 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['investor', challengeId, currentWalletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, currentWalletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, currentWalletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', challengeId, currentWalletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['challengeSnapshots', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['challengeInvestors', challengeId, subgraphNetwork] });
       }, 3000);
 
     } catch (error: any) {
