@@ -448,9 +448,9 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                     </div>
 
                     {/* Fund Info Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {/* Fund ID */}
-                      <div className="flex items-center justify-between md:justify-start gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {/* Fund ID - Hidden on mobile, shown on lg screens */}
+                      <div className="hidden lg:flex items-center justify-between md:justify-start gap-2">
                         <div className="text-sm text-gray-400">{t('fund')} ID</div>
                         <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
                           #{fund.fundId}
