@@ -29,6 +29,7 @@ interface FundDisplayProps {
   manager: string
   investorCount: number
   tvl: number
+  investment: number
   createdAt: Date
   updatedAt: Date
   tokens: string[]
@@ -110,6 +111,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     manager: fund.manager,
     investorCount: parseInt(fund.investorCount),
     tvl: parseFloat(fund.amountUSD),
+    investment: parseFloat(fund.share) / 1e6, // Convert from USDC decimals (10^6) to USD
     createdAt: new Date(parseInt(fund.createdAtTimestamp) * 1000),
     updatedAt: new Date(parseInt(fund.updatedAtTimestamp) * 1000),
     tokens: fund.tokensSymbols,
@@ -368,7 +370,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                 >
                   <CardContent className="p-8">
                     {/* Key Metrics Section - Large and Prominent */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-700/50">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gray-700/50">
                       {/* Manager Profit Ratio */}
                       <div className="flex flex-col justify-center space-y-3">
                         <div className="flex items-center gap-2 text-gray-400">
@@ -377,6 +379,17 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
                         <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                           {formatProfitRatio(fund.profitRatio)}
+                        </div>
+                      </div>
+
+                      {/* Investment */}
+                      <div className="flex flex-col justify-center space-y-3">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <DollarSign className="h-6 w-6" />
+                          <span className="text-lg font-medium">Investment</span>
+                        </div>
+                        <div className="text-4xl font-bold text-blue-400">
+                          {formatCurrency(fund.investment)}
                         </div>
                       </div>
 
