@@ -287,6 +287,7 @@ export const jp = {
   previous: "前へ",
   price: "価格",
   priceUnavailable: "価格利用不可",
+  principal: "元本",
   privacyPolicy: "プライバシーポリシー",
   prizeDistribution: "賞品配分",
   prizeDistributionDesc: "すべての参加費は上位ランクの参加者に分配されます",

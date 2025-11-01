@@ -287,6 +287,7 @@ export const zhCn = {
   previous: '上一个',
   price: '价格',
   priceUnavailable: '价格不可用',
+  principal: '本金',
   privacyPolicy: '隐私政策',
   prizeDistribution: "奖品分配",
   prizeDistributionDesc: "所有报名费都分配给排名靠前的参与者",

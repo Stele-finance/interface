@@ -287,6 +287,7 @@ export const bn = {
   previous: "পূর্ববর্তী",
   price: "দাম",
   priceUnavailable: "দাম উপলব্ধ নেই",
+  principal: "মূলধন",
   privacyPolicy: "গোপনীয়তা নীতি",
   prizeDistribution: "পুরস্কার বিতরণ",
   prizeDistributionDesc: "সমস্ত এন্ট্রি ফি শীর্ষ র্যাঙ্কিং অংশগ্রহণকারীদের মধ্যে বিতরণ করা হয়",

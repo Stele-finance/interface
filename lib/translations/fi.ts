@@ -283,6 +283,7 @@ export const fi = {
   previous: "Edellinen",
   price: "Hinta",
   priceUnavailable: "Hinta ei saatavilla",
+  principal: "Pääoma",
   privacyPolicy: "Tietosuojakäytäntö",
   prizeDistribution: "Palkintojen jakelu",
   prizeDistributionDesc: "Kaikki osallistumismaksut jaetaan kärkisijoituksille",

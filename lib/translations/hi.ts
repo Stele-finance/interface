@@ -285,6 +285,7 @@ export const hi = {
   previous: "पिछला",
   price: "कीमत",
   priceUnavailable: "कीमत उपलब्ध नहीं",
+  principal: "मूलधन",
   privacyPolicy: "गोपनीयता नीति",
   prizeDistribution: "पुरस्कार वितरण",
   prizeDistributionDesc: "सभी प्रवेश शुल्क शीर्ष रैंक वाले प्रतिभागियों को वितरित किए जाते हैं",

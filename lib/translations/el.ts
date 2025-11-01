@@ -287,6 +287,7 @@ export const el = {
   previous: "Προηγούμενο",
   price: "Τιμή",
   priceUnavailable: "Η τιμή δεν είναι διαθέσιμη",
+  principal: "Κεφάλαιο",
   privacyPolicy: "Πολιτική Απορρήτου",
   prizeDistribution: "Κατανομή Βραβείων",
   prizeDistributionDesc: "Όλα τα τέλη εισόδου διανέμονται στους συμμετέχοντες με την υψηλότερη κατάταξη",

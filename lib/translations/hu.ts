@@ -285,6 +285,7 @@ export const hu = {
   previous: "Előző",
   price: "Ár",
   priceUnavailable: "Az ár nem elérhető",
+  principal: "Tőke",
   privacyPolicy: "Adatvédelmi irányelvek",
   prizeDistribution: "Díjosztás",
   prizeDistributionDesc: "Minden belépési díj a legjobb helyezést elért résztvevők között kerül szétosztásra",

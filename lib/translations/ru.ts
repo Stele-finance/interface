@@ -287,6 +287,7 @@ export const ru = {
   previous: 'Предыдущий',
   price: 'Цена',
   priceUnavailable: 'Цена недоступна',
+  principal: 'Основная сумма',
   privacyPolicy: "Политика конфиденциальности",
   prizeDistribution: "Распределение призов",
   prizeDistributionDesc: "Все вступительные взносы распределяются между участниками с наивысшим рейтингом",

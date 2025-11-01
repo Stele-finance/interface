@@ -288,6 +288,7 @@ export const nl = {
   previous: "Vorige",
   price: "Prijs",
   priceUnavailable: "Prijs niet beschikbaar",
+  principal: "Hoofdsom",
   privacyPolicy: "Privacybeleid",
   prizeDistribution: "Prijsverdeling",
   prizeDistributionDesc: "Alle inschrijfgelden worden verdeeld onder de best gerangschikte deelnemers",

@@ -287,6 +287,7 @@ export const vi = {
   previous: 'Trước',
   price: 'Giá',
   priceUnavailable: 'Giá không có sẵn',
+  principal: 'Vốn gốc',
   privacyPolicy: "Chính sách Bảo mật",
   prizeDistribution: "Phân phối giải thưởng",
   prizeDistributionDesc: "Tất cả phí tham gia được phân phối cho những người tham gia có xếp hạng cao nhất",

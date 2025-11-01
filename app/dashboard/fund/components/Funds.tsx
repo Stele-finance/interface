@@ -370,7 +370,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                 >
                   <CardContent className="p-8">
                     {/* Key Metrics Section - Large and Prominent */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gray-700/50">
+                    <div className="space-y-8 mb-8 pb-8 border-b border-gray-700/50">
                       {/* Manager Profit Ratio */}
                       <div className="flex flex-col justify-center space-y-3">
                         <div className="flex items-center gap-2 text-gray-400">
@@ -382,25 +382,28 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
                       </div>
 
-                      {/* Investment */}
-                      <div className="flex flex-col justify-center space-y-3">
-                        <div className="flex items-center gap-2 text-gray-400">
-                          <DollarSign className="h-6 w-6" />
-                          <span className="text-lg font-medium">Investment</span>
+                      {/* Principal and Value - Mobile: same row, Desktop: 2 columns */}
+                      <div className="grid grid-cols-2 md:grid-cols-2 gap-8">
+                        {/* Principal */}
+                        <div className="flex flex-col justify-center space-y-3">
+                          <div className="flex items-center gap-2 text-gray-400">
+                            <DollarSign className="h-6 w-6" />
+                            <span className="text-lg font-medium">{t('principal')}</span>
+                          </div>
+                          <div className="text-4xl font-bold text-blue-400">
+                            {formatCurrency(fund.investment)}
+                          </div>
                         </div>
-                        <div className="text-4xl font-bold text-blue-400">
-                          {formatCurrency(fund.investment)}
-                        </div>
-                      </div>
 
-                      {/* Fund Amount (TVL) */}
-                      <div className="flex flex-col justify-center space-y-3">
-                        <div className="flex items-center gap-2 text-gray-400">
-                          <DollarSign className="h-6 w-6" />
-                          <span className="text-lg font-medium">TVL</span>
-                        </div>
-                        <div className="text-4xl font-bold text-yellow-400">
-                          {formatCurrency(fund.tvl)}
+                        {/* Value */}
+                        <div className="flex flex-col justify-center space-y-3">
+                          <div className="flex items-center gap-2 text-gray-400">
+                            <DollarSign className="h-6 w-6" />
+                            <span className="text-lg font-medium">{t('value')}</span>
+                          </div>
+                          <div className="text-4xl font-bold text-yellow-400">
+                            {formatCurrency(fund.tvl)}
+                          </div>
                         </div>
                       </div>
                     </div>

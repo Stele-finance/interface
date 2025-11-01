@@ -287,6 +287,7 @@ export const ms = {
   previous: "Sebelumnya",
   price: "Harga",
   priceUnavailable: "Harga tidak tersedia",
+  principal: "Prinsipal",
   privacyPolicy: "Dasar Privasi",
   prizeDistribution: "Pengagihan Hadiah",
   prizeDistributionDesc: "Semua yuran penyertaan diagihkan kepada peserta kedudukan teratas",
