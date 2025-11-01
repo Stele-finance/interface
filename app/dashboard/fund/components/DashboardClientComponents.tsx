@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/lib/language-context"
 
 // Loading skeleton component for dynamic imports
 function LoadingSkeleton() {
@@ -20,15 +19,7 @@ function LoadingSkeleton() {
 // Dynamically import client components with SSR disabled and loading fallback
 const Funds = dynamic(
   () => import("./Funds").then(mod => ({ default: mod.Funds })),
-  { 
-    ssr: false,
-    loading: () => <LoadingSkeleton />
-  }
-)
-
-const InvestableTokens = dynamic(
-  () => import("./InvestableTokens").then(mod => ({ default: mod.InvestableTokens })),
-  { 
+  {
     ssr: false,
     loading: () => <LoadingSkeleton />
   }
@@ -40,9 +31,7 @@ interface DashboardClientComponentsProps {
 }
 
 export function DashboardClientComponents({ network, onNetworkChange }: DashboardClientComponentsProps) {
-  const [activeTab, setActiveTab] = useState<'funds' | 'tokens'>('funds')
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
-  const { t } = useLanguage()
 
   // Load network selection from localStorage on mount
   useEffect(() => {
@@ -70,23 +59,10 @@ export function DashboardClientComponents({ network, onNetworkChange }: Dashboar
   }
 
   return (
-    <>
-      {activeTab === 'funds' ? (
-        <Funds 
-          showCreateButton={true} 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab}
-          selectedNetwork={selectedNetwork}
-          setSelectedNetwork={handleNetworkChange}
-        />
-      ) : (
-        <InvestableTokens 
-          network={selectedNetwork} 
-          setActiveTab={setActiveTab}
-          selectedNetwork={selectedNetwork}
-          setSelectedNetwork={handleNetworkChange}
-        />
-      )}
-    </>
+    <Funds
+      showCreateButton={true}
+      selectedNetwork={selectedNetwork}
+      setSelectedNetwork={handleNetworkChange}
+    />
   )
 } 

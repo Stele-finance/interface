@@ -1,6 +1,5 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +15,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useFunds } from "../hooks/useFunds"
 import { useQueryClient } from '@tanstack/react-query'
-import { Users, ChevronDown, Plus, Loader2, Coins } from "lucide-react"
+import { ChevronDown, Plus, Loader2, TrendingUp, DollarSign } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
@@ -33,18 +32,17 @@ interface FundDisplayProps {
   createdAt: Date
   updatedAt: Date
   tokens: string[]
+  profitRatio: string
 }
 
 
 interface FundsProps {
   showCreateButton?: boolean;
-  activeTab?: 'funds' | 'tokens';
-  setActiveTab?: (tab: 'funds' | 'tokens') => void;
   selectedNetwork?: 'ethereum' | 'arbitrum';
   setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
 }
 
-export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork = 'ethereum', setSelectedNetwork }: FundsProps) {
+export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', setSelectedNetwork }: FundsProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
@@ -79,11 +77,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
     }
   }, [showNetworkDropdown])
 
-
-
-
-
-  // Format fund data for display
+  // Format currency
   const formatCurrency = (value: string | number) => {
     const num = typeof value === 'string' ? parseFloat(value) : value
     if (num >= 1000000) {
@@ -94,6 +88,20 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
     return `$${num.toFixed(2)}`
   }
 
+  // Format profit ratio
+  const formatProfitRatio = (ratio: string) => {
+    const num = parseFloat(ratio)
+    if (isNaN(num)) return '+0.00%'
+    const percentage = (num * 100).toFixed(2)
+    return num >= 0 ? `+${percentage}%` : `${percentage}%`
+  }
+
+  // Calculate days since creation
+  const calculateDaysSince = (createdAt: Date) => {
+    const now = new Date()
+    const diff = now.getTime() - createdAt.getTime()
+    return Math.floor(diff / (1000 * 60 * 60 * 24))
+  }
 
   // Transform fund data for display
   const displayFunds: FundDisplayProps[] = funds.map(fund => ({
@@ -104,7 +112,8 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
     tvl: parseFloat(fund.amountUSD),
     createdAt: new Date(parseInt(fund.createdAtTimestamp) * 1000),
     updatedAt: new Date(parseInt(fund.updatedAtTimestamp) * 1000),
-    tokens: fund.tokensSymbols
+    tokens: fund.tokensSymbols,
+    profitRatio: fund.profitRatio
   }))
 
   // Handle Create Fund button click - show confirmation modal
@@ -130,7 +139,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
 
       // Always switch to the selected network before making the transaction
       const targetChainId = selectedNetwork === 'arbitrum' ? 42161 : 1
-      
+
       // Try to switch to the selected network
       try {
         await provider.send('wallet_switchEthereumChain', [
@@ -152,7 +161,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
             rpcUrls: ['https://mainnet.infura.io/v3/'],
             blockExplorerUrls: ['https://etherscan.io/']
           }
-          
+
           await provider.send('wallet_addEthereumChain', [networkConfig])
         } else if (switchError.code === 4001) {
           // User rejected the network switch
@@ -170,7 +179,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
       }
 
       const signer = await updatedProvider.getSigner()
-      
+
       // Get the correct contract address for the selected network
       const contractAddress = selectedNetwork === 'arbitrum'
         ? NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_INFO_ADDRESS
@@ -182,22 +191,22 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
         SteleFundInfoABI.abi,
         signer
       )
-      
+
       // Call create function (not createFund) based on the ABI
       const tx = await fundInfoContract.create()
-      
+
       // Wait for transaction confirmation
-      const receipt = await tx.wait()
-      
+      await tx.wait()
+
       // Refresh the funds data for the selected network
-      await queryClient.invalidateQueries({ queryKey: ['funds', 50] }) 
+      await queryClient.invalidateQueries({ queryKey: ['funds', 50] })
 
     } catch (error: any) {
       console.error('Error creating fund:', error)
-      
+
       // Show user-friendly error message
       let errorMessage = 'Failed to create fund'
-      
+
       if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
         // User rejected transaction - this is normal, don't show error
         return // Exit without showing error
@@ -211,7 +220,7 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
       } else if (error.code === -32000) {
         errorMessage = 'Insufficient funds for gas'
       }
-      
+
       // Log error to console instead of showing alert
       console.error(`Error: ${errorMessage}`)
     } finally {
@@ -221,22 +230,10 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
 
   return (
     <>
-
-      <div className="space-y-4 mt-8">
-        {/* Desktop Layout */}
-        <div className="hidden md:flex items-center justify-between">
-          <div className="flex gap-4">
-            <h2 className="text-3xl text-gray-100 cursor-default">{t('fund')}</h2>
-            {setActiveTab && (
-              <button
-                type="button"
-                onClick={() => setActiveTab('tokens')}
-                className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
-              >
-                {t('token')}
-              </button>
-            )}
-          </div>
+      <div className="space-y-6">
+        {/* Header with Network Dropdown */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl text-gray-100">{t('fund')}</h2>
           <div className="flex items-center gap-3">
             {/* Network Selector Dropdown */}
             <div className="relative" ref={networkDropdownRef}>
@@ -303,10 +300,10 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
               )}
             </div>
 
-            {/* Create Fund Button - same style as Challenge page */}
+            {/* Create Fund Button */}
             {showCreateButton && isConnected && (
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 size="lg"
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
                 onClick={handleCreateFundClick}
@@ -328,195 +325,113 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
           </div>
         </div>
 
-        {/* Mobile Layout */}
-        <div className="md:hidden space-y-4">
-          {/* Title and Tab */}
-          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
-            <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('fund')}</h2>
-            {setActiveTab && (
-              <button
-                type="button"
-                onClick={() => setActiveTab('tokens')}
-                className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
-              >
-                {t('token')}
-              </button>
-            )}
-          </div>
-          
-          {/* Network Dropdown and New Button */}
-          <div className="flex items-center gap-3">
-            {/* Network Selector Dropdown */}
-            <div className="relative" ref={networkDropdownRef}>
-              <button
-                onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-                className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
-              >
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </button>
-              {showNetworkDropdown && (
-                <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                  <button
-                    onClick={() => {
-                      setSelectedNetwork && setSelectedNetwork('ethereum')
-                      setShowNetworkDropdown(false)
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                  >
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={16}
-                      height={16}
-                      className="rounded-full mr-2"
-                    />
-                    Ethereum
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedNetwork && setSelectedNetwork('arbitrum')
-                      setShowNetworkDropdown(false)
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                  >
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={16}
-                      height={16}
-                      className="rounded-full mr-2"
-                    />
-                    Arbitrum
-                  </button>
-                </div>
-              )}
+        {/* Funds Grid */}
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-transparent"></div>
+                Loading funds...
+              </div>
             </div>
+          ) : error ? (
+            <div className="text-center text-red-400 py-8">
+              Error loading funds
+            </div>
+          ) : displayFunds.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12">
+              <div className="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-300 mb-1">No Funds Available</h3>
+                <p className="text-sm text-gray-500">
+                  There are currently no funds created. Funds will appear here once they are created.
+                </p>
+              </div>
+            </div>
+          ) : (
+            displayFunds.map((fund) => {
+              const profitRatio = parseFloat(fund.profitRatio)
+              const isPositive = profitRatio >= 0
+              const daysSince = calculateDaysSince(fund.createdAt)
 
-            {/* Create Fund Button Mobile - same style as Challenge page */}
-            {showCreateButton && (
-              <Button
-                variant="default"
-                size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                onClick={handleCreateFund}
-              >
-                <Plus className="mr-3 h-5 w-5" />
-                {t('create')}
-              </Button>
-            )}
-          </div>
-        </div>
-        <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="rounded-2xl overflow-hidden bg-muted hover:bg-muted/80 border-b border-gray-600">
-                    <TableHead className="text-gray-300 pl-6 min-w-[120px] whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <Coins className="h-4 w-4 text-blue-500" />
-                        {t('fund')}
+              return (
+                <Card
+                  key={fund.id}
+                  className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
+                  onClick={() => {
+                    router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
+                  }}
+                >
+                  <CardContent className="p-8">
+                    {/* Key Metrics Section - Large and Prominent */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-700/50">
+                      {/* Manager Profit Ratio */}
+                      <div className="flex flex-col justify-center space-y-3">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <TrendingUp className="h-6 w-6" />
+                          <span className="text-lg font-medium">{t('profitRatio')}</span>
+                        </div>
+                        <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatProfitRatio(fund.profitRatio)}
+                        </div>
                       </div>
-                    </TableHead>
-                    <TableHead className="text-gray-300 min-w-[80px] whitespace-nowrap">TVL</TableHead>
-                    <TableHead className="text-gray-300 min-w-[120px] whitespace-nowrap">
-                      {t('investor')}
-                    </TableHead>
-                    <TableHead className="text-gray-300 min-w-[100px] pr-6 whitespace-nowrap">{t('manager')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-8">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-transparent"></div>
-                          Loading funds...
+
+                      {/* Fund Amount (TVL) */}
+                      <div className="flex flex-col justify-center space-y-3">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <DollarSign className="h-6 w-6" />
+                          <span className="text-lg font-medium">TVL</span>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : error ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center text-red-400 py-8">
-                        Error loading funds
-                      </TableCell>
-                    </TableRow>
-                  ) : displayFunds.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                          </div>
-                          <div className="text-center">
-                            <h3 className="text-lg font-medium text-gray-300 mb-1">No Funds Available</h3>
-                            <p className="text-sm text-gray-500">
-                              There are currently no funds created. Funds will appear here once they are created.
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    displayFunds.map((fund) => (
-                      <TableRow 
-                        key={fund.id}
-                        className="border-0 transition-colors hover:bg-gray-800/50 cursor-pointer"
-                        onClick={() => {
-                          // Navigate to fund detail page
-                          router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
-                        }}
-                      >
-                        <TableCell className="pl-6 py-6 min-w-[120px] whitespace-nowrap">
-                          <div className="ml-6">
-                            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
-                              #{fund.fundId}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium text-green-400 py-6 text-lg min-w-[80px] whitespace-nowrap">
+                        <div className="text-4xl font-bold text-yellow-400">
                           {formatCurrency(fund.tvl)}
-                        </TableCell>
-                        <TableCell className="py-6 min-w-[80px]">
-                          <div className="flex items-center gap-1">
-                            <Users className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-100">{fund.investorCount}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="pr-6 py-6 min-w-[100px]">
-                          <span className="text-sm text-gray-300 font-mono">
-                            {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
-                          </span>
-                        </TableCell>
-                    </TableRow>
-                  ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Fund Info Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {/* Fund ID */}
+                      <div className="flex items-center justify-between md:justify-start gap-2">
+                        <div className="text-sm text-gray-400">{t('fund')} ID</div>
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
+                          #{fund.fundId}
+                        </Badge>
+                      </div>
+
+                      {/* Manager Address */}
+                      <div className="flex items-center justify-between md:justify-start gap-2">
+                        <div className="text-sm text-gray-400">{t('manager')}</div>
+                        <span className="text-sm text-gray-300 font-mono">
+                          {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
+                        </span>
+                      </div>
+
+                      {/* Fund Duration */}
+                      <div className="flex items-center justify-between md:justify-start gap-2">
+                        <div className="text-sm text-gray-400">{t('duration')}</div>
+                        <span className="text-sm text-gray-100 font-medium">
+                          {daysSince} {t('days')}
+                        </span>
+                      </div>
+
+                      {/* Investor Count */}
+                      <div className="flex items-center justify-between md:justify-start gap-2">
+                        <div className="text-sm text-gray-400">{t('investor')}</div>
+                        <span className="text-sm text-gray-100 font-medium">
+                          {fund.investorCount}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })
+          )}
+        </div>
       </div>
 
       {/* Confirmation Modal */}
@@ -528,17 +443,17 @@ export function Funds({ showCreateButton = true, setActiveTab, selectedNetwork =
               Are you sure you want to create a new fund on {selectedNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'} network?
             </DialogDescription>
           </DialogHeader>
-          
+
           <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowConfirmModal(false)}
               className="border-gray-600 hover:bg-gray-700"
               disabled={isCreating}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateFund}
               disabled={isCreating}
               className="bg-orange-500 hover:bg-orange-600 text-white"
