@@ -86,9 +86,10 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
     onSwappingStateChange?.(isSwapping);
   }, [isSwapping, onSwappingStateChange]);
 
-  // Get challengeId or fundId from URL params for contract call
+  // Get challengeId and walletAddress from URL params for contract call and query invalidation
   const params = useParams()
   const challengeId = params?.id || params?.challengeId || "1"
+  const walletAddress = params?.walletAddress as string
   // No fund ID needed for challenge swaps
 
   // Create utility functions with bound parameters
@@ -392,21 +393,40 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
       setFromAmount("");
 
       // Invalidate queries to refresh data after successful swap
+      // Note: Using predicate to invalidate all related queries
       setTimeout(() => {
+        // Invalidate investor-specific data
+        if (walletAddress) {
+          const investorId = `${challengeId}-${walletAddress.toUpperCase()}`;
+          queryClient.invalidateQueries({
+            queryKey: ['investor', investorId, subgraphNetwork],
+            refetchType: 'active'
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['userTokens', challengeId, walletAddress, subgraphNetwork],
+            refetchType: 'active'
+          });
+          queryClient.invalidateQueries({
+            predicate: (query) =>
+              query.queryKey[0] === 'investorSnapshots' &&
+              query.queryKey[1] === challengeId &&
+              query.queryKey[2] === walletAddress &&
+              query.queryKey[3] === subgraphNetwork,
+            refetchType: 'active'
+          });
+          queryClient.invalidateQueries({
+            predicate: (query) =>
+              query.queryKey[0] === 'transactions' &&
+              query.queryKey[1] === challengeId &&
+              query.queryKey[2] === walletAddress &&
+              query.queryKey[3] === subgraphNetwork,
+            refetchType: 'active'
+          });
+        }
+
+        // Invalidate challenge-wide data
         queryClient.invalidateQueries({
           queryKey: ['challenge', challengeId, subgraphNetwork],
-          refetchType: 'active'
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['userTokens', challengeId, subgraphNetwork],
-          refetchType: 'active'
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['investorData', challengeId, subgraphNetwork],
-          refetchType: 'active'
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['transactions', challengeId, subgraphNetwork],
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
@@ -414,19 +434,24 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['investorSnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeSnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeSnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeWeeklySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
-          queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork],
-          refetchType: 'active'
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork],
+          predicate: (query) =>
+            query.queryKey[0] === 'challengeMonthlySnapshots' &&
+            query.queryKey[1] === challengeId &&
+            query.queryKey[3] === subgraphNetwork,
           refetchType: 'active'
         });
         queryClient.invalidateQueries({
