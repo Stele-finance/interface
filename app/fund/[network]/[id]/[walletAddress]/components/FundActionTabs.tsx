@@ -322,6 +322,7 @@ export function FundActionTabs({
         queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots'] });
       }, 3000);
 
     } catch (error: any) {
@@ -499,6 +500,7 @@ export function FundActionTabs({
         queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots'] });
       }, 3000);
 
     } catch (error: any) {
@@ -599,6 +601,7 @@ export function FundActionTabs({
         queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots'] });
       }, 3000);
 
     } catch (error: any) {
