@@ -238,12 +238,12 @@ export function PortfolioSummary({
           </div>
           
           <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-            <span className="text-sm text-gray-400">{t('investor')}</span>
+            <span className="text-sm text-gray-400">{t('seedMoney')}</span>
             <span className="text-sm text-white font-medium">
-              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+              ${formattedSeedMoney.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </span>
           </div>
-          
+
           <div className="py-2">
             <div className="flex justify-between">
               <div>
@@ -304,7 +304,7 @@ export function PortfolioSummary({
                       >
                         <div className="flex items-baseline gap-2">
                           <span className="text-sm text-white font-medium">
-                            ${(Math.floor(currentValue * 100) / 100).toFixed(2)}
+                            ${(Math.floor(currentValue * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                           <span className={`text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                             ({isPositive ? '+' : ''}{(Math.floor(gainLossPercentage * 10000) / 10000).toFixed(4)}%)
@@ -329,7 +329,7 @@ export function PortfolioSummary({
                       return (
                         <div className="flex items-baseline gap-2">
                           <span className="text-sm text-white font-medium">
-                            ${(Math.floor(realTimePortfolio.totalValue * 100) / 100).toFixed(2)}
+                            ${(Math.floor(realTimePortfolio.totalValue * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                           <span className={`text-sm ${isRealTimePositive ? 'text-green-400' : 'text-red-400'}`}>
                             ({isRealTimePositive ? '+' : ''}{(Math.floor(realTimeGainLossPercentage * 10000) / 10000).toFixed(4)}%)
