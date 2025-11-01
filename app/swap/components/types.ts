@@ -1,5 +1,6 @@
 import { HTMLAttributes } from "react"
 import { UserTokenInfo } from "@/app/hooks/useUserTokens"
+import { InvestorData } from "@/app/hooks/useChallengeInvestorData"
 
 export interface InvestableToken {
   id: string
@@ -12,6 +13,7 @@ export interface InvestableToken {
 
 export interface AssetSwapProps extends HTMLAttributes<HTMLDivElement> {
   userTokens?: UserTokenInfo[];
+  investorData?: InvestorData;
   investableTokens?: InvestableToken[];
   onSwappingStateChange?: (isSwapping: boolean) => void;
   network?: 'ethereum' | 'arbitrum';

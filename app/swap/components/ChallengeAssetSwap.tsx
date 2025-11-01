@@ -50,7 +50,7 @@ import {
 import SteleABI from "@/app/abis/Stele.json"
 // Fund ABI not needed for challenge swaps
 
-export function ChallengeAssetSwap({ className, userTokens = [], investableTokens: externalInvestableTokens, onSwappingStateChange, network: propNetwork, ...props }: AssetSwapProps) {
+export function ChallengeAssetSwap({ className, userTokens = [], investorData, investableTokens: externalInvestableTokens, onSwappingStateChange, network: propNetwork, ...props }: AssetSwapProps) {
   const { t } = useLanguage()
   const { walletType, getProvider, isConnected } = useWallet()
   const queryClient = useQueryClient()
@@ -59,6 +59,15 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
   const pathParts = window.location.pathname.split('/');
   const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'ethereum';
   const subgraphNetwork = (propNetwork || networkFromUrl) as 'ethereum' | 'arbitrum';
+
+  // Use investorData to get userTokens if provided (more direct, updates faster)
+  const effectiveUserTokens = investorData?.investor ?
+    (investorData.investor.tokens || []).map((address, index) => ({
+      address,
+      symbol: investorData.investor.tokensSymbols?.[index] || `TOKEN_${index}`,
+      amount: investorData.investor.tokensAmount?.[index] || '0',
+      decimals: investorData.investor.tokensDecimals?.[index] || '18'
+    })) : userTokens;
   
   // This is always a challenge swap
   const isFundSwap = false;
@@ -93,14 +102,14 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
   // No fund ID needed for challenge swaps
 
   // Create utility functions with bound parameters
-  const getTokenAddressUtil = useCallback((tokenSymbol: string) => 
-    getTokenAddress(tokenSymbol, userTokens, investableTokens), [userTokens, investableTokens])
-  
-  const getTokenDecimalsUtil = useCallback((tokenSymbol: string) => 
-    getTokenDecimals(tokenSymbol, userTokens, investableTokens), [userTokens, investableTokens])
+  const getTokenAddressUtil = useCallback((tokenSymbol: string) =>
+    getTokenAddress(tokenSymbol, effectiveUserTokens, investableTokens), [effectiveUserTokens, investableTokens])
+
+  const getTokenDecimalsUtil = useCallback((tokenSymbol: string) =>
+    getTokenDecimals(tokenSymbol, effectiveUserTokens, investableTokens), [effectiveUserTokens, investableTokens])
 
   const getFormattedTokenBalanceUtil = useCallback((tokenSymbol: string) =>
-    getFormattedTokenBalance(tokenSymbol, userTokens), [userTokens])
+    getFormattedTokenBalance(tokenSymbol, effectiveUserTokens), [effectiveUserTokens])
 
   // Get token prices for swap tokens (network-specific, only 2 tokens needed)
   const {
@@ -145,17 +154,17 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
   // Initialize tokens when they become available
   useEffect(() => {
     // Initialize fromToken with first available user token
-    if (userTokens.length > 0 && !fromToken) {
-      setFromToken(userTokens[0].symbol);
+    if (effectiveUserTokens.length > 0 && !fromToken) {
+      setFromToken(effectiveUserTokens[0].symbol);
     }
-    
+
     // Initialize toToken with first available investable token
     if (investableTokens.length > 0 && !toToken) {
       // Try to find WETH first, otherwise use first available
       const wethToken = investableTokens.find(token => token.symbol === "WETH");
       setToToken(wethToken ? "WETH" : investableTokens[0].symbol);
     }
-  }, [investableTokens, userTokens, fromToken, toToken]);
+  }, [investableTokens, effectiveUserTokens, fromToken, toToken]);
 
   // Auto-change toToken if it becomes the same as fromToken
   useEffect(() => {
@@ -194,9 +203,9 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
 
   // Get available tokens
   const { availableFromTokens, availableToTokens } = getAvailableTokens(
-    userTokens, 
-    investableTokens, 
-    priceData, 
+    effectiveUserTokens,
+    investableTokens,
+    priceData,
     fromToken
   );
 
@@ -207,18 +216,18 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
   };
 
   // Bound utility functions for components
-  const isAmountExceedsBalanceUtil = useCallback(() => 
-    isAmountExceedsBalance(fromAmount, fromToken, userTokens), [fromAmount, fromToken, userTokens])
-  
-  const isBelowMinimumSwapAmountUtil = useCallback(() => 
+  const isAmountExceedsBalanceUtil = useCallback(() =>
+    isAmountExceedsBalance(fromAmount, fromToken, effectiveUserTokens), [fromAmount, fromToken, effectiveUserTokens])
+
+  const isBelowMinimumSwapAmountUtil = useCallback(() =>
     isBelowMinimumSwapAmount(fromAmount, fromToken, priceData, fromTokenPrice || undefined), [fromAmount, fromToken, priceData, fromTokenPrice])
-  
-  const getSwapAmountUSDUtil = useCallback(() => 
+
+  const getSwapAmountUSDUtil = useCallback(() =>
     getSwapAmountUSD(fromAmount, fromToken, priceData, fromTokenPrice || undefined), [fromAmount, fromToken, priceData, fromTokenPrice])
 
-  const handlePercentageClickUtil = useCallback((percentage: number) => 
-    utilHandlePercentageClick(percentage, fromToken, userTokens, getTokenDecimalsUtil, setFromAmount), 
-    [fromToken, userTokens, getTokenDecimalsUtil])
+  const handlePercentageClickUtil = useCallback((percentage: number) =>
+    utilHandlePercentageClick(percentage, fromToken, effectiveUserTokens, getTokenDecimalsUtil, setFromAmount),
+    [fromToken, effectiveUserTokens, getTokenDecimalsUtil])
 
   // Calculate actual output amount using dynamic prices
   const outputAmount = useMemo(() => {
@@ -498,11 +507,13 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
             refetchType: 'active'
           });
         }
+
+        // Re-enable real-time display immediately after data refresh
+        setIsSwapping(false);
       }, 3000);
 
     } catch (error: any) {
       console.error("Swap error:", error);
-    } finally {
       setIsSwapping(false);
     }
   };
@@ -518,7 +529,7 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
             onAmountChange={setFromAmount}
             onTokenSelect={setFromToken}
             availableTokens={availableFromTokens}
-            userTokens={userTokens}
+            userTokens={effectiveUserTokens}
             isFrom={true}
             subgraphNetwork={subgraphNetwork}
             getTokenAddress={getTokenAddressUtil}
@@ -549,13 +560,13 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
             onAmountChange={() => {}} // Read-only for output
             onTokenSelect={setToToken}
             availableTokens={availableToTokens}
-            userTokens={userTokens}
+            userTokens={effectiveUserTokens}
             isFrom={false}
             subgraphNetwork={subgraphNetwork}
             getTokenAddress={getTokenAddressUtil}
             getTokenDecimals={getTokenDecimalsUtil}
             getFormattedTokenBalance={getFormattedTokenBalanceUtil}
-            getSwapAmountUSD={() => 
+            getSwapAmountUSD={() =>
               getSwapAmountUSD(outputAmount, toToken, priceData, toTokenPrice || undefined)
             }
             priceData={priceData}
