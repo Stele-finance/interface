@@ -263,12 +263,46 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
       // Refresh data after 3 seconds using React Query
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['challenge', challengeId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, walletAddress, subgraphNetwork] });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', challengeId, walletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({
+          queryKey: ['challenge', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['transactions', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['ranking', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['userTokens', challengeId, walletAddress, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['investorSnapshots', challengeId, walletAddress, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['challengeSnapshots', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['challengeWeeklySnapshots', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['challengeMonthlySnapshots', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['challengeInvestors', challengeId, subgraphNetwork],
+          refetchType: 'active'
+        });
         setIsRefreshing(false);
       }, 3000);
 
