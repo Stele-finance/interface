@@ -575,7 +575,7 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                 
               <TabsContent value="portfolio" className="space-y-4">
                 <PortfolioTab
-                  userTokens={userTokens}
+                  investorData={investorData}
                   isLoadingUniswap={isLoadingUniswap}
                   subgraphNetwork={subgraphNetwork}
                   onTokenClick={handleTokenClick}
