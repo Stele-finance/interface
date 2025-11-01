@@ -863,14 +863,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                   {investor ? (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Fund ID</span>
-                        <span className="text-sm text-white font-medium">#{fundId}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">Network</span>
                         <div className="flex items-center gap-2">
-                          <Image 
+                          <Image
                             src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
                             alt={subgraphNetwork}
                             width={16}
@@ -880,17 +875,17 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                           <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Investment</span>
+                        <span className="text-sm text-gray-400">{t('principal')}</span>
                         <span className="text-sm text-white font-medium">
                           ${parseFloat(investor?.investmentUSD || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
-                      
+
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-400">Current Value</span>
+                          <span className="text-sm text-gray-400">{t('value')}</span>
                           {portfolioData.tokens.some(token => token.isRealTime) && (
                             <span className="text-xs text-green-400 flex items-center gap-1">
                               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
@@ -902,9 +897,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                           ${portfolioData.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
-                      
+
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Profit</span>
+                        <span className="text-sm text-gray-400">{t('profitRatio')}</span>
                         <span className={`text-sm font-medium ${
                           (() => {
                             const investment = parseFloat(investor?.investmentUSD || '0')

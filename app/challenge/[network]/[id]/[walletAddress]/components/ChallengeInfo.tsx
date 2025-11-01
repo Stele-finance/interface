@@ -165,20 +165,7 @@ export function ChallengeInfo({
             <span className="text-sm text-gray-400">Challenge ID</span>
             <span className="text-sm text-white font-medium">#{challengeId}</span>
           </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-            <span className="text-sm text-gray-400">{t('seedMoney')}</span>
-            <span className="text-sm text-white font-medium">
-              {(() => {
-                if (challengeData?.challenge?.seedMoney) {
-                  const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                  return seedMoneyValue > 0 ? `$${seedMoneyValue.toLocaleString()}` : '$0';
-                }
-                return '$0';
-              })()}
-            </span>
-          </div>
-          
+
           <div className="flex justify-between items-center py-2">
             <span className="text-sm text-gray-400">{t('investor')}</span>
             <span className="text-sm text-white font-medium">

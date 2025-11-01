@@ -69,9 +69,6 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl text-gray-100">{t('ranking')}</h2>
-      </div>
       <Card className="bg-transparent border-transparent">
         <CardContent className="p-0">
           <div className="space-y-0">

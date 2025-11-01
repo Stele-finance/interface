@@ -1442,14 +1442,9 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">Challenge ID</span>
-                  <span className="text-sm text-white font-medium">#{challengeId}</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('network')}</span>
                   <div className="flex items-center gap-2">
-                    <Image 
+                    <Image
                       src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
                       alt={subgraphNetwork}
                       width={16}
@@ -1459,17 +1454,17 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
                     <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('status')}</span>
                   <span className={`text-sm font-medium ${
                     (() => {
                       if (!challengeData?.challenge) return 'text-red-400';
-                      
+
                       const challenge = challengeData.challenge;
                       const endTime = new Date(parseInt(challenge.endTime) * 1000);
                       const hasEnded = currentTime >= endTime;
-                      
+
                       if (challenge.isActive && !hasEnded) {
                         return 'text-green-400';
                       } else if (challenge.isActive && hasEnded) {
@@ -1481,11 +1476,11 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
                   }`}>
                     {(() => {
                       if (!challengeData?.challenge) return t('end');
-                      
+
                       const challenge = challengeData.challenge;
                       const endTime = new Date(parseInt(challenge.endTime) * 1000);
                       const hasEnded = currentTime >= endTime;
-                      
+
                       if (challenge.isActive && !hasEnded) {
                         return t('active');
                       } else if (challenge.isActive && hasEnded) {
@@ -1496,27 +1491,14 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
                     })()}
                   </span>
                 </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">{t('seedMoney')}</span>
-                  <span className="text-sm text-white font-medium">
-                    {(() => {
-                      if (challengeData?.challenge?.seedMoney) {
-                        const seedMoneyValue = parseInt(challengeData.challenge.seedMoney);
-                        return seedMoneyValue > 0 ? `$${seedMoneyValue.toLocaleString()}` : '$0';
-                      }
-                      return '$0';
-                    })()}
-                  </span>
-                </div>
-                
+
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm text-gray-400">{t('investor')}</span>
                   <span className="text-sm text-white font-medium">
                     {challengeData?.challenge ? parseInt(challengeData.challenge.investorCounter).toLocaleString() : '0'}
                   </span>
                 </div>
-                
+
               </div>
             </div>
           </Card>

@@ -28,14 +28,13 @@ import SteleABI from "@/app/abis/Stele.json"
 
 // Import types and utilities
 import { InvestorPageProps, RealTimePortfolio } from "./types"
-import { calculatePortfolioMetrics, getChallengeDetails, getTimeRemaining, getTokenExplorerUrl, getExplorerUrl, getExplorerName } from "./utils"
+import { calculatePortfolioMetrics, getChallengeDetails, getTokenExplorerUrl, getExplorerUrl, getExplorerName } from "./utils"
 
 // Import components
 import { ErrorState } from "./components/LoadingStates"
 import { PortfolioTab } from "./components/PortfolioTab"
 import { TransactionsTab } from "./components/TransactionsTab"
 import { PortfolioSummary } from "./components/PortfolioSummary"
-import { ChallengeInfo } from "./components/ChallengeInfo"
 import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -418,7 +417,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
   // Computed values
   const portfolioMetrics = investorData?.investor ? calculatePortfolioMetrics(investorData.investor) : null
   const challengeDetails = getChallengeDetails(challengeData)
-  const timeRemaining = getTimeRemaining(challengeDetails, currentTime, isClient, t as any)
   const isChallengeEnded = challengeDetails && currentTime >= challengeDetails.endTime;
 
   // Determine challenge state
@@ -670,17 +668,6 @@ export default function InvestorPage({ params }: InvestorPageProps) {
                   isClient={isClient}
                 />
               )}
-
-              {/* Challenge Info */}
-              <ChallengeInfo 
-                challengeId={challengeId}
-                challengeData={challengeData}
-                challengeDetails={challengeDetails}
-                timeRemaining={timeRemaining}
-                isClient={isClient}
-                currentTime={currentTime}
-                network={subgraphNetwork}
-              />
 
               {/* Ranking Section */}
               <RankingSection 
