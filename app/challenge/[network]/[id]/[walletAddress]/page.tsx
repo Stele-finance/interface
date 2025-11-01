@@ -267,6 +267,8 @@ export default function InvestorPage({ params }: InvestorPageProps) {
         queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, walletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, walletAddress, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', challengeId, walletAddress, subgraphNetwork] });
         setIsRefreshing(false);
       }, 3000);
 

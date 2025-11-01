@@ -397,6 +397,8 @@ export function ChallengeAssetSwap({ className, userTokens = [], investableToken
         queryClient.invalidateQueries({ queryKey: ['userTokens', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['investorData', challengeId, subgraphNetwork] });
         queryClient.invalidateQueries({ queryKey: ['transactions', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['ranking', challengeId, subgraphNetwork] });
+        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', challengeId, subgraphNetwork] });
       }, 3000);
 
     } catch (error: any) {
