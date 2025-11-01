@@ -285,6 +285,7 @@ export const id = {
   previous: "Sebelumnya",
   price: "Harga",
   priceUnavailable: "Harga tidak tersedia",
+  principal: "Pokok",
   privacyPolicy: "Kebijakan Privasi",
   prizeDistribution: "Distribusi Hadiah",
   prizeDistributionDesc: "Semua biaya masuk didistribusikan kepada peserta peringkat teratas",

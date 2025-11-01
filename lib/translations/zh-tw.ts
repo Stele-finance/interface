@@ -287,6 +287,7 @@ export const zhTw = {
   previous: "上一個",
   price: "價格",
   priceUnavailable: "價格不可用",
+  principal: "本金",
   privacyPolicy: "隱私政策",
   prizeDistribution: "獎金分配",
   prizeDistributionDesc: "所有入場費將分配給排名最高的參與者",

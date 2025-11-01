@@ -287,6 +287,7 @@ export const de = {
   previous: "Vorherige",
   price: "Preis",
   priceUnavailable: "Preis nicht verfügbar",
+  principal: "Kapital",
   privacyPolicy: "Datenschutzerklärung",
   prizeDistribution: "Preisverteilung",
   prizeDistributionDesc: "Alle Teilnahmegebühren werden an die Erstplatzierten verteilt",

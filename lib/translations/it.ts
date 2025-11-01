@@ -285,6 +285,7 @@ export const it = {
   previous: "Precedente",
   price: "Prezzo",
   priceUnavailable: "Prezzo non disponibile",
+  principal: "Capitale",
   privacyPolicy: "Informativa sulla Privacy",
   prizeDistribution: "Distribuzione Premi",
   prizeDistributionDesc: "Tutte le quote di iscrizione vengono distribuite ai partecipanti con il ranking più alto",

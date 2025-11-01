@@ -287,6 +287,7 @@ export const es = {
   previous: "Anterior",
   price: "Precio",
   priceUnavailable: "Precio no disponible",
+  principal: "Principal",
   privacyPolicy: "Política de Privacidad",
   prizeDistribution: "Distribución de Premios",
   prizeDistributionDesc: "Todas las tarifas de entrada se distribuyen entre los participantes mejor clasificados",

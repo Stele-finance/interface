@@ -288,6 +288,7 @@ export const en = {
   previous: "Previous",
   price: "Price",
   priceUnavailable: "Price unavailable",
+  principal: "Principal",
   privacyPolicy: "Privacy Policy",
   prizeDistribution: "Prize Distribution",
   prizeDistributionDesc: "All entry fees are distributed to top-ranked participants",

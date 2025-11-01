@@ -287,6 +287,7 @@ export const th = {
   previous: 'ก่อนหน้า',
   price: 'ราคา',
   priceUnavailable: 'ราคาไม่พร้อมใช้งาน',
+  principal: 'เงินต้น',
   privacyPolicy: "นโยบายความเป็นส่วนตัว",
   prizeDistribution: "การแจกรางวัล",
   prizeDistributionDesc: "ค่าสมัครทั้งหมดจะถูกแจกจ่ายให้กับผู้เข้าร่วมที่มีอันดับสูงสุด",

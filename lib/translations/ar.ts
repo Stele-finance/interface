@@ -287,6 +287,7 @@ export const ar = {
   previous: "السابق",
   price: "السعر",
   priceUnavailable: "السعر غير متاح",
+  principal: "رأس المال",
   privacyPolicy: "سياسة الخصوصية",
   prizeDistribution: "توزيع الجوائز",
   prizeDistributionDesc: "يتم توزيع جميع رسوم الدخول على المشاركين الأوائل",

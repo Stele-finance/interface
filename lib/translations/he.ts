@@ -285,6 +285,7 @@ export const he = {
   previous: "קודם",
   price: "מחיר",
   priceUnavailable: "מחיר לא זמין",
+  principal: "קרן",
   privacyPolicy: "מדיניות פרטיות",
   prizeDistribution: "חלוקת פרסים",
   prizeDistributionDesc: "כל דמי הכניסה מחולקים למשתתפים המדורגים הגבוהים ביותר",

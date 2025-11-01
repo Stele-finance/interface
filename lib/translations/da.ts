@@ -287,6 +287,7 @@ export const da = {
   previous: "Forrige",
   price: "Pris",
   priceUnavailable: "Pris ikke tilgængelig",
+  principal: "Hovedstol",
   privacyPolicy: "Privatlivspolitik",
   prizeDistribution: "Præmiefordeling",
   prizeDistributionDesc: "Alle deltagergebyrer fordeles til top-rangerede deltagere",

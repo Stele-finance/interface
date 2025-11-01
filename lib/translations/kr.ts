@@ -288,6 +288,7 @@ export const kr = {
   previous: "이전",
   price: "가격",
   priceUnavailable: "가격 정보 없음",
+  principal: "원금",
   privacyPolicy: "개인정보 보호정책",
   prizeDistribution: "상금 분배",
   prizeDistributionDesc: "모든 참가비는 상위 입상자들에게 분배됩니다",
