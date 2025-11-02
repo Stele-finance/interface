@@ -428,7 +428,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
 
                         {/* Principal */}
-                        <div className="flex flex-col justify-center space-y-3 pl-4">
+                        <div className="flex flex-col justify-center space-y-3 pl-16">
                           <div className="flex items-center gap-2 text-gray-400">
                             <DollarSign className="h-6 w-6" />
                             <span className="text-lg font-medium">{t('principal')}</span>
@@ -439,7 +439,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
 
                         {/* Value */}
-                        <div className="flex flex-col justify-center space-y-3 pl-4">
+                        <div className="flex flex-col justify-center space-y-3 pl-16">
                           <div className="flex items-center gap-2 text-gray-400">
                             <DollarSign className="h-6 w-6" />
                             <span className="text-lg font-medium">{t('value')}</span>
