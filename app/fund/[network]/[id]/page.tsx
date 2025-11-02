@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useEffect } from "react"
 import { FundDetail } from "./components/FundDetail"
 // Mock fund hook instead of useChallenge
 // import { useFund } from '@/app/hooks/useFund'
@@ -18,9 +18,26 @@ interface FundPageProps {
 function FundContent({ fundId, network }: { fundId: string; network: string }) {
   const router = useRouter()
   const { t } = useLanguage()
-  
+
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
+
+  // Listen for network changes from Header and redirect to funds page
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network: newNetwork } = event.detail
+      // If network changed, redirect to funds page with new network
+      if (newNetwork !== network) {
+        router.push('/funds')
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [network, router])
   
   // Mock fund data instead of useChallenge
   const mockFund = {

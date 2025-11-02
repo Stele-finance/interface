@@ -43,13 +43,30 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   const { isMobileMenuOpen } = useMobileMenu()
   const { network: routeNetwork, id: fundId, walletAddress } = use(params)
   const router = useRouter()
-  
+
   // Use hooks
   const { address: connectedAddress, walletType, getProvider } = useWallet()
   const queryClient = useQueryClient()
 
   // Use URL network parameter instead of wallet network for subgraph
   const subgraphNetwork = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum'
+
+  // Listen for network changes from Header and redirect to funds page
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network: newNetwork } = event.detail
+      // If network changed, redirect to funds page with new network
+      if (newNetwork !== routeNetwork) {
+        router.push('/funds')
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [routeNetwork, router])
   
   const { data: fundInvestorData, error: investorError, isLoading: isLoadingInvestor } = useFundInvestorData(fundId, walletAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundData } = useFundData(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')

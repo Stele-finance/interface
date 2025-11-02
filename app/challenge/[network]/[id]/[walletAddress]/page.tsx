@@ -47,6 +47,23 @@ export default function InvestorPage({ params }: InvestorPageProps) {
 
   // Use URL network parameter instead of wallet network for subgraph
   const subgraphNetwork = routeNetwork === 'ethereum' || routeNetwork === 'arbitrum' ? routeNetwork : 'ethereum'
+
+  // Listen for network changes from Header and redirect to challenges page
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network: newNetwork } = event.detail
+      // If network changed, redirect to challenges page with new network
+      if (newNetwork !== routeNetwork) {
+        router.push('/challenges')
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [routeNetwork, router])
   
   const { data: investorData, error: investorError } = useInvestorData(challengeId, walletAddress, subgraphNetwork)
   const { data: userTokens = [], error: tokensError } = useUserTokens(challengeId, walletAddress, subgraphNetwork)
