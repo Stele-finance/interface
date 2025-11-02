@@ -367,7 +367,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               return (
                 <Card
                   key={fund.id}
-                  className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
+                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
                   onClick={() => {
                     router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
                   }}
@@ -450,6 +450,17 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
                       </div>
                     </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-700/50 my-6"></div>
+
+                    {/* Manager Address */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-400">{t('manager')}</div>
+                      <span className="text-sm text-gray-300 font-mono">
+                        {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
+                      </span>
+                    </div>
                   </CardContent>
                 </Card>
               )
@@ -465,7 +476,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               size="sm"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="border-gray-600 hover:bg-gray-700"
+              className="bg-muted/30 border-none hover:bg-muted/50"
             >
               {t('previous')}
             </Button>
@@ -477,7 +488,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               size="sm"
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="border-gray-600 hover:bg-gray-700"
+              className="bg-muted/30 border-none hover:bg-muted/50"
             >
               {t('next')}
             </Button>
