@@ -282,8 +282,6 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
                 <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse"></div>
               </div>
             </div>
-            {/* Separator */}
-            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 pt-2"></div>
           </CardContent>
         </Card>
       </div>
@@ -309,9 +307,6 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
                 <div className="w-16 h-8 bg-gray-700 rounded-full animate-pulse"></div>
               </div>
             </div>
-            
-            {/* Separator */}
-            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 pt-2"></div>
           </CardContent>
         </Card>
       </div>
@@ -385,11 +380,6 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
                 </div>
               )}
             </div>
-          </div>
-          
-          {/* Separator Bar - Below daily/weekly buttons, chart width */}
-          <div className="pr-6 mb-4 pt-2">
-            <div className="border-t border-gray-600/50"></div>
           </div>
         </Card>
         
@@ -665,11 +655,6 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
               </div>
             )}
           </div>
-        </div>
-        
-        {/* Separator Bar - Below daily/weekly buttons, chart width */}
-        <div className="pr-6 md:mr-12 -mr-4 mb-0 pt-2">
-          <div className="border-t border-gray-600/50"></div>
         </div>
       </Card>
 

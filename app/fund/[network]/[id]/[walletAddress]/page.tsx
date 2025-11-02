@@ -3,10 +3,9 @@
 import React, { useState, use, useEffect, useCallback, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { ArrowLeft, BarChart3, Activity, Users, Loader2, Receipt, ArrowRight, ChevronDown, Calendar } from "lucide-react"
+import { ArrowLeft, Activity, Loader2, Receipt, ArrowRight, ChevronDown, Calendar } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
@@ -18,13 +17,10 @@ import { FundInvestorCharts } from "../components/FundInvestorCharts"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "@/components/ui/use-toast"
-import { FundErrorState } from "./components/FundErrorState"
 import { FundActionTabs } from "./components/FundActionTabs"
 import { PieChart } from "lucide-react"
 import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 import { getTokenLogo } from "@/lib/utils"
-import { USDC_DECIMALS } from "@/lib/constants"
 import { useRef } from "react"
 
 interface FundInvestorPageProps {
@@ -451,27 +447,20 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 )}
               </div>
             </div>
-            
-            {/* Separator Bar - Below dropdown, chart width */}
-            <div className="pr-6 md:mr-2 -mr-4 mb-4 pt-2">
-              <div className="border-t border-gray-600/50"></div>
-            </div>
-              
+
             {/* Tabs section */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger 
-                    value="portfolio" 
-                    className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                <TabsList className="inline-flex h-auto items-center justify-start bg-transparent p-0 gap-8">
+                  <TabsTrigger
+                    value="portfolio"
+                    className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
-                    <BarChart3 className="h-4 w-4" />
                     {t('portfolio')}
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="transactions" 
-                    className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                  <TabsTrigger
+                    value="transactions"
+                    className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
-                    <Activity className="h-4 w-4" />
                     {t('transactions')}
                   </TabsTrigger>
                 </TabsList>

@@ -517,7 +517,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
           </CardContent>
           
           {/* Time interval dropdown - Below chart like fund page */}
-          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2">
+          <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 pb-2">
             <div className="relative" ref={intervalDropdownRef}>
               <button
                 onClick={() => setShowIntervalDropdown(!showIntervalDropdown)}
@@ -559,11 +559,6 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
                 </div>
               )}
             </div>
-          </div>
-          
-          {/* Separator Bar - Below daily/weekly buttons, chart width */}
-          <div className="pr-6 mb-4 pt-2">
-            <div className="border-t border-gray-600/50"></div>
           </div>
         </Card>
         
@@ -874,7 +869,7 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
         </CardContent>
         
         {/* Time interval dropdown - Below chart like fund page */}
-        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 md:mr-20">
+        <div className="flex justify-end px-2 sm:px-0 -mt-4 sm:-mt-2 mb-2 pb-2 md:mr-20">
           <div className="relative" ref={intervalDropdownRef}>
             <button
               onClick={() => setShowIntervalDropdown(!showIntervalDropdown)}
@@ -916,11 +911,6 @@ export function ChallengeCharts({ challengeId, network, joinButton }: ChallengeC
               </div>
             )}
           </div>
-        </div>
-        
-        {/* Separator Bar - Below daily/weekly buttons, chart width */}
-        <div className="pr-6 md:mr-12 -mr-4 mb-0 pt-2">
-          <div className="border-t border-gray-600/50"></div>
         </div>
       </Card>
 

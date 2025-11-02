@@ -753,19 +753,17 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           {/* Tabs */}
           <div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger 
-                value="investors" 
-                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+            <TabsList className="inline-flex h-auto items-center justify-start bg-transparent p-0 gap-8">
+              <TabsTrigger
+                value="investors"
+                className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
-                <Users className="w-4 h-4" />
                 {t('investor')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="transactions" 
-                className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              <TabsTrigger
+                value="transactions"
+                className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
-                <Activity className="w-4 h-4" />
                 {t('transactions')}
               </TabsTrigger>
             </TabsList>
