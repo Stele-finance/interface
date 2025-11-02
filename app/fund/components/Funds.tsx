@@ -367,7 +367,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               return (
                 <Card
                   key={fund.id}
-                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
+                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl hover-lift active:scale-[0.98] active:shadow-[0_10px_20px_rgba(0,0,0,0.15)]"
                   onClick={() => {
                     router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
                   }}
