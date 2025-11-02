@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { ChallengePortfolio } from "./components/ChallengePortfolio"
 import { useChallenge } from '@/app/hooks/useChallenge'
@@ -19,11 +19,28 @@ interface ChallengePageProps {
 function ChallengeContent({ challengeId, network }: { challengeId: string; network: string }) {
   const router = useRouter()
   const { t } = useLanguage()
-  
+
   // Filter network to supported types for subgraph (exclude 'solana')
   const subgraphNetwork = network === 'ethereum' || network === 'arbitrum' ? network : 'ethereum'
-  
+
   const { data, isLoading, error } = useChallenge(challengeId, subgraphNetwork)
+
+  // Listen for network changes from Header and redirect to challenges page
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network: newNetwork } = event.detail
+      // If network changed, redirect to challenges page with new network
+      if (newNetwork !== network) {
+        router.push('/challenges')
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [network, router])
 
   if (isLoading) {
     return (

@@ -270,93 +270,55 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
     setIsSwapping(true);
 
     try {
-      // Get provider using useWallet hook
+      // Get provider
       const browserProvider = await getProvider();
       if (!browserProvider) {
-        throw new Error("Failed to get wallet provider. Please reconnect your wallet.");
+        throw new Error("No provider available. Please connect your wallet first.");
       }
 
-      // Try to get address from signer first before requesting accounts
-      let userAddress: string | null = null;
+      // Always switch to the selected network before making the transaction
+      const targetChainId = subgraphNetwork === 'arbitrum' ? 42161 : 1;
 
+      // Try to switch to the selected network
       try {
-        const signer = await browserProvider.getSigner();
-        userAddress = await signer.getAddress();
-      } catch (error: any) {
-        console.warn('Could not get address from signer, requesting accounts:', error);
-        
-        // Check if user rejected the request
-        if (error.code === 4001 || error.message?.includes('rejected') || error.message?.includes('denied')) {
-          throw new Error("Connection request was rejected by user");
-        }
-        
-        // Only request accounts if we can't get address from signer
-        const accounts = await browserProvider.send('eth_requestAccounts', []);
+        await browserProvider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ]);
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          // Network not added to wallet, add it
+          const networkConfig = subgraphNetwork === 'arbitrum' ? {
+            chainId: '0xa4b1',
+            chainName: 'Arbitrum One',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io/']
+          } : {
+            chainId: '0x1',
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.infura.io/v3/'],
+            blockExplorerUrls: ['https://etherscan.io/']
+          };
 
-        if (!accounts || accounts.length === 0) {
-          throw new Error(`No accounts found. Please connect to ${walletType} wallet first.`);
-        }
-        userAddress = accounts[0];
-      }
-
-      if (!userAddress) {
-        throw new Error('Could not determine user address');
-      }
-
-      // Get wallet's current network
-      const walletChainId = await browserProvider.send('eth_chainId', []);
-      const expectedChainId = subgraphNetwork === 'arbitrum' ? '0xa4b1' : '0x1';
-      
-      // If wallet is on wrong network, switch to URL-based network
-      if (walletChainId.toLowerCase() !== expectedChainId.toLowerCase()) {
-        try {
-          // Request network switch
-          await browserProvider.send('wallet_switchEthereumChain', [
-            { chainId: expectedChainId }
-          ]);
-        } catch (switchError: any) {
-          // If network doesn't exist in wallet (error 4902), add it
-          if (switchError.code === 4902) {
-            try {
-              const networkParams = subgraphNetwork === 'arbitrum' ? {
-                chainId: expectedChainId,
-                chainName: 'Arbitrum One',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-                blockExplorerUrls: ['https://arbiscan.io']
-              } : {
-                chainId: expectedChainId,
-                chainName: 'Ethereum Mainnet',
-                nativeCurrency: {
-                  name: 'Ether',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-                blockExplorerUrls: ['https://etherscan.io']
-              };
-              
-              await browserProvider.send('wallet_addEthereumChain', [networkParams]);
-            } catch (addError) {
-              const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-              throw new Error(`Failed to add ${networkName} network. Please add it manually in your wallet settings.`);
-            }
-          } else if (switchError.code === 4001) {
-            // User rejected the switch
-            const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
-            throw new Error(`Please switch to ${networkName} network to perform swap.`);
-          } else {
-            throw switchError;
-          }
+          await browserProvider.send('wallet_addEthereumChain', [networkConfig]);
+        } else if (switchError.code === 4001) {
+          // User rejected the network switch
+          const networkName = subgraphNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum';
+          throw new Error(`Please switch to ${networkName} network to perform swap.`);
+        } else {
+          throw switchError;
         }
       }
 
-      // Use existing browserProvider and get signer
-      const signer = await browserProvider.getSigner();
+      // Get a fresh provider after network switch to ensure we're on the correct network
+      const updatedProvider = await getProvider();
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch');
+      }
+
+      const signer = await updatedProvider.getSigner();
+      const userAddress = await signer.getAddress();
       
       // Create contract instance for fund swap
       const contractAddress = getSteleFundContractAddress(subgraphNetwork);
