@@ -451,10 +451,11 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
 
     // Prevent too frequent requests (minimum 30 seconds between calls)
     const now = Date.now()
-    const timeSinceLastFetch = now - lastFetchTimeRef.current
+    const timeSinceLastFetch = now - globalLastFetchTime
     const MIN_FETCH_INTERVAL = 30000 // 30 seconds
-    
-    if (!forceRefresh && timeSinceLastFetch < MIN_FETCH_INTERVAL && priceDataRef.current) {
+
+    if (!forceRefresh && globalLastFetchTime > 0 && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
+      console.log(`⏱️ Skipping fetch - last fetch was ${Math.round(timeSinceLastFetch / 1000)}s ago (minimum ${MIN_FETCH_INTERVAL / 1000}s)`)
       return
     }
 
@@ -464,6 +465,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
         setIsLoading(true)
       }
       setError(null)
+      globalLastFetchTime = now
       lastFetchTimeRef.current = now
             
       const provider = await getProvider()
@@ -596,6 +598,9 @@ interface PriceCacheItem {
 
 const priceCache = new Map<string, PriceCacheItem>()
 const CACHE_DURATION = 180000 // 3 minutes cache
+
+// Global last fetch time to prevent rapid requests across component remounts
+let globalLastFetchTime = 0
 
 // LocalStorage key for persistent cache
 const STORAGE_KEY = 'uniswap_token_prices'
