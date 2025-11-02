@@ -15,7 +15,7 @@ import {
   getSteleContractAddress,
 } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
-import { useActiveChallenges } from "../hooks/useActiveChallenges"
+import { useActiveChallenges } from "@/app/challenge/hooks/useActiveChallenges"
 import { Users, CheckCircle, Clock, Trophy, ChevronDown, Timer } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"

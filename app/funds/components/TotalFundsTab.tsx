@@ -15,7 +15,7 @@ import {
   Loader2
 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
-import { useFunds } from "@/app/dashboard/fund/hooks/useFunds"
+import { useFunds } from "@/app/fund/hooks/useFunds"
 import Image from "next/image"
 
 interface TotalFundsTabProps {

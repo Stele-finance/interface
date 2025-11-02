@@ -62,14 +62,14 @@ function ChallengeContent({ challengeId, network }: { challengeId: string; netwo
   // Later, we can modify ChallengePortfolio to accept challenge data as props if needed
   return (
     <div className="space-y-8">
-      {/* Back to Dashboard Button */}
+      {/* Back to Challenges Button */}
       <div className="px-2 sm:px-0 -mt-8">
-        <button 
-          onClick={() => router.push('/dashboard/challenge')}
+        <button
+          onClick={() => router.push('/challenges')}
           className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors py-3 px-4 -mx-4 rounded-md hover:bg-gray-800/30 min-h-[44px]"
         >
           <ArrowLeft className="h-5 w-5" />
-          {t('dashboard')}
+          {t('challenges')}
         </button>
       </div>
       

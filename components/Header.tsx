@@ -2,15 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
-import { Trophy, BarChart3, Image as ImageIcon } from "lucide-react"
-import { cn, getNetworkLogo, getWalletLogo, detectActualWalletType } from "@/lib/utils"
-import { User, Wallet, Menu, Github, FileText, Twitter, Languages, Scale, ExternalLink } from "lucide-react"
+import { Trophy, Image as ImageIcon, Wallet, Menu, FileText, Languages, Scale, ExternalLink } from "lucide-react"
+import { cn, getWalletLogo, detectActualWalletType } from "@/lib/utils"
+import { Github, Twitter } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -24,26 +22,19 @@ import {
 import Link from "next/link"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { createPortal } from "react-dom"
-import { ethers } from "ethers"
-import {
-  getRPCUrl
-} from "@/lib/constants"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSelectorSidebar } from "@/components/LanguageSelectorSidebar"
-import { useToast } from "@/components/ui/use-toast"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
-import { useAppKitProvider, useAppKitAccount } from '@reown/appkit/react'
+import { useAppKitProvider } from '@reown/appkit/react'
 import { useIsMobile } from "@/components/ui/use-mobile"
-import { usePageType } from "@/lib/page-type-context"
 import { ChevronDown, Coins } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
   const router = useRouter()
-  const { t, language, setLanguage } = useLanguage()
-  const { toast } = useToast()
+  const { t } = useLanguage()
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
   
@@ -88,25 +79,19 @@ export function Header() {
   }
   
   // Use global wallet hook
-  const { 
-    address: walletAddress, 
-    isConnected, 
-    network: walletNetwork, 
+  const {
+    address: walletAddress,
+    isConnected,
+    network: walletNetwork,
     walletType,
-    isLoading: isWalletLoading,
-    connectWallet, 
-    disconnectWallet, 
-    switchNetwork, 
+    connectWallet,
     openWalletModal,
     isMobile: isWalletMobile
   } = useWallet()
-  
-  // Use AppKit provider and account to get actual wallet info
-  const { walletProvider } = useAppKitProvider('eip155')
-  const appKitAccount = useAppKitAccount()
 
-  const [balance, setBalance] = useState<string>('0')
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
+  // Use AppKit provider to get actual wallet info
+  const { walletProvider } = useAppKitProvider('eip155')
+
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [legalDialogOpen, setLegalDialogOpen] = useState(false)
@@ -133,56 +118,6 @@ export function Header() {
   // Force re-render when wallet provider changes
   useEffect(() => {}, [walletProvider, isConnected, walletType])
 
-  // Get network icon based on network type
-  const getNetworkIcon = () => {
-    switch (walletNetwork) {
-      case 'ethereum':
-        return getNetworkLogo('ethereum')
-      case 'arbitrum':
-        return getNetworkLogo('arbitrum')
-      default:
-        return null
-    }
-  }
-
-  // Get symbol and chain name based on network
-  const getNetworkInfo = () => {
-    switch (walletNetwork) {
-      case 'ethereum':
-        return { symbol: 'ETH', name: 'Mainnet' };
-      case 'arbitrum':
-        return { symbol: 'ETH', name: 'Arbitrum' };
-      default:
-        return { symbol: '', name: '' };
-    }
-  };
-
-  // Fetch wallet balance using network-specific RPC
-  const fetchBalance = useCallback(async () => {
-    if (!walletAddress) return;
-    
-    try {
-      setIsLoadingBalance(true);
-      
-        // Use network-specific RPC URL for accurate balance
-      const networkToUse = walletNetwork || 'ethereum';
-        const rpcUrl = getRPCUrl(networkToUse);
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        
-        // Get ETH balance using ethers provider
-        const balanceWei = await provider.getBalance(walletAddress);
-        const balanceInEth = parseFloat(ethers.formatEther(balanceWei));
-        
-        // Display up to 4 decimal places
-        setBalance(balanceInEth.toFixed(4));
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-      setBalance('?');
-    } finally {
-      setIsLoadingBalance(false);
-    }
-  }, [walletAddress, walletNetwork]);
-
   const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
 
@@ -193,28 +128,7 @@ export function Header() {
     }
   }
 
-  const handleDisconnectWallet = () => {
-    setBalance('0')
-    disconnectWallet()
-  }
-
-  // Switch between Networks
-  const switchWalletNetwork = async (targetNetwork: 'ethereum' | 'arbitrum') => {
-    try {
-      await switchNetwork(targetNetwork)
-    } catch (error) {
-      console.error("Wallet switch error:", error)
-    }
-  }
-
-  // Fetch new balance when wallet address or network changes
-  useEffect(() => {
-    if (walletAddress) {
-      fetchBalance();
-    }
-  }, [walletAddress, walletNetwork, fetchBalance]);
-
-  // Navigate to dashboard when network changes
+  // Track network changes
   useEffect(() => {
     // Skip on initial load (when prevNetworkRef is null)
     if (prevNetworkRef.current === null) {
@@ -227,7 +141,7 @@ export function Header() {
     prevNetworkRef.current = walletNetwork;
   }, [walletNetwork, pathname, router]);
 
-  // Navigate to dashboard when wallet address changes
+  // Track wallet address changes
   useEffect(() => {
     // Skip on initial load (when prevWalletAddressRef is null)
     if (prevWalletAddressRef.current === null) {
@@ -235,27 +149,10 @@ export function Header() {
       return;
     }
 
-    // Only navigate if wallet address actually changed and not already on dashboard/challenges
-    // Also skip if wallet is being disconnected (walletAddress becomes null)
-    if (prevWalletAddressRef.current !== walletAddress && 
-        walletAddress !== null && 
-        !pathname.includes('/dashboard') && 
-        !pathname.includes('/challenges')) {
-      prevWalletAddressRef.current = walletAddress;
-      
-      // Determine which dashboard to navigate to based on current path
-      if (pathname.includes('/fund')) {
-        router.push('/dashboard/fund');
-      } else {
-        // Default to challenge dashboard for all other pages (including /challenge)
-        router.push('/dashboard/challenge');
-      }
-    } else {
-      prevWalletAddressRef.current = walletAddress;
-    }
+    // Update the previous wallet address reference
+    prevWalletAddressRef.current = walletAddress;
   }, [walletAddress, pathname, router]);
 
-  const { symbol, name } = getNetworkInfo();
   const walletIcon = getWalletIcon();
 
   return (
@@ -285,38 +182,34 @@ export function Header() {
 
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link 
-            href={pageType === 'fund' ? '/dashboard/fund' : '/dashboard/challenge'}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname === "/" || pathname.includes("/dashboard")
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <BarChart3 className="h-5 w-5" />
-            {t('dashboard')}
-          </Link>
-          
-          <Link 
-            href={pageType === 'fund' ? '/funds' : '/challenges'}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/funds") || pathname.includes("/fund/")
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {pageType === 'fund' ? (
-              <Coins className="h-5 w-5" />
-            ) : (
-              <Trophy className="h-5 w-5" />
-            )}
-            {pageType === 'fund' ? t('funds') : t('challenges')}
-          </Link>
-          
           <Link
-            href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
+            href="/challenges"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/challenges") || pathname.includes("/challenge/")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Trophy className="h-5 w-5" />
+            {t('challenges')}
+          </Link>
+
+          <Link
+            href="/funds"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
+              pathname.includes("/funds") || pathname.includes("/fund/")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Coins className="h-5 w-5" />
+            {t('funds')}
+          </Link>
+
+          <Link
+            href="/nft/challenge"
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname.includes("/nft")
@@ -714,40 +607,36 @@ export function Header() {
               
               {/* Menu Items */}
               <div className="space-y-1 mb-4">
-                <Link 
-                  href={pageType === 'fund' ? '/dashboard/fund' : '/dashboard/challenge'}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname === "/" || pathname.includes("/dashboard")
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                >
-                  <BarChart3 className="h-5 w-5 mr-3" />
-                  {t('dashboard')}
-                </Link>
-                
-                <Link 
-                  href={pageType === 'fund' ? '/funds' : '/challenges'}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname.includes("/challenges") || pathname.includes("/challenge/") || pathname.includes("/funds") || pathname.includes("/fund/")
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                >
-                  {pageType === 'fund' ? (
-                    <Coins className="h-5 w-5 mr-3" />
-                  ) : (
-                    <Trophy className="h-5 w-5 mr-3" />
-                  )}
-                  {pageType === 'fund' ? t('funds') : t('challenges')}
-                </Link>
-                
                 <Link
-                  href={pageType === 'fund' ? '/nft/fund' : '/nft/challenge'}
+                  href="/challenges"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
+                    pathname.includes("/challenges") || pathname.includes("/challenge/")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Trophy className="h-5 w-5 mr-3" />
+                  {t('challenges')}
+                </Link>
+
+                <Link
+                  href="/funds"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
+                    pathname.includes("/funds") || pathname.includes("/fund/")
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Coins className="h-5 w-5 mr-3" />
+                  {t('funds')}
+                </Link>
+
+                <Link
+                  href="/nft/challenge"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",

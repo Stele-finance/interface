@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useFunds } from "../hooks/useFunds"
+import { useFunds } from "@/app/fund/hooks/useFunds"
 import { useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, Plus, Loader2, TrendingUp, DollarSign } from "lucide-react"
 import Image from "next/image"

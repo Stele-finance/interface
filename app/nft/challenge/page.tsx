@@ -1,22 +1,21 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useWallet } from "@/app/hooks/useWallet"
+import { useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ImageIcon, Trophy, TrendingUp, Calendar, ChevronDown } from "lucide-react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { ImageIcon, Trophy, ChevronDown, Coins } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFormattedNFTData } from "../hooks/useNFTData"
 import { NFTCard } from "../components/NFTCard"
-import Image from "next/image"
 
 export default function NFTPage() {
   const { t } = useLanguage()
-  const { network: walletNetwork } = useWallet()
+  const router = useRouter()
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
-  const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
-  const networkDropdownRef = useRef<HTMLDivElement>(null)
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false)
+  const typeDropdownRef = useRef<HTMLDivElement>(null)
 
   // Load network selection from localStorage on mount
   useEffect(() => {
@@ -26,11 +25,11 @@ export default function NFTPage() {
     }
   }, [])
 
-  // Handle click outside for network dropdown
+  // Handle click outside for type dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
-        setShowNetworkDropdown(false)
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setShowTypeDropdown(false)
       }
     }
 
@@ -41,12 +40,6 @@ export default function NFTPage() {
       document.removeEventListener('touchstart', handleClickOutside as any)
     }
   }, [])
-
-  // Save network selection to localStorage when it changes
-  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
-    setSelectedNetwork(network)
-    localStorage.setItem('selected-network', network)
-  }
   
   const { 
     nfts, 
@@ -78,66 +71,38 @@ export default function NFTPage() {
             <h1 className="text-3xl font-bold">{t('totalNFTs')}</h1>
           </div>
           
-          {/* Network Selector Dropdown */}
-          <div className="relative" ref={networkDropdownRef}>
+          {/* Challenge/Fund Type Selector Dropdown */}
+          <div className="relative" ref={typeDropdownRef}>
             <button
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+              onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+              className="px-2.5 py-2 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
             >
               <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
+                <Trophy className="h-4 w-4 text-yellow-500" />
+                <span className="text-gray-300 text-sm">{t('challenge')}</span>
+                <ChevronDown className="h-4 w-4 text-gray-400" />
               </div>
             </button>
-            {showNetworkDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+            {showTypeDropdown && (
+              <div className="absolute top-full mt-2 right-0 min-w-[130px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
                 <button
                   onClick={() => {
-                    handleNetworkChange('ethereum')
-                    setShowNetworkDropdown(false)
+                    setShowTypeDropdown(false)
                   }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 bg-gray-700/30"
                 >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
+                  <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
+                  {t('challenge')}
                 </button>
                 <button
                   onClick={() => {
-                    handleNetworkChange('arbitrum')
-                    setShowNetworkDropdown(false)
+                    router.push('/nft/fund')
+                    setShowTypeDropdown(false)
                   }}
                   className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
                 >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
+                  <Coins className="h-4 w-4 mr-2 text-blue-400" />
+                  {t('fund')}
                 </button>
               </div>
             )}
