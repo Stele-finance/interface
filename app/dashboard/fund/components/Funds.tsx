@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -98,13 +97,6 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     if (isNaN(num)) return '+0.00%'
     const percentage = (num * 100).toFixed(2)
     return num >= 0 ? `+${percentage}%` : `${percentage}%`
-  }
-
-  // Calculate days since creation
-  const calculateDaysSince = (createdAt: Date) => {
-    const now = new Date()
-    const diff = now.getTime() - createdAt.getTime()
-    return Math.floor(diff / (1000 * 60 * 60 * 24))
   }
 
   // Transform fund data for display
@@ -371,7 +363,6 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
             paginatedFunds.map((fund) => {
               const profitRatio = parseFloat(fund.profitRatio)
               const isPositive = profitRatio >= 0
-              const daysSince = calculateDaysSince(fund.createdAt)
 
               return (
                 <Card
@@ -385,7 +376,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                     {/* Key Metrics Section - Large and Prominent */}
                     {/* Mobile: Profit Ratio full width, then Principal + Value in same row */}
                     {/* PC: All 3 in one row */}
-                    <div className="mb-8 pb-8 border-b border-gray-700/50">
+                    <div>
                       {/* Mobile layout */}
                       <div className="md:hidden space-y-8">
                         {/* Profit Ratio - full width */}
@@ -437,7 +428,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
 
                         {/* Principal */}
-                        <div className="flex flex-col justify-center space-y-3">
+                        <div className="flex flex-col justify-center space-y-3 pl-4">
                           <div className="flex items-center gap-2 text-gray-400">
                             <DollarSign className="h-6 w-6" />
                             <span className="text-lg font-medium">{t('principal')}</span>
@@ -448,7 +439,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                         </div>
 
                         {/* Value */}
-                        <div className="flex flex-col justify-center space-y-3">
+                        <div className="flex flex-col justify-center space-y-3 pl-4">
                           <div className="flex items-center gap-2 text-gray-400">
                             <DollarSign className="h-6 w-6" />
                             <span className="text-lg font-medium">{t('value')}</span>
@@ -457,41 +448,6 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                             {formatCurrency(fund.tvl)}
                           </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Fund Info Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                      {/* Fund ID - Hidden on mobile, shown on lg screens */}
-                      <div className="hidden lg:flex items-center justify-between md:justify-start gap-2">
-                        <div className="text-sm text-gray-400">{t('fund')} ID</div>
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                          #{fund.fundId}
-                        </Badge>
-                      </div>
-
-                      {/* Manager Address */}
-                      <div className="flex items-center justify-between md:justify-start gap-2">
-                        <div className="text-sm text-gray-400">{t('manager')}</div>
-                        <span className="text-sm text-gray-300 font-mono">
-                          {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
-                        </span>
-                      </div>
-
-                      {/* Fund Duration */}
-                      <div className="flex items-center justify-between md:justify-start gap-2">
-                        <div className="text-sm text-gray-400">{t('duration')}</div>
-                        <span className="text-sm text-gray-100 font-medium">
-                          {daysSince} {t('days')}
-                        </span>
-                      </div>
-
-                      {/* Investor Count */}
-                      <div className="flex items-center justify-between md:justify-start gap-2">
-                        <div className="text-sm text-gray-400">{t('investor')}</div>
-                        <span className="text-sm text-gray-100 font-medium">
-                          {fund.investorCount}
-                        </span>
                       </div>
                     </div>
                   </CardContent>
