@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -17,10 +17,10 @@ import {
 import { formatDateWithLocale } from "@/lib/utils"
 import {
   Wallet,
-  ChevronDown,
   Coins,
   Users,
-  DollarSign
+  Plus,
+  Loader2
 } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
@@ -28,7 +28,10 @@ import { getWalletLogo } from "@/lib/utils"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { useManagerFunds } from "../hooks/useManagerFunds"
 import Image from "next/image"
-import Link from "next/link"
+import { ethers } from 'ethers'
+import { NETWORK_CONTRACTS } from "@/lib/constants"
+import SteleFundInfoABI from "@/app/abis/SteleFundInfo.json"
+import { useQueryClient } from '@tanstack/react-query'
 
 interface MyFundsTabProps {
   activeTab: 'my-funds' | 'all-funds'
@@ -40,34 +43,13 @@ interface MyFundsTabProps {
 export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelectedNetwork }: MyFundsTabProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
-  const { address, isConnected, connectWallet } = useWallet()
+  const { address, isConnected, connectWallet, getProvider } = useWallet()
   const [walletSelectOpen, setWalletSelectOpen] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
-  const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
-  const networkDropdownRef = useRef<HTMLDivElement>(null)
+  const [isCreating, setIsCreating] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const isMobile = useIsMobile()
-
-  // Handle click outside for network dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
-        setShowNetworkDropdown(false)
-      }
-    }
-
-    if (showNetworkDropdown) {
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside)
-        document.addEventListener('touchstart', handleClickOutside)
-      }, 100)
-
-      return () => {
-        clearTimeout(timeoutId)
-        document.removeEventListener('click', handleClickOutside)
-        document.removeEventListener('touchstart', handleClickOutside)
-      }
-    }
-  }, [showNetworkDropdown])
+  const queryClient = useQueryClient()
 
   // Use hooks for fund data
   const { data: fundsData, isLoading, error } = useManagerFunds(address || '', 100, selectedNetwork)
@@ -103,6 +85,118 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
       alert(error.message || "Failed to connect wallet")
     } finally {
       setIsConnecting(false)
+    }
+  }
+
+  // Handle Create Fund button click - show confirmation modal
+  const handleCreateFundClick = () => {
+    setShowConfirmModal(true)
+  }
+
+  // Handle actual fund creation after confirmation
+  const handleCreateFund = async () => {
+    setShowConfirmModal(false)
+    if (!isConnected) {
+      console.error('Wallet not connected')
+      return
+    }
+
+    setIsCreating(true)
+    try {
+      // Get provider and signer
+      const provider = await getProvider()
+      if (!provider) {
+        throw new Error('No provider available')
+      }
+
+      // Always switch to the selected network before making the transaction
+      const targetChainId = selectedNetwork === 'arbitrum' ? 42161 : 1
+
+      // Try to switch to the selected network
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${targetChainId.toString(16)}` }
+        ])
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          // Network not added to wallet, add it
+          const networkConfig = selectedNetwork === 'arbitrum' ? {
+            chainId: '0xa4b1',
+            chainName: 'Arbitrum One',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io/']
+          } : {
+            chainId: '0x1',
+            chainName: 'Ethereum Mainnet',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.infura.io/v3/'],
+            blockExplorerUrls: ['https://etherscan.io/']
+          }
+
+          await provider.send('wallet_addEthereumChain', [networkConfig])
+        } else if (switchError.code === 4001) {
+          // User rejected the network switch
+          const networkName = selectedNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'
+          throw new Error(`Please switch to ${networkName} network to create a fund.`)
+        } else {
+          throw switchError
+        }
+      }
+
+      // Get a fresh provider after network switch to ensure we're on the correct network
+      const updatedProvider = await getProvider()
+      if (!updatedProvider) {
+        throw new Error('Failed to get provider after network switch')
+      }
+
+      const signer = await updatedProvider.getSigner()
+
+      // Get the correct contract address for the selected network
+      const contractAddress = selectedNetwork === 'arbitrum'
+        ? NETWORK_CONTRACTS.arbitrum_fund.STELE_FUND_INFO_ADDRESS
+        : NETWORK_CONTRACTS.ethereum_fund.STELE_FUND_INFO_ADDRESS
+
+      // Create contract instance
+      const fundInfoContract = new ethers.Contract(
+        contractAddress,
+        SteleFundInfoABI.abi,
+        signer
+      )
+
+      // Call create function (not createFund) based on the ABI
+      const tx = await fundInfoContract.create()
+
+      // Wait for transaction confirmation
+      await tx.wait()
+
+      // Refresh the funds data for the selected network
+      await queryClient.invalidateQueries({ queryKey: ['managerFunds', address, 100] })
+
+    } catch (error: any) {
+      console.error('Error creating fund:', error)
+
+      // Show user-friendly error message
+      let errorMessage = 'Failed to create fund'
+
+      if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+        // User rejected transaction - this is normal, don't show error
+        return // Exit without showing error
+      } else if (error.message) {
+        if (error.message.includes('user denied') || error.message.includes('rejected')) {
+          return // Exit without showing error
+        }
+        errorMessage = error.message
+      } else if (error.code === -32603) {
+        errorMessage = 'Internal error occurred'
+      } else if (error.code === -32000) {
+        errorMessage = 'Insufficient funds for gas'
+      }
+
+      // Log error to console instead of showing alert
+      console.error(`Error: ${errorMessage}`)
+    } finally {
+      setIsCreating(false)
     }
   }
 
@@ -239,150 +333,62 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             {t('allFunds')}
           </button>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Network Selector Dropdown */}
-          <div className="relative" ref={networkDropdownRef}>
-            <button
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </button>
-            {showNetworkDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </button>
-              </div>
+        {/* Show +New button only when connected and no funds */}
+        {isConnected && funds.length === 0 && !isLoading && (
+          <Button
+            onClick={handleCreateFundClick}
+            disabled={isCreating}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                New
+              </>
             )}
-          </div>
-        </div>
+          </Button>
+        )}
       </div>
 
       {/* Mobile Layout */}
       <div className="md:hidden space-y-4">
-        <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
-          <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('myFunds')}</h2>
-          <button
-            onClick={() => setActiveTab('all-funds')}
-            className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
-          >
-            {t('allFunds')}
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative" ref={networkDropdownRef}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
+            <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('myFunds')}</h2>
             <button
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+              onClick={() => setActiveTab('all-funds')}
+              className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
             >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
+              {t('allFunds')}
             </button>
-            {showNetworkDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </button>
-              </div>
-            )}
           </div>
+
+          {/* Show +New button only when connected and no funds */}
+          {isConnected && funds.length === 0 && !isLoading && (
+            <Button
+              onClick={handleCreateFundClick}
+              disabled={isCreating}
+              className="bg-orange-500 hover:bg-orange-600 text-white shrink-0"
+              size="sm"
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  <span className="text-xs">Creating...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-1 h-3 w-3" />
+                  <span className="text-xs">New</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -517,6 +523,46 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
           </CardContent>
         </Card>
       )}
+
+      {/* Confirmation Modal for Creating Fund */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-[425px] bg-muted/80 border-gray-600">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-gray-100">Create New Fund</DialogTitle>
+            <DialogDescription className="text-base text-gray-300">
+              Are you sure you want to create a new fund on {selectedNetwork === 'arbitrum' ? 'Arbitrum' : 'Ethereum'} network?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-2 justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+              className="border-gray-600 hover:bg-gray-700"
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateFund}
+              disabled={isCreating}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Fund
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

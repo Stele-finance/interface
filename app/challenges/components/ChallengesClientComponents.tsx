@@ -16,6 +16,22 @@ export function ChallengesClientComponents() {
     }
   }, [])
 
+  // Listen for network changes from navbar
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network } = event.detail
+      if (network === 'ethereum' || network === 'arbitrum') {
+        setSelectedNetwork(network)
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [])
+
   // Save network selection to localStorage when it changes
   const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
     setSelectedNetwork(network)
