@@ -3,12 +3,10 @@
 import React, { useState, use, useEffect, useCallback, useRef } from "react"
 import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, BarChart3, Activity, Loader2, Calendar, ChevronDown } from "lucide-react"
+import { ArrowLeft, Calendar, ChevronDown } from "lucide-react"
 import { ChallengeAssetSwap } from "../../../../swap/components/ChallengeAssetSwap"
 import { InvestorCharts } from "./components/InvestorCharts"
 import { useLanguage } from "@/lib/language-context"
-import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { useInvestorData } from "@/app/hooks/useChallengeInvestorData"
 import { useUserTokens } from "@/app/hooks/useUserTokens"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
@@ -21,33 +19,30 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { ethers } from "ethers"
-import { toast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 import { getSteleContractAddress } from "@/lib/constants"
 import SteleABI from "@/app/abis/Stele.json"
 
 // Import types and utilities
 import { InvestorPageProps, RealTimePortfolio } from "./types"
-import { calculatePortfolioMetrics, getChallengeDetails, getTokenExplorerUrl, getExplorerUrl, getExplorerName } from "./utils"
+import { calculatePortfolioMetrics, getChallengeDetails, getTokenExplorerUrl } from "./utils"
 
 // Import components
 import { ErrorState } from "./components/LoadingStates"
 import { PortfolioTab } from "./components/PortfolioTab"
 import { TransactionsTab } from "./components/TransactionsTab"
 import { PortfolioSummary } from "./components/PortfolioSummary"
-import { ActionButtons, RegisteredStatus } from "./components/ActionButtons"
+import { ActionButtons } from "./components/ActionButtons"
 import { RankingSection } from "../components/RankingSection"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { isUserInTop5 } from "./utils/rankingUtils"
 
 export default function InvestorPage({ params }: InvestorPageProps) {
   const { t } = useLanguage()
-  const { isMobileMenuOpen } = useMobileMenu()
   const { network: routeNetwork, id: challengeId, walletAddress } = use(params)
   const router = useRouter()
-  
+
   // Use hooks
-  const { address: connectedAddress, walletType, getProvider } = useWallet()
+  const { address: connectedAddress, getProvider } = useWallet()
   const queryClient = useQueryClient()
 
   // Use URL network parameter instead of wallet network for subgraph
@@ -551,23 +546,18 @@ export default function InvestorPage({ params }: InvestorPageProps) {
               </div>
             </div>
             
-            {/* Separator Bar */}
-            <div className="border-t border-gray-600/50 mx-2 sm:mx-0 md:mr-8 pb-2"></div>
-            
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger 
-                  value="portfolio" 
-                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+              <TabsList className="inline-flex h-auto items-center justify-start bg-transparent p-0 gap-8">
+                <TabsTrigger
+                  value="portfolio"
+                  className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 >
-                  <BarChart3 className="h-4 w-4" />
                   {t('portfolio')}
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="transactions" 
-                  className="flex items-center gap-2 data-[state=active]:bg-orange-500/40 data-[state=active]:text-white text-gray-400"
+                <TabsTrigger
+                  value="transactions"
+                  className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 >
-                  <Activity className="h-4 w-4" />
                   {t('transactions')}
                 </TabsTrigger>
               </TabsList>
