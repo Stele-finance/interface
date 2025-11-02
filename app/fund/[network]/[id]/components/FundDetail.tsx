@@ -84,7 +84,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   const [showStatusTooltip, setShowStatusTooltip] = useState(false)
   const [typeTooltipTimer, setTypeTooltipTimer] = useState<NodeJS.Timeout | null>(null)
   const [statusTooltipTimer, setStatusTooltipTimer] = useState<NodeJS.Timeout | null>(null)
-  const [activeTab, setActiveTab] = useState("investors")
+  const [activeTab, setActiveTab] = useState("portfolio")
   const [isMounted, setIsMounted] = useState(false)
   const [isMintingNFT, setIsMintingNFT] = useState(false)
   const itemsPerPage = 5;
@@ -755,6 +755,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 md:mr-8">
             <TabsList className="inline-flex h-auto items-center justify-start bg-transparent p-0 gap-8">
               <TabsTrigger
+                value="portfolio"
+                className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              >
+                {t('portfolio')}
+              </TabsTrigger>
+              <TabsTrigger
                 value="investors"
                 className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
@@ -767,6 +773,106 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 {t('transactions')}
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="portfolio" className="space-y-0">
+              <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+                <div className="p-6">
+                  {portfolioData.tokens.length > 0 ? (
+                    <>
+                      {/* Pie Chart */}
+                      <div className="flex items-center justify-center mb-6">
+                        <div className="relative w-40 h-40">
+                          {/* Dynamic CSS pie chart using conic-gradient */}
+                          <div
+                            className="w-full h-full rounded-full"
+                            style={{
+                              background: `conic-gradient(
+                                from 0deg,
+                                ${(() => {
+                                  let currentDegree = 0
+                                  return portfolioData.tokens.map((token, index) => {
+                                    const startDegree = currentDegree
+                                    const endDegree = currentDegree + (token.percentage / 100) * 360
+                                    currentDegree = endDegree
+                                    const color = portfolioData.colors[index % portfolioData.colors.length]
+                                    return `${color} ${startDegree}deg ${endDegree}deg`
+                                  }).join(', ')
+                                })()}
+                              )`
+                            }}
+                          />
+                          {/* Center hole */}
+                          <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-white">
+                                ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                              </div>
+                              {portfolioData.tokens.some(token => token.isRealTime) && (
+                                <div className="flex items-center justify-center gap-1 mt-1">
+                                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                                  <span className="text-xs text-green-400">Live</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Legend */}
+                      <div className="space-y-3">
+                        {portfolioData.tokens.map((token, index) => (
+                          <div key={token.symbol} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{
+                                  backgroundColor: portfolioData.colors[index % portfolioData.colors.length]
+                                }}
+                              ></div>
+                              <span className="text-sm text-gray-300">{token.symbol}</span>
+                              <span className="text-xs text-gray-500">
+                                ({token.amount < 0.0001 && token.amount > 0
+                                  ? '<0.0001'
+                                  : token.amount.toLocaleString(undefined, {
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: token.amount < 1 ? 6 : 4
+                                    })})
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm text-white font-medium">
+                                {token.percentage.toFixed(1)}%
+                              </div>
+                              <div className="text-xs text-green-400">
+                                ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="flex items-center justify-center mb-6">
+                        <div className="relative w-40 h-40">
+                          <div className="w-full h-full rounded-full bg-gray-800 border-2 border-gray-700"></div>
+                          <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-white">
+                                ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                              </div>
+                              <div className="text-xs text-gray-400">Total Value</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-gray-400">No token holdings yet</p>
+                      <p className="text-xs text-gray-500 mt-1">Portfolio composition will appear here</p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </TabsContent>
 
             <TabsContent value="investors" className="space-y-0">
               <InvestorsTab 
@@ -1164,110 +1270,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                </div>
              )}
           </div>
-          
-          {/* Portfolio Allocation Card */}
-          <Card className="bg-transparent border-0 rounded-2xl">
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                <PieChart className="h-5 w-5" />
-                Portfolio
-              </h3>
-              
-              {portfolioData.tokens.length > 0 ? (
-                <>
-                  {/* Pie Chart */}
-                  <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-40 h-40">
-                      {/* Dynamic CSS pie chart using conic-gradient */}
-                      <div 
-                        className="w-full h-full rounded-full"
-                        style={{
-                          background: `conic-gradient(
-                            from 0deg,
-                            ${(() => {
-                              let currentDegree = 0
-                              return portfolioData.tokens.map((token, index) => {
-                                const startDegree = currentDegree
-                                const endDegree = currentDegree + (token.percentage / 100) * 360
-                                currentDegree = endDegree
-                                const color = portfolioData.colors[index % portfolioData.colors.length]
-                                return `${color} ${startDegree}deg ${endDegree}deg`
-                              }).join(', ')
-                            })()}
-                          )`
-                        }}
-                      />
-                      {/* Center hole */}
-                      <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-white">
-                            ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                          </div>
-                          {portfolioData.tokens.some(token => token.isRealTime) && (
-                            <div className="flex items-center justify-center gap-1 mt-1">
-                              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                              <span className="text-xs text-green-400">Live</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="space-y-3">
-                    {portfolioData.tokens.map((token, index) => (
-                      <div key={token.symbol} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ 
-                              backgroundColor: portfolioData.colors[index % portfolioData.colors.length] 
-                            }}
-                          ></div>
-                          <span className="text-sm text-gray-300">{token.symbol}</span>
-                          <span className="text-xs text-gray-500">
-                            ({token.amount < 0.0001 && token.amount > 0 
-                              ? '<0.0001' 
-                              : token.amount.toLocaleString(undefined, { 
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: token.amount < 1 ? 6 : 4 
-                                })})
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-white font-medium">
-                            {token.percentage.toFixed(1)}%
-                          </div>
-                          <div className="text-xs text-green-400">
-                            ${token.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-40 h-40">
-                      <div className="w-full h-full rounded-full bg-gray-800 border-2 border-gray-700"></div>
-                      <div className="absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-white">
-                            ${portfolioData.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                          </div>
-                          <div className="text-xs text-gray-400">Total Value</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">No token holdings yet</p>
-                  <p className="text-xs text-gray-500 mt-1">Portfolio composition will appear here</p>
-                </div>
-              )}
-            </div>
-          </Card>
 
           {/* Fund Info Card */}
           <Card className="bg-muted/30 border border-gray-700/50 rounded-2xl">
