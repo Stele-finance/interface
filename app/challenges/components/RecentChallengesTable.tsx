@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
@@ -43,6 +43,20 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum', onLatestCh
     return () => clearInterval(interval)
   }, [])
 
+  const getChallengeStatus = useCallback((challenge: RecentChallenge) => {
+    const startTime = new Date(Number(challenge.startTime) * 1000)
+    const endTime = new Date(Number(challenge.endTime) * 1000)
+    const hasEnded = currentTime >= endTime
+
+    if (challenge.isActive && !hasEnded) {
+      return "active"
+    } else if (challenge.isActive && hasEnded) {
+      return "pending"
+    } else {
+      return "end"
+    }
+  }, [currentTime])
+
   // Notify parent component about latest challenge status
   useEffect(() => {
     if (data?.challenges && data.challenges.length > 0 && onLatestChallengeStatusChange) {
@@ -52,34 +66,20 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum', onLatestCh
       const isActive = status === 'active'
       onLatestChallengeStatusChange(isActive)
     }
-  }, [data, currentTime, onLatestChallengeStatusChange])
+  }, [data, currentTime, onLatestChallengeStatusChange, getChallengeStatus])
 
   const getChallengeTypeName = (type: string): string => {
     // Convert to string to handle both number and string inputs
     const typeStr = String(type)
-    
+
     switch (typeStr) {
       case "0": return t('oneWeek')
       case "1": return t('oneMonth')
       case "2": return t('threeMonths')
       case "3": return t('sixMonths')
       case "4": return t('oneYear')
-      default: 
+      default:
         return t('unknown')
-    }
-  }
-
-  const getChallengeStatus = (challenge: RecentChallenge) => {
-    const startTime = new Date(Number(challenge.startTime) * 1000)
-    const endTime = new Date(Number(challenge.endTime) * 1000)
-    const hasEnded = currentTime >= endTime
-    
-    if (challenge.isActive && !hasEnded) {
-      return "active"
-    } else if (challenge.isActive && hasEnded) {
-      return "pending"
-    } else {
-      return "end"
     }
   }
 

@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Wallet, Trophy, Briefcase, Star, Shield, Globe, Clock, Sparkles } from "lucide-react"
+import { Wallet, Trophy, Briefcase, Sparkles, TrendingUp, Users, Lock, BarChart3, Eye, CheckCircle2 } from "lucide-react"
 import { ActiveChallenges } from "@/app/challenge/components/ActiveChallenges"
 import { Funds } from "@/app/fund/components/Funds"
 import { useState, useEffect } from "react"
@@ -97,29 +97,138 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Traditional Finance Limitations - Mobile Optimized */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-slate-950/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-8 sm:mb-12 animate-fade-in">
-              {t('traditionalFinanceLimitations')}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-              {[
-                { icon: Shield, text: t('complexBankProcedures') },
-                { icon: Star, text: t('highMinimumInvestment') },
-                { icon: Globe, text: t('thirdWorldInfrastructure') },
-                { icon: Clock, text: t('noCreditAccess') }
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="glass-card bg-red-950/20 border-red-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover-lift group animate-slide-in-right"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <item.icon className="h-6 w-6 sm:h-8 sm:w-8 text-red-400 mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform" />
-                  <p className="text-red-200 text-lg sm:text-xl lg:text-2xl text-center leading-relaxed">{item.text}</p>
+      {/* Platform Introduction - Challenge & Fund */}
+      <section className="py-12 sm:py-16 lg:py-24 relative overflow-hidden bg-slate-950">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900"></div>
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            {/* Section Header */}
+            <div className="text-center mb-12 sm:mb-16 lg:mb-20 animate-fade-in">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">
+                {t('ethereumArbitrumSupport')}
+              </h2>
+              <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                {t('blockchainBasedPlatform')}
+              </p>
+            </div>
+
+            {/* Two Main Features */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
+              {/* Investment Challenge Card */}
+              <div className="glass-card bg-gradient-to-br from-emerald-500/5 via-green-500/5 to-teal-500/5 border-emerald-500/20 rounded-3xl overflow-hidden group hover-lift animate-fade-in">
+                <div className="p-6 sm:p-8 lg:p-10">
+                  {/* Icon & Title */}
+                  <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                    <div className="bg-emerald-500/10 rounded-2xl w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 group-hover:bg-emerald-500/20">
+                      <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white">{t('investmentChallenge')}</h3>
+                      <p className="text-emerald-400 text-sm sm:text-base font-medium mt-1">Investment Challenge</p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-slate-300 text-xl sm:text-2xl leading-relaxed mb-6 sm:mb-8">
+                    {t('challengeDescription')}
+                  </p>
+
+                  {/* Features List */}
+                  <div className="space-y-4 sm:space-y-5">
+                    <div className="flex items-start gap-3 group/item">
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('entryFeeRequired')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('entryFeeRequiredDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('returnCompetition')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('returnCompetitionDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('prizeDistribution')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('prizeDistributionDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('transparentRecords')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('transparentRecordsDesc')}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Crypto Fund Card */}
+              <div className="glass-card bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-sky-500/5 border-blue-500/20 rounded-3xl overflow-hidden group hover-lift animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <div className="p-6 sm:p-8 lg:p-10">
+                  {/* Icon & Title */}
+                  <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                    <div className="bg-blue-500/10 rounded-2xl w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 group-hover:bg-blue-500/20">
+                      <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white">{t('cryptoFund')}</h3>
+                      <p className="text-blue-400 text-sm sm:text-base font-medium mt-1">Crypto Fund</p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-slate-300 text-xl sm:text-2xl leading-relaxed mb-6 sm:mb-8">
+                    {t('fundManagerDescription')}
+                  </p>
+
+                  {/* Features List */}
+                  <div className="space-y-4 sm:space-y-5">
+                    <div className="flex items-start gap-3 group/item">
+                      <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('managerAndInvestor')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('managerAndInvestorDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('realtimeTransparency')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('realtimeTransparencyDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('secureFundManagement')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('secureFundManagementDesc')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 group/item">
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <div>
+                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('performanceProof')}</p>
+                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('performanceProofDesc')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
