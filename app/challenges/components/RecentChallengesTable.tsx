@@ -15,9 +15,10 @@ import Image from "next/image"
 
 interface RecentChallengesTableProps {
   selectedNetwork?: 'ethereum' | 'arbitrum'
+  onLatestChallengeStatusChange?: (isActive: boolean) => void
 }
 
-export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentChallengesTableProps) {
+export function RecentChallengesTable({ selectedNetwork = 'ethereum', onLatestChallengeStatusChange }: RecentChallengesTableProps) {
   const { t } = useLanguage()
   const router = useRouter()
 
@@ -41,6 +42,17 @@ export function RecentChallengesTable({ selectedNetwork = 'ethereum' }: RecentCh
 
     return () => clearInterval(interval)
   }, [])
+
+  // Notify parent component about latest challenge status
+  useEffect(() => {
+    if (data?.challenges && data.challenges.length > 0 && onLatestChallengeStatusChange) {
+      // Get the latest challenge (highest ID)
+      const latestChallenge = data.challenges[0] // Already sorted by ID desc in hook
+      const status = getChallengeStatus(latestChallenge)
+      const isActive = status === 'active'
+      onLatestChallengeStatusChange(isActive)
+    }
+  }, [data, currentTime, onLatestChallengeStatusChange])
 
   const getChallengeTypeName = (type: string): string => {
     // Convert to string to handle both number and string inputs
