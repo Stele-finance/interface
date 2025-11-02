@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Wallet, Trophy, Briefcase, Star, Shield, Globe, Clock, Sparkles } from "lucide-react"
-import { ActiveChallenges } from "../dashboard/challenge/components/ActiveChallenges"
-import { Funds } from "../dashboard/fund/components/Funds"
+import { ActiveChallenges } from "@/app/challenge/components/ActiveChallenges"
+import { Funds } from "@/app/fund/components/Funds"
 import { useState, useEffect } from "react"
 
 export default function HomePage() {
@@ -33,11 +33,11 @@ export default function HomePage() {
   }, [])
 
   const handleGetStarted = () => {
-    router.push('/dashboard/challenge')
+    router.push('/challenges')
   }
 
   const handleBrowseChallenges = () => {
-    router.push('/dashboard/fund')
+    router.push('/funds')
   }
 
   return (
