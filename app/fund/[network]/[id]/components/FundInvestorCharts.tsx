@@ -259,13 +259,13 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           >
             <defs>
               <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#f97316" stopOpacity={0.05}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
-            <XAxis 
-              dataKey="timeLabel" 
+            <XAxis
+              dataKey="timeLabel"
               stroke="#9CA3AF"
               fontSize={11}
               tick={{ fill: '#9CA3AF' }}
@@ -274,7 +274,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
               interval="preserveStartEnd"
               minTickGap={30}
             />
-            <YAxis 
+            <YAxis
               orientation="left"
               stroke="#9CA3AF"
               fontSize={11}
@@ -291,18 +291,18 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
                 }
               }}
             />
-            <Tooltip 
-              content={<CustomTooltip />} 
-              cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: '#f97316', strokeWidth: 1 }}
             />
             <Area
               type="monotone"
-              dataKey="amountUSD" 
-              stroke="#3b82f6"
+              dataKey="amountUSD"
+              stroke="#f97316"
               strokeWidth={2}
               fill="url(#valueGradient)"
               dot={false}
-              activeDot={{ r: 4, fill: '#3b82f6', stroke: '#ffffff', strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: '#f97316', stroke: '#ffffff', strokeWidth: 2 }}
             />
             
             {/* Add green reference dot for LIVE data point with pulsing animation - matching challenge page UI/UX */}
