@@ -149,7 +149,7 @@ export default function HomePage() {
                   <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-start gap-3 group/item">
                       <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400 mt-1.5 sm:mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform"></div>
-                      <p className="text-cyan-100/90 text-lg sm:text-xl leading-relaxed">{t('instantAccountCreation')}</p>
+                      <p className="text-cyan-100/90 text-lg sm:text-xl leading-relaxed">{t('availableByLinkingWallet')}</p>
                     </div>
                     <div className="flex items-start gap-3 group/item">
                       <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400 mt-1.5 sm:mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform"></div>

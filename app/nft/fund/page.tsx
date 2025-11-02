@@ -91,7 +91,7 @@ export default function NFTFundPage() {
           <div className="relative" ref={typeDropdownRef}>
             <button
               onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-              className="px-2.5 py-2 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+              className="px-2.5 py-2 bg-transparent hover:bg-gray-700 rounded-md"
             >
               <div className="flex items-center gap-2">
                 <Coins className="h-4 w-4 text-blue-400" />
@@ -124,9 +124,6 @@ export default function NFTFundPage() {
             )}
           </div>
         </div>
-        <p className="text-muted-foreground">
-          {t('viewAllPerformanceNFTs')}
-        </p>
       </div>
 
       {isLoading ? (
