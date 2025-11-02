@@ -25,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query"
 interface ActiveChallengesProps {
   selectedNetwork?: 'ethereum' | 'arbitrum';
   setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
+  hideHeader?: boolean;
 }
 
 function calculateTimeLeft(endTime: string, currentTime: Date = new Date()): { days: number; hours: number; minutes: number; seconds: number; ended: boolean } {
@@ -61,7 +62,7 @@ function calculateProgress(startTime: string, endTime: string, isCompleted: bool
   return Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100)
 }
 
-export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetwork }: ActiveChallengesProps) {
+export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetwork, hideHeader = false }: ActiveChallengesProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
@@ -235,77 +236,79 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
 
       <div className="space-y-6">
         {/* Header with Network Dropdown */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl text-gray-100">{t('challenge')}</h2>
-          <div className="flex items-center gap-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
-                  <div className="flex items-center gap-2">
-                    {selectedNetwork === 'arbitrum' ? (
-                      <Image
-                        src="/networks/small/arbitrum.png"
-                        alt="Arbitrum"
-                        width={24}
-                        height={24}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <Image
-                        src="/networks/small/ethereum.png"
-                        alt="Ethereum"
-                        width={24}
-                        height={24}
-                        className="rounded-full"
-                      />
-                    )}
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {!hideHeader && (
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl text-gray-100">{t('challenge')}</h2>
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="lg" className="p-3 bg-transparent border-gray-600 hover:bg-gray-700">
+                    <div className="flex items-center gap-2">
+                      {selectedNetwork === 'arbitrum' ? (
+                        <Image
+                          src="/networks/small/arbitrum.png"
+                          alt="Arbitrum"
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                        />
+                      ) : (
+                        <Image
+                          src="/networks/small/ethereum.png"
+                          alt="Ethereum"
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                        />
+                      )}
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-muted/80 border-gray-600">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setSelectedNetwork && setSelectedNetwork('ethereum')}
+                  >
+                    <Image
+                      src="/networks/small/ethereum.png"
+                      alt="Ethereum"
+                      width={16}
+                      height={16}
+                      className="rounded-full mr-2"
+                    />
+                    Ethereum
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setSelectedNetwork && setSelectedNetwork('arbitrum')}
+                  >
+                    <Image
+                      src="/networks/small/arbitrum.png"
+                      alt="Arbitrum"
+                      width={16}
+                      height={16}
+                      className="rounded-full mr-2"
+                    />
+                    Arbitrum
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            {isConnected && weekChallenge.status === "end" && (
-              <ChallengeTypeModal
-                onCreateChallenge={handleCreateChallenge}
-                isCreating={isCreating}
-                activeChallenges={[{ challengeType: 0, status: weekChallenge.status }]}
-              />
-            )}
+              {isConnected && weekChallenge.status === "end" && (
+                <ChallengeTypeModal
+                  onCreateChallenge={handleCreateChallenge}
+                  isCreating={isCreating}
+                  activeChallenges={[{ challengeType: 0, status: weekChallenge.status }]}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Unified Challenge Card */}
         <Card
-          className="bg-muted/30 border border-gray-700/50 shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
+          className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl"
           onClick={() => {
             if (weekChallenge.challengeId && weekChallenge.challengeId !== "") {
               router.push(`/challenge/${selectedNetwork}/${weekChallenge.challengeId}`)
@@ -314,9 +317,9 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
         >
           <CardContent className="p-8">
             {/* Prize Pool and Timer Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-700/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 pb-8 border-b border-gray-700/50">
               {/* Left - Total Prize Pool */}
-              <div className="flex flex-col justify-center space-y-3">
+              <div className="flex flex-col items-start space-y-3">
                 <div className="flex items-center gap-2 text-yellow-400">
                   <Trophy className="h-6 w-6" />
                   <span className="text-lg font-medium">{t('totalPrize')}</span>
@@ -360,7 +363,7 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
             </div>
 
             {/* Challenge Info Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Progress */}
               <div className="flex items-center justify-between md:justify-start gap-2">
                 <div className="text-sm text-gray-400">{t('progress')}</div>
@@ -379,12 +382,6 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
                 </TooltipProvider>
               </div>
 
-              {/* Status */}
-              <div className="flex items-center justify-between md:justify-start gap-2">
-                <div className="text-sm text-gray-400">{t('status')}</div>
-                <div>{getStatusBadge(weekChallenge.status)}</div>
-              </div>
-
               {/* Participants */}
               <div className="flex items-center justify-between md:justify-start gap-2">
                 <div className="text-sm text-gray-400">{t('participants')}</div>
@@ -392,17 +389,6 @@ export function ActiveChallenges({ selectedNetwork = 'ethereum', setSelectedNetw
                   <Users className="h-4 w-4" />
                   <span>{weekChallenge.participants}</span>
                 </div>
-              </div>
-
-              {/* Challenge ID */}
-              <div className="flex items-center justify-between md:justify-start gap-2">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Trophy className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm">{t('challenge')} ID</span>
-                </div>
-                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm">
-                  {weekChallenge.challengeId || "-"}
-                </Badge>
               </div>
             </div>
           </CardContent>

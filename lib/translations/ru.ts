@@ -18,6 +18,7 @@ export const ru = {
   backToProposals: 'Назад к предложениям',
   balance: 'Баланс',
   balanceCheckFailed: 'Не удалось проверить баланс',
+  becomeAnInvestmentLegend: 'Станьте легендой инвестиций',
   blockchainBasedPlatform: "Безопасная и прозрачная платформа для инвестиций в криптовалюту на основе блокчейна",
   balanceUnavailable: 'Баланс недоступен',
   blockchainRecord: 'Запись в блокчейне',

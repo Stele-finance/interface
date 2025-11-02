@@ -19,6 +19,7 @@ export const id = {
   balance: "Saldo",
   balanceUnavailable: "Saldo tidak tersedia",
   balanceCheckFailed: "Pemeriksaan saldo gagal",
+  becomeAnInvestmentLegend: "Jadilah legenda investasi",
   blockchainBasedPlatform: "Platform investasi cryptocurrency yang aman dan transparan berbasis blockchain",
   blockchainRecord: "Kinerja investasi tercatat permanen di blockchain",
   borderlessAccess: "Akses tanpa batas ke platform investasi global",

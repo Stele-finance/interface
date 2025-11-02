@@ -63,10 +63,29 @@ export function Header() {
   }, [pathname])
   
   const [pageType, setLocalPageType] = useState<'challenge' | 'fund'>('challenge')
-  
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+
   useEffect(() => {
     setLocalPageType(getPageTypeFromUrl())
   }, [pathname, getPageTypeFromUrl])
+
+  // Load network from localStorage
+  useEffect(() => {
+    const savedNetwork = typeof window !== 'undefined' ? localStorage.getItem('selected-network') : null
+    if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
+      setSelectedNetwork(savedNetwork)
+    }
+  }, [])
+
+  // Handle network change
+  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
+    setSelectedNetwork(network)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selected-network', network)
+    }
+    // Trigger page reload or update through custom event
+    window.dispatchEvent(new CustomEvent('networkChanged', { detail: { network } }))
+  }
   
   // Use global wallet hook
   const { 
@@ -243,20 +262,15 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
       <div className="flex items-center">
         <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
-          <Image 
-            src="/stele_logo_small.png" 
-            alt="Stele Logo" 
-            width={40}
-            height={40}
+          <Image
+            src="/stele_logo_small.png"
+            alt="Stele Logo"
+            width={24}
+            height={24}
             priority
-            className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
-            style={{ 
-              width: 'auto', 
-              height: '40px',
-              maxWidth: '48px'
-            }}
+            className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
           />
-          <span className="hidden sm:block text-orange-500 text-xl sm:text-2xl">Stele</span>
+          <span className="hidden sm:block text-orange-500 text-lg sm:text-xl">Stele</span>
         </Link>
         
         {/* Mobile Menu Icon - Hidden on desktop */}
@@ -319,45 +333,53 @@ export function Header() {
 
       <div className="flex items-center gap-2 md:gap-4">
         
-        {/* Challenge/Fund Type Selector - always visible */}
+        {/* Network Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-300 hover:text-white hover:bg-gray-800/50 font-medium px-3 py-2 h-auto text-sm capitalize border-0 transition-colors"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-300 hover:text-white hover:bg-gray-800/50 font-medium px-3 py-2 h-auto text-sm border-0 transition-colors"
             >
               <div className="flex items-center gap-2">
-                {pageType === 'challenge' ? (
-                  <Trophy className="h-4 w-4 text-yellow-500" />
-                ) : (
-                  <Coins className="h-4 w-4 text-blue-500" />
-                )}
-                <span className="text-gray-100">{pageType}</span>
+                <Image
+                  src={selectedNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+                  alt={selectedNetwork}
+                  width={20}
+                  height={20}
+                  className="rounded-full"
+                />
+                <span className="text-gray-100 capitalize hidden sm:inline">{selectedNetwork}</span>
                 <ChevronDown className="h-3 w-3 text-gray-400" />
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-36 bg-gray-900/95 border-gray-700/50 backdrop-blur-sm z-[60] shadow-xl">
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
-              onClick={() => {
-                localStorage.setItem('selected-page-type', 'challenge')
-                router.push('/dashboard/challenge')
-              }}
+              onClick={() => handleNetworkChange('ethereum')}
             >
-              <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
-              <span>Challenge</span>
+              <Image
+                src="/networks/small/ethereum.png"
+                alt="Ethereum"
+                width={16}
+                height={16}
+                className="rounded-full mr-2"
+              />
+              <span>Ethereum</span>
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
-              onClick={() => {
-                localStorage.setItem('selected-page-type', 'fund')
-                router.push('/dashboard/fund')
-              }}
+              onClick={() => handleNetworkChange('arbitrum')}
             >
-              <Coins className="mr-2 h-4 w-4 text-blue-500" />
-              <span>Fund</span>
+              <Image
+                src="/networks/small/arbitrum.png"
+                alt="Arbitrum"
+                width={16}
+                height={16}
+                className="rounded-full mr-2"
+              />
+              <span>Arbitrum</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

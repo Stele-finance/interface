@@ -19,6 +19,7 @@ export const fi = {
   balance: "Saldo",
   balanceUnavailable: "Saldo ei saatavilla",
   balanceCheckFailed: "Saldon tarkistus epäonnistui",
+  becomeAnInvestmentLegend: "Tule sijoitusten legendaksi",
   blockchainBasedPlatform: "Turvallinen ja läpinäkyvä kryptovaluuttasijoitusalusta, joka perustuu lohkoketjuun",
   blockchainRecord: "Sijoitustuotto tallennetaan pysyvästi lohkoketjuun",
   borderlessAccess: "Rajaton pääsy globaaleihin sijoitusalustoihin",

@@ -41,14 +41,17 @@ interface FundsProps {
   showCreateButton?: boolean;
   selectedNetwork?: 'ethereum' | 'arbitrum';
   setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
+  hideHeader?: boolean;
+  itemsPerPage?: number;
 }
 
-export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', setSelectedNetwork }: FundsProps) {
+export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', setSelectedNetwork, hideHeader = false, itemsPerPage }: FundsProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const { isConnected, getProvider } = useWallet()
   const queryClient = useQueryClient()
   const networkDropdownRef = useRef<HTMLDivElement>(null)
@@ -117,6 +120,14 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     tokens: fund.tokensSymbols,
     profitRatio: fund.profitRatio
   }))
+
+  // Pagination logic
+  const totalFunds = displayFunds.length
+  const fundsPerPage = itemsPerPage || totalFunds // If itemsPerPage is set, use it, otherwise show all
+  const totalPages = Math.ceil(totalFunds / fundsPerPage)
+  const startIndex = (currentPage - 1) * fundsPerPage
+  const endIndex = startIndex + fundsPerPage
+  const paginatedFunds = itemsPerPage ? displayFunds.slice(startIndex, endIndex) : displayFunds
 
   // Handle Create Fund button click - show confirmation modal
   const handleCreateFundClick = () => {
@@ -234,98 +245,100 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     <>
       <div className="space-y-6">
         {/* Header with Network Dropdown */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl text-gray-100">{t('fund')}</h2>
-          <div className="flex items-center gap-3">
-            {/* Network Selector Dropdown */}
-            <div className="relative" ref={networkDropdownRef}>
-              <button
-                onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-                className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
-              >
-                <div className="flex items-center gap-2">
-                  {selectedNetwork === 'arbitrum' ? (
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
+        {!hideHeader && (
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl text-gray-100">{t('fund')}</h2>
+            <div className="flex items-center gap-3">
+              {/* Network Selector Dropdown */}
+              <div className="relative" ref={networkDropdownRef}>
+                <button
+                  onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
+                  className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    {selectedNetwork === 'arbitrum' ? (
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    )}
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  </div>
+                </button>
+                {showNetworkDropdown && (
+                  <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
+                    <button
+                      onClick={() => {
+                        setSelectedNetwork && setSelectedNetwork('ethereum')
+                        setShowNetworkDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      <Image
+                        src="/networks/small/ethereum.png"
+                        alt="Ethereum"
+                        width={16}
+                        height={16}
+                        className="rounded-full mr-2"
+                      />
+                      Ethereum
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedNetwork && setSelectedNetwork('arbitrum')
+                        setShowNetworkDropdown(false)
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
+                    >
+                      <Image
+                        src="/networks/small/arbitrum.png"
+                        alt="Arbitrum"
+                        width={16}
+                        height={16}
+                        className="rounded-full mr-2"
+                      />
+                      Arbitrum
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Create Fund Button */}
+              {showCreateButton && isConnected && (
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
+                  onClick={handleCreateFundClick}
+                  disabled={isCreating}
+                >
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                      Creating...
+                    </>
                   ) : (
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
+                    <>
+                      <Plus className="mr-3 h-5 w-5" />
+                      {t('create')}
+                    </>
                   )}
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                </div>
-              </button>
-              {showNetworkDropdown && (
-                <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                  <button
-                    onClick={() => {
-                      setSelectedNetwork && setSelectedNetwork('ethereum')
-                      setShowNetworkDropdown(false)
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                  >
-                    <Image
-                      src="/networks/small/ethereum.png"
-                      alt="Ethereum"
-                      width={16}
-                      height={16}
-                      className="rounded-full mr-2"
-                    />
-                    Ethereum
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedNetwork && setSelectedNetwork('arbitrum')
-                      setShowNetworkDropdown(false)
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                  >
-                    <Image
-                      src="/networks/small/arbitrum.png"
-                      alt="Arbitrum"
-                      width={16}
-                      height={16}
-                      className="rounded-full mr-2"
-                    />
-                    Arbitrum
-                  </button>
-                </div>
+                </Button>
               )}
             </div>
-
-            {/* Create Fund Button */}
-            {showCreateButton && isConnected && (
-              <Button
-                variant="default"
-                size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-lg"
-                onClick={handleCreateFundClick}
-                disabled={isCreating}
-              >
-                {isCreating ? (
-                  <>
-                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-3 h-5 w-5" />
-                    {t('create')}
-                  </>
-                )}
-              </Button>
-            )}
           </div>
-        </div>
+        )}
 
         {/* Funds Grid */}
         <div className="space-y-4">
@@ -355,7 +368,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               </div>
             </div>
           ) : (
-            displayFunds.map((fund) => {
+            paginatedFunds.map((fund) => {
               const profitRatio = parseFloat(fund.profitRatio)
               const isPositive = profitRatio >= 0
               const daysSince = calculateDaysSince(fund.createdAt)
@@ -487,6 +500,33 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
             })
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {itemsPerPage && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="border-gray-600 hover:bg-gray-700"
+            >
+              {t('previous')}
+            </Button>
+            <span className="text-sm text-gray-400">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="border-gray-600 hover:bg-gray-700"
+            >
+              {t('next')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Confirmation Modal */}

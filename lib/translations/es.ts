@@ -19,6 +19,7 @@ export const es = {
   balance: "Saldo",
   balanceUnavailable: "Saldo no disponible",
   balanceCheckFailed: "Verificación de saldo falló",
+  becomeAnInvestmentLegend: "Conviértete en una leyenda de la inversión",
   blockchainBasedPlatform: "Plataforma de inversión en criptomonedas segura y transparente basada en blockchain",
   blockchainRecord: "Rendimiento de inversión registrado permanentemente en blockchain",
   borderlessAccess: "Acceso sin fronteras a plataformas de inversión globales",
