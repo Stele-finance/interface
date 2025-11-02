@@ -243,20 +243,15 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border h-20 flex items-center justify-between px-4 md:px-6 bg-muted/40">
       <div className="flex items-center">
         <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-6">
-          <Image 
-            src="/stele_logo_small.png" 
-            alt="Stele Logo" 
-            width={40}
-            height={40}
+          <Image
+            src="/stele_logo_small.png"
+            alt="Stele Logo"
+            width={24}
+            height={24}
             priority
-            className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
-            style={{ 
-              width: 'auto', 
-              height: '40px',
-              maxWidth: '48px'
-            }}
+            className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
           />
-          <span className="hidden sm:block text-orange-500 text-xl sm:text-2xl">Stele</span>
+          <span className="hidden sm:block text-orange-500 text-lg sm:text-xl">Stele</span>
         </Link>
         
         {/* Mobile Menu Icon - Hidden on desktop */}
