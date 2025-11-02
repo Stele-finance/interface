@@ -464,8 +464,9 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                   </TabsTrigger>
                 </TabsList>
                   
-                <TabsContent value="portfolio" className="space-y-4">
-                  <div className="bg-transparent border-0 rounded-2xl p-0">
+                <TabsContent value="portfolio" className="space-y-0">
+                  <div className="bg-transparent border-0 rounded-2xl overflow-hidden">
+                    <div className="p-6">
                     {portfolioData.tokens.length > 0 ? (
                       <>
                         {/* Pie Chart */}
@@ -562,6 +563,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                         <p>No portfolio data available</p>
                       </div>
                     )}
+                    </div>
                   </div>
                 </TabsContent>
 
