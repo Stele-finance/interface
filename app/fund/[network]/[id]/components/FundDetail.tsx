@@ -775,7 +775,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
             </TabsList>
 
             <TabsContent value="portfolio" className="space-y-0">
-              <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+              <Card className="bg-transparent border-0 rounded-2xl overflow-hidden">
                 <div className="p-6">
                   {portfolioData.tokens.length > 0 ? (
                     <>
