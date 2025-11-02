@@ -18,7 +18,6 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { FundActionTabs } from "./components/FundActionTabs"
-import { PieChart } from "lucide-react"
 import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
 import { getTokenLogo } from "@/lib/utils"
 import { useRef } from "react"
@@ -466,12 +465,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 </TabsList>
                   
                 <TabsContent value="portfolio" className="space-y-4">
-                  <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
-                      <PieChart className="h-5 w-5" />
-                      Portfolio
-                    </h4>
-                    
+                  <div className="bg-transparent border-0 rounded-2xl p-0">
                     {portfolioData.tokens.length > 0 ? (
                       <>
                         {/* Pie Chart */}
