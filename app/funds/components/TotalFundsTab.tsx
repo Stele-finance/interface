@@ -1,22 +1,16 @@
 'use client'
 
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { formatDateWithLocale } from "@/lib/utils"
 import {
-  ChevronDown,
   Coins,
-  Users,
-  DollarSign,
-  Loader2
+  Users
 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useFunds } from "@/app/fund/hooks/useFunds"
-import Image from "next/image"
 
 interface TotalFundsTabProps {
   activeTab: 'my-funds' | 'all-funds'
@@ -25,37 +19,13 @@ interface TotalFundsTabProps {
   setSelectedNetwork: (network: 'ethereum' | 'arbitrum') => void
 }
 
-export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelectedNetwork }: TotalFundsTabProps) {
-  const { t, language } = useLanguage()
+export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: TotalFundsTabProps) {
+  const { t } = useLanguage()
   const router = useRouter()
-  const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
-  const networkDropdownRef = useRef<HTMLDivElement>(null)
 
   // Use real fund data from GraphQL
-  const { data: fundsData, isLoading, error } = useFunds(100, selectedNetwork)
+  const { data: fundsData, isLoading } = useFunds(100, selectedNetwork)
   const funds = fundsData?.funds || []
-
-  // Handle click outside for network dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
-        setShowNetworkDropdown(false)
-      }
-    }
-
-    if (showNetworkDropdown) {
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside)
-        document.addEventListener('touchstart', handleClickOutside)
-      }, 100)
-
-      return () => {
-        clearTimeout(timeoutId)
-        document.removeEventListener('click', handleClickOutside)
-        document.removeEventListener('touchstart', handleClickOutside)
-      }
-    }
-  }, [showNetworkDropdown])
 
   // Helper function to format USD values
   const formatUSD = (value: string) => {
@@ -209,72 +179,6 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork, setSel
           </button>
           <h2 className="text-3xl text-gray-100 cursor-default">{t('allFunds')}</h2>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Network Selector Dropdown */}
-          <div className="relative" ref={networkDropdownRef}>
-            <button
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </button>
-            {showNetworkDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Mobile Layout */}
@@ -287,72 +191,6 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork, setSel
             {t('myFunds')}
           </button>
           <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('allFunds')}</h2>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative" ref={networkDropdownRef}>
-            <button
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-              className="p-3 bg-transparent border border-gray-600 hover:bg-gray-700 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </button>
-            {showNetworkDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[140px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowNetworkDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

@@ -25,6 +25,22 @@ export default function NFTPage() {
     }
   }, [])
 
+  // Listen for network changes from navbar
+  useEffect(() => {
+    const handleNetworkChanged = (event: CustomEvent) => {
+      const { network } = event.detail
+      if (network === 'ethereum' || network === 'arbitrum') {
+        setSelectedNetwork(network)
+      }
+    }
+
+    window.addEventListener('networkChanged', handleNetworkChanged as EventListener)
+
+    return () => {
+      window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
+    }
+  }, [])
+
   // Handle click outside for type dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

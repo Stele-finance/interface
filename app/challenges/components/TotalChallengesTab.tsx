@@ -1,11 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { ChevronDown } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { RecentChallengesTable } from "./RecentChallengesTable"
-import Image from "next/image"
 
 interface TotalChallengesTabProps {
   activeTab: 'portfolio' | 'challenges'
@@ -14,36 +10,8 @@ interface TotalChallengesTabProps {
   setSelectedNetwork: (network: 'ethereum' | 'arbitrum') => void
 }
 
-export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, setSelectedNetwork }: TotalChallengesTabProps) {
+export function TotalChallengesTab({ setActiveTab, selectedNetwork }: TotalChallengesTabProps) {
   const { t } = useLanguage()
-  const [showNetworkDropdown, setShowNetworkDropdown] = useState(false)
-  const [showMobileNetworkDropdown, setShowMobileNetworkDropdown] = useState(false)
-  const networkDropdownRef = useRef<HTMLDivElement>(null)
-  const mobileNetworkDropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (networkDropdownRef.current && !networkDropdownRef.current.contains(event.target as Node)) {
-        setShowNetworkDropdown(false)
-      }
-      if (mobileNetworkDropdownRef.current && !mobileNetworkDropdownRef.current.contains(event.target as Node)) {
-        setShowMobileNetworkDropdown(false)
-      }
-    }
-
-    if (showNetworkDropdown || showMobileNetworkDropdown) {
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside)
-        document.addEventListener('touchstart', handleClickOutside)
-      }, 100)
-
-      return () => {
-        clearTimeout(timeoutId)
-        document.removeEventListener('click', handleClickOutside)
-        document.removeEventListener('touchstart', handleClickOutside)
-      }
-    }
-  }, [showNetworkDropdown, showMobileNetworkDropdown])
 
   return (
     <div className="space-y-4 mt-8">
@@ -58,74 +26,6 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
           </button>
           <h2 className="text-3xl text-gray-100 cursor-default">{t('totalChallenges')}</h2>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Network Selector Dropdown */}
-          <div className="relative" ref={networkDropdownRef}>
-            <Button
-              variant="outline"
-              size="lg"
-              className="p-3 bg-transparent border-gray-600 hover:bg-gray-700"
-              onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
-            >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </Button>
-            {showNetworkDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <div
-                  className="cursor-pointer p-2 hover:bg-gray-700 flex items-center"
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowNetworkDropdown(false)
-                  }}
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </div>
-                <div
-                  className="cursor-pointer p-2 hover:bg-gray-700 flex items-center"
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowNetworkDropdown(false)
-                  }}
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Mobile Layout */}
@@ -139,75 +39,6 @@ export function TotalChallengesTab({ activeTab, setActiveTab, selectedNetwork, s
             {t('myChallenge')}
           </button>
           <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('totalChallenges')}</h2>
-        </div>
-        
-        {/* Network Dropdown */}
-        <div className="flex items-center gap-3">
-          <div className="relative" ref={mobileNetworkDropdownRef}>
-            <Button
-              variant="outline"
-              size="lg"
-              className="p-3 bg-transparent border-gray-600 hover:bg-gray-700"
-              onClick={() => setShowMobileNetworkDropdown(!showMobileNetworkDropdown)}
-            >
-              <div className="flex items-center gap-2">
-                {selectedNetwork === 'arbitrum' ? (
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                )}
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </Button>
-            {showMobileNetworkDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <div
-                  className="cursor-pointer p-2 hover:bg-gray-700 flex items-center"
-                  onClick={() => {
-                    setSelectedNetwork('ethereum')
-                    setShowMobileNetworkDropdown(false)
-                  }}
-                >
-                  <Image
-                    src="/networks/small/ethereum.png"
-                    alt="Ethereum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Ethereum
-                </div>
-                <div
-                  className="cursor-pointer p-2 hover:bg-gray-700 flex items-center"
-                  onClick={() => {
-                    setSelectedNetwork('arbitrum')
-                    setShowMobileNetworkDropdown(false)
-                  }}
-                >
-                  <Image
-                    src="/networks/small/arbitrum.png"
-                    alt="Arbitrum"
-                    width={16}
-                    height={16}
-                    className="rounded-full mr-2"
-                  />
-                  Arbitrum
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
