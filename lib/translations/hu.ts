@@ -19,6 +19,7 @@ export const hu = {
   balance: "Egyenleg",
   balanceUnavailable: "Egyenleg nem elérhető",
   balanceCheckFailed: "Egyenleg ellenőrzése sikertelen",
+  becomeAnInvestmentLegend: "Válj befektetési legendává",
   blockchainBasedPlatform: "Biztonságos és átlátható kriptovaluta befektetési platform blockchain alapon",
   blockchainRecord: "Befektetési teljesítmény véglegesen rögzítve a blokkláncon",
   borderlessAccess: "Határtalan hozzáférés a globális befektetési platformokhoz",

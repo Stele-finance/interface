@@ -19,6 +19,7 @@ export const bn = {
   balance: "ব্যালেন্স",
   balanceUnavailable: "ব্যালেন্স উপলব্ধ নেই",
   balanceCheckFailed: "ব্যালেন্স চেক ব্যর্থ",
+  becomeAnInvestmentLegend: "বিনিয়োগের কিংবদন্তি হন",
   blockchainBasedPlatform: "ব্লকচেইন ভিত্তিক নিরাপদ এবং স্বচ্ছ ক্রিপ্টোকারেন্সি বিনিয়োগ প্ল্যাটফর্ম",
   blockchainRecord: "বিনিয়োগের কর্মক্ষমতা স্থায়ীভাবে ব্লকচেইনে রেকর্ড করা",
   borderlessAccess: "বিশ্বব্যাপী বিনিয়োগ প্ল্যাটফর্মে সীমাহীন অ্যাক্সেস",

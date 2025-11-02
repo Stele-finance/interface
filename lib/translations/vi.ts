@@ -18,6 +18,7 @@ export const vi = {
   backToProposals: 'Trở lại đề xuất',
   balance: 'Số dư',
   balanceCheckFailed: 'Kiểm tra số dư thất bại',
+  becomeAnInvestmentLegend: 'Trở thành huyền thoại đầu tư',
   blockchainBasedPlatform: "Nền tảng đầu tư tiền điện tử an toàn và minh bạch dựa trên blockchain",
   balanceUnavailable: 'Số dư không khả dụng',
   blockchainRecord: 'Bản ghi blockchain',

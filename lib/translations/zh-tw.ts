@@ -18,6 +18,7 @@ export const zhTw = {
   backToProposals: "返回提案",
   balance: "餘額",
   balanceCheckFailed: "餘額檢查失敗",
+  becomeAnInvestmentLegend: "成為投資傳奇",
   blockchainBasedPlatform: "基於區塊鏈的安全透明加密貨幣投資平台",
   balanceUnavailable: "餘額不可用",
   blockchainRecord: "投資績效永久記錄在區塊鏈上",

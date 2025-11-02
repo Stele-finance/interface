@@ -18,6 +18,7 @@ export const th = {
   backToProposals: 'กลับไปที่ข้อเสนอ',
   balance: 'ยอดคงเหลือ',
   balanceCheckFailed: 'ตรวจสอบยอดคงเหลือไม่สำเร็จ',
+  becomeAnInvestmentLegend: 'มาเป็นตำนานด้านการลงทุน',
   blockchainBasedPlatform: "แพลตฟอร์มการลงทุนคริปโตที่ปลอดภัยและโปร่งใสบนบล็อกเชน",
   balanceUnavailable: 'ยอดคงเหลือไม่พร้อมใช้งาน',
   blockchainRecord: 'บันทึกบล็อกเชน',

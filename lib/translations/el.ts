@@ -19,6 +19,7 @@ export const el = {
   balance: "Υπόλοιπο",
   balanceUnavailable: "Το υπόλοιπο δεν είναι διαθέσιμο",
   balanceCheckFailed: "Η επαλήθευση υπολοίπου απέτυχε",
+  becomeAnInvestmentLegend: "Γίνετε θρύλος επενδύσεων",
   blockchainBasedPlatform: "Ασφαλής και διαφανής πλατφόρμα επενδύσεων κρυπτονομισμάτων βασισμένη σε blockchain",
   blockchainRecord: "Η επενδυτική απόδοση καταγράφεται μόνιμα στο blockchain",
   borderlessAccess: "Άνευ συνόρων πρόσβαση σε παγκόσμιες επενδυτικές πλατφόρμες",

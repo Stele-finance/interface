@@ -18,6 +18,7 @@ export const ms = {
   backToProposals: "Kembali ke Cadangan",
   balance: "Baki",
   balanceCheckFailed: "Pemeriksaan baki gagal",
+  becomeAnInvestmentLegend: "Jadilah legenda pelaburan",
   blockchainBasedPlatform: "Platform pelaburan cryptocurrency yang selamat dan telus berdasarkan blockchain",
   balanceUnavailable: "Baki tidak tersedia",
   blockchainRecord: "Prestasi pelaburan direkodkan secara kekal di blockchain",

@@ -19,6 +19,7 @@ export const ar = {
   balance: "الرصيد",
   balanceUnavailable: "الرصيد غير متوفر",
   balanceCheckFailed: "فشل فحص الرصيد",
+  becomeAnInvestmentLegend: "كن أسطورة الاستثمار",
   blockchainBasedPlatform: "منصة استثمار عملات مشفرة آمنة وشفافة مبنية على البلوك تشين",
   blockchainRecord: "أداء الاستثمار مسجل بشكل دائم على البلوك تشين",
   borderlessAccess: "وصول بلا حدود إلى منصات الاستثمار العالمية",

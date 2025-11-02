@@ -19,6 +19,7 @@ export const he = {
   balance: "יתרה",
   balanceUnavailable: "יתרה לא זמינה",
   balanceCheckFailed: "בדיקת יתרה נכשלה",
+  becomeAnInvestmentLegend: "הפוך לאגדת השקעות",
   blockchainBasedPlatform: "פלטפורמת השקעות קריפטו מאובטחת ושקופה המבוססת על בלוקצ'יין",
   blockchainRecord: "ביצועי השקעה מתועדים לצמיתות על הבלוקצ'יין",
   borderlessAccess: "גישה ללא גבולות לפלטפורמות השקעה עולמיות",

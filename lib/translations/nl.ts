@@ -19,6 +19,7 @@ export const nl = {
   balance: "Saldo",
   balanceUnavailable: "Saldo niet beschikbaar",
   balanceCheckFailed: "Saldo controle mislukt",
+  becomeAnInvestmentLegend: "Word een investeringslegende",
   blockchainBasedPlatform: "Veilig en transparant cryptocurrency-investeringsplatform gebouwd op blockchain",
   blockchainRecord: "Investeringsprestaties permanent opgeslagen op blockchain",
   borderlessAccess: "Grenzeloze toegang tot mondiale investeringsplatforms",

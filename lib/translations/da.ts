@@ -19,6 +19,7 @@ export const da = {
   balance: "Saldo",
   balanceUnavailable: "Saldo ikke tilgængelig",
   balanceCheckFailed: "Saldo kontrol mislykkedes",
+  becomeAnInvestmentLegend: "Bliv en investeringslegende",
   blockchainBasedPlatform: "Sikker og gennemsigtig kryptovaluta investeringsplatform bygget på blockchain",
   blockchainRecord: "Investeringsresultater permanent registreret på blockchain",
   borderlessAccess: "Grænseløs adgang til globale investeringsplatforme",

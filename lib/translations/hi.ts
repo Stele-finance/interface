@@ -19,6 +19,7 @@ export const hi = {
   balance: "शेष राशि",
   balanceUnavailable: "शेष राशि उपलब्ध नहीं",
   balanceCheckFailed: "शेष राशि जांच असफल",
+  becomeAnInvestmentLegend: "निवेश की किंवदंती बनें",
   blockchainBasedPlatform: "ब्लॉकचेन पर आधारित सुरक्षित और पारदर्शी क्रिप्टोकरेंसी निवेश मंच",
   blockchainRecord: "निवेश प्रदर्शन स्थायी रूप से ब्लॉकचेन पर दर्ज",
   borderlessAccess: "वैश्विक निवेश प्लेटफॉर्म तक सीमाहीन पहुंच",
