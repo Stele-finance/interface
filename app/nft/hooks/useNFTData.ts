@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { request } from 'graphql-request'
 import { getSubgraphUrl, getChallengeHeaders, getFundHeaders } from '@/lib/constants'
-import { getAllNFTsQuery, NFTData, PerformanceNFT } from '../queries/nftQueries'
+import { getAllNFTsQuery, getUserNFTsQuery, NFTData, PerformanceNFT } from '../queries/nftQueries'
 
 export function useNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethereum', context: 'challenge' | 'fund' = 'challenge') {
   const subgraphUrl = getSubgraphUrl(network, context)
@@ -92,10 +92,72 @@ function getRankImageName(rank: number): string {
 function getChallengePeriod(challengeType: number): string {
   switch (challengeType) {
     case 0: return "1 Week"
-    case 1: return "1 Month"
-    case 2: return "3 Months"
-    case 3: return "6 Months"
-    case 4: return "1 Year"
     default: return "Unknown"
+  }
+}
+
+export function useUserNFTData(
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum',
+  context: 'challenge' | 'fund' = 'challenge',
+  userAddress: string | null
+) {
+  const subgraphUrl = getSubgraphUrl(network, context)
+  const headers = context === 'fund' ? getFundHeaders() : getChallengeHeaders()
+
+  return useQuery<NFTData>({
+    queryKey: ['userNfts', network, context, userAddress],
+    queryFn: async () => {
+      if (!userAddress) {
+        return { performanceNFTs: [] }
+      }
+      return await request(subgraphUrl, getUserNFTsQuery(userAddress), {}, headers)
+    },
+    enabled: !!userAddress,
+    refetchInterval: 30000,
+    staleTime: 10000,
+    gcTime: 300000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    select: (data) => ({
+      performanceNFTs: data?.performanceNFTs || []
+    })
+  })
+}
+
+export function useFormattedUserNFTData(
+  network: 'ethereum' | 'arbitrum' | null = 'ethereum',
+  context: 'challenge' | 'fund' = 'challenge',
+  userAddress: string | null
+) {
+  const { data, isLoading, error, refetch } = useUserNFTData(network, context, userAddress)
+
+  const formattedNFTs = data?.performanceNFTs.map((nft: PerformanceNFT) => {
+    const returnRatePercentage = parseFloat(nft.returnRate) / 1e18 * 100
+
+    const seedMoney = parseFloat(nft.seedMoney)
+    const finalScore = parseFloat(nft.finalScore)
+    const profitLossPercent = seedMoney > 0
+      ? Math.round(((finalScore - seedMoney) / seedMoney) * 10000)
+      : 0
+
+    const date = new Date(parseInt(nft.blockTimestamp) * 1000)
+
+    return {
+      ...nft,
+      returnRateFormatted: returnRatePercentage.toFixed(2),
+      profitLossPercent,
+      dateFormatted: date.toLocaleDateString(),
+      timestampFormatted: date.toLocaleString(),
+      rankSuffix: getRankSuffix(nft.rank),
+      challengePeriod: getChallengePeriod(nft.challengeType),
+      imagePath: `/nft/${context}/${getRankImageName(nft.rank)}.png`
+    }
+  }) || []
+
+  return {
+    nfts: formattedNFTs,
+    isLoading,
+    error: error?.message || null,
+    refetch
   }
 }

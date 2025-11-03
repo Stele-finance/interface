@@ -20,6 +20,27 @@ export const getAllFundNFTsQuery = () => gql`{
   }
 }`
 
+export const getUserFundNFTsQuery = (userAddress: string) => gql`{
+  managerNFTs(
+    where: { owner: "${userAddress.toLowerCase()}" }
+    orderBy: returnRate
+    orderDirection: desc
+    first: 1000
+  ) {
+    id
+    tokenId
+    fundId
+    manager
+    owner
+    investment
+    currentTVL
+    returnRate
+    fundCreated
+    mintedAt
+    transactionHash
+  }
+}`
+
 export interface ManagerNFT {
   id: string
   tokenId: string

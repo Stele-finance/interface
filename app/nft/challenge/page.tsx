@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ImageIcon, Trophy, ChevronDown, Coins } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useFormattedNFTData } from "../hooks/useNFTData"
+import { useFormattedNFTData, useFormattedUserNFTData } from "../hooks/useNFTData"
 import { NFTCard } from "../components/NFTCard"
+import { useWallet } from "@/app/hooks/useWallet"
 
 export default function NFTPage() {
   const { t } = useLanguage()
   const router = useRouter()
+  const { address } = useWallet()
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
   const [showTypeDropdown, setShowTypeDropdown] = useState(false)
   const typeDropdownRef = useRef<HTMLDivElement>(null)
@@ -56,17 +59,48 @@ export default function NFTPage() {
       document.removeEventListener('touchstart', handleClickOutside as any)
     }
   }, [])
-  
-  const { 
-    nfts, 
-    isLoading, 
-    error,
-    refetch 
-  } = useFormattedNFTData(selectedNetwork)
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+  // Fetch all NFTs
+  const {
+    nfts: allNfts,
+    isLoading: isLoadingAll,
+    error: errorAll,
+    refetch: refetchAll
+  } = useFormattedNFTData(selectedNetwork, 'challenge')
+
+  // Fetch user's NFTs
+  const {
+    nfts: myNfts,
+    isLoading: isLoadingMy,
+    error: errorMy,
+    refetch: refetchMy
+  } = useFormattedUserNFTData(selectedNetwork, 'challenge', address)
+
+  const renderNFTContent = (nfts: any[], isLoading: boolean, error: string | null, refetch: () => void) => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardHeader className="pb-4">
+                <Skeleton className="h-48 w-full rounded-lg" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-8 w-20" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )
+    }
+
+    if (error) {
+      return (
         <div className="text-center py-12">
           <div className="text-red-500 mb-4">
             <ImageIcon className="mx-auto h-16 w-16 mb-4" />
@@ -74,6 +108,37 @@ export default function NFTPage() {
             <p className="text-muted-foreground mb-6">{error}</p>
           </div>
         </div>
+      )
+    }
+
+    if (nfts && nfts.length > 0) {
+      return (
+        <>
+          <div className="mb-6 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              {t('totalNFTs')}: {nfts.length}
+            </div>
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              {t('refresh')}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {nfts.map((nft) => (
+              <NFTCard key={nft.id} nft={nft} network={selectedNetwork} />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    return (
+      <div className="text-center py-12">
+        <ImageIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <h2 className="text-2xl font-bold mb-2">{t('noNFTsFound')}</h2>
+        <p className="text-muted-foreground mb-6">
+          {t('noNFTsFoundDescription')}
+        </p>
       </div>
     )
   }
@@ -84,9 +149,9 @@ export default function NFTPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <ImageIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">{t('totalNFTs')}</h1>
+            <h1 className="text-3xl font-bold">{t('nft')}</h1>
           </div>
-          
+
           {/* Challenge/Fund Type Selector Dropdown */}
           <div className="relative" ref={typeDropdownRef}>
             <button
@@ -126,50 +191,30 @@ export default function NFTPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="overflow-hidden">
-              <CardHeader className="pb-4">
-                <Skeleton className="h-48 w-full rounded-lg" />
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-8 w-20" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : nfts && nfts.length > 0 ? (
-        <>
-          <div className="mb-6 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              {t('totalNFTs')}: {nfts.length}
-            </div>
-            <Button onClick={() => refetch()} variant="outline" size="sm">
-              {t('refresh')}
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {nfts.map((nft) => (
-              <NFTCard key={nft.id} nft={nft} network={selectedNetwork} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <div className="text-center py-12">
-          <ImageIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">{t('noNFTsFound')}</h2>
-          <p className="text-muted-foreground mb-6">
-            {t('noNFTsFoundDescription')}
-          </p>
-        </div>
-      )}
+      <Tabs defaultValue="myNfts" className="w-full">
+        <TabsList className="inline-flex h-auto items-center justify-start bg-transparent p-0 gap-8 mb-6">
+          <TabsTrigger
+            value="myNfts"
+            className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+          >
+            {t('myNFTs')}
+          </TabsTrigger>
+          <TabsTrigger
+            value="totalNfts"
+            className="bg-transparent px-0 py-2 text-lg md:text-xl font-medium text-gray-400 data-[state=active]:text-white data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+          >
+            {t('totalNFTs')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="myNfts" className="mt-0">
+          {renderNFTContent(myNfts, isLoadingMy, errorMy, refetchMy)}
+        </TabsContent>
+
+        <TabsContent value="totalNfts" className="mt-0">
+          {renderNFTContent(allNfts, isLoadingAll, errorAll, refetchAll)}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

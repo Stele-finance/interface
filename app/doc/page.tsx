@@ -315,7 +315,7 @@ export default function DocPage() {
                                     <div className="space-y-3">
                                       <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">2</div>
-                                        <p className="font-medium">Select challenge type (1 week, 1 month, 3 month, 6 month, 1 year)</p>
+                                        <p className="font-medium">Select challenge type (1 week)</p>
                                       </div>
                                       <ResponsiveDocImage 
                                         imageName="create2.png" 
