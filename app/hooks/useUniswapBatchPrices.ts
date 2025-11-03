@@ -455,7 +455,7 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     const MIN_FETCH_INTERVAL = 30000 // 30 seconds
 
     if (!forceRefresh && globalLastFetchTime > 0 && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
-      console.log(`⏱️ Skipping fetch - last fetch was ${Math.round(timeSinceLastFetch / 1000)}s ago (minimum ${MIN_FETCH_INTERVAL / 1000}s)`)
+      // console.log(`⏱️ Skipping fetch - last fetch was ${Math.round(timeSinceLastFetch / 1000)}s ago (minimum ${MIN_FETCH_INTERVAL / 1000}s)`)
 
       // Return cached data immediately if available, but only if we don't have any data yet
       if (!priceDataRef.current || Object.keys(priceDataRef.current.tokens).length === 0) {
