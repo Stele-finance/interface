@@ -22,6 +22,29 @@ export const getAllNFTsQuery = () => gql`{
   }
 }`
 
+export const getUserNFTsQuery = (userAddress: string) => gql`{
+  performanceNFTs(
+    where: { user: "${userAddress.toLowerCase()}" }
+    orderBy: returnRate
+    orderDirection: desc
+    first: 1000
+  ) {
+    id
+    tokenId
+    challengeId
+    challengeType
+    user
+    totalUsers
+    rank
+    seedMoney
+    finalScore
+    returnRate
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+}`
+
 export interface PerformanceNFT {
   id: string
   tokenId: string
