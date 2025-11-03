@@ -167,12 +167,12 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
         id: 'live',
         investorCount: snapshots[snapshots.length - 1].investorCount, // Use latest investor count
         tvlUSD: realTimeFundValue,
-        formattedDate: 'Live',
+        formattedDate: t('estimate'),
         fullDate: 'Real-time data',
         dateLabel: now.toISOString().split('T')[0],
-        timeLabel: intervalType === 'monthly' 
-          ? `${month}/${String(now.getFullYear()).slice(2)}-Live`
-          : `${month}/${day}-Live`,
+        timeLabel: intervalType === 'monthly'
+          ? `${month}/${String(now.getFullYear()).slice(2)}-${t('estimate')}`
+          : `${month}/${day}-${t('estimate')}`,
         timestamp: Math.floor(now.getTime() / 1000),
         tokensSymbols: fundData.fund.tokensSymbols,
         isLive: true
@@ -182,7 +182,7 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
     }
 
     return snapshots
-  }, [snapshotsData, language, intervalType, realTimeFundValue, fundData])
+  }, [snapshotsData, language, intervalType, realTimeFundValue, fundData, t])
 
   const chartData = fundChartData
 
