@@ -54,7 +54,7 @@ export function Header() {
   }, [pathname])
   
   const [pageType, setLocalPageType] = useState<'challenge' | 'fund'>('challenge')
-  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('arbitrum')
 
   useEffect(() => {
     setLocalPageType(getPageTypeFromUrl())
@@ -65,6 +65,12 @@ export function Header() {
     const savedNetwork = typeof window !== 'undefined' ? localStorage.getItem('selected-network') : null
     if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
       setSelectedNetwork(savedNetwork)
+    } else {
+      // Set default to arbitrum if no saved network
+      setSelectedNetwork('arbitrum')
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('selected-network', 'arbitrum')
+      }
     }
   }, [])
 
