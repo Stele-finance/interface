@@ -132,12 +132,12 @@ export function InvestorCharts({ challengeId, investor, network, investorData, r
           hour: 'numeric',
           minute: '2-digit',
           hour12: true
-        })} (${t('live')})`,
+        })} (${t('estimate')})`,
         dateLabel: currentDate.toISOString().split('T')[0],
         timeLabel: (() => {
           // Extract month/day from dateLabel to avoid timezone issues
           const [year, month, day] = currentDate.toISOString().split('T')[0].split('-')
-          return `${parseInt(month)}/${parseInt(day)}-${t('live')}`
+          return `${parseInt(month)}/${parseInt(day)}-${t('estimate')}`
         })(),
         isRealTime: true
       }
