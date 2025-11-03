@@ -457,31 +457,33 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     if (!forceRefresh && globalLastFetchTime > 0 && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
       console.log(`⏱️ Skipping fetch - last fetch was ${Math.round(timeSinceLastFetch / 1000)}s ago (minimum ${MIN_FETCH_INTERVAL / 1000}s)`)
 
-      // Return cached data immediately if available
-      const cachedTokens: Record<string, TokenPrice> = {}
-      tokens.forEach(token => {
-        const cacheKey = `${token.symbol}-${network}`
-        const cached = priceCache.get(cacheKey)
+      // Return cached data immediately if available, but only if we don't have any data yet
+      if (!priceDataRef.current || Object.keys(priceDataRef.current.tokens).length === 0) {
+        const cachedTokens: Record<string, TokenPrice> = {}
+        tokens.forEach(token => {
+          const cacheKey = `${token.symbol}-${network}`
+          const cached = priceCache.get(cacheKey)
 
-        if (cached && cached.price !== null) {
-          cachedTokens[token.symbol] = {
-            symbol: token.symbol,
-            address: token.address,
-            priceUSD: cached.price,
-            decimals: token.decimals,
-            lastUpdated: new Date(cached.timestamp)
+          if (cached && cached.price !== null) {
+            cachedTokens[token.symbol] = {
+              symbol: token.symbol,
+              address: token.address,
+              priceUSD: cached.price,
+              decimals: token.decimals,
+              lastUpdated: new Date(cached.timestamp)
+            }
           }
-        }
-      })
-
-      // If we have cached data, set it immediately
-      if (Object.keys(cachedTokens).length > 0) {
-        setPriceData({
-          tokens: cachedTokens,
-          timestamp: now,
-          source: 'Cache',
         })
-        setIsLoading(false)
+
+        // If we have cached data, set it immediately (only once)
+        if (Object.keys(cachedTokens).length > 0) {
+          setPriceData({
+            tokens: cachedTokens,
+            timestamp: now,
+            source: 'Cache',
+          })
+          setIsLoading(false)
+        }
       }
 
       return
