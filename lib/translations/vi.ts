@@ -109,6 +109,7 @@ export const vi = {
   duration: 'Thời gian',
   earnPrizesWithSkill: 'Kiếm giải thưởng bằng kỹ năng',
   empty: 'Trống',
+  estimate: "Ước tính",
   end: 'Kết thúc',
   endDate: 'Ngày kết thúc',
   ended: 'Đã kết thúc',

@@ -109,6 +109,7 @@ export const bn = {
   duration: "সময়কাল",
   earnPrizesWithSkill: "বিনিয়োগ দক্ষতা দিয়ে প্রকৃত পুরস্কার অর্জন করুন",
   empty: "খালি",
+  estimate: "অনুমান",
   end: "শেষ",
   endDate: "শেষের তারিখ",
   ended: "শেষ হয়েছে",

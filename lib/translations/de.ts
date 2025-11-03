@@ -109,6 +109,7 @@ export const de = {
   duration: "Dauer",
   earnPrizesWithSkill: "Verdienen Sie echte Preise mit Investmentfähigkeiten",
   empty: "Leer",
+  estimate: "Schätzung",
   end: "Ende",
   endDate: "Enddatum",
   ended: "Beendet",

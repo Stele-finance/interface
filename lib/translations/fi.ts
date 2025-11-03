@@ -109,6 +109,7 @@ export const fi = {
   duration: "Kesto",
   earnPrizesWithSkill: "Ansaitse oikeita palkintoja sijoitustaidoilla",
   empty: "Tyhjä",
+  estimate: "Arvio",
   end: "Loppu",
   endDate: "Päättymispäivä",
   ended: "Päättynyt",

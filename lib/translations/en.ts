@@ -111,6 +111,7 @@ export const en = {
   duration: "Duration",
   earnPrizesWithSkill: "Earn real prizes with investment skills",
   empty: "Empty",
+  estimate: "Estimate",
   end: "End",
   endDate: "End Date",
   ended: "Ended",

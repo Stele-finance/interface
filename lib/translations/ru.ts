@@ -109,6 +109,7 @@ export const ru = {
   duration: 'Продолжительность',
   earnPrizesWithSkill: 'Зарабатывайте призы с помощью навыков',
   empty: 'Пусто',
+  estimate: "Оценка",
   end: 'Конец',
   endDate: 'Дата окончания',
   ended: 'Завершено',

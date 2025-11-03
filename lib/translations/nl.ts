@@ -115,6 +115,7 @@ export const nl = {
   duration: "Duur",
   earnPrizesWithSkill: "Verdien echte prijzen met investeringsvaardigheden",
   empty: "Leeg",
+  estimate: "Schatting",
   end: "Einde",
   endDate: "Einddatum",
   ended: "Beëindigd",

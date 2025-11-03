@@ -273,7 +273,7 @@ export function PortfolioSummary({
                                 onMouseLeave={() => handleMouseLeave(setShowLiveTooltip, liveTooltipTimer, setLiveTooltipTimer)}
                               >
                                 <span className="w-2 h-2 bg-current rounded-full animate-pulse"></span>
-                                <span>{t('live')}:</span>
+                                <span>{t('estimate')}:</span>
                               </div>
                             </TooltipTrigger>
                             <TooltipContent>

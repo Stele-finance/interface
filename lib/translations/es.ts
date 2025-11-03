@@ -109,6 +109,7 @@ export const es = {
   duration: "Duración",
   earnPrizesWithSkill: "Gana premios reales con habilidades de inversión",
   empty: "Vacío",
+  estimate: "Estimación",
   end: "Fin",
   endDate: "Fecha de Fin",
   ended: "Terminado",

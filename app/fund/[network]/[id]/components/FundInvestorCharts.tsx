@@ -127,11 +127,11 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
         id: 'live',
         amountUSD: realTimePortfolioValue,
         profitUSD: 0, // We'll calculate this based on the first investment
-        formattedDate: 'Live',
+        formattedDate: t('estimate'),
         fullDate: 'Real-time data',
-        timeLabel: intervalType === 'monthly' 
-          ? `${month}/${String(now.getFullYear()).slice(2)}-Live`
-          : `${month}/${day}-Live`,
+        timeLabel: intervalType === 'monthly'
+          ? `${month}/${String(now.getFullYear()).slice(2)}-${t('estimate')}`
+          : `${month}/${day}-${t('estimate')}`,
         timestamp: Math.floor(now.getTime() / 1000),
         isLive: true
       }
@@ -140,7 +140,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
     }
 
     return snapshots
-  }, [snapshotsData, language, intervalType, realTimePortfolioValue])
+  }, [snapshotsData, language, intervalType, realTimePortfolioValue, t])
 
   // Calculate current value (use the most recent snapshot)
   const currentValue = useMemo(() => {
@@ -150,6 +150,33 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
     }
     return 0
   }, [chartData])
+
+  // Calculate profit metrics
+  const metrics = useMemo(() => {
+    if (!investorData?.investor || chartData.length === 0) {
+      return {
+        gainLossPercentage: 0,
+        isPositive: false
+      }
+    }
+
+    const investment = parseFloat(investorData.investor.investmentUSD || '0')
+    const currentVal = currentValue
+
+    if (investment === 0) {
+      return {
+        gainLossPercentage: 0,
+        isPositive: false
+      }
+    }
+
+    const gainLossPercentage = ((currentVal - investment) / investment) * 100
+
+    return {
+      gainLossPercentage,
+      isPositive: gainLossPercentage >= 0
+    }
+  }, [investorData, currentValue, chartData])
 
   // Get current date for header
   const currentDate = formatDateWithLocale(new Date(), language, { 
@@ -248,6 +275,11 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
             <CardTitle className="text-4xl font-bold text-gray-100">
               ${(Math.floor(currentValue * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </CardTitle>
+            <div className="flex items-center gap-1">
+              <span className={`text-sm font-medium ${metrics.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                {metrics.isPositive ? '▲' : '▼'} {(Math.floor(Math.abs(metrics.gainLossPercentage) * 10000) / 10000).toFixed(4)}%
+              </span>
+            </div>
           </div>
         </div>
       </CardHeader>

@@ -109,6 +109,7 @@ export const jp = {
   duration: "期間",
   earnPrizesWithSkill: "投資スキルで実際の賞金を獲得",
   empty: "空",
+  estimate: "推定",
   end: "終了",
   endDate: "終了日",
   ended: "終了",

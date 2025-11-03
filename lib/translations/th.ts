@@ -109,6 +109,7 @@ export const th = {
   duration: 'ระยะเวลา',
   earnPrizesWithSkill: 'รับรางวัลด้วยทักษะ',
   empty: 'ว่าง',
+  estimate: "ประมาณการ",
   end: 'จบ',
   endDate: 'วันที่สิ้นสุด',
   ended: 'สิ้นสุดแล้ว',

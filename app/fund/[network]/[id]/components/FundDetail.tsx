@@ -810,7 +810,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                               {portfolioData.tokens.some(token => token.isRealTime) && (
                                 <div className="flex items-center justify-center gap-1 mt-1">
                                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                  <span className="text-xs text-green-400">Live</span>
+                                  <span className="text-xs text-green-400">{t('estimate')}</span>
                                 </div>
                               )}
                             </div>
@@ -1305,7 +1305,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                     {portfolioData.tokens.some(token => token.isRealTime) && (
                       <span className="text-xs text-green-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                        Live
+                        {t('estimate')}
                       </span>
                     )}
                   </div>

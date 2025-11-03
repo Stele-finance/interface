@@ -108,6 +108,7 @@ export const kr = {
   duration: "기간",
   earnPrizesWithSkill: "투자 실력으로 실제 상금 획득",
   empty: "비어있음",
+  estimate: "예상",
   end: "종료",
   endDate: "종료일",
   ended: "종료됨",

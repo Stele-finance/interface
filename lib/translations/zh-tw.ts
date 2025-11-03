@@ -109,6 +109,7 @@ export const zhTw = {
   duration: "持續時間",
   earnPrizesWithSkill: "用投資技能贏得真實獎品",
   empty: "空的",
+  estimate: "預估",
   end: "結束",
   endDate: "結束日期",
   ended: "已結束",

@@ -109,6 +109,7 @@ export const id = {
   duration: "Durasi",
   earnPrizesWithSkill: "Menangkan hadiah nyata dengan keterampilan investasi",
   empty: "Kosong",
+  estimate: "Perkiraan",
   end: "Selesai",
   endDate: "Tanggal Berakhir",
   ended: "Berakhir",
