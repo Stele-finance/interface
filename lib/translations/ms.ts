@@ -109,6 +109,7 @@ export const ms = {
   duration: "Tempoh",
   earnPrizesWithSkill: "Dapatkan hadiah sebenar dengan kemahiran pelaburan",
   empty: "Kosong",
+  estimate: "Anggaran",
   end: "Tamat",
   endDate: "Tarikh Tamat",
   ended: "Tamat",

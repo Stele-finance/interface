@@ -109,6 +109,7 @@ export const zhCn = {
   duration: '持续时间',
   earnPrizesWithSkill: '用技能赢得奖品',
   empty: '空的',
+  estimate: "预估",
   end: '结束',
   endDate: '结束日期',
   ended: '已结束',

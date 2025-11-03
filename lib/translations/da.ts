@@ -109,6 +109,7 @@ export const da = {
   duration: "Varighed",
   earnPrizesWithSkill: "Tjen rigtige præmier med investeringsfærdigheder",
   empty: "Tom",
+  estimate: "Estimat",
   end: "Slutning",
   endDate: "Slutdato",
   ended: "Afsluttet",

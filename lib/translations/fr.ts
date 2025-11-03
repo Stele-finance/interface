@@ -109,6 +109,7 @@ export const fr = {
   duration: "Durée",
   earnPrizesWithSkill: "Gagner de vrais prix avec les compétences d'investissement",
   empty: "Vide",
+  estimate: "Estimation",
   end: "Fin",
   endDate: "Date de Fin",
   ended: "Terminé",

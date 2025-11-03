@@ -109,6 +109,7 @@ export const el = {
   duration: "Διάρκεια",
   earnPrizesWithSkill: "Κερδίστε πραγματικά βραβεία με επενδυτικές δεξιότητες",
   empty: "Κενό",
+  estimate: "Εκτίμηση",
   end: "Τέλος",
   endDate: "Ημερομηνία Λήξης",
   ended: "Τελείωσε",

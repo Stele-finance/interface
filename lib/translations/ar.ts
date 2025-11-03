@@ -109,6 +109,7 @@ export const ar = {
   duration: "المدة",
   earnPrizesWithSkill: "اربح جوائز حقيقية بمهارات الاستثمار",
   empty: "فارغ",
+  estimate: "تقدير",
   end: "انتهاء",
   endDate: "تاريخ الانتهاء",
   ended: "انتهى",

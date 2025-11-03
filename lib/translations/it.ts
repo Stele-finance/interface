@@ -112,6 +112,7 @@ export const it = {
   duration: "Durata",
   earnPrizesWithSkill: "Vinci premi reali con le competenze di investimento",
   empty: "Vuoto",
+  estimate: "Stima",
   end: "Fine",
   endDate: "Data di Fine",
   ended: "Terminato",

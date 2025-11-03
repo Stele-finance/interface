@@ -109,6 +109,7 @@ export const he = {
   duration: "משך זמן",
   earnPrizesWithSkill: "זכה בפרסים אמיתיים עם כישורי השקעה",
   empty: "ריק",
+  estimate: "הערכה",
   end: "סוף",
   endDate: "תאריך סיום",
   ended: "הסתיים",

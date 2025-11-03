@@ -109,6 +109,7 @@ export const hu = {
   duration: "Időtartam",
   earnPrizesWithSkill: "Valódi díjak szerzése befektetési készségekkel",
   empty: "Üres",
+  estimate: "Becslés",
   end: "Vége",
   endDate: "Befejezés dátuma",
   ended: "Befejezett",

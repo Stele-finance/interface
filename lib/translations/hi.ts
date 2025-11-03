@@ -109,6 +109,7 @@ export const hi = {
   duration: "अवधि",
   earnPrizesWithSkill: "निवेश कौशल से वास्तविक पुरस्कार कमाएं",
   empty: "खाली",
+  estimate: "अनुमान",
   end: "समाप्त",
   endDate: "अंतिम तिथि",
   ended: "समाप्त",
