@@ -12,7 +12,6 @@ import { useSwapTokenPricesIndependent } from "@/app/hooks/useUniswapBatchPrices
 import { useQueryClient } from "@tanstack/react-query"
 // Challenge hooks not needed for fund swaps
 import { useFundInvestableTokensForSwap } from "@/app/hooks/useFundInvestableTokens"
-import { useFundSettings } from "@/app/hooks/useFundSettings"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { ethers } from "ethers"
@@ -74,9 +73,7 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
   
   // If externalInvestableTokens are provided, we're not loading from the hook
   const effectiveIsLoadingInvestableTokens = externalInvestableTokens ? false : isLoadingInvestableTokens;
-  
-  // Fetch fund settings for slippage configuration
-  const { data: fundSettings, isLoading: isLoadingSettings } = useFundSettings(subgraphNetwork);
+
   const [fromAmount, setFromAmount] = useState<string>("")
   const [fromToken, setFromToken] = useState<string>("")
   const [toToken, setToToken] = useState<string>("")
@@ -376,38 +373,9 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
       
       const amountInWei = ethers.parseUnits(adjustedAmount, Number(fromTokenDecimals));
       
-      // Execute fund swap with slippage protection
+      // Execute fund swap
       let tx;
       {
-        let minOutputAmount = BigInt(0);
-        
-        if (outputAmount && parseFloat(outputAmount) > 0 && fundSettings?.maxSlippage) {
-          const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
-          
-          // Use maxSlippage but reduce it by 20% for more conservative calculation
-          const maxSlippageBP = parseInt(fundSettings.maxSlippage);
-          const reducedSlippage = Math.floor(maxSlippageBP * 0.8); // 20% reduction
-                    
-          // Calculate minOutput = expectedOutput * (10000 - reducedSlippage) / 10000
-          const basisPoints = BigInt(10000);
-          const slippageBigInt = BigInt(reducedSlippage);
-          minOutputAmount = (expectedOutput * (basisPoints - slippageBigInt)) / basisPoints;          
-        } else if (outputAmount && parseFloat(outputAmount) > 0) {
-          // Fallback: use 1% slippage if settings not available
-          const expectedOutput = ethers.parseUnits(outputAmount, Number(toTokenDecimals));
-          minOutputAmount = (expectedOutput * BigInt(9900)) / BigInt(10000);
-          console.warn('Fund settings not available, using 1% slippage fallback');
-        } else {
-          console.warn('No outputAmount available, using minimal value');
-          minOutputAmount = BigInt(1);
-        }
-        
-        // If still 0, something went wrong - set a minimal amount to avoid reverting with 0
-        if (minOutputAmount === BigInt(0)) {
-          console.warn('Could not calculate minimum output, using minimal amount');
-          minOutputAmount = BigInt(1);
-        }
-
         // Find best swap path using Uniswap Smart Order Router (V3 only)
         console.log('Finding best swap path...');
         const { findBestSwapPath } = await import('../utils/pathFinder');
@@ -429,16 +397,8 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
         console.log(`Best path found: ${bestPath.swapType === 0 ? 'Single-hop' : 'Multi-hop'}`);
         console.log(`Expected output: ${ethers.formatUnits(bestPath.amountOut, Number(toTokenDecimals))} ${toToken}`);
 
-        // Recalculate minOutputAmount based on router's quote
-        minOutputAmount = bestPath.amountOut;
-        if (fundSettings?.maxSlippage) {
-          const maxSlippageBP = parseInt(fundSettings.maxSlippage);
-          const reducedSlippage = Math.floor(maxSlippageBP * 0.8);
-          minOutputAmount = (bestPath.amountOut * (BigInt(10000) - BigInt(reducedSlippage))) / BigInt(10000);
-        } else {
-          minOutputAmount = (bestPath.amountOut * BigInt(9900)) / BigInt(10000);
-        }
-        if (minOutputAmount === BigInt(0)) minOutputAmount = BigInt(1);
+        // Contract uses fixed slippage, so we pass the expected output from router
+        const minOutputAmount = bestPath.amountOut;
 
         // Prepare swap params using best path found
         const swapParams = {
