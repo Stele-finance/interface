@@ -37,7 +37,7 @@ NEXT_PUBLIC_ETHERSCAN_API_KEY=your_etherscan_api_here
 ## Application Architecture
 
 ### Core Platform
-**Stele** is a decentralized investment challenge platform for testing cryptocurrency investment strategies. The application supports multi-network DeFi operations on Ethereum and Arbitrum networks.
+**Stele** is a decentralized platform for creating and managing cryptocurrency investment funds. The application supports multi-network DeFi operations on Ethereum and Arbitrum networks, enabling fund managers to create on-chain funds and investors to participate in professionally managed crypto portfolios.
 
 ### Tech Stack
 - **Framework**: Next.js 15 with App Router
@@ -53,18 +53,20 @@ The application operates on two primary networks:
 - **Arbitrum One** (Chain ID: 42161)
 
 Network-specific configurations are centralized in `lib/constants.ts` with helper functions for:
-- Contract addresses (Stele, USDC, governance contracts)
+- Contract addresses (Fund contracts, USDC, governance contracts)
 - RPC URLs and block explorers
 - Subgraph endpoints
 - Block time calculations for governance
 
 ### Key Application Features
 
-**Investment Challenges**:
-- Challenge creation and participation
+**Investment Funds**:
+- Fund creation by managers
 - Real-time portfolio tracking and ranking
-- Token swapping via Uniswap V3
+- Token swapping via Uniswap V3 (manager-only)
 - Weekly snapshots and historical data
+- NFT certificates for fund managers
+- Investor participation with share-based returns
 
 **Governance System**:
 - Proposal creation and voting
@@ -75,27 +77,30 @@ Network-specific configurations are centralized in `lib/constants.ts` with helpe
 - Multi-token portfolio tracking
 - USD value calculations with real-time pricing
 - Transaction history and analytics
+- Manager fee system
 
 ### Core Architecture Patterns
 
 **Route Structure**:
 ```
-/[network]/challenge/[id]/[walletAddress]  # Challenge-specific investor view
-/[network]/portfolio/[walletAddress]       # General portfolio view
+/home                                      # Landing page
+/funds                                     # Fund list page
+/fund/[network]/[id]                       # Fund detail page
+/fund/[network]/[id]/[walletAddress]       # Investor-specific fund view
+/nft/fund                                  # Fund NFT gallery
 /vote/[id]                                 # Governance proposals
-/swap/[challengeId]/[walletAddress]        # Token swapping interface
 ```
 
 **Data Layer**:
 - Custom hooks in `app/hooks/` for blockchain interactions
-- Feature-specific hook directories (e.g., `app/challenge/hooks/`)
+- Fund-specific hooks in `app/fund/hooks/` and `app/fund/[network]/[id]/hooks/`
 - React Query for caching and state synchronization
 - GraphQL queries to The Graph subgraphs
 
 **Component Organization**:
 - Page-level components in route directories
 - Shared UI components in `components/ui/` (shadcn/ui)
-- Feature-specific components co-located with pages
+- Feature-specific components co-located with pages (e.g., `app/fund/[network]/[id]/components/`)
 - Global components in `components/` root
 
 ### Wallet Integration
@@ -107,13 +112,13 @@ Uses Reown AppKit (WalletConnect v2) with custom wallet state management:
 
 ### Internationalization
 Comprehensive i18n support with:
-- 15+ language translations in `lib/translations/`
+- 24+ language translations in `lib/translations/`
 - Auto-detection via `/api/detect-language/` endpoint
 - Context-based language switching
 - RTL support for Arabic and Hebrew
 
 ### Smart Contract Integration
-- ABI definitions in `app/abis/` for Stele, governance, and ERC20 contracts
+- ABI definitions in `app/abis/` for Fund, governance, and ERC20 contracts
 - Ethers.js contract interactions with provider management
 - Multi-network contract address resolution
 - Uniswap V3 price quotations and swap execution
@@ -123,6 +128,7 @@ Comprehensive i18n support with:
 - CSS variable-based theming for dark/light modes
 - shadcn/ui component library for consistent UI patterns
 - Responsive design with mobile-first approach
+- Custom animations: `animate-fade-in`, `animate-fade-in-delayed`, `animate-slide-in-right`, `animate-float`
 
 ## Important Development Notes
 
@@ -135,3 +141,11 @@ Comprehensive i18n support with:
 **Error Handling**: Implement proper error boundaries and loading states, especially for wallet and network operations.
 
 **Performance**: Leverage React Query caching for expensive blockchain calls and GraphQL queries.
+
+**Swap Functionality**: Swap functionality is only available for Fund managers. Use `FundAssetSwap` component from `app/swap/components/` which integrates with Uniswap V3.
+
+**Fund-Specific Features**:
+- Fund creation requires wallet connection and network switching
+- Investors can join/leave funds and claim rewards
+- Managers can swap tokens and manage portfolios
+- All fund data is fetched from The Graph subgraphs specific to each network
