@@ -57,6 +57,8 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const containerRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState(0)
 
   // Use real fund data from GraphQL with selected network
   const { data: fundsData, isLoading, error } = useFunds(50, selectedNetwork)
@@ -124,17 +126,29 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const endIndex = startIndex + fundsPerPage
   const paginatedFunds = itemsPerPage ? displayFunds.slice(startIndex, endIndex) : displayFunds
 
-  // Touch swipe handlers for mobile pagination
+  // Touch swipe handlers for mobile pagination with visual feedback
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (!itemsPerPage || totalPages <= 1) return
     touchStartX.current = e.touches[0].clientX
+    setIsDragging(true)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!itemsPerPage || totalPages <= 1 || !isDragging) return
     touchEndX.current = e.touches[0].clientX
+    const diff = touchStartX.current - touchEndX.current
+
+    // Limit drag distance and add resistance at edges
+    let offset = -diff
+    if ((currentPage === 1 && offset > 0) || (currentPage === totalPages && offset < 0)) {
+      offset = offset * 0.3 // Add resistance at edges
+    }
+
+    setDragOffset(offset)
   }
 
   const handleTouchEnd = () => {
-    if (!itemsPerPage || totalPages <= 1) return // Only work if pagination is enabled
+    if (!itemsPerPage || totalPages <= 1) return
 
     const swipeThreshold = 50 // Minimum swipe distance in pixels
     const diff = touchStartX.current - touchEndX.current
@@ -149,6 +163,9 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
       }
     }
 
+    // Reset
+    setIsDragging(false)
+    setDragOffset(0)
     touchStartX.current = 0
     touchEndX.current = 0
   }
@@ -367,7 +384,11 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
         {/* Funds Grid */}
         <div
           ref={containerRef}
-          className="space-y-4"
+          className="space-y-4 transition-transform"
+          style={{
+            transform: `translateX(${dragOffset}px)`,
+            transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+          }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
