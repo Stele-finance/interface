@@ -1,15 +1,12 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
-import { useRouter } from "next/navigation"
-import { Wallet, Trophy, Briefcase, Sparkles, TrendingUp, Users, Lock, BarChart3, Eye, CheckCircle2 } from "lucide-react"
-import { ActiveChallenges } from "@/app/challenge/components/ActiveChallenges"
+import { Wallet, Trophy, Briefcase, Sparkles, Users, Lock, BarChart3, Eye, CheckCircle2 } from "lucide-react"
 import { Funds } from "@/app/fund/components/Funds"
 import { useState, useEffect } from "react"
 
 export default function HomePage() {
   const { t } = useLanguage()
-  const router = useRouter()
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
 
   // Load network selection from localStorage on mount
@@ -32,51 +29,8 @@ export default function HomePage() {
     }
   }, [])
 
-  const handleGetStarted = () => {
-    router.push('/challenges')
-  }
-
-  const handleBrowseChallenges = () => {
-    router.push('/funds')
-  }
-
   return (
     <div className="min-h-screen -m-4 md:-m-6">
-      {/* Hero Section with Radial Gradient */}
-      <section className="relative overflow-hidden">
-        {/* Background with subtle radial gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950"></div>
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.15), transparent 50%)',
-          }}
-        ></div>
-
-        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-20 lg:py-28 relative z-10">
-          <div className="text-center space-y-8 sm:space-y-12 animate-fade-in">
-            {/* Main Heading */}
-            <div className="max-w-2xl mx-auto space-y-6">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-bold leading-tight tracking-tight">
-                {t('winAndGetPrizeMoney')}
-              </h1>
-            </div>
-
-            {/* Active Challenges */}
-            <div className="w-full max-w-2xl mx-auto animate-fade-in-delayed">
-              <ActiveChallenges
-                selectedNetwork={selectedNetwork}
-                setSelectedNetwork={setSelectedNetwork}
-                hideHeader={true}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative gradient orb */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-32 sm:h-48 bg-gradient-to-t from-amber-500/10 to-transparent blur-3xl"></div>
-      </section>
-
       {/* Become an investment legend - Funds Section */}
       <section className="py-12 sm:py-16 lg:py-20 bg-slate-900/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 sm:px-6">
@@ -116,66 +70,10 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Two Main Features */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
-              {/* Investment Challenge Card */}
-              <div className="glass-card bg-gradient-to-br from-emerald-500/5 via-green-500/5 to-teal-500/5 border-emerald-500/20 rounded-3xl overflow-hidden group hover-lift animate-fade-in">
-                <div className="p-6 sm:p-8 lg:p-10">
-                  {/* Icon & Title */}
-                  <div className="flex items-center gap-4 mb-6 sm:mb-8">
-                    <div className="bg-emerald-500/10 rounded-2xl w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 group-hover:bg-emerald-500/20">
-                      <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-white">{t('investmentChallenge')}</h3>
-                      <p className="text-emerald-400 text-sm sm:text-base font-medium mt-1">Investment Challenge</p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-slate-300 text-xl sm:text-2xl leading-relaxed mb-6 sm:mb-8">
-                    {t('challengeDescription')}
-                  </p>
-
-                  {/* Features List */}
-                  <div className="space-y-4 sm:space-y-5">
-                    <div className="flex items-start gap-3 group/item">
-                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                      <div>
-                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('entryFeeRequired')}</p>
-                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('entryFeeRequiredDesc')}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 group/item">
-                      <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                      <div>
-                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('returnCompetition')}</p>
-                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('returnCompetitionDesc')}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 group/item">
-                      <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                      <div>
-                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('prizeDistribution')}</p>
-                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('prizeDistributionDesc')}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 group/item">
-                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 mt-0.5 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                      <div>
-                        <p className="text-white font-semibold text-xl sm:text-2xl">{t('transparentRecords')}</p>
-                        <p className="text-slate-400 text-lg sm:text-xl mt-1">{t('transparentRecordsDesc')}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+            {/* Main Feature - Centered */}
+            <div className="max-w-3xl mx-auto">
               {/* Crypto Fund Card */}
-              <div className="glass-card bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-sky-500/5 border-blue-500/20 rounded-3xl overflow-hidden group hover-lift animate-fade-in" style={{ animationDelay: '200ms' }}>
+              <div className="glass-card bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-sky-500/5 border-blue-500/20 rounded-3xl overflow-hidden group hover-lift animate-fade-in">
                 <div className="p-6 sm:p-8 lg:p-10">
                   {/* Icon & Title */}
                   <div className="flex items-center gap-4 mb-6 sm:mb-8">
