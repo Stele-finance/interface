@@ -35,7 +35,9 @@ export function NFTCard({ nft, network = 'ethereum' }: NFTCardProps) {
   const router = useRouter()
 
   const getNFTExplorerUrl = () => {
-    const nftAddress = NETWORK_CONTRACTS[network].STELE_PERFORMANCE_NFT_ADDRESS
+    // Use network_fund key format for NETWORK_CONTRACTS
+    const networkKey = network === 'arbitrum' ? 'arbitrum_fund' : 'ethereum_fund'
+    const nftAddress = NETWORK_CONTRACTS[networkKey].STELE_FUND_NFT_ADDRESS
     const baseUrl = network === 'arbitrum' ? 'https://arbiscan.io' : 'https://etherscan.io'
     return `${baseUrl}/nft/${nftAddress}/${nft.tokenId}`
   }

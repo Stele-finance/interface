@@ -25,7 +25,6 @@ import {
 import { FundCharts } from "./FundCharts"
 import { useRouter } from "next/navigation"
 import { 
-  getSteleContractAddress,
   getUSDCTokenAddress,
   getRPCUrl,
   USDC_DECIMALS,

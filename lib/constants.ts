@@ -31,21 +31,6 @@ export const ARBITRUM_BLOCK_TIME_MS = 0.25; // ~0.25 seconds per block (250ms)
 
 // Network-specific Contract Addresses
 export const NETWORK_CONTRACTS = {
-  ethereum: {
-    STELE_CONTRACT_ADDRESS: "0x1De26fD50aF9bEA93eC4eC78747064C981c743Cd",
-    STELE_PERFORMANCE_NFT_ADDRESS: "0x92b0749d677B6d5C9522a92Ea360E21e82ac56c8",
-    USDC_TOKEN_ADDRESS: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    RPC_URL: 'https://mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
-    EXPLORER_URL: 'https://etherscan.io',
-    EXPLORER_NAME: 'Etherscan',
-    // Uniswap V3 addresses
-    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
-    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
-    WETH_TOKEN_ADDRESS: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    WBTC_TOKEN_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    UNI_TOKEN_ADDRESS: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
-  },
   ethereum_fund: {
     STELE_FUND_CONTRACT_ADDRESS: "0x8a37AC980ceC4c3a4f791147dC1c06983772C3D5",
     STELE_FUND_NFT_ADDRESS: "0xBe2732dfB5e35684234747f3cED88279495749e5",
@@ -61,21 +46,6 @@ export const NETWORK_CONTRACTS = {
     WBTC_TOKEN_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     UNI_TOKEN_ADDRESS: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
     LINK_TOKEN_ADDRESS: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
-  },
-  arbitrum: {
-    STELE_CONTRACT_ADDRESS: "0x2256A95cBFf3C792Ae60AEE2B63358BBc71F0Fe6",
-    STELE_PERFORMANCE_NFT_ADDRESS: "0x39f480f533124b80876155786d8E0980d52efC60",
-    USDC_TOKEN_ADDRESS: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum USDC
-    RPC_URL: 'https://arbitrum-mainnet.infura.io/v3/' + process.env.NEXT_PUBLIC_INFURA_API_KEY,
-    EXPLORER_URL: 'https://arbiscan.io',
-    EXPLORER_NAME: 'Arbiscan',
-    // Uniswap V3 addresses (Arbitrum)
-    UNISWAP_V3_QUOTER: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // QuoterV2
-    MULTICALL_CONTRACT: "0xcA11bde05977b3631167028862bE2a173976CA11", // Multicall3
-    WETH_TOKEN_ADDRESS: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // Arbitrum WETH
-    WBTC_TOKEN_ADDRESS: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", // Arbitrum WBTC
-    UNI_TOKEN_ADDRESS: "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0",   // Arbitrum UNI
-    LINK_TOKEN_ADDRESS: "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4"  // Arbitrum LINK
   },
   arbitrum_fund: {
     STELE_FUND_CONTRACT_ADDRESS: "0xC252969F84F7C358F46d1E1AcF0b3193B2fdc8Ee",
@@ -138,14 +108,9 @@ export const getChainConfig = (network: 'ethereum' | 'arbitrum' | null) => {
   return ETHEREUM_CHAIN_CONFIG; // Default to Ethereum
 };
 
-export const getSteleContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.STELE_CONTRACT_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.STELE_CONTRACT_ADDRESS; // Default to Ethereum
-};
-
 export const getUSDCTokenAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.USDC_TOKEN_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.USDC_TOKEN_ADDRESS; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.USDC_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.USDC_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
@@ -156,18 +121,18 @@ export const getSteleFundContractAddress = (network: 'ethereum' | 'arbitrum' | n
 };
 
 export const getRPCUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.RPC_URL;
-  return NETWORK_CONTRACTS.ethereum.RPC_URL; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.RPC_URL;
+  return NETWORK_CONTRACTS.ethereum_fund.RPC_URL; // Default to Ethereum
 };
 
 export const getExplorerUrl = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.EXPLORER_URL;
-  return NETWORK_CONTRACTS.ethereum.EXPLORER_URL; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.EXPLORER_URL;
+  return NETWORK_CONTRACTS.ethereum_fund.EXPLORER_URL; // Default to Ethereum
 };
 
 export const getExplorerName = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.EXPLORER_NAME;
-  return NETWORK_CONTRACTS.ethereum.EXPLORER_NAME; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.EXPLORER_NAME;
+  return NETWORK_CONTRACTS.ethereum_fund.EXPLORER_NAME; // Default to Ethereum
 };
 
 // Helper functions to build explorer URLs for transactions and addresses
@@ -188,39 +153,38 @@ export const buildTokenUrl = (network: 'ethereum' | 'arbitrum' | null, tokenAddr
 
 // Uniswap V3 related helper functions
 export const getUniswapQuoterAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.UNISWAP_V3_QUOTER;
-  return NETWORK_CONTRACTS.ethereum.UNISWAP_V3_QUOTER; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.UNISWAP_V3_QUOTER;
+  return NETWORK_CONTRACTS.ethereum_fund.UNISWAP_V3_QUOTER; // Default to Ethereum
 };
 
 export const getMulticallAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.MULTICALL_CONTRACT;
-  return NETWORK_CONTRACTS.ethereum.MULTICALL_CONTRACT; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.MULTICALL_CONTRACT;
+  return NETWORK_CONTRACTS.ethereum_fund.MULTICALL_CONTRACT; // Default to Ethereum
 };
 
 export const getWETHAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.WETH_TOKEN_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.WETH_TOKEN_ADDRESS; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.WETH_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.WETH_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 export const getWBTCAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.WBTC_TOKEN_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.WBTC_TOKEN_ADDRESS; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.WBTC_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.WBTC_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 export const getUNIAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.UNI_TOKEN_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.UNI_TOKEN_ADDRESS; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.UNI_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.UNI_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 export const getLINKAddress = (network: 'ethereum' | 'arbitrum' | null): string => {
-  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum.LINK_TOKEN_ADDRESS;
-  return NETWORK_CONTRACTS.ethereum.LINK_TOKEN_ADDRESS; // Default to Ethereum
+  if (network === 'arbitrum') return NETWORK_CONTRACTS.arbitrum_fund.LINK_TOKEN_ADDRESS;
+  return NETWORK_CONTRACTS.ethereum_fund.LINK_TOKEN_ADDRESS; // Default to Ethereum
 };
 
 // Legacy exports for backward compatibility (these will use Ethereum by default)
-export const STELE_CONTRACT_ADDRESS = NETWORK_CONTRACTS.ethereum.STELE_CONTRACT_ADDRESS;
-export const USDC_TOKEN_ADDRESS = NETWORK_CONTRACTS.ethereum.USDC_TOKEN_ADDRESS;
-export const RPC_URL = NETWORK_CONTRACTS.ethereum.RPC_URL;
+export const USDC_TOKEN_ADDRESS = NETWORK_CONTRACTS.ethereum_fund.USDC_TOKEN_ADDRESS;
+export const RPC_URL = NETWORK_CONTRACTS.ethereum_fund.RPC_URL;
 
 // Token decimals
 export const USDC_DECIMALS = 6;

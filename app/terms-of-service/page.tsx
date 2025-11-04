@@ -61,7 +61,7 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  The Interface is distinct from the Stele Protocol and is one, but not the exclusive, means of accessing the Protocol. The Protocol comprises open-source or source-available self-executing smart contracts that are deployed on various public blockchains, such as Ethereum and Arbitrum. By using the Interface, you understand that you are not buying or selling digital assets from us. Stele Finance does not operate or manage challenge entry fees. Challenge entry fees are distributed to the top 1–5 ranked users according to the allocation ratios defined in the Stele Protocol. Stele Finance does not manage fund assets. Deposits and withdrawals of fund assets can only be performed by the investor themselves. Fund fees are allocated to the fund manager in accordance with the Protocol. Fund managers may only rebalance the fund portfolio by swapping assets. Stele Finance does not supervise or control fund managers. The Protocol was initially deployed on the Ethereum and Arbitrum blockchain. Please note that digital assets that have been "bridged" or "wrapped" to operate on other blockchain networks (including to blockchains compatible with the Ethereum Virtual Machine that are designed to ensure the Ethereum blockchain can effectively process more transactions or other blockchains that are frequently referred to as "Layer 2" solutions) are distinct from the original Ethereum mainnet asset.
+                  The Interface is distinct from the Stele Protocol and is one, but not the exclusive, means of accessing the Protocol. The Protocol comprises open-source or source-available self-executing smart contracts that are deployed on various public blockchains, such as Ethereum and Arbitrum. By using the Interface, you understand that you are not buying or selling digital assets from us. Stele Finance does not manage fund assets. Deposits and withdrawals of fund assets can only be performed by the investor themselves. Fund fees are allocated to the fund manager in accordance with the Protocol. Fund managers may only rebalance the fund portfolio by swapping assets. Stele Finance does not supervise or control fund managers. The Protocol was initially deployed on the Ethereum and Arbitrum blockchain. Please note that digital assets that have been "bridged" or "wrapped" to operate on other blockchain networks (including to blockchains compatible with the Ethereum Virtual Machine that are designed to ensure the Ethereum blockchain can effectively process more transactions or other blockchains that are frequently referred to as "Layer 2" solutions) are distinct from the original Ethereum mainnet asset.
                 </p>
 
                 <p>
@@ -226,7 +226,7 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  FURTHER, YOU UNDERSTAND THAT SMART CONTRACT TRANSACTIONS AUTOMATICALLY EXECUTE AND SETTLE, AND THAT BLOCKCHAIN-BASED TRANSACTIONS ARE IRREVERSIBLE WHEN CONFIRMED. YOU ACKNOWLEDGE AND ACCEPT THAT THE COST AND SPEED OF TRANSACTING WITH CRYPTOGRAPHIC AND BLOCKCHAIN-BASED SYSTEMS SUCH AS ETHEREUM ARE VARIABLE AND MAY INCREASE DRAMATICALLY AT ANY TIME. YOU FURTHER ACKNOWLEDGE AND ACCEPT THE RISK OF PRICE LOSS DUE TO SLIPPAGE WHEN EXECUTING SWAP TRANSACTIONS IN CHALLENGES OR FUNDS.
+                  FURTHER, YOU UNDERSTAND THAT SMART CONTRACT TRANSACTIONS AUTOMATICALLY EXECUTE AND SETTLE, AND THAT BLOCKCHAIN-BASED TRANSACTIONS ARE IRREVERSIBLE WHEN CONFIRMED. YOU ACKNOWLEDGE AND ACCEPT THAT THE COST AND SPEED OF TRANSACTING WITH CRYPTOGRAPHIC AND BLOCKCHAIN-BASED SYSTEMS SUCH AS ETHEREUM ARE VARIABLE AND MAY INCREASE DRAMATICALLY AT ANY TIME. YOU FURTHER ACKNOWLEDGE AND ACCEPT THE RISK OF PRICE LOSS DUE TO SLIPPAGE WHEN EXECUTING SWAP TRANSACTIONS IN FUNDS.
                 </p>
 
                 <p>
@@ -238,7 +238,7 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  FINALLY, YOU UNDERSTAND THAT WE DO NOT CREATE, OWN, OR OPERATE CROSS-CHAIN BRIDGES AND WE DO NOT MAKE ANY REPRESENTATION OR WARRANTY ABOUT THE SAFETY OR SOUNDNESS OF ANY CROSS-CHAIN BRIDGE, INCLUDING ITS USE FOR STELE GOVERNANCE.
+                  FINALLY, YOU UNDERSTAND THAT WE DO NOT CREATE, OWN, OR OPERATE CROSS-CHAIN BRIDGES AND WE DO NOT MAKE ANY REPRESENTATION OR WARRANTY ABOUT THE SAFETY OR SOUNDNESS OF ANY CROSS-CHAIN BRIDGE.
                 </p>
 
                 <p>
@@ -251,7 +251,7 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  SIMILARLY, THE PROTOCOL IS PROVIDED "AS IS," AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND. ALTHOUGH WE CONTRIBUTED TO THE INITIAL CODE FOR THE PROTOCOL, WE DO NOT PROVIDE, OWN, OR CONTROL THE PROTOCOL, WHICH IS RUN AUTONOMOUSLY WITHOUT ANY HEADCOUNT BY SMART CONTRACTS DEPLOYED ON VARIOUS BLOCKCHAINS. UPGRADES AND MODIFICATIONS TO THE PROTOCOL ARE GENERALLY MANAGED IN A COMMUNITY-DRIVEN WAY BY HOLDERS OF THE STELE GOVERNANCE TOKEN. NO DEVELOPER OR ENTITY INVOLVED IN CREATING THE PROTOCOL WILL BE LIABLE FOR ANY CLAIMS OR DAMAGES WHATSOEVER ASSOCIATED WITH YOUR USE, INABILITY TO USE, OR YOUR INTERACTION WITH OTHER USERS OF, THE PROTOCOL, INCLUDING ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR LOSS OF PROFITS, CRYPTOCURRENCIES, TOKENS, OR ANYTHING ELSE OF VALUE. WE DO NOT ENDORSE, GUARANTEE, OR ASSUME RESPONSIBILITY FOR ANY ADVERTISEMENTS, OFFERS, OR STATEMENTS MADE BY THIRD PARTIES CONCERNING ANY OF OUR PRODUCTS.
+                  SIMILARLY, THE PROTOCOL IS PROVIDED "AS IS," AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND. ALTHOUGH WE CONTRIBUTED TO THE INITIAL CODE FOR THE PROTOCOL, WE DO NOT PROVIDE, OWN, OR CONTROL THE PROTOCOL, WHICH IS RUN AUTONOMOUSLY WITHOUT ANY HEADCOUNT BY SMART CONTRACTS DEPLOYED ON VARIOUS BLOCKCHAINS. UPGRADES AND MODIFICATIONS TO THE PROTOCOL ARE GENERALLY MANAGED IN A COMMUNITY-DRIVEN WAY BY ANYONE. NO DEVELOPER OR ENTITY INVOLVED IN CREATING THE PROTOCOL WILL BE LIABLE FOR ANY CLAIMS OR DAMAGES WHATSOEVER ASSOCIATED WITH YOUR USE, INABILITY TO USE, OR YOUR INTERACTION WITH OTHER USERS OF, THE PROTOCOL, INCLUDING ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR LOSS OF PROFITS, CRYPTOCURRENCIES, TOKENS, OR ANYTHING ELSE OF VALUE. WE DO NOT ENDORSE, GUARANTEE, OR ASSUME RESPONSIBILITY FOR ANY ADVERTISEMENTS, OFFERS, OR STATEMENTS MADE BY THIRD PARTIES CONCERNING ANY OF OUR PRODUCTS.
                 </p>
 
                 <p>
@@ -330,12 +330,7 @@ export default function TermsPage() {
                   You may not assign or transfer this Agreement, by operation of law or otherwise, without our prior written consent. Any attempt by you to assign or transfer this Agreement without our prior written consent shall be null and void. We may freely assign or transfer this Agreement. Subject to the foregoing, this Agreement will bind and inure to the benefit of the parties, their successors and permitted assigns.
                 </p>
 
-                <h3 className="text-xl font-semibold text-foreground">9.3 Rewards</h3>
-                <p>
-                  In connection with your historic or current use of one or more of our Products, we may provide you certain incentives, prizes or rewards for completing certain activities, such as completing a certain number of transactions ("User Rewards"). Details regarding the criteria for earning a reward will be described within the applicable Product or official Stele documentation. Upon satisfaction of the criteria for obtaining a reward and subject to your compliance with the associated rewards terms, this Agreement, and applicable law — to be determined exclusively by Stele — we or an applicable Third-Party Partner will use commercially reasonable efforts to promptly transfer the earned reward to the digital wallet that you designate or have connected to the applicable Product. We reserve the right to change, modify, discontinue or cancel any rewards programs (including the frequency and criteria for earning such User Rewards), at any time and without notice to you.
-                </p>
-
-                <h3 className="text-xl font-semibold text-foreground">9.4 Not Registered with the SEC or Any Other Agency</h3>
+                <h3 className="text-xl font-semibold text-foreground">9.3 Not Registered with the SEC or Any Other Agency</h3>
                 <p>
                   We are not registered with the U.S. Securities and Exchange Commission as a national securities exchange or in any other capacity. You understand and acknowledge that we do not broker trading orders on your behalf. We also do not facilitate the execution or settlement of your trades, which occur entirely on public distributed blockchains like Ethereum. As a result, we do not (and cannot) guarantee market best pricing or best execution through our Products or when using our Auto Routing feature, which routes trades across liquidity pools on the Protocol only. Any references in a Product to "best price" does not constitute a representation or warranty about pricing available through such Product, on the Protocol, or elsewhere.
                 </p>
