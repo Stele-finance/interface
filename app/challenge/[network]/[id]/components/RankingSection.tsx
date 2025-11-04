@@ -47,9 +47,29 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
   };
 
   const getRankIcon = (rank: number) => {
+    const ordinals = ['1st', '2nd', '3rd', '4th', '5th'];
+    const colors = [
+      'text-yellow-400',  // 1st - Gold
+      'text-gray-300',    // 2nd - Silver
+      'text-orange-500',  // 3rd - Bronze
+      'text-blue-400',    // 4th - Blue
+      'text-green-400'    // 5th - Green
+    ];
+    const textColors = [
+      'text-yellow-300',  // 1st text
+      'text-gray-200',    // 2nd text
+      'text-orange-400',  // 3rd text
+      'text-blue-300',    // 4th text
+      'text-green-300'    // 5th text
+    ];
+
     if (rank <= 5) {
-      const emojis = ['🥇', '🥈', '🥉', '🏅', '🎖️'];
-      return <span className="text-3xl">{emojis[rank - 1]}</span>;
+      return (
+        <div className="flex flex-col items-center gap-1">
+          <Trophy className={`h-6 w-6 ${colors[rank - 1]} drop-shadow-lg`} strokeWidth={2.5} />
+          <span className={`text-base font-bold ${textColors[rank - 1]}`}>{ordinals[rank - 1]}</span>
+        </div>
+      );
     } else {
       return <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">{rank}</div>;
     }
@@ -92,14 +112,14 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
                 const isEmptySlot = !formattedAddress;
 
                 return (
-                  <div 
-                    key={`${user}-${rank}`} 
+                  <div
+                    key={`${user}-${rank}`}
                     className={`flex items-center justify-between p-4 rounded-lg border ${getRankColor(rank)} ${
                       isEmptySlot ? 'cursor-default' : 'cursor-pointer transition-colors'
                     }`}
                     onClick={() => !isEmptySlot && handleUserClick(user)}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                       {getRankIcon(rank)}
                       <div>
                         <div className="font-medium text-white">
@@ -111,7 +131,7 @@ export function RankingSection({ challengeId, network }: RankingSectionProps) {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right ml-6">
                       <div className="font-bold text-lg text-white">${formatScore(score || '0')}</div>
                       <div className={`text-sm font-medium ${
                         parseFloat(profitRatio) >= 0 ? 'text-green-400' : 'text-red-400'
