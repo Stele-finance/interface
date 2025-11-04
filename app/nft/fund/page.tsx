@@ -6,7 +6,7 @@ import { useLanguage } from "@/lib/language-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ImageIcon, ChevronDown, Trophy, Coins } from "lucide-react"
+import { ImageIcon } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFormattedFundNFTData, useFormattedUserFundNFTData } from "../hooks/useFundNFTData"
 import { FundNFTCard } from "../components/FundNFTCard"
@@ -14,11 +14,8 @@ import { useWallet } from "@/app/hooks/useWallet"
 
 export default function NFTFundPage() {
   const { t } = useLanguage()
-  const router = useRouter()
   const { address } = useWallet()
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false)
-  const typeDropdownRef = useRef<HTMLDivElement>(null)
 
   // Load network selection from localStorage on mount
   useEffect(() => {
@@ -41,22 +38,6 @@ export default function NFTFundPage() {
 
     return () => {
       window.removeEventListener('networkChanged', handleNetworkChanged as EventListener)
-    }
-  }, [])
-
-  // Handle click outside for type dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
-        setShowTypeDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside as any)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside as any)
     }
   }, [])
 
@@ -146,48 +127,9 @@ export default function NFTFundPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <ImageIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">{t('nft')}</h1>
-          </div>
-
-          {/* Challenge/Fund Type Selector Dropdown */}
-          <div className="relative" ref={typeDropdownRef}>
-            <button
-              onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-              className="px-2.5 py-2 bg-transparent hover:bg-gray-700 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-blue-400" />
-                <span className="text-gray-300 text-sm">{t('fund')}</span>
-                <ChevronDown className="h-4 w-4 text-gray-400" />
-              </div>
-            </button>
-            {showTypeDropdown && (
-              <div className="absolute top-full mt-2 right-0 min-w-[130px] bg-muted/80 border border-gray-600 rounded-md shadow-lg z-[60]">
-                <button
-                  onClick={() => {
-                    router.push('/nft/challenge')
-                    setShowTypeDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50"
-                >
-                  <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
-                  {t('challenge')}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowTypeDropdown(false)
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 bg-gray-700/30"
-                >
-                  <Coins className="h-4 w-4 mr-2 text-blue-400" />
-                  {t('fund')}
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="flex items-center gap-3 mb-4">
+          <ImageIcon className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">{t('nft')}</h1>
         </div>
       </div>
 

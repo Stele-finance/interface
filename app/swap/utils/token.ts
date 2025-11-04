@@ -1,12 +1,17 @@
 import { ethers } from "ethers"
-import { UserTokenInfo } from "@/app/hooks/useUserTokens"
-import { getTokenAddressBySymbol, getTokenDecimalsBySymbol } from "@/app/hooks/useChallengeInvestableTokens"
 import { getFundTokenAddressBySymbol, getFundTokenDecimalsBySymbol } from "@/app/hooks/useFundInvestableTokens"
+
+export interface UserTokenInfo {
+  address: string;
+  symbol: string;
+  amount: string;
+  decimals: string;
+}
 
 // Get token address by symbol - enhanced with investable tokens
 export const getTokenAddress = (
-  tokenSymbol: string, 
-  userTokens: UserTokenInfo[], 
+  tokenSymbol: string,
+  userTokens: UserTokenInfo[],
   investableTokens: any[]
 ): string => {
   // First check user tokens (for from token)
@@ -14,9 +19,9 @@ export const getTokenAddress = (
     const userToken = userTokens.find(token => token.symbol === tokenSymbol);
     if (userToken?.address) return userToken.address;
   }
-  
-  // Then check investable tokens (for to token)
-  const investableTokenAddress = getTokenAddressBySymbol(investableTokens, tokenSymbol);
+
+  // Then check investable tokens (for to token) - use Fund version
+  const investableTokenAddress = getFundTokenAddressBySymbol(investableTokens, tokenSymbol);
   if (investableTokenAddress) return investableTokenAddress;
   
   // Fallback for common tokens - use ethers.getAddress to ensure proper checksum
@@ -52,8 +57,8 @@ export const getTokenDecimals = (
     if (userToken?.decimals) return parseInt(userToken.decimals);
   }
   
-  // Then check investable tokens (for to token)
-  const investableTokenDecimals = getTokenDecimalsBySymbol(investableTokens, tokenSymbol);
+  // Then check investable tokens (for to token) - use Fund version
+  const investableTokenDecimals = getFundTokenDecimalsBySymbol(investableTokens, tokenSymbol);
   if (investableTokenDecimals !== 18) return investableTokenDecimals; // 18 is default, so if different, use it
   
   // Common token decimals fallback

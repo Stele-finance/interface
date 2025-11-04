@@ -360,14 +360,15 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               </div>
             </div>
           ) : (
-            paginatedFunds.map((fund) => {
+            paginatedFunds.map((fund, index) => {
               const profitRatio = parseFloat(fund.profitRatio)
               const isPositive = profitRatio >= 0
 
               return (
                 <Card
                   key={fund.id}
-                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl hover-lift active:scale-[0.98] active:shadow-[0_10px_20px_rgba(0,0,0,0.15)]"
+                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl hover-lift active:scale-[0.98] active:shadow-[0_10px_20px_rgba(0,0,0,0.15)] animate-fade-in"
+                  style={{ animationDelay: `${index * 150}ms` }}
                   onClick={() => {
                     router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
                   }}

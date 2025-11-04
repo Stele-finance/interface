@@ -18,7 +18,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { FundActionTabs } from "./components/FundActionTabs"
-import { useInvestableTokenPrices } from "@/app/hooks/useInvestableTokenPrices"
+import { useFundInvestableTokenPrices } from "@/app/fund/hooks/useFundInvestableTokenPrices"
 import { getTokenLogo } from "@/lib/utils"
 import { useRef } from "react"
 
@@ -167,7 +167,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   const isInvestor = !!investor
   
   // Get investable token prices for portfolio calculation
-  const { data: tokensWithPrices } = useInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
+  const { data: tokensWithPrices } = useFundInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
 
   // Calculate portfolio data from fund tokens using investor's share ratio
   const portfolioData = useMemo(() => {
