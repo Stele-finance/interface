@@ -38,7 +38,7 @@ export default function HomePage() {
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-bold leading-tight tracking-tight text-center mb-8 sm:mb-12 animate-fade-in">
               {t('becomeAnInvestmentLegend')}
             </h2>
-            <div>
+            <div className="animate-fade-in-delayed">
               <Funds
                 showCreateButton={false}
                 selectedNetwork={selectedNetwork}

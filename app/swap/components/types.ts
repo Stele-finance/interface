@@ -1,6 +1,23 @@
 import { HTMLAttributes } from "react"
-import { UserTokenInfo } from "@/app/hooks/useUserTokens"
-import { InvestorData } from "@/app/hooks/useChallengeInvestorData"
+
+// Re-export UserTokenInfo from token utils
+export interface UserTokenInfo {
+  address: string
+  symbol: string
+  amount: string
+  decimals: string
+}
+
+// Fund investor data interface (replacing Challenge InvestorData)
+export interface InvestorData {
+  investor?: {
+    tokens?: string[]
+    tokensAmount?: string[]
+    tokensSymbols?: string[]
+    tokensDecimals?: string[]
+    [key: string]: any
+  }
+}
 
 export interface InvestableToken {
   id: string

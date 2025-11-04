@@ -1,6 +1,5 @@
 import { ethers } from "ethers"
-import { UserTokenInfo } from "@/app/hooks/useUserTokens"
-import { SwapQuote, PriceData } from "../components/types"
+import { UserTokenInfo, SwapQuote, PriceData } from "../components/types"
 import { getFromTokenBalance } from "./token"
 
 // Minimum swap amount in USD (greater than or equal to)

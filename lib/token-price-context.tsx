@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
-import { useChallengeInvestableTokens } from '@/app/hooks/useChallengeInvestableTokens'
 import { useFundInvestableTokens } from '@/app/hooks/useFundInvestableTokens'
 import { useUniswapBatchPrices } from '@/app/hooks/useUniswapBatchPrices'
 import { useWallet } from '@/app/hooks/useWallet'
@@ -26,30 +25,26 @@ interface TokenPriceContextType {
 
 const TokenPriceContext = createContext<TokenPriceContextType | undefined>(undefined)
 
-export function TokenPriceProvider({ 
+export function TokenPriceProvider({
   children,
-  context = 'challenge'
-}: { 
+  context = 'fund'
+}: {
   children: React.ReactNode
-  context?: 'challenge' | 'fund'
+  context?: 'fund'
 }) {
   const [tokenPricesMap, setTokenPricesMap] = useState<Map<string, TokenPrice>>(new Map())
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
-  
+
   // Get network from URL path instead of wallet
   const pathParts = typeof window !== 'undefined' ? window.location.pathname.split('/') : []
   const networkFromUrl = pathParts.find(part => part === 'ethereum' || part === 'arbitrum') || 'arbitrum'
   const network = networkFromUrl as 'ethereum' | 'arbitrum'
-  
-  // Determine context from URL if not explicitly provided
-  const actualContext = context || (pathParts.includes('fund') ? 'fund' : 'challenge')
 
-  // Get investable tokens based on context
-  const { data: challengeTokens, isLoading: isLoadingChallengeTokens } = useChallengeInvestableTokens(network)
+  // Get investable tokens from Fund only (Challenge removed)
   const { data: fundTokens, isLoading: isLoadingFundTokens } = useFundInvestableTokens(network)
 
-  const investableTokens = actualContext === 'fund' ? fundTokens : challengeTokens
-  const isLoadingTokens = actualContext === 'fund' ? isLoadingFundTokens : isLoadingChallengeTokens
+  const investableTokens = fundTokens
+  const isLoadingTokens = isLoadingFundTokens
 
   // Prepare token infos for batch price fetching
   const tokenInfos = useMemo(() => {

@@ -33,7 +33,6 @@ import {
 } from "@/lib/constants"
 // Mock data instead of real hooks
 // import { useEntryFee } from "@/lib/hooks/use-entry-fee"
-import SteleABI from "@/app/abis/Stele.json"
 import SteleFundABI from "@/app/abis/SteleFund.json"
 import ERC20ABI from "@/app/abis/ERC20.json"
 import SteleFundManagerNFTABI from "@/app/abis/SteleFundManagerNFT.json"

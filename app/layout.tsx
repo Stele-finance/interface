@@ -8,7 +8,6 @@ import { Header } from "@/components/Header"
 import { Toaster } from "@/components/ui/toaster"
 import { ClientOnly } from "@/components/ClientOnly"
 import { WalletProvider } from "@/components/WalletProvider"
-import { EntryFeeProvider } from "@/lib/hooks/use-entry-fee"
 import QueryProvider from "../components/QueryProvider"
 import { LanguageProvider } from "@/lib/language-context"
 import { MobileMenuProvider } from "@/lib/mobile-menu-context"
@@ -46,20 +45,18 @@ export default function RootLayout({
             <LanguageProvider>
               <ClientOnly>
                 <WalletProvider>
-                  <EntryFeeProvider>
-                    <TokenPriceProvider>
-                      <MobileMenuProvider>
-                        <PageTypeProvider>
-                          <div className="flex flex-col min-h-screen bg-muted/40">
-                            <Header />
-                            <main className="flex-1 p-4 md:p-6">
-                              {children}
-                            </main>
-                          </div>
-                        </PageTypeProvider>
-                      </MobileMenuProvider>
-                    </TokenPriceProvider>
-                  </EntryFeeProvider>
+                  <TokenPriceProvider>
+                    <MobileMenuProvider>
+                      <PageTypeProvider>
+                        <div className="flex flex-col min-h-screen bg-muted/40">
+                          <Header />
+                          <main className="flex-1 p-4 md:p-6">
+                            {children}
+                          </main>
+                        </div>
+                      </PageTypeProvider>
+                    </MobileMenuProvider>
+                  </TokenPriceProvider>
                 </WalletProvider>
               </ClientOnly>
             </LanguageProvider>
