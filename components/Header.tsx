@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
-import { Trophy, Image as ImageIcon, Wallet, Menu, FileText, Languages, Scale, ExternalLink } from "lucide-react"
+import { Image as ImageIcon, Wallet, Menu, FileText, Languages, Scale, ExternalLink } from "lucide-react"
 import { cn, getWalletLogo, detectActualWalletType } from "@/lib/utils"
 import { Github, Twitter } from "lucide-react"
 import {
@@ -38,27 +38,7 @@ export function Header() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
   
-  // Determine pageType from URL or localStorage
-  const getPageTypeFromUrl = useCallback(() => {
-    if (pathname.includes('/fund')) return 'fund'
-    if (pathname.includes('/funds')) return 'fund'
-    if (pathname.includes('/challenge')) return 'challenge'
-    if (pathname.includes('/challenges')) return 'challenge'
-    // Check localStorage for saved preference
-    const savedPageType = typeof window !== 'undefined' ? localStorage.getItem('selected-page-type') : null
-    if (savedPageType === 'fund' || savedPageType === 'challenge') {
-      return savedPageType
-    }
-    // Default to challenge
-    return 'challenge'
-  }, [pathname])
-  
-  const [pageType, setLocalPageType] = useState<'challenge' | 'fund'>('challenge')
   const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('arbitrum')
-
-  useEffect(() => {
-    setLocalPageType(getPageTypeFromUrl())
-  }, [pathname, getPageTypeFromUrl])
 
   // Load network from localStorage
   useEffect(() => {
@@ -189,19 +169,6 @@ export function Header() {
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden md:flex items-center gap-6">
           <Link
-            href="/challenges"
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
-              pathname.includes("/challenges") || pathname.includes("/challenge/")
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Trophy className="h-5 w-5" />
-            {t('challenges')}
-          </Link>
-
-          <Link
             href="/funds"
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
@@ -215,7 +182,7 @@ export function Header() {
           </Link>
 
           <Link
-            href="/nft/challenge"
+            href="/nft/fund"
             className={cn(
               "flex items-center gap-2 px-3 py-2 text-lg font-medium transition-colors",
               pathname.includes("/nft")
@@ -614,20 +581,6 @@ export function Header() {
               {/* Menu Items */}
               <div className="space-y-1 mb-4">
                 <Link
-                  href="/challenges"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",
-                    pathname.includes("/challenges") || pathname.includes("/challenge/")
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                >
-                  <Trophy className="h-5 w-5 mr-3" />
-                  {t('challenges')}
-                </Link>
-
-                <Link
                   href="/funds"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
@@ -642,7 +595,7 @@ export function Header() {
                 </Link>
 
                 <Link
-                  href="/nft/challenge"
+                  href="/nft/fund"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors",

@@ -51,7 +51,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Platform Introduction - Challenge & Fund */}
+      {/* Platform Introduction - Fund */}
       <section className="py-12 sm:py-16 lg:py-24 relative overflow-hidden bg-slate-950">
         {/* Background effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900"></div>
