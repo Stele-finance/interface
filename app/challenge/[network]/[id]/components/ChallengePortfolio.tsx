@@ -698,11 +698,6 @@ export function ChallengePortfolio({ challengeId, network }: ChallengePortfolioP
         // Wait for transaction to be mined
         await tx.wait();
 
-        // Track Twitter conversion event for challenge join
-        if (typeof window !== 'undefined' && (window as any).twq) {
-          (window as any).twq('event', 'tw-qps7p-qps7p', {});
-        }
-
         // Update local state immediately for instant UI feedback
         setHasJoinedLocally(true);
         
