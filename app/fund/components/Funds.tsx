@@ -57,8 +57,10 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const containerRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
+  const touchStartY = useRef<number>(0)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState(0)
+  const hasMovedEnough = useRef<boolean>(false)
 
   // Use real fund data from GraphQL with selected network
   const { data: fundsData, isLoading, error } = useFunds(50, selectedNetwork)
@@ -130,21 +132,37 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!itemsPerPage || totalPages <= 1) return
     touchStartX.current = e.touches[0].clientX
-    setIsDragging(true)
+    touchStartY.current = e.touches[0].clientY
+    hasMovedEnough.current = false
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!itemsPerPage || totalPages <= 1 || !isDragging) return
+    if (!itemsPerPage || totalPages <= 1) return
+
     touchEndX.current = e.touches[0].clientX
-    const diff = touchStartX.current - touchEndX.current
+    const diffX = touchStartX.current - touchEndX.current
+    const diffY = Math.abs(e.touches[0].clientY - touchStartY.current)
 
-    // Limit drag distance and add resistance at edges
-    let offset = -diff
-    if ((currentPage === 1 && offset > 0) || (currentPage === totalPages && offset < 0)) {
-      offset = offset * 0.3 // Add resistance at edges
+    // Only start dragging if horizontal movement is greater than vertical (to allow vertical scroll)
+    // and movement is more than 10px (to distinguish from click)
+    const minDragDistance = 10
+    if (Math.abs(diffX) > minDragDistance && Math.abs(diffX) > diffY) {
+      if (!hasMovedEnough.current) {
+        hasMovedEnough.current = true
+        setIsDragging(true)
+      }
+
+      // Prevent vertical scroll when dragging horizontally
+      e.preventDefault()
+
+      // Limit drag distance and add resistance at edges
+      let offset = -diffX
+      if ((currentPage === 1 && offset > 0) || (currentPage === totalPages && offset < 0)) {
+        offset = offset * 0.3 // Add resistance at edges
+      }
+
+      setDragOffset(offset)
     }
-
-    setDragOffset(offset)
   }
 
   const handleTouchEnd = () => {
@@ -153,7 +171,8 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     const swipeThreshold = 50 // Minimum swipe distance in pixels
     const diff = touchStartX.current - touchEndX.current
 
-    if (Math.abs(diff) > swipeThreshold) {
+    // Only trigger page change if user actually dragged (not just clicked)
+    if (hasMovedEnough.current && Math.abs(diff) > swipeThreshold) {
       if (diff > 0 && currentPage < totalPages) {
         // Swiped left - go to next page
         setCurrentPage(currentPage + 1)
@@ -166,8 +185,10 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     // Reset
     setIsDragging(false)
     setDragOffset(0)
+    hasMovedEnough.current = false
     touchStartX.current = 0
     touchEndX.current = 0
+    touchStartY.current = 0
   }
 
   // Handle Create Fund button click - show confirmation modal
