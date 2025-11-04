@@ -54,6 +54,9 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const { isConnected, getProvider } = useWallet()
   const queryClient = useQueryClient()
   const networkDropdownRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef<number>(0)
+  const touchEndX = useRef<number>(0)
 
   // Use real fund data from GraphQL with selected network
   const { data: fundsData, isLoading, error } = useFunds(50, selectedNetwork)
@@ -120,6 +123,35 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const startIndex = (currentPage - 1) * fundsPerPage
   const endIndex = startIndex + fundsPerPage
   const paginatedFunds = itemsPerPage ? displayFunds.slice(startIndex, endIndex) : displayFunds
+
+  // Touch swipe handlers for mobile pagination
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!itemsPerPage || totalPages <= 1) return // Only work if pagination is enabled
+
+    const swipeThreshold = 50 // Minimum swipe distance in pixels
+    const diff = touchStartX.current - touchEndX.current
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0 && currentPage < totalPages) {
+        // Swiped left - go to next page
+        setCurrentPage(currentPage + 1)
+      } else if (diff < 0 && currentPage > 1) {
+        // Swiped right - go to previous page
+        setCurrentPage(currentPage - 1)
+      }
+    }
+
+    touchStartX.current = 0
+    touchEndX.current = 0
+  }
 
   // Handle Create Fund button click - show confirmation modal
   const handleCreateFundClick = () => {
@@ -333,7 +365,13 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
         )}
 
         {/* Funds Grid */}
-        <div className="space-y-4">
+        <div
+          ref={containerRef}
+          className="space-y-4"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center gap-2">
@@ -386,7 +424,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                             <TrendingUp className="h-6 w-6" />
                             <span className="text-lg font-medium">{t('profitRatio')}</span>
                           </div>
-                          <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`text-5xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                             {formatProfitRatio(fund.profitRatio)}
                           </div>
                         </div>
@@ -452,11 +490,11 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
                       </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="border-t border-gray-700/50 my-6"></div>
+                    {/* Divider - Hidden on mobile */}
+                    <div className="hidden md:block border-t border-gray-700/50 my-6"></div>
 
-                    {/* Manager Address */}
-                    <div className="flex items-center justify-between">
+                    {/* Manager Address - Hidden on mobile */}
+                    <div className="hidden md:flex items-center justify-between">
                       <div className="text-sm text-gray-400">{t('manager')}</div>
                       <span className="text-sm text-gray-300 font-mono">
                         {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
@@ -472,24 +510,29 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
         {/* Pagination Controls */}
         {itemsPerPage && totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
+            {/* Previous button - hidden on mobile */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="bg-muted/30 border-none hover:bg-muted/50"
+              className="hidden md:flex bg-muted/30 border-none hover:bg-muted/50"
             >
               {t('previous')}
             </Button>
+
+            {/* Page indicator - always visible */}
             <span className="text-sm text-gray-400">
               {currentPage} / {totalPages}
             </span>
+
+            {/* Next button - hidden on mobile */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="bg-muted/30 border-none hover:bg-muted/50"
+              className="hidden md:flex bg-muted/30 border-none hover:bg-muted/50"
             >
               {t('next')}
             </Button>
