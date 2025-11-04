@@ -106,7 +106,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     return num >= 0 ? `+${percentage}%` : `${percentage}%`
   }
 
-  // Transform fund data for display
+  // Transform fund data for display (already sorted by profitRatio from query)
   const displayFunds: FundDisplayProps[] = funds.map(fund => ({
     id: fund.id,
     fundId: fund.fundId,
@@ -128,6 +128,39 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
   const endIndex = startIndex + fundsPerPage
   const paginatedFunds = itemsPerPage ? displayFunds.slice(startIndex, endIndex) : displayFunds
 
+  // Native touchmove listener with passive: false to prevent scroll
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !itemsPerPage || totalPages <= 1) return
+
+    const handleTouchMoveNative = (e: TouchEvent) => {
+      touchEndX.current = e.touches[0].clientX
+      const diffX = touchStartX.current - touchEndX.current
+      const diffY = Math.abs(e.touches[0].clientY - touchStartY.current)
+
+      const minDragDistance = 10
+      if (Math.abs(diffX) > minDragDistance && Math.abs(diffX) > diffY) {
+        if (!hasMovedEnough.current) {
+          hasMovedEnough.current = true
+          setIsDragging(true)
+        }
+        e.preventDefault()
+
+        let offset = -diffX
+        if ((currentPage === 1 && offset > 0) || (currentPage === totalPages && offset < 0)) {
+          offset = offset * 0.3
+        }
+        setDragOffset(offset)
+      }
+    }
+
+    container.addEventListener('touchmove', handleTouchMoveNative, { passive: false })
+
+    return () => {
+      container.removeEventListener('touchmove', handleTouchMoveNative)
+    }
+  }, [itemsPerPage, totalPages, currentPage])
+
   // Touch swipe handlers for mobile pagination with visual feedback
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!itemsPerPage || totalPages <= 1) return
@@ -136,34 +169,7 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
     hasMovedEnough.current = false
   }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!itemsPerPage || totalPages <= 1) return
-
-    touchEndX.current = e.touches[0].clientX
-    const diffX = touchStartX.current - touchEndX.current
-    const diffY = Math.abs(e.touches[0].clientY - touchStartY.current)
-
-    // Only start dragging if horizontal movement is greater than vertical (to allow vertical scroll)
-    // and movement is more than 10px (to distinguish from click)
-    const minDragDistance = 10
-    if (Math.abs(diffX) > minDragDistance && Math.abs(diffX) > diffY) {
-      if (!hasMovedEnough.current) {
-        hasMovedEnough.current = true
-        setIsDragging(true)
-      }
-
-      // Prevent vertical scroll when dragging horizontally
-      e.preventDefault()
-
-      // Limit drag distance and add resistance at edges
-      let offset = -diffX
-      if ((currentPage === 1 && offset > 0) || (currentPage === totalPages && offset < 0)) {
-        offset = offset * 0.3 // Add resistance at edges
-      }
-
-      setDragOffset(offset)
-    }
-  }
+  // Note: handleTouchMove logic moved to useEffect with native listener for passive: false
 
   const handleTouchEnd = () => {
     if (!itemsPerPage || totalPages <= 1) return
@@ -411,7 +417,6 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
             transition: isDragging ? 'none' : 'transform 0.3s ease-out'
           }}
           onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           {isLoading ? (

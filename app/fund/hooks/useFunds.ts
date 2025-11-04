@@ -4,7 +4,7 @@ import { gql, request } from 'graphql-request'
 
 const FUNDS_QUERY = gql`
   query GetFunds($first: Int = 50) {
-    funds(first: $first, orderBy: createdAtTimestamp, orderDirection: desc) {
+    funds(first: $first, orderBy: profitRatio, orderDirection: desc) {
       id
       fundId
       createdAtTimestamp
