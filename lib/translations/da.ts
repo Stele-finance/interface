@@ -128,7 +128,7 @@ export const da = {
   errorLoadingRankings: "Fejl ved indlæsning af rangeringer",
   errorLoadingTokens: "Fejl ved indlæsning af tokens",
   errorLoadingTransactions: "Fejl ved indlæsning af transaktioner",
-  ethereumArbitrumSupport: "Ethereum & Arbitrum netværksstøtte",
+  ethereumArbitrumSupport: "Ethereum netværksstøtte",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Alle Kan Være Fondsforvaltere",
   exampleFunctionParameter: "f.eks. 150000000",

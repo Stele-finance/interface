@@ -128,7 +128,7 @@ export const ar = {
   errorLoadingRankings: "خطأ في تحميل التصنيفات",
   errorLoadingTokens: "خطأ في تحميل الرموز",
   errorLoadingTransactions: "خطأ في تحميل المعاملات",
-  ethereumArbitrumSupport: "دعم شبكة إيثريوم وأربتروم",
+  ethereumArbitrumSupport: "دعم شبكة إيثريوم",
   ethereumMainnet: "شبكة إيثريوم الرئيسية",
   everyoneFundManager: "يمكن للجميع أن يكونوا مديري صناديق",
   exampleFunctionParameter: "مثال: 150000000",

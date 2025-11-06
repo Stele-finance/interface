@@ -128,7 +128,7 @@ export const de = {
   errorLoadingRankings: "Fehler beim Laden der Ranglisten",
   errorLoadingTokens: "Fehler beim Laden der Token",
   errorLoadingTransactions: "Fehler beim Laden der Transaktionen",
-  ethereumArbitrumSupport: "Ethereum & Arbitrum Netzwerk-Unterstützung",
+  ethereumArbitrumSupport: "Ethereum Netzwerk-Unterstützung",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Jeder Kann Fondsmanager Sein",
   exampleFunctionParameter: "z.B. 150000000",

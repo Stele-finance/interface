@@ -128,7 +128,7 @@ export const bn = {
   errorLoadingRankings: "র‍্যাঙ্কিং লোড করতে ত্রুটি",
   errorLoadingTokens: "টোকেন লোড করতে ত্রুটি",
   errorLoadingTransactions: "লেনদেন লোড করতে ত্রুটি",
-  ethereumArbitrumSupport: "Ethereum এবং Arbitrum নেটওয়ার্ক সমর্থন",
+  ethereumArbitrumSupport: "Ethereum নেটওয়ার্ক সমর্থন",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "সবাই ফান্ড ম্যানেজার হতে পারে",
   exampleFunctionParameter: "যেমন: 150000000",

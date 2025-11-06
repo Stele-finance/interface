@@ -128,7 +128,7 @@ export const el = {
   errorLoadingRankings: "Σφάλμα φόρτωσης κατατάξεων",
   errorLoadingTokens: "Σφάλμα φόρτωσης tokens",
   errorLoadingTransactions: "Σφάλμα φόρτωσης συναλλαγών",
-  ethereumArbitrumSupport: "Υποστήριξη δικτύου Ethereum & Arbitrum",
+  ethereumArbitrumSupport: "Υποστήριξη δικτύου Ethereum",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Ο Καθένας Μπορεί να Είναι Διαχειριστής Κεφαλαίων",
   exampleFunctionParameter: "π.χ. 150000000",

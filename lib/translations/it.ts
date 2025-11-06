@@ -131,7 +131,7 @@ export const it = {
   errorLoadingRankings: "Errore nel caricare le classifiche",
   errorLoadingTokens: "Errore nel caricare i token",
   errorLoadingTransactions: "Errore nel caricare le transazioni",
-  ethereumArbitrumSupport: "Supporto rete Ethereum e Arbitrum",
+  ethereumArbitrumSupport: "Supporto rete Ethereum",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Tutti possono essere fund manager",
   exampleFunctionParameter: "es. 150000000",

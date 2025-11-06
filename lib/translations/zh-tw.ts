@@ -128,7 +128,7 @@ export const zhTw = {
   errorLoadingRankings: "載入排名時出錯",
   errorLoadingTokens: "載入代幣時出錯",
   errorLoadingTransactions: "載入交易時出錯",
-  ethereumArbitrumSupport: "支援以太坊與Arbitrum網路",
+  ethereumArbitrumSupport: "支援以太坊網路",
   ethereumMainnet: "以太坊主網",
   everyoneFundManager: "每個人都可以成為基金經理",
   exampleFunctionParameter: "例如 150000000",

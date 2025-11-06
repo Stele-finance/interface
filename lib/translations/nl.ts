@@ -134,7 +134,7 @@ export const nl = {
   errorLoadingRankings: "Fout bij laden van ranglijsten",
   errorLoadingTokens: "Fout bij laden van tokens",
   errorLoadingTransactions: "Fout bij laden van transacties",
-  ethereumArbitrumSupport: "Ethereum & Arbitrum netwerkondersteuning",
+  ethereumArbitrumSupport: "Ethereum netwerkondersteuning",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Iedereen Kan een Fondsmanager Zijn",
   exampleFunctionParameter: "bijv. 150000000",

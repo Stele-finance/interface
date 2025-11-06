@@ -128,7 +128,7 @@ export const vi = {
   errorLoadingRankings: 'Lỗi tải xếp hạng',
   errorLoadingTokens: 'Lỗi tải token',
   errorLoadingTransactions: 'Lỗi tải giao dịch',
-  ethereumArbitrumSupport: "Hỗ trợ mạng Ethereum & Arbitrum",
+  ethereumArbitrumSupport: "Hỗ trợ mạng Ethereum",
   ethereumMainnet: 'Mạng chính Ethereum',
   everyoneFundManager: 'Mọi người đều là quản lý quỹ',
   exampleFunctionParameter: 'Tham số hàm ví dụ',

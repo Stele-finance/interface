@@ -128,7 +128,7 @@ export const ru = {
   errorLoadingRankings: 'Ошибка загрузки рейтингов',
   errorLoadingTokens: 'Ошибка загрузки токенов',
   errorLoadingTransactions: 'Ошибка загрузки транзакций',
-  ethereumArbitrumSupport: "Поддержка сетей Ethereum и Arbitrum",
+  ethereumArbitrumSupport: "Поддержка сети Ethereum",
   ethereumMainnet: 'Основная сеть Ethereum',
   everyoneFundManager: 'Каждый - управляющий фондом',
   exampleFunctionParameter: 'Пример параметра функции',

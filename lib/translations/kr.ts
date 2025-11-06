@@ -127,7 +127,7 @@ export const kr = {
   errorLoadingRankings: "순위 로딩 오류",
   errorLoadingTokens: "토큰 로딩 오류",
   errorLoadingTransactions: "거래 로딩 오류",
-  ethereumArbitrumSupport: "Ethereum & Arbitrum 네트워크 지원",
+  ethereumArbitrumSupport: "Ethereum 네트워크 지원",
   ethereumMainnet: "이더리움 메인넷",
   everyoneFundManager: "누구나 펀드 매니저",
   exampleFunctionParameter: "예: 150000000",

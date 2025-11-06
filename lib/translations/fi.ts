@@ -128,7 +128,7 @@ export const fi = {
   errorLoadingRankings: "Virhe ladatessa sijoituksia",
   errorLoadingTokens: "Virhe ladatessa tokeneja",
   errorLoadingTransactions: "Virhe ladatessa transaktioita",
-  ethereumArbitrumSupport: "Ethereum ja Arbitrum -verkon tuki",
+  ethereumArbitrumSupport: "Ethereum -verkon tuki",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Kaikki Voivat Olla Rahastonhoitajia",
   exampleFunctionParameter: "esim. 150000000",
