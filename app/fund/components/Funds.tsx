@@ -112,11 +112,11 @@ function FundCard({
                   <TrendingUp className="h-6 w-6" />
                   <span className="text-lg font-medium">1D Chart</span>
                 </div>
-                <div className="w-full h-20">
+                <div className="w-full h-12">
                   {chartData.length > 0 ? (
-                    <SparklineChart data={chartData} height={80} />
+                    <SparklineChart data={chartData} height={48} />
                   ) : (
-                    <div className="h-20 flex items-center justify-center text-xs text-gray-500">
+                    <div className="h-12 flex items-center justify-center text-xs text-gray-500">
                       No data
                     </div>
                   )}
@@ -155,11 +155,11 @@ function FundCard({
                 <TrendingUp className="h-6 w-6" />
                 <span className="text-lg font-medium">1D Chart</span>
               </div>
-              <div className="w-full h-24">
+              <div className="w-full h-14">
                 {chartData.length > 0 ? (
-                  <SparklineChart data={chartData} height={96} />
+                  <SparklineChart data={chartData} height={56} />
                 ) : (
-                  <div className="h-24 flex items-center justify-center text-xs text-gray-500">
+                  <div className="h-14 flex items-center justify-center text-xs text-gray-500">
                     No data
                   </div>
                 )}
