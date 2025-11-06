@@ -105,8 +105,18 @@ function FundCard({
               </div>
             </div>
 
-            {/* Chart and Value - same row */}
+            {/* Value and Chart - same row (Order: Value first, Chart second) */}
             <div className="grid grid-cols-2 gap-8">
+              <div className="flex flex-col justify-center space-y-3">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <DollarSign className="h-6 w-6" />
+                  <span className="text-lg font-medium">{t('value')}</span>
+                </div>
+                <div className="text-4xl font-bold text-yellow-400">
+                  {formatCurrency(fund.tvl)}
+                </div>
+              </div>
+
               <div className="flex flex-col justify-center space-y-3">
                 <div className="flex items-center gap-2 text-gray-400">
                   <TrendingUp className="h-6 w-6" />
@@ -122,20 +132,10 @@ function FundCard({
                   )}
                 </div>
               </div>
-
-              <div className="flex flex-col justify-center space-y-3">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <DollarSign className="h-6 w-6" />
-                  <span className="text-lg font-medium">{t('value')}</span>
-                </div>
-                <div className="text-4xl font-bold text-yellow-400">
-                  {formatCurrency(fund.tvl)}
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Desktop layout - all 3 in one row */}
+          {/* Desktop layout - all 3 in one row (Order: Profit Ratio, Value, 1D Chart) */}
           <div className="hidden md:grid md:grid-cols-3 gap-8">
             {/* Profit Ratio */}
             <div className="flex flex-col justify-center space-y-3">
@@ -149,23 +149,6 @@ function FundCard({
               </div>
             </div>
 
-            {/* Chart */}
-            <div className="flex flex-col justify-center space-y-3 pl-16">
-              <div className="flex items-center gap-2 text-gray-400">
-                <TrendingUp className="h-6 w-6" />
-                <span className="text-lg font-medium">1D Chart</span>
-              </div>
-              <div className="w-full h-14">
-                {chartData.length > 0 ? (
-                  <SparklineChart data={chartData} height={56} />
-                ) : (
-                  <div className="h-14 flex items-center justify-center text-xs text-gray-500">
-                    No data
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Value */}
             <div className="flex flex-col justify-center space-y-3 pl-16">
               <div className="flex items-center gap-2 text-gray-400">
@@ -174,6 +157,23 @@ function FundCard({
               </div>
               <div className="text-4xl font-bold text-yellow-400">
                 {formatCurrency(fund.tvl)}
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="flex flex-col justify-center space-y-3 pl-16">
+              <div className="flex items-center gap-2 text-gray-400">
+                <TrendingUp className="h-6 w-6" />
+                <span className="text-lg font-medium">1D Chart</span>
+              </div>
+              <div className="w-full h-12">
+                {chartData.length > 0 ? (
+                  <SparklineChart data={chartData} height={48} />
+                ) : (
+                  <div className="h-12 flex items-center justify-center text-xs text-gray-500">
+                    No data
+                  </div>
+                )}
               </div>
             </div>
           </div>
