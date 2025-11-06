@@ -11,6 +11,8 @@ import {
 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useFunds } from "@/app/fund/hooks/useFunds"
+import { useFundSnapshots } from "@/app/fund/hooks/useFundSnapshots"
+import { SparklineChart } from "@/components/SparklineChart"
 
 interface TotalFundsTabProps {
   activeTab: 'my-funds' | 'all-funds'
@@ -46,14 +48,6 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
     return num >= 0 ? `+${percentage}%` : `${percentage}%`
   }
 
-  const formatDateTime = (timestamp: string) => {
-    const date = new Date(Number(timestamp) * 1000)
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    const year = date.getFullYear()
-    return `${month}/${day}/${year}`
-  }
-
   // Fund Table Row Component
   const FundRow = ({ fund }: { fund: any }) => {
     const handleRowClick = () => {
@@ -62,6 +56,18 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
 
     const profitRatio = parseFloat(fund.profitRatio)
     const isPositive = profitRatio >= 0
+
+    // Fetch daily snapshots for the chart
+    const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+    const snapshots = snapshotsData?.dailySnapshots || []
+
+    // Transform snapshot data for the chart (reverse to show oldest to newest)
+    const chartData = snapshots
+      .slice()
+      .reverse()
+      .map(snapshot => ({
+        value: parseFloat(snapshot.amountUSD)
+      }))
 
     return (
       <tr
@@ -85,6 +91,17 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
             {formatUSD(fund.amountUSD)}
           </span>
         </td>
+        <td className="py-6 px-4 min-w-[140px]">
+          <div className="w-32">
+            {chartData.length > 0 ? (
+              <SparklineChart data={chartData} height={40} />
+            ) : (
+              <div className="h-10 flex items-center justify-center text-xs text-gray-500">
+                No data
+              </div>
+            )}
+          </div>
+        </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4 text-purple-400" />
@@ -92,11 +109,6 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
               {fund.investorCount}
             </span>
           </div>
-        </td>
-        <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
-          <span className="text-sm text-gray-400">
-            {formatDateTime(fund.createdAtTimestamp)}
-          </span>
         </td>
       </tr>
     )
@@ -132,8 +144,8 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Chart</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('create')}</th>
                   </tr>
                 </thead>
                 <tbody>
