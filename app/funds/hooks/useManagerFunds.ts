@@ -56,6 +56,11 @@ export function useManagerFunds(manager: string, limit: number = 100, network: '
   return useQuery<ManagerFundsData>({
     queryKey: ['managerFunds', manager, limit, network],
     queryFn: async () => {
+      // Only fetch data for ethereum mainnet
+      if (network !== 'ethereum') {
+        return { funds: [] }
+      }
+
       // Convert address to lowercase for subgraph query
       const lowercaseManager = manager.toLowerCase()
       const result = await request<ManagerFundsData>(
