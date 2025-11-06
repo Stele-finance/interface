@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
 import { formatDateWithLocale } from "@/lib/utils"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
-import { DollarSign, Plus, Loader2, Wallet, Share2, Copy, Trophy, Coins, ChevronDown, Calendar } from 'lucide-react'
+import { DollarSign, Plus, Loader2, Wallet, Share2, Copy, Trophy, Coins, ChevronDown, Calendar, Triangle } from 'lucide-react'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -427,11 +427,25 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
               </div>
             </div>
             
-            {/* Second row: $72K amount + Share button */}
+            {/* Second row: $72K amount + profit ratio + Share button */}
             <div className="flex items-baseline justify-between gap-3 mt-2">
-              <CardTitle className="text-4xl font-bold text-gray-100">
-                ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </CardTitle>
+              <div className="flex items-baseline gap-2">
+                <CardTitle className="text-4xl font-bold text-gray-100">
+                  ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </CardTitle>
+                {fundData?.fund?.principal && (() => {
+                  const principal = parseFloat(fundData.fund.principal)
+                  const currentValue = realTimeFundValue !== null ? realTimeFundValue : currentTVL
+                  const profitRatio = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                  const isPositive = profitRatio >= 0
+                  return (
+                    <div className={`flex items-center gap-1 text-lg font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                      <Triangle className={`h-3 w-3 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                      <span>{profitRatio.toFixed(2)}%</span>
+                    </div>
+                  )
+                })()}
+              </div>
 
               {/* Share button */}
               <DropdownMenu>
@@ -485,10 +499,24 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
             </div>
               
             <div className="flex items-baseline justify-between gap-3 mt-2">
-              <CardTitle className="text-4xl font-bold text-gray-100">
-              ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </CardTitle>
-              
+              <div className="flex items-baseline gap-2">
+                <CardTitle className="text-4xl font-bold text-gray-100">
+                ${currentTVL >= 1000000 ? `${(currentTVL / 1000000).toFixed(1)}M` : currentTVL >= 1000 ? `${(currentTVL / 1000).toFixed(1)}K` : currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </CardTitle>
+                {fundData?.fund?.principal && (() => {
+                  const principal = parseFloat(fundData.fund.principal)
+                  const currentValue = realTimeFundValue !== null ? realTimeFundValue : currentTVL
+                  const profitRatio = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+                  const isPositive = profitRatio >= 0
+                  return (
+                    <div className={`flex items-center gap-1 text-lg font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                      <Triangle className={`h-3 w-3 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                      <span>{profitRatio.toFixed(2)}%</span>
+                    </div>
+                  )
+                })()}
+              </div>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-100">

@@ -13,14 +13,16 @@ import {
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useFunds } from "@/app/fund/hooks/useFunds"
+import { useFundSnapshots } from "@/app/fund/hooks/useFundSnapshots"
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, Plus, Loader2, TrendingUp, DollarSign } from "lucide-react"
+import { ChevronDown, Plus, Loader2, TrendingUp, DollarSign, Triangle } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useWallet } from "@/app/hooks/useWallet"
 import { ethers } from 'ethers'
 import { NETWORK_CONTRACTS } from "@/lib/constants"
 import SteleFundInfoABI from "@/app/abis/SteleFundInfo.json"
+import { SparklineChart } from "@/components/SparklineChart"
 
 interface FundDisplayProps {
   id: string
@@ -42,6 +44,154 @@ interface FundsProps {
   setSelectedNetwork?: (network: 'ethereum' | 'arbitrum') => void;
   hideHeader?: boolean;
   itemsPerPage?: number;
+}
+
+// FundCard component with chart
+function FundCard({
+  fund,
+  index,
+  selectedNetwork,
+  formatProfitRatio,
+  formatCurrency
+}: {
+  fund: FundDisplayProps
+  index: number
+  selectedNetwork: 'ethereum' | 'arbitrum'
+  formatProfitRatio: (ratio: string) => string
+  formatCurrency: (value: string | number) => string
+}) {
+  const router = useRouter()
+  const { t } = useLanguage()
+
+  const profitRatio = parseFloat(fund.profitRatio)
+  const isPositive = profitRatio >= 0
+
+  // Fetch daily snapshots for the chart
+  const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+  const snapshots = snapshotsData?.fundSnapshots || []
+
+  // Transform snapshot data for the chart (reverse to show oldest to newest)
+  const chartData = snapshots
+    .slice()
+    .reverse()
+    .map(snapshot => ({
+      value: parseFloat(snapshot.amountUSD)
+    }))
+
+  return (
+    <Card
+      className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl hover-lift active:scale-[0.98] active:shadow-[0_10px_20px_rgba(0,0,0,0.15)] animate-fade-in"
+      style={{ animationDelay: `${index * 150}ms` }}
+      onClick={() => {
+        router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
+      }}
+    >
+      <CardContent className="p-8">
+        {/* Key Metrics Section - Large and Prominent */}
+        {/* Mobile: Profit Ratio full width, then Chart + Value in same row */}
+        {/* PC: All 3 in one row */}
+        <div>
+          {/* Mobile layout */}
+          <div className="md:hidden space-y-8">
+            {/* Profit Ratio - full width */}
+            <div className="flex flex-col justify-center space-y-3">
+              <div className="flex items-center gap-2 text-gray-400">
+                <TrendingUp className="h-6 w-6" />
+                <span className="text-lg font-medium">{t('profitRatio')}</span>
+              </div>
+              <div className={`text-5xl font-bold flex items-center gap-2 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                <Triangle className={`h-4 w-4 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                {formatProfitRatio(fund.profitRatio).replace(/^[+-]/, '')}
+              </div>
+            </div>
+
+            {/* Chart and Value - same row */}
+            <div className="grid grid-cols-2 gap-8">
+              <div className="flex flex-col justify-center space-y-3">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <TrendingUp className="h-6 w-6" />
+                  <span className="text-lg font-medium">1D Chart</span>
+                </div>
+                <div className="w-full h-20">
+                  {chartData.length > 0 ? (
+                    <SparklineChart data={chartData} height={80} />
+                  ) : (
+                    <div className="h-20 flex items-center justify-center text-xs text-gray-500">
+                      No data
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-center space-y-3">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <DollarSign className="h-6 w-6" />
+                  <span className="text-lg font-medium">{t('value')}</span>
+                </div>
+                <div className="text-4xl font-bold text-yellow-400">
+                  {formatCurrency(fund.tvl)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop layout - all 3 in one row */}
+          <div className="hidden md:grid md:grid-cols-3 gap-8">
+            {/* Profit Ratio */}
+            <div className="flex flex-col justify-center space-y-3">
+              <div className="flex items-center gap-2 text-gray-400">
+                <TrendingUp className="h-6 w-6" />
+                <span className="text-lg font-medium">{t('profitRatio')}</span>
+              </div>
+              <div className={`text-6xl font-bold flex items-center gap-3 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                <Triangle className={`h-5 w-5 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                {formatProfitRatio(fund.profitRatio).replace(/^[+-]/, '')}
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="flex flex-col justify-center space-y-3 pl-16">
+              <div className="flex items-center gap-2 text-gray-400">
+                <TrendingUp className="h-6 w-6" />
+                <span className="text-lg font-medium">1D Chart</span>
+              </div>
+              <div className="w-full h-24">
+                {chartData.length > 0 ? (
+                  <SparklineChart data={chartData} height={96} />
+                ) : (
+                  <div className="h-24 flex items-center justify-center text-xs text-gray-500">
+                    No data
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Value */}
+            <div className="flex flex-col justify-center space-y-3 pl-16">
+              <div className="flex items-center gap-2 text-gray-400">
+                <DollarSign className="h-6 w-6" />
+                <span className="text-lg font-medium">{t('value')}</span>
+              </div>
+              <div className="text-4xl font-bold text-yellow-400">
+                {formatCurrency(fund.tvl)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider - Hidden on mobile */}
+        <div className="hidden md:block border-t border-gray-700/50 my-6"></div>
+
+        {/* Manager Address - Hidden on mobile */}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="text-sm text-gray-400">{t('manager')}</div>
+          <span className="text-sm text-gray-300 font-mono">
+            {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', setSelectedNetwork, hideHeader = false, itemsPerPage }: FundsProps) {
@@ -450,105 +600,14 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
               const isPositive = profitRatio >= 0
 
               return (
-                <Card
+                <FundCard
                   key={fund.id}
-                  className="bg-muted/30 border-none shadow-lg hover:shadow-xl transition-all cursor-pointer rounded-2xl hover-lift active:scale-[0.98] active:shadow-[0_10px_20px_rgba(0,0,0,0.15)] animate-fade-in"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                  onClick={() => {
-                    router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
-                  }}
-                >
-                  <CardContent className="p-8">
-                    {/* Key Metrics Section - Large and Prominent */}
-                    {/* Mobile: Profit Ratio full width, then Principal + Value in same row */}
-                    {/* PC: All 3 in one row */}
-                    <div>
-                      {/* Mobile layout */}
-                      <div className="md:hidden space-y-8">
-                        {/* Profit Ratio - full width */}
-                        <div className="flex flex-col justify-center space-y-3">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <TrendingUp className="h-6 w-6" />
-                            <span className="text-lg font-medium">{t('profitRatio')}</span>
-                          </div>
-                          <div className={`text-5xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                            {formatProfitRatio(fund.profitRatio)}
-                          </div>
-                        </div>
-
-                        {/* Principal and Value - same row */}
-                        <div className="grid grid-cols-2 gap-8">
-                          <div className="flex flex-col justify-center space-y-3">
-                            <div className="flex items-center gap-2 text-gray-400">
-                              <DollarSign className="h-6 w-6" />
-                              <span className="text-lg font-medium">{t('principal')}</span>
-                            </div>
-                            <div className="text-4xl font-bold text-blue-400">
-                              {formatCurrency(fund.investment)}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col justify-center space-y-3">
-                            <div className="flex items-center gap-2 text-gray-400">
-                              <DollarSign className="h-6 w-6" />
-                              <span className="text-lg font-medium">{t('value')}</span>
-                            </div>
-                            <div className="text-4xl font-bold text-yellow-400">
-                              {formatCurrency(fund.tvl)}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Desktop layout - all 3 in one row */}
-                      <div className="hidden md:grid md:grid-cols-3 gap-8">
-                        {/* Profit Ratio */}
-                        <div className="flex flex-col justify-center space-y-3">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <TrendingUp className="h-6 w-6" />
-                            <span className="text-lg font-medium">{t('profitRatio')}</span>
-                          </div>
-                          <div className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                            {formatProfitRatio(fund.profitRatio)}
-                          </div>
-                        </div>
-
-                        {/* Principal */}
-                        <div className="flex flex-col justify-center space-y-3 pl-16">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <DollarSign className="h-6 w-6" />
-                            <span className="text-lg font-medium">{t('principal')}</span>
-                          </div>
-                          <div className="text-4xl font-bold text-blue-400">
-                            {formatCurrency(fund.investment)}
-                          </div>
-                        </div>
-
-                        {/* Value */}
-                        <div className="flex flex-col justify-center space-y-3 pl-16">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <DollarSign className="h-6 w-6" />
-                            <span className="text-lg font-medium">{t('value')}</span>
-                          </div>
-                          <div className="text-4xl font-bold text-yellow-400">
-                            {formatCurrency(fund.tvl)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Divider - Hidden on mobile */}
-                    <div className="hidden md:block border-t border-gray-700/50 my-6"></div>
-
-                    {/* Manager Address - Hidden on mobile */}
-                    <div className="hidden md:flex items-center justify-between">
-                      <div className="text-sm text-gray-400">{t('manager')}</div>
-                      <span className="text-sm text-gray-300 font-mono">
-                        {fund.manager.slice(0, 6)}...{fund.manager.slice(-4)}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  fund={fund}
+                  index={index}
+                  selectedNetwork={selectedNetwork}
+                  formatProfitRatio={formatProfitRatio}
+                  formatCurrency={formatCurrency}
+                />
               )
             })
           )}

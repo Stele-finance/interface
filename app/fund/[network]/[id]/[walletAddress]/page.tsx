@@ -5,7 +5,7 @@ import { createPortal } from "react-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { ArrowLeft, Activity, Loader2, Receipt, ArrowRight, ChevronDown, Calendar } from "lucide-react"
+import { ArrowLeft, Activity, Loader2, Receipt, ArrowRight, ChevronDown, Calendar, Triangle } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { useMobileMenu } from "@/lib/mobile-menu-context"
@@ -39,7 +39,7 @@ interface RealTimePortfolio {
 }
 
 export default function FundInvestorPage({ params }: FundInvestorPageProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { isMobileMenuOpen } = useMobileMenu()
   const { network: routeNetwork, id: fundId, walletAddress } = use(params)
   const router = useRouter()
@@ -865,20 +865,6 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                   {investor ? (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                        <span className="text-sm text-gray-400">Network</span>
-                        <div className="flex items-center gap-2">
-                          <Image
-                            src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
-                            alt={subgraphNetwork}
-                            width={16}
-                            height={16}
-                            className="rounded-full"
-                          />
-                          <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">{t('principal')}</span>
                         <span className="text-sm text-white font-medium">
                           ${parseFloat(investor?.principal || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -902,7 +888,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
 
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">{t('profitRatio')}</span>
-                        <span className={`text-sm font-medium ${
+                        <div className={`flex items-center gap-1 text-sm font-medium ${
                           (() => {
                             const investment = parseFloat(investor?.principal || '0')
                             const currentValue = portfolioData.totalValue
@@ -914,15 +900,35 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                             const investment = parseFloat(investor?.principal || '0')
                             const currentValue = portfolioData.totalValue
                             const profitPercent = investment > 0 ? ((currentValue - investment) / investment) * 100 : 0
-                            return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`
+                            const isPositive = profitPercent >= 0
+                            return (
+                              <>
+                                <Triangle className={`h-2.5 w-2.5 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                                <span>{profitPercent.toFixed(2)}%</span>
+                              </>
+                            )
                           })()}
-                        </span>
+                        </div>
                       </div>
-                      
-                      <div className="flex justify-between items-center py-2">
+
+                      <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">Stake</span>
                         <span className="text-sm text-white font-medium">
                           {finalSharePercentage.toFixed(2)}%
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm text-gray-400">Created</span>
+                        <span className="text-sm text-white font-medium">
+                          {fundData?.fund?.createdAtTimestamp
+                            ? new Date(parseInt(fundData.fund.createdAtTimestamp) * 1000).toLocaleDateString(language, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })
+                            : '-'
+                          }
                         </span>
                       </div>
                       
