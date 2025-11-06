@@ -426,7 +426,17 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             </Card>
           ) : (
             <>
-              {funds.length === 0 ? (
+              {selectedNetwork !== 'ethereum' ? (
+                <Card className="bg-muted border-gray-700/50">
+                  <CardContent className="text-center py-12">
+                    <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
+                    <h3 className="text-lg font-medium text-gray-100 mb-2">No Funds Available</h3>
+                    <p className="text-gray-400 mb-4">
+                      Funds are only available on Ethereum Mainnet.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : funds.length === 0 ? (
                 <Card className="bg-muted border-gray-700/50">
                   <CardContent className="text-center py-12">
                     <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
