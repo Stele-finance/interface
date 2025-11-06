@@ -59,7 +59,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
 
     // Fetch daily snapshots for the chart
     const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
-    const snapshots = snapshotsData?.dailySnapshots || []
+    const snapshots = snapshotsData?.fundSnapshots || []
 
     // Transform snapshot data for the chart (reverse to show oldest to newest)
     const chartData = snapshots
