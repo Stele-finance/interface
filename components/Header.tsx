@@ -101,12 +101,20 @@ export function Header() {
     }
   }
 
-  // Track network changes
+  // Track network changes and sync with selectedNetwork
   useEffect(() => {
     // Skip on initial load (when prevNetworkRef is null)
     if (prevNetworkRef.current === null) {
       prevNetworkRef.current = walletNetwork;
       return;
+    }
+
+    // Update selectedNetwork when wallet network changes
+    if (walletNetwork && (walletNetwork === 'ethereum' || walletNetwork === 'arbitrum')) {
+      setSelectedNetwork(walletNetwork);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('selected-network', walletNetwork);
+      }
     }
 
     // Update the previous network reference but don't navigate
