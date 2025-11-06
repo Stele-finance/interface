@@ -4,11 +4,11 @@ import { gql, request } from 'graphql-request'
 
 const FUND_SNAPSHOTS_QUERY = gql`
   query GetFundSnapshots($fundId: String!, $first: Int = 30) {
-    dailySnapshots(
+    fundSnapshots(
       first: $first
       orderBy: timestamp
       orderDirection: desc
-      where: { fund_: { fundId: $fundId } }
+      where: { fundId: $fundId }
     ) {
       id
       timestamp
@@ -28,7 +28,7 @@ export interface FundSnapshot {
 }
 
 export interface FundSnapshotsResponse {
-  dailySnapshots: FundSnapshot[]
+  fundSnapshots: FundSnapshot[]
 }
 
 export function useFundSnapshots(fundId: string, network: 'ethereum' | 'arbitrum' = 'ethereum') {
@@ -39,7 +39,7 @@ export function useFundSnapshots(fundId: string, network: 'ethereum' | 'arbitrum
     queryFn: async (): Promise<FundSnapshotsResponse> => {
       try {
         if (network !== 'ethereum') {
-          return { dailySnapshots: [] }
+          return { fundSnapshots: [] }
         }
 
         const result = await request<FundSnapshotsResponse>(
@@ -50,13 +50,13 @@ export function useFundSnapshots(fundId: string, network: 'ethereum' | 'arbitrum
         )
 
         if (!result) {
-          return { dailySnapshots: [] }
+          return { fundSnapshots: [] }
         }
 
         return result
       } catch (error) {
         console.error('Error fetching fund snapshots:', error)
-        return { dailySnapshots: [] }
+        return { fundSnapshots: [] }
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
