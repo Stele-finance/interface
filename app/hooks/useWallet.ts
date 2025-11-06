@@ -64,17 +64,10 @@ const isMobile = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768
 }
 
-// Convert network ID to network type
-const chainIdToNetwork = (chainId: string | number): NetworkType => {
-  const id = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId
-  switch (id) {
-    case 1:
-      return 'ethereum'
-    case 42161:
-      return 'arbitrum'
-    default:
-      return 'ethereum'
-  }
+// Convert network ID to network type - Only support Ethereum
+const chainIdToNetwork = (_chainId: string | number): NetworkType => {
+  // Only support Ethereum (chain ID 1), return ethereum for any other chain
+  return 'ethereum'
 }
 
 // Restore state from localStorage - only restore if AppKit actually shows as connected
@@ -211,14 +204,19 @@ export const useWallet = () => {
     }
   }, [appKit, disconnectWallet])
 
-  // Switch network
+  // Switch network - Only allow Ethereum
   const switchNetwork = useCallback(async (targetNetwork: NetworkType) => {
     if (!globalState.isConnected || globalState.walletType !== 'walletconnect') {
       throw new Error('WalletConnect not connected')
     }
 
-    const chainConfig = targetNetwork === 'ethereum' ? ETHEREUM_CHAIN_CONFIG : ARBITRUM_CHAIN_CONFIG
-      
+    // Only allow Ethereum network
+    if (targetNetwork !== 'ethereum') {
+      throw new Error('Only Ethereum network is supported')
+    }
+
+    const chainConfig = ETHEREUM_CHAIN_CONFIG
+
     try {
       const provider = appKitProvider?.walletProvider as any
       if (!provider) {
@@ -229,8 +227,8 @@ export const useWallet = () => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: chainConfig.chainId }],
       })
-      
-      updateState({ network: targetNetwork })
+
+      updateState({ network: 'ethereum' })
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         // Add network if it doesn't exist
@@ -241,7 +239,7 @@ export const useWallet = () => {
               method: 'wallet_addEthereumChain',
               params: [chainConfig],
             })
-            updateState({ network: targetNetwork })
+            updateState({ network: 'ethereum' })
           }
         } catch (addError) {
           throw addError
