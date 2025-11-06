@@ -12,6 +12,7 @@ const FUND_QUERY = gql`
       manager
       investorCount
       share
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -36,6 +37,7 @@ export interface Fund {
   manager: string
   investorCount: string
   share: string
+  principal: string
   amountUSD: string
   profitUSD: string
   profitRatio: string
