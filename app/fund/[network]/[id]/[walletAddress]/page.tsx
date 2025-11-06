@@ -881,7 +881,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                         <span className="text-sm text-gray-400">{t('principal')}</span>
                         <span className="text-sm text-white font-medium">
-                          ${parseFloat(investor?.investmentUSD || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          ${parseFloat(investor?.principal || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
 
@@ -904,14 +904,14 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                         <span className="text-sm text-gray-400">{t('profitRatio')}</span>
                         <span className={`text-sm font-medium ${
                           (() => {
-                            const investment = parseFloat(investor?.investmentUSD || '0')
+                            const investment = parseFloat(investor?.principal || '0')
                             const currentValue = portfolioData.totalValue
                             const profitPercent = investment > 0 ? ((currentValue - investment) / investment) * 100 : 0
                             return profitPercent >= 0 ? 'text-green-400' : 'text-red-400'
                           })()
                         }`}>
                           {(() => {
-                            const investment = parseFloat(investor?.investmentUSD || '0')
+                            const investment = parseFloat(investor?.principal || '0')
                             const currentValue = portfolioData.totalValue
                             const profitPercent = investment > 0 ? ((currentValue - investment) / investment) * 100 : 0
                             return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`

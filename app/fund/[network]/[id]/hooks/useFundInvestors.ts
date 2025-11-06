@@ -21,7 +21,7 @@ const GET_FUND_INVESTORS_QUERY = `
       investor
       isManager
       share
-      investmentUSD
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -37,7 +37,7 @@ export interface FundInvestor {
   investor: string
   isManager: boolean
   share: string | null
-  investmentUSD: string
+  principal: string
   amountUSD: string
   profitUSD: string
   profitRatio: string
