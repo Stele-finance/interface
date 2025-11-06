@@ -54,18 +54,23 @@ export interface FundsResponse {
 
 export function useFunds(first: number = 50, network: 'ethereum' | 'arbitrum' = 'arbitrum') {
   const url = network === 'ethereum' ? NETWORK_SUBGRAPHS.ethereum_fund : NETWORK_SUBGRAPHS.arbitrum_fund
-  
+
   return useQuery<FundsResponse>({
     queryKey: ['funds', first, network],
     queryFn: async (): Promise<FundsResponse> => {
       try {
+        // Only fetch data for ethereum mainnet
+        if (network !== 'ethereum') {
+          return { funds: [] }
+        }
+
         const result = await request<FundsResponse>(url, FUNDS_QUERY, { first }, headers)
-        
+
         // Ensure we always return a valid response
         if (!result) {
           return { funds: [] }
         }
-        
+
         return result
       } catch (error) {
         console.error('Error fetching funds data:', error)

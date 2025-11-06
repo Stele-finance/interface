@@ -11,6 +11,10 @@ export function useFundNFTData(network: 'ethereum' | 'arbitrum' | null = 'ethere
   return useQuery<FundNFTData>({
     queryKey: ['fundNfts', network],
     queryFn: async () => {
+      // Only fetch data for ethereum mainnet
+      if (network !== 'ethereum') {
+        return { managerNFTs: [] }
+      }
       return await request(subgraphUrl, getAllFundNFTsQuery(), {}, headers)
     },
     refetchInterval: 30000,
@@ -54,7 +58,8 @@ export function useUserFundNFTData(
   return useQuery<FundNFTData>({
     queryKey: ['userFundNfts', network, userAddress],
     queryFn: async () => {
-      if (!userAddress) {
+      // Only fetch data for ethereum mainnet
+      if (!userAddress || network !== 'ethereum') {
         return { managerNFTs: [] }
       }
       return await request(subgraphUrl, getUserFundNFTsQuery(userAddress), {}, headers)
