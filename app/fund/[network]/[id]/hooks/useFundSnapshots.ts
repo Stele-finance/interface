@@ -17,6 +17,7 @@ const FUND_SNAPSHOTS_QUERY = gql`
       manager
       investorCount
       share
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -43,6 +44,7 @@ const FUND_WEEKLY_SNAPSHOTS_QUERY = gql`
       manager
       investorCount
       share
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -69,6 +71,7 @@ const FUND_MONTHLY_SNAPSHOTS_QUERY = gql`
       manager
       investorCount
       share
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -88,6 +91,7 @@ export interface FundSnapshot {
   manager: string
   investorCount: string
   share: string
+  principal: string
   amountUSD: string
   profitUSD: string
   profitRatio: string

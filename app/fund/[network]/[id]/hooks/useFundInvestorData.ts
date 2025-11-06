@@ -13,7 +13,7 @@ const FUND_INVESTOR_QUERY = gql`
       investor
       isManager
       share
-      investmentUSD
+      principal
       amountUSD
       profitUSD
       profitRatio
@@ -31,7 +31,7 @@ export interface FundInvestor {
   investor: string
   isManager: boolean
   share: string  // Will be BigInt from subgraph but treated as string in GraphQL
-  investmentUSD: string  // Total invested amount (cumulative deposits)
+  principal: string  // Total invested amount (cumulative deposits)
   amountUSD: string
   profitUSD: string
   profitRatio: string

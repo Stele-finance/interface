@@ -160,7 +160,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
       }
     }
 
-    const investment = parseFloat(investorData.investor.investmentUSD || '0')
+    const investment = parseFloat(investorData.investor.principal || '0')
     const currentVal = currentValue
 
     if (investment === 0) {
