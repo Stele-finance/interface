@@ -38,6 +38,14 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
     return `$${num.toFixed(2)}`
   }
 
+  // Format profit ratio
+  const formatProfitRatio = (ratio: string) => {
+    const num = parseFloat(ratio)
+    if (isNaN(num)) return '+0.00%'
+    const percentage = (num * 100).toFixed(2)
+    return num >= 0 ? `+${percentage}%` : `${percentage}%`
+  }
+
   const formatDateTime = (timestamp: string) => {
     const date = new Date(Number(timestamp) * 1000)
     const month = date.getMonth() + 1
@@ -52,6 +60,9 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
       router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
     }
 
+    const profitRatio = parseFloat(fund.profitRatio)
+    const isPositive = profitRatio >= 0
+
     return (
       <tr
         className="hover:bg-gray-800/30 transition-colors cursor-pointer"
@@ -63,6 +74,11 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
               #{fund.fundId}
             </Badge>
           </div>
+        </td>
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+          <span className={`font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            {formatProfitRatio(fund.profitRatio)}
+          </span>
         </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <span className="font-medium text-green-400">
@@ -114,6 +130,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
                         {t('fund')}
                       </div>
                     </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('create')}</th>
@@ -202,7 +219,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                    {[1, 2, 3, 4, 5].map((i) => (
                       <th key={i} className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
                         <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
                       </th>
@@ -212,7 +229,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
                 <tbody>
                   {[1, 2, 3, 4, 5].map((i) => (
                     <tr key={i} className="hover:bg-gray-800/30 transition-colors">
-                      {[1, 2, 3, 4, 5, 6].map((j) => (
+                      {[1, 2, 3, 4, 5].map((j) => (
                         <td key={j} className="py-6 px-4 whitespace-nowrap">
                           <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
                         </td>
