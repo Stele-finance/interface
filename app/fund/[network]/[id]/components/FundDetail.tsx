@@ -1290,8 +1290,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('principal')}</span>
                   <span className="text-sm text-white font-medium">
-                    ${fund && fund.share
-                      ? (parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    ${fund && fund.principal
+                      ? parseFloat(fund.principal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                       : '0.00'
                     }
                   </span>
@@ -1316,14 +1316,14 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                   <span className="text-sm text-gray-400">{t('profitRatio')}</span>
                   <span className={`text-sm font-medium ${
                     (() => {
-                      const principal = fund && fund.share ? parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS) : 0
+                      const principal = fund && fund.principal ? parseFloat(fund.principal) : 0
                       const currentValue = portfolioData.totalValue
                       const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
                       return profitPercent >= 0 ? 'text-green-400' : 'text-red-400'
                     })()
                   }`}>
                     {(() => {
-                      const principal = fund && fund.share ? parseFloat(fund.share) / Math.pow(10, USDC_DECIMALS) : 0
+                      const principal = fund && fund.principal ? parseFloat(fund.principal) : 0
                       const currentValue = portfolioData.totalValue
                       const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
                       return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`
