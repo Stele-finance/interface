@@ -6,7 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Image as ImageIcon, DollarSign, Plus, PieChart, Wallet } from "lucide-react"
+import { ArrowRight, Loader2, User, Users, Receipt, ArrowLeftRight, Activity, Image as ImageIcon, DollarSign, Plus, PieChart, Wallet, Triangle } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { ethers } from "ethers"
@@ -1274,20 +1274,6 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
-                  <span className="text-sm text-gray-400">{t('network')}</span>
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={subgraphNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
-                      alt={subgraphNetwork}
-                      width={16}
-                      height={16}
-                      className="rounded-full"
-                    />
-                    <span className="text-sm text-white font-medium capitalize">{subgraphNetwork}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('principal')}</span>
                   <span className="text-sm text-white font-medium">
                     ${fund && fund.principal
@@ -1314,7 +1300,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('profitRatio')}</span>
-                  <span className={`text-sm font-medium ${
+                  <div className={`flex items-center gap-1 text-sm font-medium ${
                     (() => {
                       const principal = fund && fund.principal ? parseFloat(fund.principal) : 0
                       const currentValue = portfolioData.totalValue
@@ -1326,14 +1312,34 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                       const principal = fund && fund.principal ? parseFloat(fund.principal) : 0
                       const currentValue = portfolioData.totalValue
                       const profitPercent = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
-                      return `${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`
+                      const isPositive = profitPercent >= 0
+                      return (
+                        <>
+                          <Triangle className={`h-2.5 w-2.5 ${isPositive ? '' : 'rotate-180'} fill-current`} />
+                          <span>{profitPercent.toFixed(2)}%</span>
+                        </>
+                      )
                     })()}
-                  </span>
+                  </div>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-2 border-b border-gray-700/30">
                   <span className="text-sm text-gray-400">{t('investor')}</span>
                   <span className="text-sm text-white font-medium">{fund ? fund.investorCount : '0'}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-gray-400">Created</span>
+                  <span className="text-sm text-white font-medium">
+                    {fund && fund.createdAtTimestamp
+                      ? new Date(parseInt(fund.createdAtTimestamp) * 1000).toLocaleDateString(language, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })
+                      : '-'
+                    }
+                  </span>
                 </div>
                 
               </div>

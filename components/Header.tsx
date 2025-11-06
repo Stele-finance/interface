@@ -38,7 +38,7 @@ export function Header() {
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useMobileMenu()
   const isMobile = useIsMobile()
   
-  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('arbitrum')
+  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'arbitrum'>('ethereum')
 
   // Load network from localStorage
   useEffect(() => {
@@ -46,10 +46,10 @@ export function Header() {
     if (savedNetwork === 'ethereum' || savedNetwork === 'arbitrum') {
       setSelectedNetwork(savedNetwork)
     } else {
-      // Set default to arbitrum if no saved network
-      setSelectedNetwork('arbitrum')
+      // Set default to ethereum if no saved network
+      setSelectedNetwork('ethereum')
       if (typeof window !== 'undefined') {
-        localStorage.setItem('selected-network', 'arbitrum')
+        localStorage.setItem('selected-network', 'ethereum')
       }
     }
   }, [])

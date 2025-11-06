@@ -144,7 +144,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">Chart</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">1D Chart</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
                   </tr>
                 </thead>
