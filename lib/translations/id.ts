@@ -128,7 +128,7 @@ export const id = {
   errorLoadingRankings: "Error memuat peringkat",
   errorLoadingTokens: "Error memuat token",
   errorLoadingTransactions: "Error memuat transaksi",
-  ethereumArbitrumSupport: "Dukungan Jaringan Ethereum & Arbitrum",
+  ethereumArbitrumSupport: "Dukungan Jaringan Ethereum",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Setiap orang bisa menjadi fund manager",
   exampleFunctionParameter: "contoh 150000000",

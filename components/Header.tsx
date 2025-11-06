@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import Link from "next/link"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
@@ -29,7 +29,7 @@ import { useMobileMenu } from "@/lib/mobile-menu-context"
 import Image from "next/image"
 import { useAppKitProvider } from '@reown/appkit/react'
 import { useIsMobile } from "@/components/ui/use-mobile"
-import { ChevronDown, Coins } from "lucide-react"
+import { Coins } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
@@ -54,16 +54,6 @@ export function Header() {
     }
   }, [])
 
-  // Handle network change
-  const handleNetworkChange = (network: 'ethereum' | 'arbitrum') => {
-    setSelectedNetwork(network)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selected-network', network)
-    }
-    // Trigger page reload or update through custom event
-    window.dispatchEvent(new CustomEvent('networkChanged', { detail: { network } }))
-  }
-  
   // Use global wallet hook
   const {
     address: walletAddress,
@@ -100,9 +90,6 @@ export function Header() {
     setIsMounted(true)
     return () => setIsMounted(false)
   }, [])
-
-  // Force re-render when wallet provider changes
-  useEffect(() => {}, [walletProvider, isConnected, walletType])
 
   const handleConnectWallet = async () => {
     setWalletSelectOpen(false)
@@ -198,57 +185,18 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
-        
-        {/* Network Selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white hover:bg-gray-800/50 font-medium px-3 py-2 h-auto text-sm border-0 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Image
-                  src={selectedNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
-                  alt={selectedNetwork}
-                  width={20}
-                  height={20}
-                  className="rounded-full"
-                />
-                <span className="text-gray-100 capitalize hidden sm:inline">{selectedNetwork}</span>
-                <ChevronDown className="h-3 w-3 text-gray-400" />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36 bg-gray-900/95 border-gray-700/50 backdrop-blur-sm z-[60] shadow-xl">
-            <DropdownMenuItem
-              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
-              onClick={() => handleNetworkChange('ethereum')}
-            >
-              <Image
-                src="/networks/small/ethereum.png"
-                alt="Ethereum"
-                width={16}
-                height={16}
-                className="rounded-full mr-2"
-              />
-              <span>Ethereum</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer hover:bg-gray-800/80 focus:bg-gray-800/80 text-gray-200"
-              onClick={() => handleNetworkChange('arbitrum')}
-            >
-              <Image
-                src="/networks/small/arbitrum.png"
-                alt="Arbitrum"
-                width={16}
-                height={16}
-                className="rounded-full mr-2"
-              />
-              <span>Arbitrum</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        {/* Network Status Display */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/40 border border-gray-600/50">
+          <Image
+            src={selectedNetwork === 'arbitrum' ? '/networks/small/arbitrum.png' : '/networks/small/ethereum.png'}
+            alt={selectedNetwork}
+            width={20}
+            height={20}
+            className="rounded-full"
+          />
+          <span className="text-gray-100 capitalize text-sm font-medium hidden sm:inline">{selectedNetwork}</span>
+        </div>
 
         {walletAddress ? (
           <div className="flex items-center gap-2 md:gap-3">

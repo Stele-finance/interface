@@ -128,7 +128,7 @@ export const ms = {
   errorLoadingRankings: "Ralat memuatkan kedudukan",
   errorLoadingTokens: "Ralat memuatkan token",
   errorLoadingTransactions: "Ralat memuatkan transaksi",
-  ethereumArbitrumSupport: "Sokongan Rangkaian Ethereum & Arbitrum",
+  ethereumArbitrumSupport: "Sokongan Rangkaian Ethereum",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Semua Orang Boleh Menjadi Pengurus Dana",
   exampleFunctionParameter: "cth 150000000",

@@ -128,7 +128,7 @@ export const zhCn = {
   errorLoadingRankings: '加载排名时出错',
   errorLoadingTokens: '加载代币时出错',
   errorLoadingTransactions: '加载交易时出错',
-  ethereumArbitrumSupport: "支持 Ethereum 和 Arbitrum 网络",
+  ethereumArbitrumSupport: "支持 Ethereum 网络",
   ethereumMainnet: '以太坊主网',
   everyoneFundManager: '每个人都是基金经理',
   exampleFunctionParameter: '示例函数参数',

@@ -128,7 +128,7 @@ export const jp = {
   errorLoadingRankings: "ランキングの読み込みエラー",
   errorLoadingTokens: "トークンの読み込みエラー",
   errorLoadingTransactions: "取引の読み込みエラー",
-  ethereumArbitrumSupport: "EthereumとArbitrumネットワークのサポート",
+  ethereumArbitrumSupport: "Ethereumネットワークのサポート",
   ethereumMainnet: "Ethereumメインネット",
   everyoneFundManager: "誰でもファンドマネージャーになれる",
   exampleFunctionParameter: "例: 150000000",

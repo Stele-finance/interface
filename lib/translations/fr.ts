@@ -128,7 +128,7 @@ export const fr = {
   errorLoadingRankings: "Erreur lors du chargement des classements",
   errorLoadingTokens: "Erreur lors du chargement des tokens",
   errorLoadingTransactions: "Erreur lors du chargement des transactions",
-  ethereumArbitrumSupport: "Support des réseaux Ethereum et Arbitrum",
+  ethereumArbitrumSupport: "Support du réseau Ethereum",
   ethereumMainnet: "Réseau Principal Ethereum",
   everyoneFundManager: "Tout le monde peut être gestionnaire de fonds",
   exampleFunctionParameter: "ex. 150000000",

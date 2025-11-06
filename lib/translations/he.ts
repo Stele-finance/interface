@@ -128,7 +128,7 @@ export const he = {
   errorLoadingRankings: "שגיאה בטעינת דירוגים",
   errorLoadingTokens: "שגיאה בטעינת טוקנים",
   errorLoadingTransactions: "שגיאה בטעינת עסקאות",
-  ethereumArbitrumSupport: "תמיכה ברשתות Ethereum ו-Arbitrum",
+  ethereumArbitrumSupport: "תמיכה ברשת Ethereum",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "כל אחד יכול להיות מנהל קרן",
   exampleFunctionParameter: "דוגמה 150000000",

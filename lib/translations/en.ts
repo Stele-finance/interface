@@ -130,7 +130,7 @@ export const en = {
   errorLoadingRankings: "Error loading rankings",
   errorLoadingTokens: "Error loading tokens",
   errorLoadingTransactions: "Error loading transactions",
-  ethereumArbitrumSupport: "Ethereum & Arbitrum Network Support",
+  ethereumArbitrumSupport: "Ethereum Network Support",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "Everyone Can Be a Fund Manager",
   exampleFunctionParameter: "e.g. 150000000",

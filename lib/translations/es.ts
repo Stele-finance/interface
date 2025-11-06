@@ -128,7 +128,7 @@ export const es = {
   errorLoadingRankings: "Error cargando clasificaciones",
   errorLoadingTokens: "Error cargando tokens",
   errorLoadingTransactions: "Error cargando transacciones",
-  ethereumArbitrumSupport: "Soporte de red Ethereum y Arbitrum",
+  ethereumArbitrumSupport: "Soporte de red Ethereum",
   ethereumMainnet: "Red Principal de Ethereum",
   everyoneFundManager: "Todos Pueden Ser Gestores de Fondos",
   exampleFunctionParameter: "ej. 150000000",

@@ -128,7 +128,7 @@ export const hi = {
   errorLoadingRankings: "रैंकिंग लोड करने में त्रुटि",
   errorLoadingTokens: "टोकन लोड करने में त्रुटि",
   errorLoadingTransactions: "लेनदेन लोड करने में त्रुटि",
-  ethereumArbitrumSupport: "Ethereum और Arbitrum नेटवर्क समर्थन",
+  ethereumArbitrumSupport: "Ethereum नेटवर्क समर्थन",
   ethereumMainnet: "Ethereum Mainnet",
   everyoneFundManager: "हर कोई फंड मैनेजर हो सकता है",
   exampleFunctionParameter: "उदा. 150000000",

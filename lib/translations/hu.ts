@@ -128,7 +128,7 @@ export const hu = {
   errorLoadingRankings: "Hiba a ranglisták betöltése során",
   errorLoadingTokens: "Hiba a tokenek betöltése során",
   errorLoadingTransactions: "Hiba a tranzakciók betöltése során",
-  ethereumArbitrumSupport: "Ethereum és Arbitrum hálózat támogatás",
+  ethereumArbitrumSupport: "Ethereum hálózat támogatás",
   ethereumMainnet: "Ethereum főhálózat",
   everyoneFundManager: "Mindenki lehet alapkezelő",
   exampleFunctionParameter: "pl. 150000000",

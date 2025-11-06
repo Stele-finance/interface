@@ -128,7 +128,7 @@ export const th = {
   errorLoadingRankings: 'เกิดข้อผิดพลาดในการโหลดอันดับ',
   errorLoadingTokens: 'เกิดข้อผิดพลาดในการโหลดโทเค็น',
   errorLoadingTransactions: 'เกิดข้อผิดพลาดในการโหลดธุรกรรม',
-  ethereumArbitrumSupport: "รองรับเครือข่าย Ethereum และ Arbitrum",
+  ethereumArbitrumSupport: "รองรับเครือข่าย Ethereum",
   ethereumMainnet: 'Ethereum Mainnet',
   everyoneFundManager: 'ทุกคนเป็นผู้จัดการกองทุน',
   exampleFunctionParameter: 'ตัวอย่างพารามิเตอร์ฟังก์ชัน',
