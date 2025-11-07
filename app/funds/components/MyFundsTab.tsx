@@ -805,7 +805,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                           <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
                           <h3 className="text-lg font-medium text-gray-100 mb-2">No Managing Funds</h3>
                           <p className="text-gray-400 mb-4">
-                            You haven't created any funds yet
+                            You haven&apos;t created any funds yet
                           </p>
                         </CardContent>
                       </Card>
@@ -822,7 +822,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                           <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
                           <h3 className="text-lg font-medium text-gray-100 mb-2">No Investing Funds</h3>
                           <p className="text-gray-400 mb-4">
-                            You haven't joined any funds yet
+                            You haven&apos;t joined any funds yet
                           </p>
                         </CardContent>
                       </Card>
