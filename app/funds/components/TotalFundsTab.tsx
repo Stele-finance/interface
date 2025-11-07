@@ -94,7 +94,7 @@ export function TotalFundsTab({ activeTab, setActiveTab, selectedNetwork }: Tota
         <td className="py-6 px-4 min-w-[140px]">
           <div className="w-32">
             {chartData.length > 0 ? (
-              <SparklineChart data={chartData} height={40} />
+              <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
             ) : (
               <div className="h-10 flex items-center justify-center text-xs text-gray-500">
                 No data

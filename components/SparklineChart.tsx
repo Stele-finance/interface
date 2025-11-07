@@ -18,11 +18,8 @@ export const SparklineChart: React.FC<SparklineChartProps> = ({
     return null;
   }
 
-  // Determine if trend is positive or negative
-  const firstValue = data[0]?.value || 0;
-  const lastValue = data[data.length - 1]?.value || 0;
-  const isPositive = lastValue >= firstValue;
-  const chartColor = isPositive ? '#10b981' : '#ef4444'; // green or red
+  // Use provided color or fallback to default green
+  const chartColor = color;
 
   return (
     <ResponsiveContainer width={width} height={height}>
