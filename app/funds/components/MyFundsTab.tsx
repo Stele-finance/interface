@@ -648,22 +648,18 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="bg-muted/80 border-gray-600">
-              {isConnected && managerFunds.length > 0 && (
-                <DropdownMenuItem
-                  onClick={() => setFundFilter('managing')}
-                  className="cursor-pointer hover:bg-gray-700"
-                >
-                  Managing
-                </DropdownMenuItem>
-              )}
-              {isConnected && pureInvestorFunds.length > 0 && (
-                <DropdownMenuItem
-                  onClick={() => setFundFilter('investing')}
-                  className="cursor-pointer hover:bg-gray-700"
-                >
-                  Investing
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onClick={() => setFundFilter('managing')}
+                className="cursor-pointer hover:bg-gray-700"
+              >
+                Managing
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setFundFilter('investing')}
+                className="cursor-pointer hover:bg-gray-700"
+              >
+                Investing
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFundFilter('all-funds')}
                 className="cursor-pointer hover:bg-gray-700"
