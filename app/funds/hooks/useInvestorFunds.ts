@@ -6,68 +6,52 @@ import { getSubgraphUrl, getFundHeaders } from '@/lib/constants'
 export const INVESTOR_FUNDS_QUERY = gql`
   query GetInvestorFunds($investor: Bytes!, $first: Int!) {
     investors(
-      where: { investor: $investor }
+      where: { investor: $investor, amountUSD_gt: "0" }
       first: $first
       orderBy: createdAtTimestamp
       orderDirection: desc
     ) {
       id
+      fundId
       investor
-      fund {
-        id
-        fundId
-        manager
-        share
-        amountUSD
-        profitUSD
-        profitRatio
-        investorCount
-        tokens
-        tokensSymbols
-        tokensDecimals
-        tokensAmount
-        createdAtTimestamp
-        updatedAtTimestamp
-      }
-      amountUSD
-      principal
-      profitUSD
+      isManager
       share
+      principal
+      amountUSD
+      profitUSD
+      profitRatio
       createdAtTimestamp
       updatedAtTimestamp
     }
   }
 `
 
-export interface InvestorFundData {
-  id: string
-  investor: string
-  fund: {
-    id: string
-    fundId: string
-    manager: string
-    share: string
-    amountUSD: string
-    profitUSD: string
-    profitRatio: string
-    investorCount: string
-    tokens: string[]
-    tokensSymbols: string[]
-    tokensDecimals: string[]
-    tokensAmount: string[]
-    createdAtTimestamp: string
-    updatedAtTimestamp: string
+// Get fund investorCount separately
+export const FUND_INVESTOR_COUNT_QUERY = gql`
+  query GetFundInvestorCount($fundId: String!) {
+    fund(id: $fundId) {
+      investorCount
+    }
   }
-  amountUSD: string
-  principal: string
-  profitUSD: string
+`
+
+export interface InvestorData {
+  id: string
+  fundId: string
+  investor: string
+  isManager: boolean
   share: string
+  principal: string
+  amountUSD: string
+  profitUSD: string
+  profitRatio: string
   createdAtTimestamp: string
   updatedAtTimestamp: string
+  investorCount?: string // Will be fetched separately
 }
 
 export interface InvestorFundsData {
-  investors: InvestorFundData[]
+  investors: InvestorData[]
 }
 
 export function useInvestorFunds(investor: string, limit: number = 100, network: 'ethereum' | 'arbitrum' | null = 'ethereum') {
@@ -83,7 +67,9 @@ export function useInvestorFunds(investor: string, limit: number = 100, network:
 
       // Convert address to lowercase for subgraph query
       const lowercaseInvestor = investor.toLowerCase()
-      const result = await request<InvestorFundsData>(
+
+      // Fetch investor records
+      const result = await request<{ investors: InvestorData[] }>(
         subgraphUrl,
         INVESTOR_FUNDS_QUERY,
         {
@@ -92,7 +78,32 @@ export function useInvestorFunds(investor: string, limit: number = 100, network:
         },
         getFundHeaders()
       )
-      return result
+
+      // Fetch investorCount for each fund
+      const investorsWithCount = await Promise.all(
+        result.investors.map(async (inv) => {
+          try {
+            const fundResult = await request<{ fund: { investorCount: string } | null }>(
+              subgraphUrl,
+              FUND_INVESTOR_COUNT_QUERY,
+              { fundId: inv.fundId },
+              getFundHeaders()
+            )
+            return {
+              ...inv,
+              investorCount: fundResult.fund?.investorCount || '0'
+            }
+          } catch (error) {
+            console.error(`Failed to fetch investorCount for fund ${inv.fundId}:`, error)
+            return {
+              ...inv,
+              investorCount: '0'
+            }
+          }
+        })
+      )
+
+      return { investors: investorsWithCount }
     },
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes

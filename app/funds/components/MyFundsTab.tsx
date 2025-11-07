@@ -90,9 +90,9 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
     return num >= 0 ? `+${percentage}%` : `${percentage}%`
   }
 
-  // Filter out funds where user is both manager and investor from investing list
+  // Filter out funds where user is manager from investing list
   const pureInvestorFunds = investorFunds.filter(
-    (investor) => investor.fund.manager.toLowerCase() !== address?.toLowerCase()
+    (investor) => !investor.isManager
   )
 
   const handleConnectWallet = async () => {
@@ -288,16 +288,15 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
 
   // Investing Fund Table Row Component
   const InvestingFundRow = ({ investorData }: { investorData: any }) => {
-    const fund = investorData.fund
     const handleRowClick = () => {
-      router.push(`/fund/${selectedNetwork}/${fund.fundId}/${address}`)
+      router.push(`/fund/${selectedNetwork}/${investorData.fundId}/${address}`)
     }
 
-    const profitRatio = parseFloat(fund.profitRatio)
+    const profitRatio = parseFloat(investorData.profitRatio)
     const isPositive = profitRatio >= 0
 
     // Fetch daily snapshots for the chart
-    const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+    const { data: snapshotsData } = useFundSnapshots(investorData.fundId, selectedNetwork)
     const snapshots = snapshotsData?.fundSnapshots || []
 
     // Transform snapshot data for the chart (reverse to show oldest to newest)
@@ -316,13 +315,13 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
         <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
           <div className="ml-6">
             <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
-              #{fund.fundId}
+              #{investorData.fundId}
             </Badge>
           </div>
         </td>
         <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
           <span className={`font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-            {formatProfitRatio(fund.profitRatio)}
+            {formatProfitRatio(investorData.profitRatio)}
           </span>
         </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
@@ -330,22 +329,11 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             {formatUSD(investorData.amountUSD)}
           </span>
         </td>
-        <td className="py-6 px-4 min-w-[140px]">
-          <div className="w-32">
-            {chartData.length > 0 ? (
-              <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
-            ) : (
-              <div className="h-10 flex items-center justify-center text-xs text-gray-500">
-                No data
-              </div>
-            )}
-          </div>
-        </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4 text-purple-400" />
             <span className="font-medium text-gray-100">
-              {fund.investorCount}
+              {investorData.investorCount || '0'}
             </span>
           </div>
         </td>
@@ -420,7 +408,6 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">1D Chart</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
                   </tr>
                 </thead>
