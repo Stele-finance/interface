@@ -184,6 +184,7 @@ export const zhTw = {
   joinBonusParamDesc: "加入挑戰獎勵的 STL 代幣數量（以 wei 為單位，18 位小數）",
   joinChallenge: "加入挑戰",
   joinDate: "加入日期",
+  joined: "Joined",
   joining: "加入中...",
   joinRequestSuccessful: "加入請求成功！",
   language: "語言",

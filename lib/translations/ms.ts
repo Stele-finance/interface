@@ -184,6 +184,7 @@ export const ms = {
   joinBonusParamDesc: "Jumlah token STL yang diberikan sebagai ganjaran untuk menyertai cabaran (dalam wei, 18 perpuluhan)",
   joinChallenge: "Sertai Cabaran",
   joinDate: "Tarikh Penyertaan",
+  joined: "Joined",
   joining: "Menyertai...",
   joinRequestSuccessful: "Permintaan penyertaan berjaya!",
   language: "Bahasa",

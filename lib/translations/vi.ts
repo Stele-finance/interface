@@ -184,6 +184,7 @@ export const vi = {
   joinBonusParamDesc: 'Mô tả tham số thưởng tham gia',
   joinChallenge: 'Tham gia thử thách',
   joinDate: 'Ngày tham gia',
+  joined: "Joined",
   joining: 'Đang tham gia',
   joinRequestSuccessful: 'Yêu cầu tham gia thành công',
   language: 'Ngôn ngữ',

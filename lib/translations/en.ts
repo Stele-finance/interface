@@ -180,6 +180,7 @@ export const en = {
   investmentChallenge: "Investment Challenge",
   join: "Join",
   joinChallenge: "Join Challenge",
+  joined: "Joined",
   joining: "Joining...",
   joinRequestSuccessful: "Join request successful!",
   language: "Language",

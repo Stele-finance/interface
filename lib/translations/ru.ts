@@ -184,6 +184,7 @@ export const ru = {
   joinBonusParamDesc: 'Описание параметра бонуса за присоединение',
   joinChallenge: 'Присоединиться к вызову',
   joinDate: 'Дата присоединения',
+  joined: "Joined",
   joining: 'Присоединение',
   joinRequestSuccessful: 'Запрос на присоединение успешен',
   language: 'Язык',
