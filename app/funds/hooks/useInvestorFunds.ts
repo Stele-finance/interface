@@ -6,7 +6,7 @@ import { getSubgraphUrl, getFundHeaders } from '@/lib/constants'
 export const INVESTOR_FUNDS_QUERY = gql`
   query GetInvestorFunds($investor: Bytes!, $first: Int!) {
     investors(
-      where: { investor: $investor, amountUSD_gt: "0" }
+      where: { investor: $investor }
       first: $first
       orderBy: createdAtTimestamp
       orderDirection: desc
