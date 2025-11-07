@@ -692,8 +692,55 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
         )}
       </div>
 
-      {/* Show funds tables when wallet is connected */}
-      {isConnected && address ? (
+      {/* Show funds tables */}
+      {fundFilter === 'all-funds' ? (
+        // All Funds - always show regardless of wallet connection
+        <>
+          {isLoadingAllFunds ? (
+            <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-700 bg-muted hover:bg-muted/80">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <th key={i} className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">
+                            <div className="h-4 bg-gray-600 rounded w-16 animate-pulse"></div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <tr key={i} className="hover:bg-gray-800/30 transition-colors">
+                          {[1, 2, 3, 4, 5].map((j) => (
+                            <td key={j} className="py-6 px-4 whitespace-nowrap">
+                              <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          ) : allFunds.length > 0 ? (
+            <AllFundsTable funds={allFunds} />
+          ) : (
+            <Card className="bg-muted border-gray-700/50">
+              <CardContent className="text-center py-12">
+                <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-100 mb-2">No Funds Available</h3>
+                <p className="text-gray-400 mb-4">
+                  There are no funds available on this network
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      ) : (fundFilter === 'managing' || fundFilter === 'investing') && isConnected && address ? (
+        // Managing and Investing - require wallet connection
         <>
           {isLoading ? (
             <Card className="bg-transparent border border-gray-700/50 rounded-2xl overflow-hidden">
@@ -749,18 +796,37 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
               ) : (
                 <>
                   {/* Managing Section */}
-                  {fundFilter === 'managing' && managerFunds.length > 0 && (
-                    <ManagingFundTable funds={managerFunds} />
+                  {fundFilter === 'managing' && (
+                    managerFunds.length > 0 ? (
+                      <ManagingFundTable funds={managerFunds} />
+                    ) : (
+                      <Card className="bg-muted border-gray-700/50">
+                        <CardContent className="text-center py-12">
+                          <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
+                          <h3 className="text-lg font-medium text-gray-100 mb-2">No Managing Funds</h3>
+                          <p className="text-gray-400 mb-4">
+                            You haven't created any funds yet
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )
                   )}
 
                   {/* Investing Section */}
-                  {fundFilter === 'investing' && pureInvestorFunds.length > 0 && (
-                    <InvestingFundTable investorFunds={pureInvestorFunds} />
-                  )}
-
-                  {/* All Funds Section */}
-                  {fundFilter === 'all-funds' && allFunds.length > 0 && (
-                    <AllFundsTable funds={allFunds} />
+                  {fundFilter === 'investing' && (
+                    pureInvestorFunds.length > 0 ? (
+                      <InvestingFundTable investorFunds={pureInvestorFunds} />
+                    ) : (
+                      <Card className="bg-muted border-gray-700/50">
+                        <CardContent className="text-center py-12">
+                          <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
+                          <h3 className="text-lg font-medium text-gray-100 mb-2">No Investing Funds</h3>
+                          <p className="text-gray-400 mb-4">
+                            You haven't joined any funds yet
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )
                   )}
                 </>
               )}
