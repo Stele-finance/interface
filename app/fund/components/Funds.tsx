@@ -124,7 +124,7 @@ function FundCard({
                 </div>
                 <div className="w-5/6 h-10 mx-auto">
                   {chartData.length > 0 ? (
-                    <SparklineChart data={chartData} height={40} />
+                    <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
                   ) : (
                     <div className="h-10 flex items-center justify-center text-xs text-gray-500">
                       No data
@@ -170,7 +170,7 @@ function FundCard({
               </div>
               <div className="w-5/6 h-10 mx-auto">
                 {chartData.length > 0 ? (
-                  <SparklineChart data={chartData} height={40} />
+                  <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
                 ) : (
                   <div className="h-10 flex items-center justify-center text-xs text-gray-500">
                     No data

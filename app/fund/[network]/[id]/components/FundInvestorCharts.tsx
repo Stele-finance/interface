@@ -226,7 +226,15 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <User className="w-6 h-6 text-blue-500" />
-                <h3 className="text-2xl sm:text-3xl text-gray-100">
+                <h3
+                  className="text-2xl sm:text-3xl text-gray-100 hover:text-blue-400 transition-colors cursor-pointer"
+                  onClick={() => {
+                    const explorerUrl = network === 'arbitrum'
+                      ? `https://arbiscan.io/address/${investor}`
+                      : `https://etherscan.io/address/${investor}`
+                    window.open(explorerUrl, '_blank')
+                  }}
+                >
                   {formatInvestorAddress(investor)}
                 </h3>
               </div>
@@ -262,7 +270,15 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <User className="w-6 h-6 text-blue-500" />
-              <h3 className="text-2xl sm:text-3xl text-gray-100">
+              <h3
+                className="text-2xl sm:text-3xl text-gray-100 hover:text-blue-400 transition-colors cursor-pointer"
+                onClick={() => {
+                  const explorerUrl = network === 'arbitrum'
+                    ? `https://arbiscan.io/address/${investor}`
+                    : `https://etherscan.io/address/${investor}`
+                  window.open(explorerUrl, '_blank')
+                }}
+              >
                 {formatInvestorAddress(investor)}
               </h3>
             </div>
