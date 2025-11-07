@@ -14,13 +14,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { formatDateWithLocale } from "@/lib/utils"
 import {
   Wallet,
   Coins,
   Users,
   Plus,
-  Loader2
+  Loader2,
+  ChevronDown,
+  Filter
 } from "lucide-react"
 import { useWallet } from "@/app/hooks/useWallet"
 import { useLanguage } from "@/lib/language-context"
@@ -51,6 +54,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
   const [isConnecting, setIsConnecting] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [fundFilter, setFundFilter] = useState<'managing' | 'investing' | 'all-funds'>('managing')
   const isMobile = useIsMobile()
   const queryClient = useQueryClient()
 
@@ -458,19 +462,61 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
     )
   }
 
+  // Get filter display text
+  const getFilterText = () => {
+    switch (fundFilter) {
+      case 'managing': return 'Managing'
+      case 'investing': return 'Investing'
+      case 'all-funds': return 'All Funds'
+      default: return 'Managing'
+    }
+  }
+
   return (
-    <div className="space-y-4 mt-8">
-      {/* Desktop Layout */}
-      <div className="hidden md:flex items-center justify-between">
-        <div className="flex gap-4">
-          <h2 className="text-3xl text-gray-100 cursor-default">{t('myFunds')}</h2>
-          <button
-            onClick={() => setActiveTab('all-funds')}
-            className="text-3xl text-gray-400 hover:text-gray-200 transition-colors"
-          >
-            {t('allFunds')}
-          </button>
+    <div className="space-y-8 mt-8">
+      {/* Header with Filter Dropdown */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h2 className="text-3xl text-gray-100">Funds</h2>
+
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2 bg-muted/40 border-gray-600 hover:bg-muted/60">
+                <span>{getFilterText()}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="bg-muted/80 border-gray-600">
+              {isConnected && managerFunds.length > 0 && (
+                <DropdownMenuItem
+                  onClick={() => setFundFilter('managing')}
+                  className="cursor-pointer hover:bg-gray-700"
+                >
+                  Managing
+                </DropdownMenuItem>
+              )}
+              {isConnected && pureInvestorFunds.length > 0 && (
+                <DropdownMenuItem
+                  onClick={() => setFundFilter('investing')}
+                  className="cursor-pointer hover:bg-gray-700"
+                >
+                  Investing
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  setFundFilter('all-funds')
+                  setActiveTab('all-funds')
+                }}
+                className="cursor-pointer hover:bg-gray-700"
+              >
+                All Funds
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
         {/* Show +New button only when connected and no managing funds */}
         {isConnected && managerFunds.length === 0 && !isLoading && (
           <Button
@@ -491,43 +537,6 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             )}
           </Button>
         )}
-      </div>
-
-      {/* Mobile Layout */}
-      <div className="md:hidden space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
-            <h2 className="text-2xl sm:text-3xl text-gray-100 cursor-default whitespace-nowrap">{t('myFunds')}</h2>
-            <button
-              onClick={() => setActiveTab('all-funds')}
-              className="text-2xl sm:text-3xl text-gray-400 hover:text-gray-200 transition-colors whitespace-nowrap"
-            >
-              {t('allFunds')}
-            </button>
-          </div>
-
-          {/* Show +New button only when connected and no managing funds */}
-          {isConnected && managerFunds.length === 0 && !isLoading && (
-            <Button
-              onClick={handleCreateFundClick}
-              disabled={isCreating}
-              className="bg-orange-500 hover:bg-orange-600 text-white shrink-0"
-              size="sm"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                  <span className="text-xs">Creating...</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-1 h-3 w-3" />
-                  <span className="text-xs">New</span>
-                </>
-              )}
-            </Button>
-          )}
-        </div>
       </div>
 
       {/* Show funds tables when wallet is connected */}
@@ -585,19 +594,35 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-8">
+                <div className="space-y-12">
                   {/* Managing Section */}
-                  {managerFunds.length > 0 && (
+                  {fundFilter === 'managing' && managerFunds.length > 0 && (
                     <div className="space-y-4">
-                      <h3 className="text-2xl font-semibold text-gray-100">Managing</h3>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                          <Coins className="h-5 w-5 text-orange-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-semibold text-gray-100">Managing</h3>
+                          <p className="text-sm text-gray-400">Funds you manage</p>
+                        </div>
+                      </div>
                       <ManagingFundTable funds={managerFunds} />
                     </div>
                   )}
 
                   {/* Investing Section */}
-                  {pureInvestorFunds.length > 0 && (
+                  {fundFilter === 'investing' && pureInvestorFunds.length > 0 && (
                     <div className="space-y-4">
-                      <h3 className="text-2xl font-semibold text-gray-100">Investing</h3>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                          <Wallet className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-semibold text-gray-100">Investing</h3>
+                          <p className="text-sm text-gray-400">Funds you invested in</p>
+                        </div>
+                      </div>
                       <InvestingFundTable investorFunds={pureInvestorFunds} />
                     </div>
                   )}
