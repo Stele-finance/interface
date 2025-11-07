@@ -38,6 +38,7 @@ import SteleFundInfoABI from "@/app/abis/SteleFundInfo.json"
 import { useQueryClient } from '@tanstack/react-query'
 import { SparklineChart } from "@/components/SparklineChart"
 import { useFundSnapshots } from "@/app/fund/hooks/useFundSnapshots"
+import { useFunds } from "@/app/fund/hooks/useFunds"
 
 interface MyFundsTabProps {
   activeTab: 'my-funds' | 'all-funds'
@@ -54,18 +55,19 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
   const [isConnecting, setIsConnecting] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [fundFilter, setFundFilter] = useState<'managing' | 'investing' | 'all-funds'>('managing')
   const isMobile = useIsMobile()
   const queryClient = useQueryClient()
 
   // Use hooks for fund data
   const { data: managerFundsData, isLoading: isLoadingManager } = useManagerFunds(address || '', 100, selectedNetwork)
   const { data: investorFundsData, isLoading: isLoadingInvestor } = useInvestorFunds(address || '', 100, selectedNetwork)
+  const { data: allFundsData, isLoading: isLoadingAllFunds } = useFunds(100, selectedNetwork)
 
   const managerFunds = managerFundsData?.funds || []
   const investorFunds = investorFundsData?.investors || []
+  const allFunds = allFundsData?.funds || []
 
-  const isLoading = isLoadingManager || isLoadingInvestor
+  const isLoading = isLoadingManager || isLoadingInvestor || isLoadingAllFunds
 
   // Helper function to format USD values
   const formatUSD = (value: string) => {
@@ -98,6 +100,17 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
   const pureInvestorFunds = investorFunds.filter(
     (investor) => !investor.isManager
   )
+
+  // Determine default filter based on available funds
+  const getDefaultFilter = (): 'managing' | 'investing' | 'all-funds' => {
+    if (isConnected) {
+      if (managerFunds.length > 0) return 'managing'
+      if (pureInvestorFunds.length > 0) return 'investing'
+    }
+    return 'all-funds'
+  }
+
+  const [fundFilter, setFundFilter] = useState<'managing' | 'investing' | 'all-funds'>(getDefaultFilter())
 
   const handleConnectWallet = async () => {
     try {
@@ -382,6 +395,153 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
     )
   }
 
+  // All Funds Table Row Component (same as TotalFundsTab)
+  const AllFundsRow = ({ fund }: { fund: any }) => {
+    const handleRowClick = () => {
+      router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
+    }
+
+    const profitRatio = parseFloat(fund.profitRatio)
+    const isPositive = profitRatio >= 0
+
+    // Fetch daily snapshots for the chart
+    const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+    const snapshots = snapshotsData?.fundSnapshots || []
+
+    // Transform snapshot data for the chart (reverse to show oldest to newest)
+    const chartData = snapshots
+      .slice()
+      .reverse()
+      .map(snapshot => ({
+        value: parseFloat(snapshot.amountUSD)
+      }))
+
+    return (
+      <tr
+        className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+        onClick={handleRowClick}
+      >
+        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
+          <div className="ml-6">
+            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
+              #{fund.fundId}
+            </Badge>
+          </div>
+        </td>
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+          <span className={`font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            {formatProfitRatio(fund.profitRatio)}
+          </span>
+        </td>
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          <span className="font-medium text-green-400">
+            {formatUSD(fund.amountUSD)}
+          </span>
+        </td>
+        <td className="py-6 px-4 min-w-[140px]">
+          <div className="w-32">
+            {chartData.length > 0 ? (
+              <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
+            ) : (
+              <div className="h-10 flex items-center justify-center text-xs text-gray-500">
+                No data
+              </div>
+            )}
+          </div>
+        </td>
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          <div className="flex items-center gap-1">
+            <Users className="h-4 w-4 text-purple-400" />
+            <span className="font-medium text-gray-100">
+              {fund.investorCount}
+            </span>
+          </div>
+        </td>
+      </tr>
+    )
+  }
+
+  // All Funds Table Component
+  const AllFundsTable = ({ funds }: { funds: any[] }) => {
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
+    const maxPages = 5
+
+    if (funds.length === 0) return null
+
+    const totalFunds = Math.min(funds.length, maxPages * itemsPerPage)
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = Math.min(startIndex + itemsPerPage, totalFunds)
+    const paginatedFunds = funds.slice(startIndex, endIndex)
+    const totalPages = Math.min(Math.ceil(totalFunds / itemsPerPage), maxPages)
+
+    return (
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <div className="min-w-[500px]">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Coins className="h-4 w-4 text-blue-500" />
+                        {t('fund')}
+                      </div>
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">1D Chart</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedFunds.map((fund) => (
+                    <AllFundsRow key={fund.id} fund={fund} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center py-4 px-6 border-t border-gray-600">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer hover:bg-gray-700"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gray-700"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Investing Fund Table Component
   const InvestingFundTable = ({ investorFunds }: { investorFunds: any[] }) => {
     const [currentPage, setCurrentPage] = useState(1)
@@ -505,10 +665,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
-                onClick={() => {
-                  setFundFilter('all-funds')
-                  setActiveTab('all-funds')
-                }}
+                onClick={() => setFundFilter('all-funds')}
                 className="cursor-pointer hover:bg-gray-700"
               >
                 All Funds
@@ -517,8 +674,8 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
           </DropdownMenu>
         </div>
 
-        {/* Show +New button only when connected and no managing funds */}
-        {isConnected && managerFunds.length === 0 && !isLoading && (
+        {/* Show +New button when on Managing filter and no managing funds */}
+        {isConnected && fundFilter === 'managing' && managerFunds.length === 0 && !isLoading && (
           <Button
             onClick={handleCreateFundClick}
             disabled={isCreating}
@@ -594,39 +751,22 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-12">
+                <>
                   {/* Managing Section */}
                   {fundFilter === 'managing' && managerFunds.length > 0 && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                          <Coins className="h-5 w-5 text-orange-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-semibold text-gray-100">Managing</h3>
-                          <p className="text-sm text-gray-400">Funds you manage</p>
-                        </div>
-                      </div>
-                      <ManagingFundTable funds={managerFunds} />
-                    </div>
+                    <ManagingFundTable funds={managerFunds} />
                   )}
 
                   {/* Investing Section */}
                   {fundFilter === 'investing' && pureInvestorFunds.length > 0 && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <Wallet className="h-5 w-5 text-blue-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-semibold text-gray-100">Investing</h3>
-                          <p className="text-sm text-gray-400">Funds you invested in</p>
-                        </div>
-                      </div>
-                      <InvestingFundTable investorFunds={pureInvestorFunds} />
-                    </div>
+                    <InvestingFundTable investorFunds={pureInvestorFunds} />
                   )}
-                </div>
+
+                  {/* All Funds Section */}
+                  {fundFilter === 'all-funds' && allFunds.length > 0 && (
+                    <AllFundsTable funds={allFunds} />
+                  )}
+                </>
               )}
             </>
           )}
