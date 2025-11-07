@@ -27,11 +27,14 @@ import { useLanguage } from "@/lib/language-context"
 import { getWalletLogo } from "@/lib/utils"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { useManagerFunds } from "../hooks/useManagerFunds"
+import { useInvestorFunds } from "../hooks/useInvestorFunds"
 import Image from "next/image"
 import { ethers } from 'ethers'
 import { NETWORK_CONTRACTS } from "@/lib/constants"
 import SteleFundInfoABI from "@/app/abis/SteleFundInfo.json"
 import { useQueryClient } from '@tanstack/react-query'
+import { SparklineChart } from "@/components/SparklineChart"
+import { useFundSnapshots } from "@/app/fund/hooks/useFundSnapshots"
 
 interface MyFundsTabProps {
   activeTab: 'my-funds' | 'all-funds'
@@ -52,9 +55,13 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
   const queryClient = useQueryClient()
 
   // Use hooks for fund data
-  const { data: fundsData, isLoading, error } = useManagerFunds(address || '', 100, selectedNetwork)
+  const { data: managerFundsData, isLoading: isLoadingManager } = useManagerFunds(address || '', 100, selectedNetwork)
+  const { data: investorFundsData, isLoading: isLoadingInvestor } = useInvestorFunds(address || '', 100, selectedNetwork)
 
-  const funds = fundsData?.funds || []
+  const managerFunds = managerFundsData?.funds || []
+  const investorFunds = investorFundsData?.investors || []
+
+  const isLoading = isLoadingManager || isLoadingInvestor
 
   // Helper function to format USD values
   const formatUSD = (value: string) => {
@@ -74,6 +81,19 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
     const year = date.getFullYear()
     return `${month}/${day}/${year}`
   }
+
+  // Format profit ratio
+  const formatProfitRatio = (ratio: string) => {
+    const num = parseFloat(ratio)
+    if (isNaN(num)) return '+0.00%'
+    const percentage = (num * 100).toFixed(2)
+    return num >= 0 ? `+${percentage}%` : `${percentage}%`
+  }
+
+  // Filter out funds where user is both manager and investor from investing list
+  const pureInvestorFunds = investorFunds.filter(
+    (investor) => investor.fund.manager.toLowerCase() !== address?.toLowerCase()
+  )
 
   const handleConnectWallet = async () => {
     try {
@@ -200,11 +220,26 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
     }
   }
 
-  // Fund Table Row Component
-  const FundRow = ({ fund }: { fund: any }) => {
+  // Managing Fund Table Row Component
+  const ManagingFundRow = ({ fund }: { fund: any }) => {
     const handleRowClick = () => {
       router.push(`/fund/${selectedNetwork}/${fund.fundId}`)
     }
+
+    const profitRatio = parseFloat(fund.profitRatio)
+    const isPositive = profitRatio >= 0
+
+    // Fetch daily snapshots for the chart
+    const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+    const snapshots = snapshotsData?.fundSnapshots || []
+
+    // Transform snapshot data for the chart (reverse to show oldest to newest)
+    const chartData = snapshots
+      .slice()
+      .reverse()
+      .map(snapshot => ({
+        value: parseFloat(snapshot.amountUSD)
+      }))
 
     return (
       <tr
@@ -218,10 +253,26 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             </Badge>
           </div>
         </td>
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+          <span className={`font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            {formatProfitRatio(fund.profitRatio)}
+          </span>
+        </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <span className="font-medium text-green-400">
             {formatUSD(fund.amountUSD)}
           </span>
+        </td>
+        <td className="py-6 px-4 min-w-[140px]">
+          <div className="w-32">
+            {chartData.length > 0 ? (
+              <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
+            ) : (
+              <div className="h-10 flex items-center justify-center text-xs text-gray-500">
+                No data
+              </div>
+            )}
+          </div>
         </td>
         <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
           <div className="flex items-center gap-1">
@@ -231,27 +282,126 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             </span>
           </div>
         </td>
-        <td className="py-6 px-6 min-w-[120px] whitespace-nowrap">
-          <span className="text-sm text-gray-400">
-            {formatDateTime(fund.createdAtTimestamp)}
+      </tr>
+    )
+  }
+
+  // Investing Fund Table Row Component
+  const InvestingFundRow = ({ investorData }: { investorData: any }) => {
+    const fund = investorData.fund
+    const handleRowClick = () => {
+      router.push(`/fund/${selectedNetwork}/${fund.fundId}/${address}`)
+    }
+
+    const profitRatio = parseFloat(fund.profitRatio)
+    const isPositive = profitRatio >= 0
+
+    // Fetch daily snapshots for the chart
+    const { data: snapshotsData } = useFundSnapshots(fund.fundId, selectedNetwork)
+    const snapshots = snapshotsData?.fundSnapshots || []
+
+    // Transform snapshot data for the chart (reverse to show oldest to newest)
+    const chartData = snapshots
+      .slice()
+      .reverse()
+      .map(snapshot => ({
+        value: parseFloat(snapshot.amountUSD)
+      }))
+
+    return (
+      <tr
+        className="hover:bg-gray-800/30 transition-colors cursor-pointer"
+        onClick={handleRowClick}
+      >
+        <td className="py-6 pl-6 pr-4 min-w-[100px] whitespace-nowrap">
+          <div className="ml-6">
+            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-sm whitespace-nowrap hover:bg-gray-800 hover:text-gray-300 hover:border-gray-600">
+              #{fund.fundId}
+            </Badge>
+          </div>
+        </td>
+        <td className="py-6 px-4 min-w-[120px] whitespace-nowrap">
+          <span className={`font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+            {formatProfitRatio(fund.profitRatio)}
           </span>
+        </td>
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          <span className="font-medium text-green-400">
+            {formatUSD(investorData.amountUSD)}
+          </span>
+        </td>
+        <td className="py-6 px-4 min-w-[140px]">
+          <div className="w-32">
+            {chartData.length > 0 ? (
+              <SparklineChart data={chartData} height={40} color={isPositive ? '#10b981' : '#ef4444'} />
+            ) : (
+              <div className="h-10 flex items-center justify-center text-xs text-gray-500">
+                No data
+              </div>
+            )}
+          </div>
+        </td>
+        <td className="py-6 px-4 min-w-[100px] whitespace-nowrap">
+          <div className="flex items-center gap-1">
+            <Users className="h-4 w-4 text-purple-400" />
+            <span className="font-medium text-gray-100">
+              {fund.investorCount}
+            </span>
+          </div>
         </td>
       </tr>
     )
   }
 
-  // Fund Table Component
-  const FundTable = ({ funds }: { funds: any[] }) => {
-    const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 5
-    const maxPages = 5
-
+  // Managing Fund Table Component (Only 1 fund per manager)
+  const ManagingFundTable = ({ funds }: { funds: any[] }) => {
     if (funds.length === 0) return null
 
-    const totalFunds = Math.min(funds.length, maxPages * itemsPerPage)
+    return (
+      <Card className="bg-transparent border border-gray-600 rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <div className="min-w-[500px]">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-600 bg-muted hover:bg-muted/80">
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Coins className="h-4 w-4 text-blue-500" />
+                        {t('fund')}
+                      </div>
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">1D Chart</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {funds.map((fund) => (
+                    <ManagingFundRow key={fund.id} fund={fund} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Investing Fund Table Component
+  const InvestingFundTable = ({ investorFunds }: { investorFunds: any[] }) => {
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
+    const maxPages = 5
+
+    if (investorFunds.length === 0) return null
+
+    const totalFunds = Math.min(investorFunds.length, maxPages * itemsPerPage)
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = Math.min(startIndex + itemsPerPage, totalFunds)
-    const paginatedFunds = funds.slice(startIndex, endIndex)
+    const paginatedFunds = investorFunds.slice(startIndex, endIndex)
     const totalPages = Math.min(Math.ceil(totalFunds / itemsPerPage), maxPages)
 
     return (
@@ -268,14 +418,15 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                         {t('fund')}
                       </div>
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">TVL</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('profitRatio')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('value')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">1D Chart</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 whitespace-nowrap">{t('investor')}</th>
-                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400 whitespace-nowrap">{t('create')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedFunds.map((fund) => (
-                    <FundRow key={fund.id} fund={fund} />
+                  {paginatedFunds.map((investorData) => (
+                    <InvestingFundRow key={investorData.id} investorData={investorData} />
                   ))}
                 </tbody>
               </table>
@@ -333,8 +484,8 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             {t('allFunds')}
           </button>
         </div>
-        {/* Show +New button only when connected and no funds */}
-        {isConnected && funds.length === 0 && !isLoading && (
+        {/* Show +New button only when connected and no managing funds */}
+        {isConnected && managerFunds.length === 0 && !isLoading && (
           <Button
             onClick={handleCreateFundClick}
             disabled={isCreating}
@@ -368,8 +519,8 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
             </button>
           </div>
 
-          {/* Show +New button only when connected and no funds */}
-          {isConnected && funds.length === 0 && !isLoading && (
+          {/* Show +New button only when connected and no managing funds */}
+          {isConnected && managerFunds.length === 0 && !isLoading && (
             <Button
               onClick={handleCreateFundClick}
               disabled={isCreating}
@@ -392,7 +543,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
         </div>
       </div>
 
-      {/* Show funds table when wallet is connected */}
+      {/* Show funds tables when wallet is connected */}
       {isConnected && address ? (
         <>
           {isLoading ? (
@@ -436,7 +587,7 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                     </p>
                   </CardContent>
                 </Card>
-              ) : funds.length === 0 ? (
+              ) : managerFunds.length === 0 && pureInvestorFunds.length === 0 ? (
                 <Card className="bg-muted border-gray-700/50">
                   <CardContent className="text-center py-12">
                     <Coins className="h-12 w-12 mx-auto mb-4 opacity-50 text-gray-400" />
@@ -447,7 +598,23 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
                   </CardContent>
                 </Card>
               ) : (
-                <FundTable funds={funds} />
+                <div className="space-y-8">
+                  {/* Managing Section */}
+                  {managerFunds.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-semibold text-gray-100">Managing</h3>
+                      <ManagingFundTable funds={managerFunds} />
+                    </div>
+                  )}
+
+                  {/* Investing Section */}
+                  {pureInvestorFunds.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-semibold text-gray-100">Investing</h3>
+                      <InvestingFundTable investorFunds={pureInvestorFunds} />
+                    </div>
+                  )}
+                </div>
               )}
             </>
           )}
