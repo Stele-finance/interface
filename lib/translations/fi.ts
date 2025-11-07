@@ -184,6 +184,7 @@ export const fi = {
   joinBonusParamDesc: "Amount of STL tokens rewarded for joining a challenge (in wei, 18 decimals)",
   joinChallenge: "Liity Haasteeseen",
   joinDate: "Join Date",
+  joined: "Joined",
   joinRequestSuccessful: "Liittymispyyntö onnistui!",
   joining: "Liitytään...",
   language: "Kieli",

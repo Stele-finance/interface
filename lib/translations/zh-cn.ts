@@ -184,6 +184,7 @@ export const zhCn = {
   joinBonusParamDesc: '加入奖金参数描述',
   joinChallenge: '加入挑战',
   joinDate: '加入日期',
+  joined: "Joined",
   joining: '加入中',
   joinRequestSuccessful: '加入请求成功',
   language: '语言',

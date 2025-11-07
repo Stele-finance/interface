@@ -83,6 +83,7 @@ export const nl = {
   tvl: "TVL",
   topInvestors: "Top Investeerders",
   joinDate: "Aansluitdatum",
+  joined: "Joined",
   closed: "Gesloten",
   currentTime: "Huidig",
   customContractInteraction: "Aangepaste Contract Interactie",

@@ -184,6 +184,7 @@ export const th = {
   joinBonusParamDesc: 'คำอธิบายพารามิเตอร์โบนัสการเข้าร่วม',
   joinChallenge: 'เข้าร่วมความท้าทาย',
   joinDate: 'วันที่เข้าร่วม',
+  joined: "Joined",
   joining: 'กำลังเข้าร่วม',
   joinRequestSuccessful: 'คำขอเข้าร่วมสำเร็จ',
   language: 'ภาษา',

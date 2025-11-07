@@ -919,10 +919,10 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                       </div>
 
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm text-gray-400">Created</span>
+                        <span className="text-sm text-gray-400">{t('joined')}</span>
                         <span className="text-sm text-white font-medium">
-                          {fundData?.fund?.createdAtTimestamp
-                            ? new Date(parseInt(fundData.fund.createdAtTimestamp) * 1000).toLocaleDateString(language, {
+                          {investor?.createdAtTimestamp
+                            ? new Date(parseInt(investor.createdAtTimestamp) * 1000).toLocaleDateString(language, {
                                 year: 'numeric',
                                 month: 'short',
                                 day: 'numeric'

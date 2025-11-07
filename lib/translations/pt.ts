@@ -83,6 +83,7 @@ export const pt = {
   tvl: "TVL",
   topInvestors: "Top Investidores",
   joinDate: "Data de Adesão",
+  joined: "Joined",
   closed: "Fechado",
   currentTime: "Atual",
   customContractInteraction: "Interação de Contrato Personalizada",

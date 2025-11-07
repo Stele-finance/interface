@@ -184,6 +184,7 @@ export const jp = {
   joinBonusParamDesc: "チャレンジ参加に対して報酬として与えられるSTLトークンの量（wei単位、18桁）",
   joinChallenge: "チャレンジに参加",
   joinDate: "参加日",
+  joined: "Joined",
   joining: "参加中...",
   joinRequestSuccessful: "参加リクエスト成功！",
   language: "言語",
