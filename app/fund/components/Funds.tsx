@@ -144,7 +144,7 @@ function FundCard({
                 <span className="text-lg font-medium">{t('profitRatio')}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Triangle className={`h-6 w-6 flex-shrink-0 ${isPositive ? '' : 'rotate-180'} ${isPositive ? 'fill-green-400' : 'fill-red-400'}`} />
+                <Triangle className={`h-6 w-6 flex-shrink-0 ${isPositive ? '' : 'rotate-180'} ${isPositive ? 'fill-green-400' : 'fill-red-400'} stroke-none`} />
                 <span className={`text-6xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
                   {formatProfitRatio(fund.profitRatio).replace(/^[+-]/, '')}
                 </span>
