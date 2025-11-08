@@ -245,7 +245,18 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
         ? `$${(currentTVL / 1000).toFixed(1)}K`
         : `$${currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 
-    const tweetText = `Check out Fund ${fundId} on Stele Finance! 💰 Total Value: ${formattedTVL} ${currentUrl}`
+    // Calculate profit ratio
+    let profitRatioText = ''
+    if (fundData?.fund?.principal) {
+      const principal = parseFloat(fundData.fund.principal)
+      const currentValue = realTimeFundValue !== null ? realTimeFundValue : currentTVL
+      const profitRatio = principal > 0 ? ((currentValue - principal) / principal) * 100 : 0
+      const isPositive = profitRatio >= 0
+      const triangleIcon = isPositive ? '▲' : '▼'
+      profitRatioText = ` 📈 Profit ratio: ${triangleIcon}${profitRatio.toFixed(2)}%`
+    }
+
+    const tweetText = `Check out Fund ${fundId} on Stele Finance!${profitRatioText} 💰 Total Value: ${formattedTVL} ${currentUrl}`
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
     window.open(twitterUrl, '_blank')
   }
