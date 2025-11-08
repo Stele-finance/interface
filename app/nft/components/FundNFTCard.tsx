@@ -178,7 +178,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         </CardHeader>
-        <CardContent className="pt-1 pb-1 px-2">
+        <CardContent className="pt-3 pb-3 px-2">
           <a
             href={getNFTExplorerUrl()}
             target="_blank"
