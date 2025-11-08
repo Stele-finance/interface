@@ -316,27 +316,9 @@ export function FundActionTabs({
       // Clear the input
       setWithdrawAmount("0")
 
-      // Invalidate queries to refresh data after successful withdraw
+      // Refresh page after successful withdraw
       setTimeout(() => {
-        // Fund data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork], refetchType: 'active' });
-
-        // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+        window.location.reload();
       }, 3000);
 
     } catch (error: any) {
@@ -508,27 +490,9 @@ export function FundActionTabs({
         throw new Error('Failed to collect fees from any token')
       }
 
-      // Invalidate queries to refresh data after successful fee collection
+      // Refresh page after successful fee collection
       setTimeout(() => {
-        // Fund data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork], refetchType: 'active' });
-
-        // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+        window.location.reload();
       }, 3000);
 
     } catch (error: any) {
@@ -623,27 +587,9 @@ export function FundActionTabs({
       // Clear the input
       setDepositAmount("")
 
-      // Invalidate queries to refresh data after successful deposit
+      // Refresh page after successful deposit
       setTimeout(() => {
-        // Fund data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork], refetchType: 'active' });
-
-        // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+        window.location.reload();
       }, 3000);
 
     } catch (error: any) {

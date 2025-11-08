@@ -470,27 +470,9 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
       // Clear the form
       setFromAmount("");
 
-      // Invalidate queries to refresh data after successful swap
+      // Refresh page after successful swap
       setTimeout(() => {
-        // Fund data
-        queryClient.invalidateQueries({ queryKey: ['fund', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundUserTokens', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Investor data
-        queryClient.invalidateQueries({ queryKey: ['fundInvestor', subgraphNetwork], refetchType: 'active' });
-
-        // Transactions
-        queryClient.invalidateQueries({ queryKey: ['fundTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundAllTransactions', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Snapshots for charts
-        queryClient.invalidateQueries({ queryKey: ['fundSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['fundInvestorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorSnapshots', fundId, subgraphNetwork], refetchType: 'active' });
-
-        // Share data
-        queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
-        queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+        window.location.reload();
       }, 3000);
 
     } catch (error: any) {
