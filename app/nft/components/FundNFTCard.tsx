@@ -101,7 +101,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
   const returnRateColor = getReturnRateSVGColor(nft.returnRateFormatted)
 
   const svgContent = `
-    <svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+    <svg width="300" height="370" viewBox="0 0 300 370" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="orangeGradient-${nft.id}" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:#ff8c42;stop-opacity:1" />
@@ -116,52 +116,52 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
         </filter>
       </defs>
 
-      <rect width="300" height="400" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1" filter="url(#cardShadow-${nft.id})"/>
+      <rect width="300" height="370" rx="12" fill="url(#cardBackground-${nft.id})" stroke="#404040" stroke-width="1" filter="url(#cardShadow-${nft.id})"/>
       <rect x="0" y="0" width="300" height="4" rx="12" fill="url(#orangeGradient-${nft.id})"/>
 
-      <text x="24" y="40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#f9fafb">
+      <text x="24" y="35" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#f9fafb">
         Fund Performance
       </text>
-      <text x="24" y="60" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#9ca3af">
+      <text x="24" y="53" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" fill="#9ca3af">
         Stele Protocol
       </text>
 
-      <rect x="24" y="85" width="80" height="32" rx="16" fill="url(#orangeGradient-${nft.id})"/>
-      <text x="64" y="103" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">
+      <rect x="24" y="73" width="80" height="30" rx="15" fill="url(#orangeGradient-${nft.id})"/>
+      <text x="64" y="91" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">
         Fund #${nft.fundId}
       </text>
 
       <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-        <text x="24" y="140" font-size="14" font-weight="500" fill="#9ca3af">Fund ID</text>
-        <text x="276" y="140" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.fundId}</text>
+        <text x="24" y="125" font-size="13" font-weight="500" fill="#9ca3af">Fund ID</text>
+        <text x="276" y="125" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">#${nft.fundId}</text>
 
-        <text x="24" y="165" font-size="14" font-weight="500" fill="#9ca3af">Manager</text>
-        <text x="276" y="165" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAddressShort(nft.manager)}</text>
+        <text x="24" y="147" font-size="13" font-weight="500" fill="#9ca3af">Manager</text>
+        <text x="276" y="147" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAddressShort(nft.manager)}</text>
 
-        <text x="24" y="190" font-size="14" font-weight="500" fill="#9ca3af">Created</text>
-        <text x="276" y="190" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.fundCreatedFormatted}</text>
+        <text x="24" y="169" font-size="13" font-weight="500" fill="#9ca3af">Created</text>
+        <text x="276" y="169" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.fundCreatedFormatted}</text>
 
-        <text x="24" y="215" font-size="14" font-weight="500" fill="#9ca3af">Minted</text>
-        <text x="276" y="215" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.mintedAtFormatted}</text>
+        <text x="24" y="191" font-size="13" font-weight="500" fill="#9ca3af">Minted</text>
+        <text x="276" y="191" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">${nft.mintedAtFormatted}</text>
 
-        <text x="24" y="240" font-size="14" font-weight="500" fill="#9ca3af">Return Rate</text>
-        <text x="276" y="240" font-size="16" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.returnRateFormatted)}</text>
+        <text x="24" y="213" font-size="13" font-weight="500" fill="#9ca3af">Return Rate</text>
+        <text x="276" y="213" font-size="15" font-weight="700" fill="${returnRateColor}" text-anchor="end">${formatReturnRate(nft.returnRateFormatted)}</text>
       </g>
 
-      <line x1="24" y1="270" x2="276" y2="270" stroke="#404040" stroke-width="1"/>
+      <line x1="24" y1="235" x2="276" y2="235" stroke="#404040" stroke-width="1"/>
 
       <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-        <text x="24" y="295" font-size="14" font-weight="500" fill="#9ca3af">Investment</text>
-        <text x="276" y="295" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.investment)}</text>
+        <text x="24" y="257" font-size="13" font-weight="500" fill="#9ca3af">Investment</text>
+        <text x="276" y="257" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.investment)}</text>
 
-        <text x="24" y="320" font-size="14" font-weight="500" fill="#9ca3af">Current Value</text>
-        <text x="276" y="320" font-size="14" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.currentTVL)}</text>
+        <text x="24" y="279" font-size="13" font-weight="500" fill="#9ca3af">Current Value</text>
+        <text x="276" y="279" font-size="13" font-weight="600" fill="#f9fafb" text-anchor="end">${formatAmount(nft.currentTVL)}</text>
 
-        <text x="24" y="345" font-size="14" font-weight="500" fill="#9ca3af">Profit</text>
-        <text x="276" y="345" font-size="14" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatAmount(profit.toString())}</text>
+        <text x="24" y="301" font-size="13" font-weight="500" fill="#9ca3af">Profit</text>
+        <text x="276" y="301" font-size="13" font-weight="600" fill="${profitColor}" text-anchor="end">${profitSign}${formatAmount(profit.toString())}</text>
       </g>
 
-      <text x="150" y="380" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle">
+      <text x="150" y="340" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="11" font-weight="500" fill="#9ca3af" text-anchor="middle">
         Powered by Stele Protocol
       </text>
     </svg>
@@ -176,16 +176,16 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
       </CardHeader>
-      <CardContent className="pt-2">
+      <CardContent className="pt-1 pb-2 px-2">
         <a
           href={getNFTExplorerUrl()}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+          className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
           <ExternalLink className="h-3 w-3" />
-          <span className="font-mono">
+          <span className="font-mono text-[11px]">
             Token ID: {nft.tokenId}
           </span>
         </a>
