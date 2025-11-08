@@ -210,6 +210,9 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
       // Refresh the funds data for the selected network
       await queryClient.invalidateQueries({ queryKey: ['managerFunds', address, 100] })
 
+      // Refresh page
+      window.location.reload()
+
     } catch (error: any) {
       console.error('Error creating fund:', error)
 

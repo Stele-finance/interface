@@ -491,6 +491,9 @@ export function FundAssetSwap({ className, userTokens = [], investableTokens: ex
         // Share data
         queryClient.invalidateQueries({ queryKey: ['fundShare', fundId, subgraphNetwork], refetchType: 'active' });
         queryClient.invalidateQueries({ queryKey: ['investorShare', subgraphNetwork], refetchType: 'active' });
+
+        // Refresh page
+        window.location.reload();
       }, 3000);
 
     } catch (error: any) {
