@@ -56,7 +56,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           analytics: false,
           email: false,
           socials: [],
-          allWallets: false,
+          allWallets: true,
           swaps: false,
           onramp: false,
         },
