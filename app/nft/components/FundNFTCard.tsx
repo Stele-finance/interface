@@ -168,7 +168,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
   `
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+    <Card className="overflow-hidden bg-transparent border-0 hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-0 p-0">
         <div
           onClick={handleCardClick}
@@ -176,7 +176,7 @@ export function FundNFTCard({ nft, network = 'ethereum' }: FundNFTCardProps) {
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="pt-2">
         <a
           href={getNFTExplorerUrl()}
           target="_blank"
