@@ -207,9 +207,6 @@ export function MyFundsTab({ activeTab, setActiveTab, selectedNetwork, setSelect
       // Wait for transaction confirmation
       await tx.wait()
 
-      // Refresh the funds data for the selected network
-      await queryClient.invalidateQueries({ queryKey: ['managerFunds', address, 100] })
-
       // Refresh page
       window.location.reload()
 

@@ -431,9 +431,6 @@ export function Funds({ showCreateButton = true, selectedNetwork = 'ethereum', s
       // Wait for transaction confirmation
       await tx.wait()
 
-      // Refresh the funds data for the selected network
-      await queryClient.invalidateQueries({ queryKey: ['funds', 50] })
-
       // Refresh page
       window.location.reload()
 
