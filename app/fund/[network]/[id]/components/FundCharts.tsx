@@ -239,10 +239,14 @@ export function FundCharts({ fundId, network, fundData, tokensWithPrices, invest
 
   const handleShareToTwitter = () => {
     const currentUrl = window.location.href
-    const tweetText = t('shareToTwitterTemplate')
-      .replace('{fundId}', fundId)
-      .replace('${totalValue}', currentTVL.toLocaleString())
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(currentUrl)}`
+    const formattedTVL = currentTVL >= 1000000
+      ? `$${(currentTVL / 1000000).toFixed(1)}M`
+      : currentTVL >= 1000
+        ? `$${(currentTVL / 1000).toFixed(1)}K`
+        : `$${currentTVL.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+
+    const tweetText = `Check out Fund ${fundId} on Stele Finance! 💰 Total Value: ${formattedTVL} ${currentUrl}`
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
     window.open(twitterUrl, '_blank')
   }
 
