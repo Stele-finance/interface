@@ -67,7 +67,7 @@ export function FundActionTabs({
   // Calculate fee portfolio data for pie chart
   const feePortfolioData = useMemo(() => {
     const fund = fundDataResponse?.fund
-    if (!fund || !fund.feeTokensAmount || fund.feeTokensAmount.length === 0 || isLoadingFeeTokenPrices) {
+    if (!fund || !fund.feeTokensAmount || fund.feeTokensAmount.length === 0) {
       return {
         tokens: [],
         totalValue: 0,
@@ -79,16 +79,16 @@ export function FundActionTabs({
       const amountValue = parseFloat(amount || '0')
       const tokenSymbol = fund.feeSymbols?.[index] || 'UNKNOWN'
       const tokenAddress = fund.feeTokens?.[index]
-      
+
       // Get token price from context
       let tokenPrice = 0
       const priceData = getTokenPrice(tokenAddress) || getTokenPriceBySymbol(tokenSymbol)
       if (priceData) {
         tokenPrice = priceData.priceUSD
       }
-      
+
       const value = amountValue * tokenPrice
-      
+
       return {
         symbol: tokenSymbol,
         amount: amountValue,
@@ -96,7 +96,7 @@ export function FundActionTabs({
         price: tokenPrice,
         percentage: 0 // Will be calculated after total
       }
-    }).filter(token => token.amount > 0 && token.value > 0)
+    }).filter(token => token.amount > 0)
     
     // Calculate total value
     const totalValue = tokens.reduce((sum, token) => sum + token.value, 0)
