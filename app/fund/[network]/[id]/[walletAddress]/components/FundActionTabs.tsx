@@ -9,7 +9,7 @@ import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
 import { useFundUserTokens } from "../../hooks/useFundUserTokens"
 import { useFundData } from "../../hooks/useFundData"
 import { useETHPrice } from "@/app/hooks/useETHPrice"
-import { useTokenPrices } from "@/lib/token-price-context"
+import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { ethers } from "ethers"
 import { ETHEREUM_CHAIN_CONFIG, ARBITRUM_CHAIN_CONFIG, NETWORK_CONTRACTS, getSteleFundContractAddress } from "@/lib/constants"
 import { toast } from "@/components/ui/use-toast"
@@ -52,11 +52,22 @@ export function FundActionTabs({
   
   // Get ETH price for USD value display
   const { ethPrice } = useETHPrice(subgraphNetwork as 'ethereum' | 'arbitrum')
-  
-  
-  // Get prices for fee tokens from the global context
-  const { getTokenPrice, getTokenPriceBySymbol, isLoading: isLoadingFeeTokenPrices } = useTokenPrices()
-  
+
+  // Prepare fee tokens for price fetching
+  const feeTokensForPricing = useMemo(() => {
+    const fund = fundDataResponse?.fund
+    if (!fund || !fund.feeTokens || !fund.feeSymbols) return []
+
+    return fund.feeTokens.map((address: string, index: number) => ({
+      symbol: fund.feeSymbols[index] || 'UNKNOWN',
+      address: address,
+      decimals: '18' // Default to 18, will be corrected by the hook if needed
+    }))
+  }, [fundDataResponse])
+
+  // Get prices for fee tokens using Uniswap batch prices
+  const { data: feeTokenPricesData } = useUserTokenPrices(feeTokensForPricing, subgraphNetwork as 'ethereum' | 'arbitrum')
+
   // Calculate USD value of deposit amount
   const calculateUSDValue = (ethAmount: string): string => {
     if (!ethAmount || !ethPrice || parseFloat(ethAmount) <= 0) return '$0.00'
@@ -74,17 +85,16 @@ export function FundActionTabs({
         colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
       }
     }
-    
+
     const tokens = fund.feeTokensAmount.map((amount: string, index: number) => {
       const amountValue = parseFloat(amount || '0')
       const tokenSymbol = fund.feeSymbols?.[index] || 'UNKNOWN'
       const tokenAddress = fund.feeTokens?.[index]
 
-      // Get token price from context
+      // Get token price from Uniswap batch prices
       let tokenPrice = 0
-      const priceData = getTokenPrice(tokenAddress) || getTokenPriceBySymbol(tokenSymbol)
-      if (priceData) {
-        tokenPrice = priceData.priceUSD
+      if (feeTokenPricesData?.tokens?.[tokenSymbol]) {
+        tokenPrice = feeTokenPricesData.tokens[tokenSymbol].priceUSD
       }
 
       const value = amountValue * tokenPrice
@@ -97,10 +107,10 @@ export function FundActionTabs({
         percentage: 0 // Will be calculated after total
       }
     }).filter(token => token.amount > 0)
-    
+
     // Calculate total value
     const totalValue = tokens.reduce((sum, token) => sum + token.value, 0)
-    
+
     // Calculate percentages
     if (tokens.length === 1) {
       tokens[0].percentage = 100
@@ -115,53 +125,17 @@ export function FundActionTabs({
         }
       })
     }
-    
+
     // Sort by value descending
     tokens.sort((a, b) => b.value - a.value)
-    
+
     return {
       tokens,
       totalValue,
       colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
     }
-  }, [fundDataResponse, getTokenPrice, getTokenPriceBySymbol, isLoadingFeeTokenPrices])
-  
-  // Calculate accumulated fees in USD
-  const calculateAccumulatedFees = (): string => {
-    const fund = fundDataResponse?.fund
-    if (!fund || !fund.feeTokensAmount || fund.feeTokensAmount.length === 0) {
-      return '$0.000'
-    }
-    
-    // If prices are not loaded yet, show loading
-    if (isLoadingFeeTokenPrices) {
-      return 'Loading...'
-    }
-    
-    // Calculate total USD value using real token prices
-    let totalFeesUSD = 0
-    
-    fund.feeTokensAmount.forEach((amount: string, index: number) => {
-      const amountValue = parseFloat(amount || '0')
-      if (amountValue > 0) {
-        const tokenSymbol = fund.feeSymbols?.[index]
-        const tokenAddress = fund.feeTokens?.[index]
-        
-        // Get token price from context
-        let tokenPrice = 0
-        const priceData = getTokenPrice(tokenAddress) || getTokenPriceBySymbol(tokenSymbol)
-        if (priceData) {
-          tokenPrice = priceData.priceUSD
-        }
-        
-        // Calculate USD value (amount is already in token units with decimals)
-        totalFeesUSD += amountValue * tokenPrice
-      }
-    })
-    
-    return `$${totalFeesUSD.toFixed(3)}`
-  }
-  
+  }, [fundDataResponse, feeTokenPricesData])
+
   // Determine which tabs to show based on user role
   const showTabs = isManager || isInvestor
   const isManagerAndInvestor = isManager && isInvestor
