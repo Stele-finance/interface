@@ -411,6 +411,10 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     tokenOutSymbol: tx.tokenOutSymbol,
     amountIn: tx.amountIn,
     amountOut: tx.amountOut,
+    // Preserve withdraw multi-token data
+    tokens: tx.tokens,
+    tokensSymbols: tx.tokensSymbols,
+    tokensAmount: tx.tokensAmount,
   }))
 
 
@@ -1019,7 +1023,42 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                             </span>
                                           </div>
                                         </div>
-                                      ) : (transaction.type === 'Withdraw' || transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee' || transaction.type.toLowerCase() === 'withdrawfee') && transaction.symbol ? (
+                                      ) : transaction.type === 'Withdraw' && transaction.tokens && transaction.tokens.length > 0 ? (
+                                        <div className="flex items-center gap-1 justify-end flex-wrap">
+                                          {transaction.tokens.map((tokenAddress: string, idx: number) => {
+                                            const tokenSymbol = transaction.tokensSymbols?.[idx] || 'UNKNOWN'
+                                            const tokenAmount = transaction.tokensAmount?.[idx] || '0'
+                                            const tokenLogo = getTokenLogo(tokenAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+                                            const totalTokens = transaction.tokens?.length || 0
+
+                                            return (
+                                              <div key={idx} className="flex items-center gap-1">
+                                                <span className="text-xs md:text-sm font-medium text-gray-100">
+                                                  {tokenAmount}
+                                                </span>
+                                                <div className="relative flex-shrink-0">
+                                                  {tokenLogo ? (
+                                                    <Image
+                                                      src={tokenLogo}
+                                                      alt={tokenSymbol}
+                                                      width={16}
+                                                      height={16}
+                                                      className="rounded-full"
+                                                    />
+                                                  ) : (
+                                                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                      {tokenSymbol.slice(0, 1)}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                {idx < totalTokens - 1 && (
+                                                  <span className="text-gray-500 mx-0.5">+</span>
+                                                )}
+                                              </div>
+                                            )
+                                          })}
+                                        </div>
+                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee' || transaction.type.toLowerCase() === 'withdrawfee') && transaction.symbol ? (
                                         <div className="flex items-center gap-2 justify-end">
                                           <span className="text-sm md:text-base font-medium text-gray-100 truncate">
                                             {transaction.value}
@@ -1030,8 +1069,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                               const tokenAddress = transaction.token || tokenSymbol
                                               const tokenLogo = getTokenLogo(tokenAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
                                               return tokenLogo ? (
-                                                <Image 
-                                                  src={tokenLogo} 
+                                                <Image
+                                                  src={tokenLogo}
                                                   alt={tokenSymbol || 'Token'}
                                                   width={20}
                                                   height={20}
@@ -1045,8 +1084,8 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                             })()}
                                             {subgraphNetwork === 'arbitrum' && (
                                               <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                                                <Image 
-                                                  src="/networks/small/arbitrum.png" 
+                                                <Image
+                                                  src="/networks/small/arbitrum.png"
                                                   alt="Arbitrum One"
                                                   width={10}
                                                   height={10}

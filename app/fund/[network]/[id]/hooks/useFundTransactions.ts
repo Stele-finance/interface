@@ -137,7 +137,10 @@ export interface FundTransactionData {
   tokenOutSymbol?: string
   amountIn?: string
   amountOut?: string
-  // Additional data for withdraws
+  // Additional data for withdraws (multiple tokens)
+  tokens?: string[]
+  tokensSymbols?: string[]
+  tokensAmount?: string[]
   feeAmount?: string
 }
 
@@ -311,28 +314,34 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
           })
         }
 
-        // Process withdraws - now with individual token data
+        // Process withdraws - now with multiple tokens in single transaction
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            // If withdraw has tokens data, create a transaction for each token
+            // If withdraw has tokens data, store all tokens in arrays
             if (withdraw.tokens && withdraw.tokens.length > 0) {
-              withdraw.tokens.forEach((tokenAddress, index) => {
-                const tokenSymbol = withdraw.tokensSymbols[index] || 'UNKNOWN'
-                const tokenAmount = withdraw.tokensAmount[index] || '0'
-                const formattedAmount = parseFloat(tokenAmount).toFixed(6).replace(/\.?0+$/, '')
+              const tokens = withdraw.tokens
+              const tokensSymbols = withdraw.tokensSymbols
+              const tokensAmount = withdraw.tokensAmount.map((amount: string, index: number) => {
+                const symbol = tokensSymbols[index]?.toUpperCase() || ''
+                const numAmount = parseFloat(amount)
+                // WBTC and ETH: 6 decimals, others: 2 decimals
+                const decimals = (symbol === 'WBTC' || symbol === 'ETH' || symbol === 'WETH') ? 6 : 2
+                return numAmount.toFixed(decimals).replace(/\.?0+$/, '')
+              })
 
-                allTransactions.push({
-                  type: 'withdraw',
-                  id: `${withdraw.id}-${index}`,
-                  fundId: withdraw.fundId,
-                  user: withdraw.investor,
-                  amount: `${formattedAmount} ${tokenSymbol}`,
-                  details: `Withdrew ${tokenSymbol}`,
-                  timestamp: parseInt(withdraw.blockTimestamp),
-                  transactionHash: withdraw.transactionHash,
-                  token: tokenAddress,
-                  symbol: tokenSymbol,
-                })
+              allTransactions.push({
+                type: 'withdraw',
+                id: withdraw.id,
+                fundId: withdraw.fundId,
+                user: withdraw.investor,
+                amount: '', // Not used for multi-token display
+                details: `Withdrew ${tokensSymbols.length} tokens`,
+                timestamp: parseInt(withdraw.blockTimestamp),
+                transactionHash: withdraw.transactionHash,
+                // Store multiple tokens data
+                tokens: tokens,
+                tokensSymbols: tokensSymbols,
+                tokensAmount: tokensAmount,
               })
             } else {
               // Fallback for old withdraws without token data
