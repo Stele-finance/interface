@@ -65,7 +65,7 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       transactionHash
     }
     withdraws(
-      where: { 
+      where: {
         fundId: $fundId,
         investor: $userAddress
       }
@@ -78,6 +78,10 @@ const GET_FUND_TRANSACTIONS_QUERY = `
       investor
       percentage
       amountUSD
+      tokens
+      tokensSymbols
+      tokensDecimals
+      tokensAmount
       blockTimestamp
       transactionHash
     }
@@ -177,6 +181,10 @@ interface GraphQLResponse {
     investor: string
     percentage: string
     amountUSD: string
+    tokens: string[]
+    tokensSymbols: string[]
+    tokensDecimals: string[]
+    tokensAmount: string[]
     blockTimestamp: string
     transactionHash: string
   }>
@@ -303,22 +311,46 @@ export function useFundTransactions(fundId: string, walletAddress: string, netwo
           })
         }
 
-        // Process withdraws
+        // Process withdraws - now with individual token data
         if (data.withdraws && Array.isArray(data.withdraws)) {
           data.withdraws.forEach((withdraw) => {
-            const percentage = parseFloat(withdraw.percentage)
-            const amountUSD = parseFloat(withdraw.amountUSD)
-            
-            allTransactions.push({
-              type: 'withdraw',
-              id: withdraw.id,
-              fundId: withdraw.fundId,
-              user: withdraw.investor,
-              amount: `$${amountUSD.toFixed(2)}`,
-              details: `Withdrew ${percentage.toFixed(2)}% ($${amountUSD.toFixed(2)} USD)`,
-              timestamp: parseInt(withdraw.blockTimestamp),
-              transactionHash: withdraw.transactionHash,
-            })
+            // If withdraw has tokens data, create a transaction for each token
+            if (withdraw.tokens && withdraw.tokens.length > 0) {
+              withdraw.tokens.forEach((tokenAddress, index) => {
+                const tokenSymbol = withdraw.tokensSymbols[index] || 'UNKNOWN'
+                const tokenAmount = withdraw.tokensAmount[index] || '0'
+                const formattedAmount = parseFloat(tokenAmount).toFixed(6).replace(/\.?0+$/, '')
+
+                allTransactions.push({
+                  type: 'withdraw',
+                  id: `${withdraw.id}-${index}`,
+                  fundId: withdraw.fundId,
+                  user: withdraw.investor,
+                  amount: `${formattedAmount} ${tokenSymbol}`,
+                  details: `Withdrew ${tokenSymbol}`,
+                  timestamp: parseInt(withdraw.blockTimestamp),
+                  transactionHash: withdraw.transactionHash,
+                  token: tokenAddress,
+                  symbol: tokenSymbol,
+                })
+              })
+            } else {
+              // Fallback for old withdraws without token data
+              const percentage = parseFloat(withdraw.percentage)
+              const amountUSD = parseFloat(withdraw.amountUSD)
+
+              allTransactions.push({
+                type: 'withdraw',
+                id: withdraw.id,
+                fundId: withdraw.fundId,
+                user: withdraw.investor,
+                amount: `${percentage.toFixed(0)}%`,
+                details: `Withdrew ${percentage.toFixed(2)}% ($${amountUSD.toFixed(2)} USD)`,
+                timestamp: parseInt(withdraw.blockTimestamp),
+                transactionHash: withdraw.transactionHash,
+                symbol: '%',
+              })
+            }
           })
         }
 

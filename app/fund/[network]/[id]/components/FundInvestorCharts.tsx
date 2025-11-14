@@ -86,17 +86,21 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
       const date = new Date(parseInt(snapshot.timestamp) * 1000)
       const amountUSD = parseFloat(snapshot.amountUSD)
       const profitUSD = parseFloat(snapshot.profitUSD)
-      
+      const principal = parseFloat(snapshot.principal)
+      const profitRatio = parseFloat(snapshot.profitRatio)
+
       return {
         id: snapshot.id,
         amountUSD,
         profitUSD,
-        formattedDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
+        principal,
+        profitRatio,
+        formattedDate: formatDateWithLocale(date, language, {
+          month: 'short',
           day: 'numeric'
         }),
-        fullDate: formatDateWithLocale(date, language, { 
-          month: 'short', 
+        fullDate: formatDateWithLocale(date, language, {
+          month: 'short',
           day: 'numeric',
           year: 'numeric',
           hour: 'numeric',
@@ -106,7 +110,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
         timeLabel: (() => {
           const month = date.getMonth() + 1
           const day = date.getDate()
-          
+
           if (intervalType === 'monthly') {
             return `${month}/${String(date.getFullYear()).slice(2)}`
           } else {
@@ -122,11 +126,18 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
       const now = new Date()
       const month = now.getMonth() + 1
       const day = now.getDate()
-      
+
+      // Calculate real-time profit ratio
+      const latestSnapshot = snapshots[snapshots.length - 1]
+      const principal = latestSnapshot.principal
+      const profitRatio = principal > 0 ? ((realTimePortfolioValue - principal) / principal) * 100 : 0
+
       const liveDataPoint = {
         id: 'live',
         amountUSD: realTimePortfolioValue,
-        profitUSD: 0, // We'll calculate this based on the first investment
+        profitUSD: realTimePortfolioValue - principal, // Calculate profit
+        principal: principal,
+        profitRatio: profitRatio,
         formattedDate: t('estimate'),
         fullDate: 'Real-time data',
         timeLabel: intervalType === 'monthly'
@@ -135,7 +146,7 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
         timestamp: Math.floor(now.getTime() / 1000),
         isLive: true
       }
-      
+
       return [...snapshots, liveDataPoint]
     }
 
@@ -190,13 +201,28 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
-      const value = payload[0]?.value
-      
+      const dataPoint = payload[0]?.payload
+      const value = dataPoint?.amountUSD
+      const principal = dataPoint?.principal
+      const profitRatio = dataPoint?.profitRatio
+
       return (
-        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
-          <p className="text-gray-100 text-sm font-medium">
+        <div className="bg-gray-800/95 border border-gray-600 rounded-lg px-3 py-2.5 shadow-xl backdrop-blur-sm">
+          <p className="text-gray-100 text-sm font-medium mb-1">
             Value: ${value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
+          {principal !== undefined && (
+            <p className="text-gray-300 text-xs mb-1">
+              Principal: ${principal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          )}
+          {profitRatio !== undefined && !isNaN(profitRatio) && (
+            <div className="flex items-center gap-1">
+              <p className={`text-xs font-medium ${profitRatio >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {profitRatio >= 0 ? '▲' : '▼'} Profit: {profitRatio.toFixed(2)}%
+              </p>
+            </div>
+          )}
         </div>
       )
     }

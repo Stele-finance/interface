@@ -1019,11 +1019,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                             </span>
                                           </div>
                                         </div>
-                                      ) : transaction.type === 'Withdraw' ? (
-                                        <div className="font-medium text-gray-100">
-                                          {transaction.value.startsWith('$') ? transaction.value : `$${transaction.value}`}
-                                        </div>
-                                      ) : (transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee' || transaction.type.toLowerCase() === 'withdrawfee') && transaction.symbol ? (
+                                      ) : (transaction.type === 'Withdraw' || transaction.type === 'Deposit' || transaction.type === 'Depositfee' || transaction.type === 'Withdrawfee' || transaction.type.toLowerCase() === 'withdrawfee') && transaction.symbol ? (
                                         <div className="flex items-center gap-2 justify-end">
                                           <span className="text-sm md:text-base font-medium text-gray-100 truncate">
                                             {transaction.value}
