@@ -723,23 +723,57 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                                   </div>
                                                 </div>
                                               </div>
+                                            ) : transaction.type === 'withdraw' && transaction.tokens && transaction.tokens.length > 0 ? (
+                                              <div className="flex items-center gap-1 justify-end flex-wrap">
+                                                {transaction.tokens.map((tokenAddress: string, idx: number) => {
+                                                  const tokenSymbol = transaction.tokensSymbols?.[idx] || 'UNKNOWN'
+                                                  const tokenAmount = transaction.tokensAmount?.[idx] || '0'
+                                                  const tokenLogo = getTokenLogo(tokenAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+
+                                                  return (
+                                                    <div key={idx} className="flex items-center gap-1">
+                                                      <span className="text-xs md:text-sm font-medium text-gray-100">
+                                                        {tokenAmount}
+                                                      </span>
+                                                      <div className="relative flex-shrink-0">
+                                                        {tokenLogo ? (
+                                                          <Image
+                                                            src={tokenLogo}
+                                                            alt={tokenSymbol}
+                                                            width={16}
+                                                            height={16}
+                                                            className="rounded-full"
+                                                          />
+                                                        ) : (
+                                                          <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                            {tokenSymbol.slice(0, 1)}
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      {idx < transaction.tokens.length - 1 && (
+                                                        <span className="text-gray-500 mx-0.5">+</span>
+                                                      )}
+                                                    </div>
+                                                  )
+                                                })}
+                                              </div>
                                             ) : (
                                               <div className="flex items-center gap-2 justify-end">
                                                 {(() => {
                                                   // Extract amount and token symbol from transaction data
                                                   let displayAmount = transaction.amount || '';
                                                   let tokenSymbol = transaction.symbol || '';
-                                                  
+
                                                   // If amount includes token symbol, split them
                                                   if (displayAmount && displayAmount.includes(' ')) {
                                                     const parts = displayAmount.split(' ');
                                                     displayAmount = parts[0];
                                                     tokenSymbol = tokenSymbol || parts[1];
                                                   }
-                                                  
+
                                                   // For deposit/withdraw, use the token field if available
                                                   const tokenAddress = transaction.token || tokenSymbol;
-                                                  
+
                                                   return (
                                                     <>
                                                       <span className="text-sm md:text-base font-medium text-gray-100 truncate">
@@ -750,8 +784,8 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                                           {(() => {
                                                             const tokenLogo = getTokenLogo(tokenAddress || tokenSymbol, subgraphNetwork as 'ethereum' | 'arbitrum')
                                                             return tokenLogo ? (
-                                                              <Image 
-                                                                src={tokenLogo} 
+                                                              <Image
+                                                                src={tokenLogo}
                                                                 alt={tokenSymbol}
                                                                 width={20}
                                                                 height={20}
@@ -765,8 +799,8 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                                                           })()}
                                                           {subgraphNetwork === 'arbitrum' && (
                                                             <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-gray-900 border border-gray-600 flex items-center justify-center">
-                                                              <Image 
-                                                                src="/networks/small/arbitrum.png" 
+                                                              <Image
+                                                                src="/networks/small/arbitrum.png"
                                                                 alt="Arbitrum One"
                                                                 width={10}
                                                                 height={10}
