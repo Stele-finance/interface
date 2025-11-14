@@ -87,7 +87,9 @@ export function FundInvestorCharts({ fundId, investor, network, isLoadingInvesto
       const amountUSD = parseFloat(snapshot.amountUSD)
       const profitUSD = parseFloat(snapshot.profitUSD)
       const principal = parseFloat(snapshot.principal)
-      const profitRatio = parseFloat(snapshot.profitRatio)
+      // Convert profitRatio to percentage if it's in decimal format (0.5 -> 50)
+      const profitRatioRaw = parseFloat(snapshot.profitRatio)
+      const profitRatio = profitRatioRaw < 10 && profitRatioRaw > -10 ? profitRatioRaw * 100 : profitRatioRaw
 
       return {
         id: snapshot.id,
