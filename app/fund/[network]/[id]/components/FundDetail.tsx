@@ -411,6 +411,10 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
     tokenOutSymbol: tx.tokenOutSymbol,
     amountIn: tx.amountIn,
     amountOut: tx.amountOut,
+    // Preserve withdraw multi-token data
+    tokens: tx.tokens,
+    tokensSymbols: tx.tokensSymbols,
+    tokensAmount: tx.tokensAmount,
   }))
 
 
