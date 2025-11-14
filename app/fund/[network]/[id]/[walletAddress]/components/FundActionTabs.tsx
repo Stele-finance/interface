@@ -8,6 +8,7 @@ import { useWallet } from "@/app/hooks/useWallet"
 import { useFundInvestableTokens } from "../../hooks/useFundInvestableTokens"
 import { useFundUserTokens } from "../../hooks/useFundUserTokens"
 import { useFundData } from "../../hooks/useFundData"
+import { useFundInvestorData } from "../../hooks/useFundInvestorData"
 import { useETHPrice } from "@/app/hooks/useETHPrice"
 import { useUserTokenPrices } from "@/app/hooks/useUniswapBatchPrices"
 import { ethers } from "ethers"
@@ -49,6 +50,9 @@ export function FundActionTabs({
   const { data: investableTokens = [], isLoading: isLoadingInvestableTokens } = useFundInvestableTokens(subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundUserTokens = [], isLoading: isLoadingUserTokens } = useFundUserTokens(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
   const { data: fundDataResponse, isLoading: isLoadingFundData } = useFundData(fundId, subgraphNetwork as 'ethereum' | 'arbitrum')
+
+  // Import useFundInvestorData to check if user has actual portfolio
+  const { data: fundInvestorData } = useFundInvestorData(fundId, connectedAddress || '', subgraphNetwork as 'ethereum' | 'arbitrum')
   
   // Get ETH price for USD value display
   const { ethPrice } = useETHPrice(subgraphNetwork as 'ethereum' | 'arbitrum')
@@ -749,7 +753,7 @@ export function FundActionTabs({
         {/* Withdraw Tab Content */}
         <TabsContent value="withdraw" className="space-y-4">
           <div>
-            {fundUserTokens.length === 0 ? (
+            {!fundInvestorData?.investor || parseFloat(fundInvestorData.investor.amountUSD || '0') === 0 ? (
               <div className="bg-muted/30 border border-gray-700/50 rounded-2xl p-8">
                 <div className="text-center space-y-4">
                   <div className="mx-auto w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
