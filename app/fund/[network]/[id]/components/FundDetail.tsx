@@ -1025,6 +1025,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                             const tokenSymbol = transaction.tokensSymbols?.[idx] || 'UNKNOWN'
                                             const tokenAmount = transaction.tokensAmount?.[idx] || '0'
                                             const tokenLogo = getTokenLogo(tokenAddress, subgraphNetwork as 'ethereum' | 'arbitrum')
+                                            const totalTokens = transaction.tokens?.length || 0
 
                                             return (
                                               <div key={idx} className="flex items-center gap-1">
@@ -1046,7 +1047,7 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
                                                     </div>
                                                   )}
                                                 </div>
-                                                {idx < transaction.tokens.length - 1 && (
+                                                {idx < totalTokens - 1 && (
                                                   <span className="text-gray-500 mx-0.5">+</span>
                                                 )}
                                               </div>
