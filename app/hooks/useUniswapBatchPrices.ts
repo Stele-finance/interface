@@ -460,6 +460,39 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       // Return cached data immediately if available, but only if we don't have any data yet
       if (!priceDataRef.current || Object.keys(priceDataRef.current.tokens).length === 0) {
         const cachedTokens: Record<string, TokenPrice> = {}
+
+        // Always add USDC with fixed price first
+        const usdcAddress = getUSDCTokenAddress(network)
+        cachedTokens['USDC'] = {
+          symbol: 'USDC',
+          address: usdcAddress,
+          priceUSD: 1.0,
+          decimals: 6,
+          lastUpdated: new Date()
+        }
+
+        // Add ETH/WETH from cache if available
+        const wethAddress = getWETHAddress(network)
+        const ethCacheKey = `ETH-${network}`
+        const cachedEth = priceCache.get(ethCacheKey)
+        if (cachedEth && cachedEth.price !== null) {
+          cachedTokens['ETH'] = {
+            symbol: 'ETH',
+            address: wethAddress,
+            priceUSD: cachedEth.price,
+            decimals: 18,
+            lastUpdated: new Date(cachedEth.timestamp)
+          }
+          cachedTokens['WETH'] = {
+            symbol: 'WETH',
+            address: wethAddress,
+            priceUSD: cachedEth.price,
+            decimals: 18,
+            lastUpdated: new Date(cachedEth.timestamp)
+          }
+        }
+
+        // Add other tokens from cache
         tokens.forEach(token => {
           const cacheKey = `${token.symbol}-${network}`
           const cached = priceCache.get(cacheKey)
