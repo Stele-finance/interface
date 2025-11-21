@@ -167,7 +167,7 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
   const isInvestor = !!investor
   
   // Get investable token prices for portfolio calculation
-  const { data: tokensWithPrices } = useFundInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
+  const { data: tokensWithPrices, isLoading: isLoadingTokenPrices } = useFundInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
 
   // Calculate portfolio data from fund tokens using investor's share ratio
   const portfolioData = useMemo(() => {
@@ -484,13 +484,18 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                 <TabsContent value="portfolio" className="space-y-0">
                   <div className="bg-transparent border-0 rounded-2xl overflow-hidden">
                     <div className="p-6">
-                    {portfolioData.tokens.length > 0 ? (
+                    {isLoadingTokenPrices ? (
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                        <span className="ml-3 text-gray-400">Loading portfolio prices...</span>
+                      </div>
+                    ) : portfolioData.tokens.length > 0 ? (
                       <>
                         {/* Pie Chart */}
                         <div className="flex items-center justify-center mb-6">
                           <div className="relative w-40 h-40">
                             {/* Dynamic CSS pie chart using conic-gradient */}
-                            <div 
+                            <div
                               className="w-full h-full rounded-full"
                               style={{
                                 background: `conic-gradient(
@@ -530,19 +535,19 @@ export default function FundInvestorPage({ params }: FundInvestorPageProps) {
                           {portfolioData.tokens.map((token, index) => (
                             <div key={token.symbol} className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <div 
+                                <div
                                   className="w-3 h-3 rounded-full"
-                                  style={{ 
-                                    backgroundColor: portfolioData.colors[index % portfolioData.colors.length] 
+                                  style={{
+                                    backgroundColor: portfolioData.colors[index % portfolioData.colors.length]
                                   }}
                                 ></div>
                                 <span className="text-sm text-gray-300">{token.symbol}</span>
                                 <span className="text-xs text-gray-500">
-                                  ({token.amount < 0.0001 && token.amount > 0 
-                                    ? '<0.0001' 
-                                    : token.amount.toLocaleString(undefined, { 
+                                  ({token.amount < 0.0001 && token.amount > 0
+                                    ? '<0.0001'
+                                    : token.amount.toLocaleString(undefined, {
                                         minimumFractionDigits: 0,
-                                        maximumFractionDigits: token.amount < 1 ? 6 : 4 
+                                        maximumFractionDigits: token.amount < 1 ? 6 : 4
                                       })})
                                 </span>
                               </div>
