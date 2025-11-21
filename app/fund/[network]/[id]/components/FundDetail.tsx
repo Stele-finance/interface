@@ -312,11 +312,10 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
   }, [connectedAddress, fund?.manager]);
 
   // Get fund investable token prices for portfolio calculation
-  const { 
-    data: tokensWithPrices, 
-    getFundTokenPriceBySymbol, 
+  const {
+    data: tokensWithPrices,
     getFundTokenInfoBySymbol,
-    isLoading: isLoadingTokenPrices 
+    isLoading: isLoadingTokenPrices
   } = useFundInvestableTokenPrices(subgraphNetwork as 'ethereum' | 'arbitrum')
 
   // Calculate portfolio data from fund tokens
@@ -779,7 +778,12 @@ export function FundDetail({ fundId, network }: FundDetailProps) {
             <TabsContent value="portfolio" className="space-y-0">
               <Card className="bg-transparent border-0 rounded-2xl overflow-hidden">
                 <div className="p-6">
-                  {portfolioData.tokens.length > 0 ? (
+                  {isLoadingTokenPrices ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                      <span className="ml-3 text-gray-400">Loading portfolio prices...</span>
+                    </div>
+                  ) : portfolioData.tokens.length > 0 ? (
                     <>
                       {/* Pie Chart */}
                       <div className="flex items-center justify-center mb-6">

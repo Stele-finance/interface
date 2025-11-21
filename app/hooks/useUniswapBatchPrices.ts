@@ -490,14 +490,12 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
     }
 
     try {
-      // Only show loading for initial fetch or when no data exists
-      if (!priceDataRef.current) {
-        setIsLoading(true)
-      }
+      // Always show loading when fetching price data to ensure complete data loads
+      setIsLoading(true)
       setError(null)
       globalLastFetchTime = now
       lastFetchTimeRef.current = now
-            
+
       const provider = await getProvider()
       const processedTokens = await fetchBatchPricesWithMulticall(tokens, provider)
 
@@ -511,8 +509,8 @@ export function useUniswapBatchPrices(tokens: TokenInfo[] = [], network: 'ethere
       console.error('Failed to fetch batch prices:', fetchError)
       console.error('Network:', network)
       console.error('Number of tokens:', tokens.length)
-      
-      // Provide fallback USDC price 
+
+      // Provide fallback USDC price
       const usdcAddress = getUSDCTokenAddress(network)
       setPriceData({
         tokens: {
